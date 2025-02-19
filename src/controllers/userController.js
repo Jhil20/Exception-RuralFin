@@ -3,11 +3,11 @@ import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import {ApiResponse} from "../utils/ApiResponse.js"
 import Prisma from "../utils/prisma.js"
-
+import bcrypt from "bcrypt";
 
 
 const createUser = asyncHandler(async (req, res) => {
-    const { full_name,
+    var { full_name,
         phone_number,
         email,
         password_hash,
@@ -53,6 +53,9 @@ const createUser = asyncHandler(async (req, res) => {
                 email: email.toLowerCase()
             }
         });
+        password_hash = await bcrypt.hash(password_hash,10)
+        console.log(password_hash);
+        
         if(user)
         {
             throw new ApiError(400,"User already exits");
