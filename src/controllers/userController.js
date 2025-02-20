@@ -82,4 +82,37 @@ const createUser = asyncHandler(async (req, res) => {
 
 })
 
-export { createUser }
+const loginUser = asyncHandler(async (req,res)=>{
+    const {phone_number,password} = req.body;
+    if(!phone_number){
+        throw new ApiError(400,"Phone number is not entered");
+    }
+    const user = await Prisma.user.findUnique({
+        where:{
+            phone_number
+        }
+    })
+    if(!user){
+        throw new ApiError(404,"User does not exist");
+    }
+
+    const isPasswordValid = await bcrypt.compare(password,user.password_hash)
+    if(!isPasswordValid)
+    {
+        throw new ApiError(401,"Incorrect password");
+    }
+    const userCopy = {...user}
+    delete userCopy.password_hash;
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            {
+                user:userCopy
+            },
+            "User logged in successfully"
+        )
+    )
+})
+
+
+export { createUser, loginUser }
