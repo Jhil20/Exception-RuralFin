@@ -16,7 +16,7 @@ datasource db {
 model User {
   user_id        String   @id @default(uuid()) // UUID as Primary Key
   full_name      String
-  phone_number   String   @unique
+  phone_number   BigInt   @unique
   email          String?  @unique
   password_hash  String
   gender         String?  // Nullable
@@ -24,6 +24,7 @@ model User {
   income        Decimal?  
   budget_limit  Decimal?
   wallet_balance Decimal  @default(0.00)
+  refresh_token  String
   created_at    DateTime @default(now())
 }
 

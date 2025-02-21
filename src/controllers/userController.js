@@ -2,9 +2,20 @@
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import {ApiResponse} from "../utils/ApiResponse.js"
+import { generateAccessToken,generateRefreshToken } from "../utils/tokenMethods.js";
 import Prisma from "../utils/prisma.js"
 import bcrypt from "bcrypt";
 
+
+const generateRefreshAndAccessTokens = async (user)=>{
+    try {
+        const accessToken = generateAccessToken(user);
+        const refreshToken = generateRefreshToken(user);
+        user.refresh_token = refreshToken
+    } catch (error) {
+        throw new ApiError(500,"something went wrong in creating refresh and access token");
+    }
+}
 
 const createUser = asyncHandler(async (req, res) => {
     var { full_name,
