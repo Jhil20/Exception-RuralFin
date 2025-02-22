@@ -1,12 +1,13 @@
 import jwt from "jsonwebtoken";
 import Prisma from "./prisma.js"
+import { UsageRecordInstance } from "twilio/lib/rest/supersim/v1/usageRecord.js";
 
 const generateAccessToken = function (user) {
     return jwt.sign(
         {
             user_id:user.user_id,
             email:user.email,
-            password_hash:user.phone_number,
+            phone_number:user.phone_number.toString(),
             fullname:user.full_name
         },
         process.env.ACCESS_TOKEN_SECRET,

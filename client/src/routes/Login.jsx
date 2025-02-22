@@ -1,60 +1,58 @@
 import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
 import axios from "axios";
-// Validation Schema
-const loginValidationSchema = Yup.object().shape({
-  email: Yup.string()
-    .email("Invalid email format")
-    .required("Email is required"),
-  password: Yup.string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
-});
-
-// Validation Schema
-const signupValidationSchema = Yup.object().shape({
-  full_name: Yup.string().required("Full Name is required"),
-  phone_number: Yup.string()
-    .matches(/^\d{10}$/, "Phone number must be 10 digits")
-    .required("Phone Number is required"),
-  email: Yup.string()
-    .email("Invalid email format")
-    .required("Email is required"),
-  gender: Yup.string()
-    .oneOf(["Male", "Female", "Other"], "Select a valid gender")
-    .required("Gender is required"),
-  age: Yup.number()
-    .min(18, "Must be at least 18")
-    .max(100, "Must be under 100")
-    .required("Age is required"),
-  income: Yup.number()
-    .min(0, "Income cannot be negative")
-    .required("Income is required"),
-  budget_limit: Yup.number()
-    .min(0, "Budget cannot be negative")
-    .required("Budget Limit is required"),
-  password: Yup.string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
-});
-
-const handleSignupSubmit = async (values) => {
-//   console.log("values", values);
-  try {
-    console.log("hhhhhhh")
-    const response = await axios.post(
-      "http://localhost:5000/users/register",
-      values
-    );
-    console.log("response",response);
-  } catch (error) {
-    console.log("error", error);
-  }
-};
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import {
+  loginValidationSchema,
+  signupValidationSchema,
+} from "../yupValidators/validationSchema";
+import { userLoggedin } from "../redux/slices/signInSlice";
 
 const Login = () => {
   const [showLogin, setShowLogin] = useState(true);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [error, setError] = useState(null);
+  const loginValidation = loginValidationSchema;
+  const signupValidation = signupValidationSchema;
+
+  const handleLogin = async (values) => {
+    console.log("values", values);
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/users/login",
+        values
+      );
+      console.log("response", response);
+      const token = response?.data?.data?.user?.refresh_token;
+      Cookies.set("jwt-token", token);
+      dispatch(userLoggedin());
+      navigate("/");
+    } catch (error) {
+      setError(error?.response?.data?.message || "Something Went Wrong");
+      console.log("error", error);
+    }
+  };
+
+  const handleSignupSubmit = async (values) => {
+    try {
+      // console.log("hhhhhhh")
+      const response = await axios.post(
+        "http://localhost:5000/users/register",
+        values
+      );
+      const token = response?.data?.data?.user?.refresh_token;
+      Cookies.set("jwt-token", token);
+      dispatch(userLoggedin());
+      navigate("/");
+      console.log("response", response);
+    } catch (error) {
+      setError(error?.response?.data?.message || "Something Went Wrong");
+      console.log("error", error);
+    }
+  };
 
   if (showLogin) {
     return (
@@ -63,41 +61,21 @@ const Login = () => {
           <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
 
           <Formik
-            initialValues={{ email: "", password: "" }}
-            validationSchema={loginValidationSchema}
-            onSubmit={(values) => {
-              console.log("Login Data:", values);
-              // Handle login logic here
-            }}
+            initialValues={{ phone_number: "" }}
+            validationSchema={loginValidation}
+            onSubmit={handleLogin}
           >
             {({ isSubmitting }) => (
               <Form className="space-y-4">
-                {/* Email Field */}
+                {/* Phone_number */}
                 <div>
-                  <label className="block text-gray-700">Email</label>
+                  <label className="block text-gray-700">Phone Number</label>
                   <Field
-                    type="email"
-                    name="email"
+                    name="phone_number"
                     className="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200"
                   />
                   <ErrorMessage
-                    name="email"
-                    component="p"
-                    className="text-red-500 text-sm"
-                  />
-                </div>
-
-                {/* Password Field */}
-                <div>
-                  <label className="block text-gray-700">Password</label>
-                  <Field
-                    type="password"
-                    name="password"
-                    autoComplete="password"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200"
-                  />
-                  <ErrorMessage
-                    name="password"
+                    name="phone_number"
                     component="p"
                     className="text-red-500 text-sm"
                   />
@@ -111,7 +89,11 @@ const Login = () => {
                     Don't have an account? Signup!!
                   </h1>
                 </div>
-
+                {error && (
+                  <h1 className="text-md text-red-500 font-bold">
+                    {error || "Something Went Wrong. Please Try Again"}
+                  </h1>
+                )}
                 {/* Submit Button */}
                 <button
                   type="submit"
@@ -144,7 +126,7 @@ const Login = () => {
             budget_limit: "",
             password: "",
           }}
-          validationSchema={signupValidationSchema}
+          validationSchema={signupValidation}
           onSubmit={handleSignupSubmit}
         >
           {({ isSubmitting }) => (
@@ -272,6 +254,20 @@ const Login = () => {
                   className="text-red-500 text-sm"
                 />
               </div>
+              <div className="w-full h-fit">
+                <h1
+                  className="cursor-pointer"
+                  onClick={() => setShowLogin(true)}
+                >
+                  Already have an account? Signin!!
+                </h1>
+              </div>
+
+              {error && (
+                <h1 className="text-md text-red-500 font-bold">
+                  {error || "Something Went Wrong. Please Try Again"}
+                </h1>
+              )}
 
               {/* Submit Button */}
               <button

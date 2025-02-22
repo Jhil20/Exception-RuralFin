@@ -7,9 +7,9 @@ dotenv.config({
 
 // createUserTable()
 
-app.listen(4000 || process.env.PORT,() =>{
+app.listen(5000 || process.env.PORT,() =>{
     try {
-        console.log(`App running on Port ${process.env.PORT || 4000}`);
+        console.log(`App running on Port ${process.env.PORT}`);
     } catch (error) {
         console.log(`error in running`,error);
         
