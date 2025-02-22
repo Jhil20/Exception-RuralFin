@@ -12,17 +12,19 @@ const generateRefreshAndAccessTokens = async (existedUser) => {
         console.log(existedUser)
         const accessToken = generateAccessToken(existedUser);
         const refreshToken = generateRefreshToken(existedUser);
-        console.log("access",accessToken);
-        console.log("refresh",refreshToken);
+        console.log("access", accessToken);
+        console.log("refresh", refreshToken);
         existedUser.refresh_token = refreshToken;
-        Prisma.user.update({
+        console.log("existedUSer",existedUser.refresh_token)
+        await Prisma.user.update({
             where: {
                 user_id: existedUser.user_id
             },
             data: {
-                refresh_token: existedUser.refreshToken
+                refresh_token: existedUser.refresh_token
             }
         })
+        console.log("refresh", refreshToken);
         return { refreshToken, accessToken };
     } catch (error) {
         throw new ApiError(500, "something went wrong in creating refresh and access token");
@@ -66,7 +68,7 @@ const createUser = asyncHandler(async (req, res) => {
 
         const user = await Prisma.user.findUnique({
             where: {
-                phone_number: phone_number.trim()
+                phone_number: phone_number
             }
         });
 
@@ -78,7 +80,6 @@ const createUser = asyncHandler(async (req, res) => {
                 full_name,
                 phone_number,
                 email,
-                password_hash,
                 age,
                 income,
                 budget_limit
@@ -108,16 +109,21 @@ const loginUser = asyncHandler(async (req, res) => {
     if (!existedUser) {
         throw new ApiError(404, "User does not exist");
     }
-    console.log(user);
-    const { refreshToken, accessToken } = generateRefreshAndAccessTokens(existedUser);
+    console.log(existedUser);
+    const { refreshToken, accessToken } = await generateRefreshAndAccessTokens(existedUser);
     const userCopy = { ...existedUser }
-    delete userCopy.password_hash;
-    const options={
-        httpOnly:true,
-        secure:true
-       }
-    return res.status(200).cookie("accessToken", accessToken, options)
-        .cookie("refreshtoken", refreshToken, options).json(
+    console.log(refreshToken)
+    userCopy.phone_number = userCopy.phone_number.toString()
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshtoken", refreshToken, options)
+        .json(
             new ApiResponse(
                 200,
                 {
