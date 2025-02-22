@@ -73,7 +73,7 @@ const createUser = asyncHandler(async (req, res) => {
         });
 
         if (user) {
-            throw new ApiError(400, "User phone number already already exists");
+            throw new ApiError(400, "User phone number already exists");
         }
         await Prisma.user.create({
             data: {
@@ -97,7 +97,7 @@ const createUser = asyncHandler(async (req, res) => {
 })
 
 const loginUser = asyncHandler(async (req, res) => {
-    const { phone_number, password } = req.body;
+    const { phone_number } = req.body;
     if (!phone_number) {
         throw new ApiError(400, "Phone number is not entered");
     }
