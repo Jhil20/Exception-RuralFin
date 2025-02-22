@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id        String   @id @default(uuid()) // UUID as Primary Key
+  full_name      String
+  phone_number   BigInt   @unique
+  email          String?  @unique
+  gender         String?  // Nullable
+  age            Int?      
+  income        Decimal?  
+  budget_limit  Decimal?
+  wallet_balance Decimal  @default(0.00)
+  refresh_token  String?
+  created_at    DateTime @default(now())
+
+  agents agentTransaction[]
+}
+
+model Agent {
+  agent_id         String       @id @default(uuid())
+  agent_name            String    @db.VarChar(255)
+  agent_phone           String    @unique @db.VarChar(15)
+  email           String?  @unique
+  location        String    @db.VarChar(255)
+  securityDeposit Decimal   @default(0.00)
+  balance         Decimal   @default(0.00)
+  rating          Float?    @default(0.0)
+  status          EnumStatus @default(ACTIVE)
+  createdAt       DateTime  @default(now())
+  refresh_token  String?
+
+  users  agentTransaction[]
+}
+
+model agentTransaction {
+  user_id    String
+  agent_id   String
+  AssignedAt DateTime @default(now())
+
+  user  User  @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  agent Agent @relation(fields: [agent_id], references: [agent_id], onDelete: Cascade)
+
+  @@id([user_id, agent_id]) // Composite Primary Key
+}
+
+// Enum for Agent Status
+enum EnumStatus {
+  ACTIVE
+  INACTIVE
+}
