@@ -73,7 +73,8 @@ const createUser = asyncHandler(async (req, res) => {
         if (user) {
             throw new ApiError(400, "User phone number already already exists");
         }
-        await Prisma.user.create({
+        console.log("hjsjabcsabjbcas")
+        const newUser=await Prisma.user.create({
             data: {
                 full_name,
                 phone_number,
@@ -84,6 +85,7 @@ const createUser = asyncHandler(async (req, res) => {
                 budget_limit
             }
         })
+        console.log("user",newUser);
         res.status(200).json(
             new ApiResponse(200, "user registered successfully")
         )

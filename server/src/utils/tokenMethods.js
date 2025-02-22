@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import Prisma from "../utils/prisma.js"
+import Prisma from "./prisma.js"
 
 const generateAccessToken = function (user) {
     return jwt.sign(
