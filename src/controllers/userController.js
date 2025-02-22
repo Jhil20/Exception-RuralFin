@@ -1,19 +1,31 @@
 
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import {ApiResponse} from "../utils/ApiResponse.js"
-import { generateAccessToken,generateRefreshToken } from "../utils/tokenMethods.js";
+import { ApiResponse } from "../utils/ApiResponse.js"
+import { generateAccessToken, generateRefreshToken } from "../utils/tokenMethods.js";
 import Prisma from "../utils/prisma.js"
 import bcrypt from "bcrypt";
 
 
-const generateRefreshAndAccessTokens = async (user)=>{
+const generateRefreshAndAccessTokens = async (existedUser) => {
     try {
-        const accessToken = generateAccessToken(user);
-        const refreshToken = generateRefreshToken(user);
-        user.refresh_token = refreshToken
+        console.log(existedUser)
+        const accessToken = generateAccessToken(existedUser);
+        const refreshToken = generateRefreshToken(existedUser);
+        console.log("access",accessToken);
+        console.log("refresh",refreshToken);
+        existedUser.refresh_token = refreshToken;
+        Prisma.user.update({
+            where: {
+                user_id: existedUser.user_id
+            },
+            data: {
+                refresh_token: existedUser.refreshToken
+            }
+        })
+        return { refreshToken, accessToken };
     } catch (error) {
-        throw new ApiError(500,"something went wrong in creating refresh and access token");
+        throw new ApiError(500, "something went wrong in creating refresh and access token");
     }
 }
 
@@ -21,7 +33,6 @@ const createUser = asyncHandler(async (req, res) => {
     var { full_name,
         phone_number,
         email,
-        password_hash,
         age,
         income,
         budget_limit
@@ -40,12 +51,6 @@ const createUser = asyncHandler(async (req, res) => {
         if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
             throw new ApiError(400, "Invalid email format");
         }
-        if (!password_hash || password_hash.length < 8) {
-            throw new ApiError(400, "Password must be at least 8 characters long");
-        }
-        if (!/[A-Z]/.test(password_hash) || !/[a-z]/.test(password_hash) || !/[0-9]/.test(password_hash) || !/[!@#$%^&*]/.test(password_hash)) {
-            throw new ApiError(400, "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character");
-        }
         if (!age || isNaN(age) || age < 18 || age > 100) {
             throw new ApiError(400, "Age must be a number between 18 and 100");
         }
@@ -58,71 +63,69 @@ const createUser = asyncHandler(async (req, res) => {
         if (budget_limit > income) {
             throw new ApiError(400, "Budget limit cannot be greater than income");
         }
-        
+
         const user = await Prisma.user.findUnique({
-            where:{
-                email: email.toLowerCase()
+            where: {
+                phone_number: phone_number.trim()
             }
         });
-        password_hash = await bcrypt.hash(password_hash,10)
-        console.log(password_hash);
-        
-        if(user)
-        {
-            throw new ApiError(400,"User already exits");
+
+        if (user) {
+            throw new ApiError(400, "User phone number already already exists");
         }
         await Prisma.user.create({
-            data:{
+            data: {
                 full_name,
                 phone_number,
                 email,
                 password_hash,
-                age,    
+                age,
                 income,
                 budget_limit
             }
         })
         res.status(200).json(
-            new ApiResponse(200,"user registered successfully")
+            new ApiResponse(200, "user registered successfully")
         )
 
     } catch (error) {
         res.status(error.statusCode || 500).json({ message: error.message || "Internal Server Error" });
-        
+
     }
 
 })
 
-const loginUser = asyncHandler(async (req,res)=>{
-    const {phone_number,password} = req.body;
-    if(!phone_number){
-        throw new ApiError(400,"Phone number is not entered");
+const loginUser = asyncHandler(async (req, res) => {
+    const { phone_number, password } = req.body;
+    if (!phone_number) {
+        throw new ApiError(400, "Phone number is not entered");
     }
-    const user = await Prisma.user.findUnique({
-        where:{
+    const existedUser = await Prisma.user.findUnique({
+        where: {
             phone_number
         }
     })
-    if(!user){
-        throw new ApiError(404,"User does not exist");
+    if (!existedUser) {
+        throw new ApiError(404, "User does not exist");
     }
-
-    const isPasswordValid = await bcrypt.compare(password,user.password_hash)
-    if(!isPasswordValid)
-    {
-        throw new ApiError(401,"Incorrect password");
-    }
-    const userCopy = {...user}
+    console.log(user);
+    const { refreshToken, accessToken } = generateRefreshAndAccessTokens(existedUser);
+    const userCopy = { ...existedUser }
     delete userCopy.password_hash;
-    return res.status(200).json(
-        new ApiResponse(
-            200,
-            {
-                user:userCopy
-            },
-            "User logged in successfully"
+    const options={
+        httpOnly:true,
+        secure:true
+       }
+    return res.status(200).cookie("accessToken", accessToken, options)
+        .cookie("refreshtoken", refreshToken, options).json(
+            new ApiResponse(
+                200,
+                {
+                    user: userCopy
+                },
+                "User logged in successfully"
+            )
         )
-    )
 })
 
 
