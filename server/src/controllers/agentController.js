@@ -36,6 +36,8 @@ const createAgent = asyncHandler(async(req,res)=>{
         balance
     }=req.body;
 
+    console.log("inside agent create controller")
+
     try {
         if (!agent_name || agent_name.trim() === '') {
             throw new ApiError(400, "Full name is required");
@@ -58,10 +60,13 @@ const createAgent = asyncHandler(async(req,res)=>{
         if (balance < 0) {
             throw new ApiError(400, "Balance cannot be negative");
         }
+
+        const phone=Number(agent_phone);
+        console.log(phone)
         
         const agent = await Prisma.agent.findUnique({
             where: {
-                agent_phone: agent_phone
+                agent_phone: phone
             }
         });
         
@@ -69,7 +74,7 @@ const createAgent = asyncHandler(async(req,res)=>{
             throw new ApiError(400, "Agent phone number already  exists");
         }
 
-        await Prisma.agent.create({
+        const newAgent=await Prisma.agent.create({
             data: {
                 agent_name,
                 agent_phone,
@@ -79,6 +84,7 @@ const createAgent = asyncHandler(async(req,res)=>{
                 balance
             }
         })
+        console.log("new agent",newAgent);
 
         res.status(200).json(
             new ApiResponse(200, "Agent registered successfully")

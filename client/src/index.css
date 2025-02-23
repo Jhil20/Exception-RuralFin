@@ -1,1 +1,43 @@
 @import "tailwindcss";
+
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.no-spinner {
+  -moz-appearance: textfield; /* Firefox */
+}
+
+.custom-select {
+  appearance: none; /* Hides default styling */
+  -webkit-appearance: none; /* For Safari */
+  -moz-appearance: none; /* For Firefox */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18'><path fill='black' d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 8px center; /* Adjusts padding from right */
+  background-size: 18px;
+  padding-right: 15px; /* Creates space for the arrow */
+}
+
+
+@font-face {
+    font-family: "FiraCode";
+    src: url("/fonts/FiraCode.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: "TTHoves";
+    src: url("/fonts/TTHoves.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: "Gilroy";
+    src: url("/fonts/Gilroy.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+  }
+  

@@ -13,7 +13,7 @@ module.exports = {
           'FiraCode': ['FiraCode', 'sans-serif'],
           'TTHoves': ['TTHoves', 'sans-serif'], 
           'Gilroy': ['Gilroy', 'sans-serif'], 
-  
+
         },
       },
     },
