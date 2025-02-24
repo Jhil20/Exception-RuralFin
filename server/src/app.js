@@ -14,7 +14,9 @@ app.use(cors())
 
 import router from './routes/users.routes.js';
 import routerAgent from './routes/agent.routes.js';
+import routerAdmin from './routes/admin.routes.js'
 
 app.use("/users",router)
 app.use("/agent",routerAgent)
+app.use("/admin",routerAdmin)
 export {app};
