@@ -6,7 +6,6 @@ import {
   generateRefreshToken,
 } from "../utils/tokenMethods.js";
 import Prisma from "../utils/prisma.js";
-import bcrypt from "bcrypt";
 
 const generateRefreshAndAccessTokens = async (existedUser) => {
   try {
@@ -128,6 +127,9 @@ const createUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   const { phone_number } = req.body;
   console.log(phone_number);
+  if ( !/^\d{10}$/.test(phone_number)) {
+    throw new ApiError(400, "Phone number must be exactly 10 digits");
+  }
   if (!phone_number) {
     throw new ApiError(400, "Phone number is not entered");
   }
