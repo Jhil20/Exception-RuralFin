@@ -25,6 +25,39 @@ model User {
   wallet_balance Decimal  @default(0.00)
   refresh_token  String?
   created_at    DateTime @default(now())
+
+  agents agentTransaction[]
 }
 
+model Agent {
+  agent_id         String       @id @default(uuid())
+  agent_name            String    @db.VarChar(255)
+  agent_phone           String    @unique @db.VarChar(15)
+  email           String?  @unique
+  location        String    @db.VarChar(255)
+  securityDeposit Decimal   @default(0.00)
+  balance         Decimal   @default(0.00)
+  rating          Float?    @default(0.0)
+  status          EnumStatus @default(ACTIVE)
+  createdAt       DateTime  @default(now())
+  refresh_token  String?
 
+  users  agentTransaction[]
+}
+
+model agentTransaction {
+  user_id    String
+  agent_id   String
+  AssignedAt DateTime @default(now())
+
+  user  User  @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  agent Agent @relation(fields: [agent_id], references: [agent_id], onDelete: Cascade)
+
+  @@id([user_id, agent_id]) // Composite Primary Key
+}
+
+// Enum for Agent Status
+enum EnumStatus {
+  ACTIVE
+  INACTIVE
+}
