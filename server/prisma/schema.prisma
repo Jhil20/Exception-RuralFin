@@ -46,9 +46,13 @@ model User {
   city          String?
   state         String?
   Agent         UserAgentTransaction[]
-  PeerToPeerTransaction PeerToPeerTransaction[]
+  sentTransaction  PeerToPeerTransaction[] @relation(name: "SenderRelation")
+  receivedTransaction  PeerToPeerTransaction[] @relation(name: "RecipientRelation")
+
   userWallet        UserWallet? 
 
+  NotificationSender NotificationUser[] @relation(name: "notification-sender")
+  NotificationRecipent NotificationUser[]@relation(name: "notification-recipent")
 }
 
 // User Wallet Model
@@ -122,10 +126,24 @@ model UserAgentTransaction {
 // Peer-to-Peer Transactions
 model PeerToPeerTransaction {
   transaction_id String   @id @default(uuid())
-  user_id       String
+  sender_id       String
   recipient_id  String
   amount        Decimal
   date_time     DateTime @default(now())
 
-  sender        User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  sender        User @relation(name: "SenderRelation",fields: [sender_id], references: [user_id], onDelete: Cascade)
+  recipient     User @relation(name: "RecipientRelation",fields: [recipient_id], references: [user_id], onDelete: Cascade)
+
+}
+
+model NotificationUser{
+  id          String   @id @default(uuid())
+  sender_id      String   // The recipient of the notification
+  recipent_id    String   // The user who sent the notification
+  message     String   // Custom message
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  sender        User     @relation(name: "notification-sender",fields: [sender_id], references: [user_id], onDelete: Cascade)
+  receipent     User     @relation(name: "notification-recipent",fields: [recipent_id],references: [user_id])
 }

@@ -253,4 +253,32 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "user logged out"));
 });
 
-export { createUser, loginUser, logoutUser };
+const userActivity = asyncHandler(async (user_id)=>{
+  const today = new Date();
+  const formattedDate = today.toISOString().split('T')[0]; 
+   // Example: "2025-02-26"
+
+  const activityPerDayAgent = await Prisma.userAgentTransaction.count({
+    where: {
+      user_id:user_id,
+      date_time: {
+        gte: new Date(today + "T00:00:00.000Z"),
+        lt: new Date(today + "T23:59:59.999Z")
+      }
+    }
+  })
+  const activityPerDayUser = await Prisma.peerToPeerTransaction.count({
+    where:{
+      user_id:user_id,
+      date_time: {
+        gte: new Date(today + "T00:00:00.000Z"),
+        lt: new Date(today + "T23:59:59.999Z")
+      }
+    }
+  })
+  let totalTransactionPerDay = activityPerDayAgent + activityPerDayUser;
+})
+
+
+
+export { createUser, loginUser, logoutUser,notificationToUser};
