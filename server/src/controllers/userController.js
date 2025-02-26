@@ -35,7 +35,7 @@ const generateRefreshAndAccessTokens = async (existedUser) => {
 };
 
 const createUser = asyncHandler(async (req, res) => {
-  var { full_name, phone_number, email, age, income, gender, budget_limit } =
+  var { full_name, phone_number, email, age, income, gender, budget_limit, address, pincode, state, city } =
     req.body;
 
   try {
@@ -69,7 +69,77 @@ const createUser = asyncHandler(async (req, res) => {
     if (budget_limit > income) {
       throw new ApiError(400, "Budget limit cannot be greater than income");
     }
-    console.log("in back register");
+    if (!address) {
+      throw new ApiError(400, "Address field is empty");
+    }
+    if (!pincode) {
+      throw new ApiError(400, "pincode is empty");
+    }
+    if (pincode.length != 6) {
+      throw new ApiError(400, "Pincode must be 6 of digit");
+    }
+    const validStates = [
+      "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+      "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
+      "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram",
+      "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
+      "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
+      "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu",
+      "Delhi", "Lakshadweep", "Puducherry", "Jammu & Kashmir", "Ladakh"
+    ];
+    if (!state) {
+      throw new ApiError(400, "State Field is empty");
+    }
+    if (!validStates.includes(state)) {
+      throw new ApiError(400, "Enter appropriate State")
+    }
+
+    const stateCities = {
+      "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur", "Tirupati", "Nellore", "Kurnool", "Rajahmundry", "Kadapa", "Anantapur"],
+      "Arunachal Pradesh": ["Itanagar", "Tawang", "Ziro", "Pasighat", "Bomdila", "Roing", "Daporijo"],
+      "Assam": ["Guwahati", "Dibrugarh", "Silchar", "Jorhat", "Tezpur", "Tinsukia", "Nagaon"],
+      "Bihar": ["Patna", "Gaya", "Bhagalpur", "Muzaffarpur", "Purnia", "Darbhanga", "Begusarai", "Arrah", "Bettiah"],
+      "Chhattisgarh": ["Raipur", "Bilaspur", "Durg", "Bhilai", "Korba", "Jagdalpur", "Ambikapur"],
+      "Goa": ["Panaji", "Margao", "Vasco da Gama", "Mapusa", "Ponda"],
+      "Gujarat": ["Ahmedabad", "Surat", "Vadodara", "Rajkot", "Gandhinagar", "Bhavnagar", "Jamnagar", "Junagadh", "Anand"],
+      "Haryana": ["Chandigarh", "Faridabad", "Gurugram", "Panipat", "Ambala", "Hisar", "Rohtak", "Yamunanagar"],
+      "Himachal Pradesh": ["Shimla", "Manali", "Dharamshala", "Mandi", "Kullu", "Chamba", "Solan", "Bilaspur"],
+      "Jharkhand": ["Ranchi", "Jamshedpur", "Dhanbad", "Bokaro", "Hazaribagh", "Deoghar", "Giridih"],
+      "Karnataka": ["Bengaluru", "Mysuru", "Hubballi", "Mangaluru", "Belagavi", "Davangere", "Shivamogga", "Ballari"],
+      "Kerala": ["Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur", "Kollam", "Palakkad", "Kannur", "Alappuzha"],
+      "Madhya Pradesh": ["Bhopal", "Indore", "Gwalior", "Jabalpur", "Ujjain", "Satna", "Sagar", "Ratlam"],
+      "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik", "Aurangabad", "Solapur", "Amravati", "Kolhapur", "Latur"],
+      "Manipur": ["Imphal", "Thoubal", "Bishnupur", "Kakching", "Ukhrul", "Senapati"],
+      "Meghalaya": ["Shillong", "Tura", "Nongstoin", "Jowai", "Williamnagar"],
+      "Mizoram": ["Aizawl", "Lunglei", "Champhai", "Saiha", "Kolasib"],
+      "Nagaland": ["Kohima", "Dimapur", "Mokokchung", "Tuensang", "Mon", "Zunheboto"],
+      "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela", "Sambalpur", "Berhampur", "Puri", "Balasore", "Jeypore"],
+      "Punjab": ["Chandigarh", "Ludhiana", "Amritsar", "Jalandhar", "Patiala", "Bathinda", "Hoshiarpur"],
+      "Rajasthan": ["Jaipur", "Udaipur", "Jodhpur", "Kota", "Ajmer", "Bikaner", "Alwar", "Bharatpur"],
+      "Sikkim": ["Gangtok", "Namchi", "Mangan", "Gyalshing", "Jorethang"],
+      "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem", "Tirunelveli", "Erode", "Vellore"],
+      "Telangana": ["Hyderabad", "Warangal", "Nizamabad", "Karimnagar", "Khammam", "Ramagundam", "Mahbubnagar"],
+      "Tripura": ["Agartala", "Udaipur", "Dharmanagar", "Kailashahar", "Ambassa"],
+      "Uttar Pradesh": ["Lucknow", "Kanpur", "Agra", "Varanasi", "Meerut", "Prayagraj", "Bareilly", "Moradabad", "Gorakhpur"],
+      "Uttarakhand": ["Dehradun", "Haridwar", "Rishikesh", "Haldwani", "Nainital", "Roorkee", "Kashipur"],
+      "West Bengal": ["Kolkata", "Howrah", "Durgapur", "Siliguri", "Asansol", "Kharagpur", "Haldia"],
+
+      // Union Territories
+      "Andaman and Nicobar Islands": ["Port Blair"],
+      "Chandigarh": ["Chandigarh"],
+      "Dadra and Nagar Haveli and Daman and Diu": ["Daman", "Silvassa"],
+      "Delhi": ["New Delhi"],
+      "Lakshadweep": ["Kavaratti"],
+      "Puducherry": ["Puducherry", "Karaikal", "Mahe", "Yanam"],
+      "Jammu & Kashmir": ["Srinagar", "Jammu", "Anantnag", "Baramulla"],
+      "Ladakh": ["Leh", "Kargil"]
+    };
+    if (!city) {
+      throw new ApiError(400, "City field is empty");
+    }
+    if (!stateCities[state].includes(city)) {
+      throw new ApiError(400, "Enter Appropriate City");
+    }
 
     const user = await Prisma.user.findUnique({
       where: {
@@ -89,34 +159,26 @@ const createUser = asyncHandler(async (req, res) => {
         income,
         gender,
         budget_limit,
+        pincode,
+        address,
+        state,
+        city
       },
     });
 
-    const { refreshToken, accessToken } = await generateRefreshAndAccessTokens(
-      newUser
-    );
-    const userCopy = { ...newUser };
-    console.log(refreshToken);
-    userCopy.phone_number = userCopy.phone_number.toString();
-    const options = {
-      httpOnly: true,
-      secure: true,
-    };
-
+    
     console.log("uset", newUser);
     return res
-    .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshtoken", refreshToken, options)
-    .json(
-      new ApiResponse(
-        200,
-        {
-          user: userCopy,
-        },
-        "User registered in successfully"
-      )
-    );
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          {
+            user: newUser,
+          },
+          "User registered in successfully"
+        )
+      );
   } catch (error) {
     res
       .status(error.statusCode || 500)
@@ -127,7 +189,7 @@ const createUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   const { phone_number } = req.body;
   console.log(phone_number);
-  if ( !/^\d{10}$/.test(phone_number)) {
+  if (!/^\d{10}$/.test(phone_number)) {
     throw new ApiError(400, "Phone number must be exactly 10 digits");
   }
   if (!phone_number) {

@@ -61,12 +61,12 @@ const createAgent = asyncHandler(async(req,res)=>{
             throw new ApiError(400, "Balance cannot be negative");
         }
 
-        const phone=Number(agent_phone);
-        console.log(phone)
-        
+        // const phone=Number(agent_phone);
+        // console.log(phone)
+
         const agent = await Prisma.agent.findUnique({
             where: {
-                agent_phone: phone
+                agent_phone: agent_phone
             }
         });
         

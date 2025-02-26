@@ -13,58 +13,119 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  user_id        String   @id @default(uuid()) // UUID as Primary Key
-  full_name      String
-  phone_number   BigInt   @unique
-  email          String?  @unique
-  gender         String?  // Nullable
-  age            Int?      
-  income        Decimal?  
-  budget_limit  Decimal?
-  wallet_balance Decimal  @default(0.00)
-  refresh_token  String?
-  created_at    DateTime @default(now())
-
-  agents agentTransaction[]
-}
-
-model Agent {
-  agent_id         String       @id @default(uuid())
-  agent_name            String    @db.VarChar(255)
-  agent_phone           String    @unique @db.VarChar(15)
-  email           String?  @unique
-  location        String    @db.VarChar(255)
-  securityDeposit Decimal   @default(0.00)
-  balance         Decimal   @default(0.00)
-  rating          Float?    @default(0.0)
-  status          EnumStatus @default(ACTIVE)
-  createdAt       DateTime  @default(now())
-  refresh_token  String?
-
-  users  agentTransaction[]
-}
-
-model agentTransaction {
-  user_id    String
-  agent_id   String
-  AssignedAt DateTime @default(now())
-
-  user  User  @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
-  agent Agent @relation(fields: [agent_id], references: [agent_id], onDelete: Cascade)
-
-  @@id([user_id, agent_id]) // Composite Primary Key
-}
-
-model Admin{
-  admin_id String @id@default("4323")
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  refresh_token  String?
-}
-
-// Enum for Agent Status
+// Enum Definitions
 enum EnumStatus {
   ACTIVE
   INACTIVE
+}
+
+enum TransactionType {
+  WITHDRAW
+  DEPOSIT
+}
+
+enum PaymentMode {
+  CASH
+  DIGITAL
+}
+
+// User Model
+model User {
+  user_id       String   @id @default(uuid())
+  full_name     String
+  phone_number  String   @unique
+  email         String?  @unique
+  gender        String?
+  age           String?
+  income        Decimal?
+  budget_limit  Decimal?
+  refresh_token String?
+  created_at    DateTime @default(now())
+  address       String?
+  pincode       String?
+  city          String?
+  state         String?
+  Agent         UserAgentTransaction[]
+  PeerToPeerTransaction PeerToPeerTransaction[]
+  userWallet        UserWallet? 
+
+}
+
+// User Wallet Model
+model UserWallet {
+  wallet_id   String  @id
+  user_balance Decimal @default(0.00)
+  user_id     String  @unique
+  user_pin    String?
+  created_at  DateTime @default(now())
+
+  user        User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+}
+
+// Agent Model
+model Agent {
+  agent_id      String    @id @default(uuid())
+  full_name     String
+  phone_num     String    @unique
+  email         String?   @unique
+  refresh_token String?
+  created_at    DateTime  @default(now())
+  address       String?
+  pincode       String?
+  city          String?
+  state         String?
+  status        EnumStatus @default(ACTIVE)
+  bank_details  String?
+  deposit_ending_date DateTime?
+  bond_deposit_amount Decimal
+  rating        Decimal?
+  user          UserAgentTransaction[]
+  agentWallet   AgentWallet?
+  agentAdmin    AgentAdminTransaction?
+}
+
+// Agent Wallet Model
+model AgentWallet {
+  wallet_id      String  @id
+  wallet_balance Decimal @default(0.00)
+  agent_pin      String?
+  created_at     DateTime @default(now())
+  agent_id       String  @unique
+
+  agent         Agent @relation(fields: [agent_id], references: [agent_id], onDelete: Cascade)
+}
+
+// Agent-Admin Transactions
+model AgentAdminTransaction {
+  transaction_id String  @id @default(uuid())
+  security_deposit_amt Decimal
+  agent_id     String @unique
+  date_time    DateTime @default(now())
+  payment_mode PaymentMode
+
+  agent        Agent @relation(fields: [agent_id], references: [agent_id], onDelete: Cascade)
+}
+
+// User-Agent Transactions
+model UserAgentTransaction {
+  transaction_id String   @id @default(uuid())
+  user_id       String
+  agent_id      String
+  amount        Decimal
+  transaction_type TransactionType
+  date_time     DateTime @default(now())
+
+  user         User  @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  agent        Agent @relation(fields: [agent_id], references: [agent_id], onDelete: Cascade)
+}
+
+// Peer-to-Peer Transactions
+model PeerToPeerTransaction {
+  transaction_id String   @id @default(uuid())
+  user_id       String
+  recipient_id  String
+  amount        Decimal
+  date_time     DateTime @default(now())
+
+  sender        User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 }

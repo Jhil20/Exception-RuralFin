@@ -4,7 +4,8 @@ import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { generateAccessToken } from "../utils/adminTokens.js";
 import Prisma from "../utils/prisma.js"
-
+import transporter from "../utils/emailTransporter.js";
+import hbs from "nodemailer-express-handlebars";
 
 
 const generateRefreshAndAccessToken=async(existedAdmin)=>{
@@ -87,4 +88,46 @@ const logoutAdmin=asyncHandler(async(req,res)=>{
     .json(new ApiResponse(200,{},"Admin logged out"))
 })
 
-export  {loginAdmin,logoutAdmin}
+const allPendingAgents = asyncHandler(async (req,res)=>{
+    const pendingAgents = await Prisma.agent.findMany({
+        where:{
+            status:"ACTIVE"
+        }
+    })
+    console.log(pendingAgents);
+    
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            {
+                Agents : pendingAgents
+            },
+            "Pending agents fetched successfully"
+        )
+    )
+})
+
+const acceptPendingAgents = asyncHandler(async (req,res) => {
+    const {email} = req.body;
+    const mailOptions = {
+        from: 'Ruralfin@gmail.com', // Sender address
+        to: email, // List of recipients
+        subject: 'Approval from Admin, RuralFin', // Subject line
+        html: '<h2 style="color:#ff6600;">Hello People!, Welcome to Bacancy!</h2>',
+    };
+
+    transporter.sendMail(mailOptions, function(err, info) {
+    if (err) {
+        console.log(err)
+    } else {
+        console.log(info);
+    }
+    res.status(200).json(
+        new ApiResponse(
+            200,"mail sent successfully"
+        )
+    )
+    })
+})
+
+export {loginAdmin,logoutAdmin,allPendingAgents,acceptPendingAgents};
