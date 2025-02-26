@@ -49,10 +49,11 @@ model User {
   sentTransaction  PeerToPeerTransaction[] @relation(name: "SenderRelation")
   receivedTransaction  PeerToPeerTransaction[] @relation(name: "RecipientRelation")
 
+  NotificationSender NotificationUser[]   @relation(name: "notification-sender")
+  NotificationRecipent NotificationUser[]   @relation(name: "notification-recipent")
+
   userWallet        UserWallet? 
 
-  NotificationSender NotificationUser[] @relation(name: "notification-sender")
-  NotificationRecipent NotificationUser[]@relation(name: "notification-recipent")
 }
 
 // User Wallet Model
@@ -78,10 +79,10 @@ model Agent {
   pincode       String?
   city          String?
   state         String?
-  status        EnumStatus @default(ACTIVE)
-  bank_details  String?
+  status        EnumStatus @default(INACTIVE)
+  bank_details  String?  @unique
   deposit_ending_date DateTime?
-  bond_deposit_amount Decimal
+  bond_deposit_amount Decimal?
   rating        Decimal?
   user          UserAgentTransaction[]
   agentWallet   AgentWallet?
@@ -145,5 +146,5 @@ model NotificationUser{
   createdAt   DateTime @default(now())
 
   sender        User     @relation(name: "notification-sender",fields: [sender_id], references: [user_id], onDelete: Cascade)
-  receipent     User     @relation(name: "notification-recipent",fields: [recipent_id],references: [user_id])
+  receipent     User     @relation(name: "notification-recipent",fields: [recipent_id],references: [user_id],onDelete: Cascade)
 }

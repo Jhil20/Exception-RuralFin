@@ -6,6 +6,8 @@ import {
   generateRefreshToken,
 } from "../utils/tokenMethods.js";
 import Prisma from "../utils/prisma.js";
+import bcrypt from "bcrypt"
+
 
 const generateRefreshAndAccessTokens = async (existedUser) => {
   try {
@@ -34,9 +36,19 @@ const generateRefreshAndAccessTokens = async (existedUser) => {
   }
 };
 
+const generateWalletId = () => {
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let randomLetters = "";
+  for (let i = 0; i < 3; i++) {
+    randomLetters += letters.charAt(Math.floor(Math.random() * letters.length));
+  }
+  return `${randomLetters}@RURALFIN`;
+};
+
 const createUser = asyncHandler(async (req, res) => {
-  var { full_name, phone_number, email, age, income, gender, budget_limit, address, pincode, state, city } =
+  var { full_name, phone_number, email, age, income, gender, budget_limit, address, pincode, state, city, user_pin } =
     req.body;
+
 
   try {
     if (!full_name || full_name.trim() === "") {
@@ -77,6 +89,9 @@ const createUser = asyncHandler(async (req, res) => {
     }
     if (pincode.length != 6) {
       throw new ApiError(400, "Pincode must be 6 of digit");
+    }
+    if (!user_pin || !/^\d{4,6}$/.test(user_pin)) {
+      throw new ApiError(400, "User PIN must be a 4 to 6 digit number");
     }
     const validStates = [
       "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
@@ -147,8 +162,11 @@ const createUser = asyncHandler(async (req, res) => {
       },
     });
 
+    const saltRounds = 10;
+    const hashedPin = await bcrypt.hash(user_pin, saltRounds);
+
     if (user) {
-      throw new ApiError(400, "User phone number already exists");
+      throw new ApiError(400, "User already exists");
     }
     const newUser = await Prisma.user.create({
       data: {
@@ -166,7 +184,14 @@ const createUser = asyncHandler(async (req, res) => {
       },
     });
 
-    
+    await Prisma.UserWallet.create({
+      data: {
+        wallet_id: generateWalletId(),
+        user_id: newUser.user_id,
+        user_pin: hashedPin || null
+      }
+    });
+
     console.log("uset", newUser);
     return res
       .status(200)
@@ -182,7 +207,7 @@ const createUser = asyncHandler(async (req, res) => {
   } catch (error) {
     res
       .status(error.statusCode || 500)
-      .json({ message: error.message || "Internal Server Error" });
+      .json({ message: error.message || "Failed to register user" });
   }
 });
 
@@ -253,14 +278,14 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "user logged out"));
 });
 
-const userActivity = asyncHandler(async (user_id)=>{
+const userActivity = asyncHandler(async (user_id) => {
   const today = new Date();
-  const formattedDate = today.toISOString().split('T')[0]; 
-   // Example: "2025-02-26"
+  const formattedDate = today.toISOString().split('T')[0];
+  // Example: "2025-02-26"
 
   const activityPerDayAgent = await Prisma.userAgentTransaction.count({
     where: {
-      user_id:user_id,
+      user_id: user_id,
       date_time: {
         gte: new Date(today + "T00:00:00.000Z"),
         lt: new Date(today + "T23:59:59.999Z")
@@ -268,8 +293,8 @@ const userActivity = asyncHandler(async (user_id)=>{
     }
   })
   const activityPerDayUser = await Prisma.peerToPeerTransaction.count({
-    where:{
-      user_id:user_id,
+    where: {
+      user_id: user_id,
       date_time: {
         gte: new Date(today + "T00:00:00.000Z"),
         lt: new Date(today + "T23:59:59.999Z")
@@ -281,4 +306,70 @@ const userActivity = asyncHandler(async (user_id)=>{
 
 
 
-export { createUser, loginUser, logoutUser,notificationToUser};
+const totalAgent = asyncHandler(async (req, res) => {
+  const allAgent = await Prisma.agent.findMany(
+    {
+      where: {
+        status: "ACTIVE"
+      }
+    }
+  )
+  res.status(200).json(new ApiResponse(
+    200,
+    { agent: allAgent },
+    "Agent fetched"
+  ))
+})
+
+const notificationToUser = asyncHandler(async (req, res) => {
+  const { user_id, receipent_wallet_id, amount } = req.body;
+  const receipent_id = await Prisma.userWallet.findUnique({
+    where: {
+      wallet_id: receipent_wallet_id
+    },
+    select: {
+      user_id: true
+    }
+  })
+  await Prisma.notificationUser.create({
+    data: {
+      sender: {
+        connect: {
+          user_id: user_id
+        }
+      },
+      receipent: {
+        connect: {
+          user_id: receipent_id.user_id
+        }
+      },
+      message: `${amount} is sent`
+    }
+  })
+  await Prisma.notificationUser.create({
+    data: {
+      sender: {
+        connect: {
+          user_id: receipent_id.user_id
+        }
+      },
+      receipent: {
+        connect: {
+          user_id: user_id
+        }
+      },
+      message: `${amount} is received`
+    }
+  })
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      "Agent is notified"
+    )
+  )
+})
+
+
+export { createUser, loginUser, logoutUser, totalAgent, notificationToUser };
+
+
