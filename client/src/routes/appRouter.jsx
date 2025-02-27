@@ -4,6 +4,7 @@ import Body from "./Body";
 import Login from "./Login";
 import UserDashboard from "./UserDashboard";
 import UserProfile from "./UserProfile";
+import Budget from "./Budget";
 
 const appRouter = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ const appRouter = createBrowserRouter([
       {
         path:"/userProfile",
         element:<UserProfile/>,
+      },
+      {
+        path:"/budget",
+        element:<Budget/>,
       }
     ],
   },

@@ -201,7 +201,6 @@ const userActivity = asyncHandler(async (user_id) => {
 })
 
 
-
 const totalAgent = asyncHandler(async (req, res) => {
   const allAgent = await Prisma.agent.findMany(
     {
