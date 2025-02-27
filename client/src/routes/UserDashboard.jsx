@@ -3,52 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { userLoggedout } from "../redux/slices/signInSlice";
 import { useDispatch } from "react-redux";
 import Cookies from "js-cookie";
+import AgentCard from "../components/AgentCard";
 
 const UserDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
-
-  // Sample data based on the image
-  const userData = {
-    balance: 10000,
-    rewards: 250,
-    activity: 12,
-    agents: [
-      {
-        id: 1,
-        name: "Rahul K",
-        rating: 4.8,
-        location: "North Delhi",
-        status: "Available",
-      },
-      {
-        id: 2,
-        name: "Priya S",
-        rating: 4.9,
-        location: "South Delhi",
-        status: "Busy",
-      },
-      {
-        id: 3,
-        name: "Amit P",
-        rating: 4.7,
-        location: "East Delhi",
-        status: "Available",
-      },
-    ],
-    transactions: [
-      { id: 1, title: "Trans #1", time: "2h ago", amount: 500 },
-      { id: 2, title: "Trans #2", time: "2h ago", amount: 500 },
-      { id: 3, title: "Trans #3", time: "2h ago", amount: 500 },
-    ],
-    quickActions: [
-      { id: 1, title: "Send", icon: "arrow-up-right" },
-      { id: 2, title: "Deposit", icon: "wallet" },
-      { id: 3, title: "Budget", icon: "clock" },
-    ],
-  };
-
+  const [showAgentTranscationOptions, setShowAgentTranscationOptions] =
+    useState(false);
   const handleLogout = () => {
     Cookies.remove("jwt-token");
     console.log("logout clled");
@@ -63,7 +25,7 @@ const UserDashboard = () => {
         <div className="h-full w-full bg-gray-900/80  fixed top-0 left-0 z-50 flex justify-center items-center">
           <div className="bg-white rounded-lg p-4 shadow-lg h-2/3 w-6/12">
             <div className="flex justify-between items-start h-1/12">
-              <h1 className="text-lg font-semibold">Notifications</h1>
+              <h1 className="text-lg font-semibold ml-2">Notifications</h1>
               <button
                 className="cursor-pointer rounded-full w-10 hover:bg-gray-200 transition-all duration-500 flex justify-center items-center p-2"
                 onClick={() => setShowNotifications(false)}
@@ -86,6 +48,64 @@ const UserDashboard = () => {
             </div>
             <div className="flex h-11/12  justify-center items-center">
               <h2>No Notifictaions received!!</h2>
+            </div>
+          </div>
+        </div>
+      )}
+      {showAgentTranscationOptions && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex justify-center items-center">
+          <div className="bg-white rounded-xl p-6 shadow-2xl shadow-black/40 w-1/3 max-w-lg relative">
+            <div className="flex justify-between items-center border-b pb-3">
+              <h1 className="text-xl font-bold text-gray-800">
+                Agent Transaction Panel
+              </h1>
+              <button
+                className="p-2 cursor-pointer rounded-full hover:bg-gray-300 transition duration-500"
+                onClick={() => setShowAgentTranscationOptions(false)}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-gray-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="py-4">
+              <h2 className="text-lg font-semibold text-gray-700">
+                Agent Information
+              </h2>
+              <div className="mt-3 space-y-2 text-gray-600">
+                <p>
+                  <span className="font-semibold">Agent Name:</span> Atrey & K
+                </p>
+                <p>
+                  <span className="font-semibold">Rating:</span> 4.8 ⭐
+                </p>
+                <p>
+                  <span className="font-semibold">Address:</span> Kaka ni Pav
+                  Bhaji
+                </p>
+                <p>
+                  <span className="font-semibold">Agent Budget:</span> ₹100,000
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-around mt-6">
+              <button className="w-5/12 py-2 rounded-lg bg-gradient-to-tr from-blue-500 shadow-gray-500 to-blue-950 cursor-pointer text-white font-semibold text-md hover:from-blue-950 hover:to-blue-500 transition duration-700 shadow-md">
+                Withdraw
+              </button>
+              <button className="w-5/12 py-2 rounded-lg bg-gradient-to-tr from-green-500 shadow-gray-500 to-green-950 cursor-pointer text-white font-semibold text-md hover:from-green-950 hover:to-green-500 transition duration-700 shadow-md">
+                Deposit
+              </button>
             </div>
           </div>
         </div>
@@ -128,7 +148,7 @@ const UserDashboard = () => {
               e.stopPropagation(); // Prevent Link navigation
               handleLogout();
             }}
-            className="w-30  relative z-10 hover:ring-4 ring-sky-800 transition-all duration-600 bg-gradient-to-r from-blue-500 to-blue-700 text-white flex justify-center items-center rounded-xl p-2 h-12 pb-3 ml-2 font-semibold text-black text-lg cursor-pointer "
+            className="w-30  relative z-10 transition-all duration-700 bg-gradient-to-tr from-blue-500 to-blue-800 hover:from-blue-800 hover:to-blue-500 text-white flex justify-center items-center rounded-xl p-2 h-12 pb-3 ml-2 font-semibold text-lg cursor-pointer"
           >
             Logout
           </button>
@@ -140,7 +160,7 @@ const UserDashboard = () => {
         <div className="w-2/3">
           <div className="grid w-full grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             {/* Balance Card */}
-            <div className=" bg-gradient-to-r cursor-default from-blue-500 to-blue-700  ring-blue-800 text-white rounded-lg p-4 shadow-sm">
+            <div className=" bg-gradient-to-r cursor-default from-blue-500 to-blue-800 shadow-md shadow-gray-400 ring-blue-800 text-white rounded-lg p-4">
               <div className="mb-4">
                 <svg
                   className="h-6 w-6 text-white"
@@ -157,13 +177,11 @@ const UserDashboard = () => {
                 </svg>
               </div>
               <div className="text-sm mb-1">Balance</div>
-              <div className="text-2xl font-bold">
-                ₹{userData.balance.toLocaleString()}
-              </div>
+              <div className="text-2xl font-bold">₹10,000</div>
             </div>
 
             {/* Rewards Card */}
-            <div className="bg-gradient-to-r cursor-default from-purple-500 to-purple-700 text-white rounded-lg p-4 shadow-sm">
+            <div className="bg-gradient-to-r cursor-default from-purple-500 to-purple-800 text-white rounded-lg p-4 shadow-md shadow-gray-400">
               <div className="mb-4">
                 <svg
                   className="h-6 w-6 text-white"
@@ -180,11 +198,11 @@ const UserDashboard = () => {
                 </svg>
               </div>
               <div className="text-sm mb-1">Rewards</div>
-              <div className="text-2xl font-bold">{userData.rewards} pts</div>
+              <div className="text-2xl font-bold">250 pts</div>
             </div>
 
             {/* Activity Card */}
-            <div className="bg-gradient-to-r cursor-default from-green-500 to-green-700 text-white rounded-lg p-4 shadow-sm">
+            <div className="bg-gradient-to-r cursor-default shadow-md shadow-gray-400 from-green-500 to-green-800 text-white rounded-lg p-4">
               <div className="mb-4">
                 <svg
                   className="h-6 w-6 text-white"
@@ -201,9 +219,7 @@ const UserDashboard = () => {
                 </svg>
               </div>
               <div className="text-sm mb-1">Activity</div>
-              <div className="text-2xl font-bold">
-                {userData.activity} trans
-              </div>
+              <div className="text-2xl font-bold">12 trans</div>
             </div>
           </div>
 
@@ -213,57 +229,10 @@ const UserDashboard = () => {
               <div className="bg-white rounded-lg p-4 shadow-sm mb-4">
                 <h2 className="text-lg font-semibold mb-4">Select an Agent</h2>
                 <div className="space-y-3 grid grid-cols-2 gap-4 gap-y-2">
-                  {userData.agents.map((agent) => (
-                    <div
-                      key={agent.id}
-                      className="flex items-center justify-between border border-gray-200 hover:bg-gray-200 cursor-pointer tranisition-all duration-500 shadow-lg rounded-lg p-3"
-                    >
-                      <div className="flex items-center">
-                        <div className="mr-3">
-                          <svg
-                            className="h-6 w-6 text-gray-500"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                            />
-                          </svg>
-                        </div>
-                        <div>
-                          <div className="font-medium">{agent.name}</div>
-                          <div className="flex items-center">
-                            <svg
-                              className="h-4 w-4 text-yellow-400"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            <span className="text-sm ml-1">{agent.rating}</span>
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {agent.location}
-                          </div>
-                        </div>
-                      </div>
-                      <div>
-                        <span
-                          className={`text-xs px-2 py-1 rounded-full ${
-                            agent.status === "Available"
-                              ? "bg-green-100 text-green-600"
-                              : "bg-orange-100 text-orange-600"
-                          }`}
-                        >
-                          {agent.status}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                  {/* Agent 1 */}
+                  <AgentCard onClick={setShowAgentTranscationOptions} />
+                  <AgentCard onClick={setShowAgentTranscationOptions} />
+                  <AgentCard onClick={setShowAgentTranscationOptions} />
                 </div>
               </div>
 
@@ -271,61 +240,105 @@ const UserDashboard = () => {
               <div className="bg-white w-full rounded-lg p-4 shadow-sm">
                 <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
                 <div className="grid grid-cols-5 gap-4">
-                  {userData.quickActions.map((action) => (
-                    <button
-                      key={action.id}
-                      className="flex flex-col items-center justify-center p-4 border cursor-pointer border-gray-200 shadow-lg hover:bg-gray-200 transition-all duration-500 rounded-lg"
-                    >
-                      <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mb-2">
-                        {action.icon === "arrow-up-right" && (
-                          <svg
-                            className="h-5 w-5 text-gray-900"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M7 11l5-5m0 0l5 5m-5-5v12"
-                            />
-                          </svg>
-                        )}
-                        {action.icon === "wallet" && (
-                          <svg
-                            className="h-5 w-5 text-gray-900"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                            />
-                          </svg>
-                        )}
-                        {action.icon === "clock" && (
-                          <svg
-                            className="h-5 w-5 text-gray-900"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                        )}
-                      </div>
-                      <span className="text-sm">{action.title}</span>
-                    </button>
-                  ))}
+                  {/* Send */}
+                  <button className="flex flex-col items-center justify-center p-4 border hover:shadow-black/40 cursor-pointer border-gray-200 shadow-lg hover:bg-gray-200 transition-all duration-500 rounded-lg">
+                    <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mb-2">
+                      <svg
+                        className="h-5 w-5 text-gray-900"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M7 11l5-5m0 0l5 5m-5-5v12"
+                        />
+                      </svg>
+                    </div>
+                    <span className="text-sm">Send</span>
+                  </button>
+
+                  {/* Deposit */}
+                  <button className="flex flex-col items-center hover:shadow-black/40 justify-center p-4 border cursor-pointer border-gray-200 shadow-lg hover:bg-gray-200 transition-all duration-500 rounded-lg">
+                    <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mb-2">
+                      <svg
+                        className="h-5 w-5 text-gray-900"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                        />
+                      </svg>
+                    </div>
+                    <span className="text-sm">Deposit</span>
+                  </button>
+
+                  {/* Withdraw */}
+                  <button className="flex flex-col items-center hover:shadow-black/40 justify-center p-4 border cursor-pointer border-gray-200 shadow-lg hover:bg-gray-200 transition-all duration-500 rounded-lg">
+                    <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mb-2">
+                      <svg
+                        className="h-5 w-5 text-gray-900"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17 13l-5 5m0 0l-5-5m5 5V6"
+                        />
+                      </svg>
+                    </div>
+                    <span className="text-sm">Withdraw</span>
+                  </button>
+
+                  {/* Budget */}
+                  <button className="flex flex-col items-center hover:shadow-black/40 justify-center p-4 border cursor-pointer border-gray-200 shadow-lg hover:bg-gray-200 transition-all duration-500 rounded-lg">
+                    <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mb-2">
+                      <svg
+                        className="h-5 w-5 text-gray-900"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </div>
+                    <span className="text-sm">Budget</span>
+                  </button>
+
+                  {/* Invest */}
+                  <button className="flex flex-col items-center hover:shadow-black/40 justify-center p-4 border cursor-pointer border-gray-200 shadow-lg hover:bg-gray-200 transition-all duration-500 rounded-lg">
+                    <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mb-2">
+                      <svg
+                        className="h-5 w-5 text-gray-900"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                        />
+                      </svg>
+                    </div>
+                    <span className="text-sm">Invest</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -335,23 +348,41 @@ const UserDashboard = () => {
         <div className="bg-white w-1/3 rounded-lg p-4 shadow-sm">
           <h2 className="text-lg font-semibold mb-4">Recent Transactions</h2>
           <div className="space-y-3">
-            {userData.transactions.map((transaction) => (
-              <div
-                key={transaction.id}
-                className="flex items-center justify-between border border-gray-200 rounded-lg shadow-lg hover:bg-gray-200 transition-all duration-500 cursor-pointer p-3"
-              >
-                <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-gray-400 mr-3"></div>
-                  <div>
-                    <div className="font-medium">{transaction.title}</div>
-                    <div className="text-sm text-gray-500">
-                      {transaction.time}
-                    </div>
-                  </div>
+            {/* Transaction 1 */}
+            <div className="flex items-center hover:shadow-black/40 justify-between border border-gray-200 rounded-lg shadow-lg hover:bg-gray-200 transition-all duration-500 cursor-pointer p-3">
+              <div className="flex items-center">
+                <div className="w-10 h-10 rounded-full bg-gray-400 mr-3"></div>
+                <div>
+                  <div className="font-medium">Trans #1</div>
+                  <div className="text-sm text-gray-500">2h ago</div>
                 </div>
-                <div className="font-medium">₹{transaction.amount}</div>
               </div>
-            ))}
+              <div className="font-medium">₹500</div>
+            </div>
+
+            {/* Transaction 2 */}
+            <div className="flex items-center hover:shadow-black/40 justify-between border border-gray-200 rounded-lg shadow-lg hover:bg-gray-200 transition-all duration-500 cursor-pointer p-3">
+              <div className="flex items-center">
+                <div className="w-10 h-10 rounded-full bg-gray-400 mr-3"></div>
+                <div>
+                  <div className="font-medium">Trans #2</div>
+                  <div className="text-sm text-gray-500">2h ago</div>
+                </div>
+              </div>
+              <div className="font-medium">₹500</div>
+            </div>
+
+            {/* Transaction 3 */}
+            <div className="flex items-center hover:shadow-black/40 justify-between border border-gray-200 rounded-lg shadow-lg hover:bg-gray-200 transition-all duration-500 cursor-pointer p-3">
+              <div className="flex items-center">
+                <div className="w-10 h-10 rounded-full bg-gray-400 mr-3"></div>
+                <div>
+                  <div className="font-medium">Trans #3</div>
+                  <div className="text-sm text-gray-500">2h ago</div>
+                </div>
+              </div>
+              <div className="font-medium">₹500</div>
+            </div>
           </div>
         </div>
       </div>
