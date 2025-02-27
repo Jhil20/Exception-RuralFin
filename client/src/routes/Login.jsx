@@ -40,9 +40,9 @@ const Login = () => {
         setShowOtp(true);
         console.log("in ifcondition");
       }
-      // Cookies.set("jwt-token", token);
-      // dispatch(userLoggedin());
-      // navigate("/");
+      Cookies.set("jwt-token", token);
+      dispatch(userLoggedin());
+      navigate("/userDashboard");
     } catch (error) {
       setError(error?.response?.data?.message || "Something Went Wrong");
       console.log("error", error);
@@ -71,50 +71,9 @@ const Login = () => {
   if (showLogin) {
     return (
       <div className="flex justify-center items-center h-[90.7vh] bg-gray-300">
-        {showOtp && (
-          <div className="bg-white p-6 min-h-80 h-fit rounded-lg hover:shadow-2xl transition-all duration-500 hover:ring-[906px] overflow-clip z-1 relative ring-gray-400 shadow-lg w-96">
-            <h2 className="text-2xl font-bold text-center text-gray-700 mb-4">
-              Enter OTP sent to {otpNumber}
-            </h2>
-
-            <Formik
-              initialValues={{ otp: "" }}
-              validationSchema={otpValidationSchema}
-              onSubmit={handleOtpLogin}
-            >
-              <Form className="space-y-4">
-                {/* OTP Number Field */}
-                <div>
-                  <p className="text-gray-700 mb-1">OTP*</p>
-                  <Field
-                    name="otp"
-                    className="w-full p-2 border hover:ring-[1px] ring-gray-700 transition-all duration-500 border-gray-300 rounded-md focus:ring focus:ring-blue-200"
-                  />
-                  <ErrorMessage
-                    name="otp"
-                    component="p"
-                    className="text-red-500 text-sm mt-1"
-                  />
-                </div>
-
-                {/* Error Message */}
-                {error && (
-                  <p className="text-sm text-red-500 font-bold">
-                    {error || "Something went wrong. Please try again."}
-                  </p>
-                )}
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  className="w-full bg-blue-700 cursor-pointer text-white py-2 rounded-md hover:bg-blue-800 transition-all duration-500"
-                >
-                  Enter OTP
-                </button>
-              </Form>
-            </Formik>
-          </div>
-        )}
+        {/* {showOtp && (
+          
+        )} */}
 
         {!showOtp && (
           <div className="bg-white min-h-80 h-fit  p-6 rounded-lg hover:shadow-2xl transition-all duration-500 hover:ring-[906px] overflow-clip z-1 relative ring-gray-400 shadow-lg w-96">
@@ -192,7 +151,8 @@ const Login = () => {
               <h2 className="text-md  font-semibold">Agent</h2>
             </div>
           </div>
-          <UserSignupForm showAgent={showAgent} error={error} setShowLogin={setShowLogin}/>
+          {!showAgent && <UserSignupForm showAgent={showAgent} error={error} setShowLogin={setShowLogin}/>}
+          
           {showAgent && (
             <Formik
               initialValues={{

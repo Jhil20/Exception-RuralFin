@@ -45,6 +45,8 @@ const generateWalletId = () => {
   return `${randomLetters}@RURALFIN`;
 };
 
+
+
 const createUser = asyncHandler(async (req, res) => {
   var { full_name, phone_number, email, age, income, gender, budget_limit, address, pincode, state, city, user_pin } =
     req.body;
@@ -200,7 +202,6 @@ const userActivity = asyncHandler(async (user_id) => {
   let totalTransactionPerDay = activityPerDayAgent + activityPerDayUser;
 })
 
-
 const totalAgent = asyncHandler(async (req, res) => {
   const allAgent = await Prisma.agent.findMany(
     {
@@ -265,6 +266,6 @@ const notificationToUser = asyncHandler(async (req, res) => {
 })
 
 
-export { createUser, loginUser, logoutUser, totalAgent, notificationToUser };
+export { createUser, loginUser, logoutUser, totalAgent, notificationToUser ,getAllUsers};
 
 

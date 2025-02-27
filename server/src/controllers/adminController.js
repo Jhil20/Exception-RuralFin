@@ -29,7 +29,6 @@ const generateRefreshAndAccessToken=async(existedAdmin)=>{
 }
 
 
-
 const loginAdmin=asyncHandler(async(req,res)=>{
     
     const {admin_id}=req.body;

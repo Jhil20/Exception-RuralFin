@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import Cookies from "js-cookie";
 import AgentCard from "../components/AgentCard";
 import RecentTransactionCard from "../components/RecentTransactionCard";
+import axios from "axios";
 
 const UserDashboard = () => {
   const dispatch = useDispatch();
@@ -35,7 +36,20 @@ const UserDashboard = () => {
     setSearchIdValue(e.target.value);
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    if(!showSendFavorites){
+      getUsers();
+    }
+  }, [showSendFavorites]);
+
+  const getUsers=async()=>{
+    try{
+      const result = await axios.get("http://localhost:5000/users");
+      console.log("result",result)
+    }catch(error){
+      console.log(error);
+    }
+  }
 
   return (
     <div className="w-full p-4 bg-gray-50 h-screen">
@@ -192,6 +206,7 @@ const UserDashboard = () => {
                       className="w-full h-12 border-2 hover:border-black/60 transition duration-500 border-gray-200 rounded-lg p-4 mb-4"
                     />
                   </div>
+
                 </div>
               )}
             </div>

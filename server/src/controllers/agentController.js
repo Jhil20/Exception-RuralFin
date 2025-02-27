@@ -91,7 +91,7 @@ const createAgent = asyncHandler(async(req,res)=>{
                 pincode,
                 city,
                 state,
-                bank_details
+                bank_details,
             }
         })
         console.log("new agent",newAgent);
