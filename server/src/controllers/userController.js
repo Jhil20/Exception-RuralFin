@@ -51,120 +51,16 @@ const createUser = asyncHandler(async (req, res) => {
 
 
   try {
-    if (!full_name || full_name.trim() === "") {
-      throw new ApiError(400, "Full name is required");
-    }
-    if (!/^[a-zA-Z\s]+$/.test(full_name)) {
-      throw new ApiError(
-        400,
-        "Full name can only contain alphabets and spaces"
-      );
-    }
-    if (!phone_number || !/^\d{10}$/.test(phone_number)) {
-      throw new ApiError(400, "Phone number must be exactly 10 digits");
-    }
-    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-      throw new ApiError(400, "Invalid email format");
-    }
-    if (!age || isNaN(age) || age < 18 || age > 100) {
-      throw new ApiError(400, "Age must be a number between 18 and 100");
-    }
-    if (!income || isNaN(income) || income < 0 || income > 10000000) {
-      throw new ApiError(
-        400,
-        "Income must be a positive number up to 10,000,000"
-      );
-    }
-    if (!budget_limit || isNaN(budget_limit) || budget_limit < 0) {
-      throw new ApiError(400, "Budget limit must be a positive number");
-    }
-    if (budget_limit > income) {
-      throw new ApiError(400, "Budget limit cannot be greater than income");
-    }
-    if (!address) {
-      throw new ApiError(400, "Address field is empty");
-    }
-    if (!pincode) {
-      throw new ApiError(400, "pincode is empty");
-    }
-    if (pincode.length != 6) {
-      throw new ApiError(400, "Pincode must be 6 of digit");
-    }
-    if (!user_pin || !/^\d{4,6}$/.test(user_pin)) {
-      throw new ApiError(400, "User PIN must be a 4 to 6 digit number");
-    }
-    const validStates = [
-      "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
-      "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
-      "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram",
-      "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
-      "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
-      "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu",
-      "Delhi", "Lakshadweep", "Puducherry", "Jammu & Kashmir", "Ladakh"
-    ];
-    if (!state) {
-      throw new ApiError(400, "State Field is empty");
-    }
-    if (!validStates.includes(state)) {
-      throw new ApiError(400, "Enter appropriate State")
-    }
-
-    const stateCities = {
-      "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur", "Tirupati", "Nellore", "Kurnool", "Rajahmundry", "Kadapa", "Anantapur"],
-      "Arunachal Pradesh": ["Itanagar", "Tawang", "Ziro", "Pasighat", "Bomdila", "Roing", "Daporijo"],
-      "Assam": ["Guwahati", "Dibrugarh", "Silchar", "Jorhat", "Tezpur", "Tinsukia", "Nagaon"],
-      "Bihar": ["Patna", "Gaya", "Bhagalpur", "Muzaffarpur", "Purnia", "Darbhanga", "Begusarai", "Arrah", "Bettiah"],
-      "Chhattisgarh": ["Raipur", "Bilaspur", "Durg", "Bhilai", "Korba", "Jagdalpur", "Ambikapur"],
-      "Goa": ["Panaji", "Margao", "Vasco da Gama", "Mapusa", "Ponda"],
-      "Gujarat": ["Ahmedabad", "Surat", "Vadodara", "Rajkot", "Gandhinagar", "Bhavnagar", "Jamnagar", "Junagadh", "Anand"],
-      "Haryana": ["Chandigarh", "Faridabad", "Gurugram", "Panipat", "Ambala", "Hisar", "Rohtak", "Yamunanagar"],
-      "Himachal Pradesh": ["Shimla", "Manali", "Dharamshala", "Mandi", "Kullu", "Chamba", "Solan", "Bilaspur"],
-      "Jharkhand": ["Ranchi", "Jamshedpur", "Dhanbad", "Bokaro", "Hazaribagh", "Deoghar", "Giridih"],
-      "Karnataka": ["Bengaluru", "Mysuru", "Hubballi", "Mangaluru", "Belagavi", "Davangere", "Shivamogga", "Ballari"],
-      "Kerala": ["Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur", "Kollam", "Palakkad", "Kannur", "Alappuzha"],
-      "Madhya Pradesh": ["Bhopal", "Indore", "Gwalior", "Jabalpur", "Ujjain", "Satna", "Sagar", "Ratlam"],
-      "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik", "Aurangabad", "Solapur", "Amravati", "Kolhapur", "Latur"],
-      "Manipur": ["Imphal", "Thoubal", "Bishnupur", "Kakching", "Ukhrul", "Senapati"],
-      "Meghalaya": ["Shillong", "Tura", "Nongstoin", "Jowai", "Williamnagar"],
-      "Mizoram": ["Aizawl", "Lunglei", "Champhai", "Saiha", "Kolasib"],
-      "Nagaland": ["Kohima", "Dimapur", "Mokokchung", "Tuensang", "Mon", "Zunheboto"],
-      "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela", "Sambalpur", "Berhampur", "Puri", "Balasore", "Jeypore"],
-      "Punjab": ["Chandigarh", "Ludhiana", "Amritsar", "Jalandhar", "Patiala", "Bathinda", "Hoshiarpur"],
-      "Rajasthan": ["Jaipur", "Udaipur", "Jodhpur", "Kota", "Ajmer", "Bikaner", "Alwar", "Bharatpur"],
-      "Sikkim": ["Gangtok", "Namchi", "Mangan", "Gyalshing", "Jorethang"],
-      "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem", "Tirunelveli", "Erode", "Vellore"],
-      "Telangana": ["Hyderabad", "Warangal", "Nizamabad", "Karimnagar", "Khammam", "Ramagundam", "Mahbubnagar"],
-      "Tripura": ["Agartala", "Udaipur", "Dharmanagar", "Kailashahar", "Ambassa"],
-      "Uttar Pradesh": ["Lucknow", "Kanpur", "Agra", "Varanasi", "Meerut", "Prayagraj", "Bareilly", "Moradabad", "Gorakhpur"],
-      "Uttarakhand": ["Dehradun", "Haridwar", "Rishikesh", "Haldwani", "Nainital", "Roorkee", "Kashipur"],
-      "West Bengal": ["Kolkata", "Howrah", "Durgapur", "Siliguri", "Asansol", "Kharagpur", "Haldia"],
-
-      // Union Territories
-      "Andaman and Nicobar Islands": ["Port Blair"],
-      "Chandigarh": ["Chandigarh"],
-      "Dadra and Nagar Haveli and Daman and Diu": ["Daman", "Silvassa"],
-      "Delhi": ["New Delhi"],
-      "Lakshadweep": ["Kavaratti"],
-      "Puducherry": ["Puducherry", "Karaikal", "Mahe", "Yanam"],
-      "Jammu & Kashmir": ["Srinagar", "Jammu", "Anantnag", "Baramulla"],
-      "Ladakh": ["Leh", "Kargil"]
-    };
-    if (!city) {
-      throw new ApiError(400, "City field is empty");
-    }
-    if (!stateCities[state].includes(city)) {
-      throw new ApiError(400, "Enter Appropriate City");
-    }
-
+    
     const user = await Prisma.user.findUnique({
       where: {
         phone_number: phone_number,
       },
     });
-
+    console.log("user in back",user,user_pin)
     const saltRounds = 10;
     const hashedPin = await bcrypt.hash(user_pin, saltRounds);
-
+    console.log("hashed pin", hashedPin);
     if (user) {
       throw new ApiError(400, "User already exists");
     }
@@ -303,7 +199,6 @@ const userActivity = asyncHandler(async (user_id) => {
   })
   let totalTransactionPerDay = activityPerDayAgent + activityPerDayUser;
 })
-
 
 
 const totalAgent = asyncHandler(async (req, res) => {

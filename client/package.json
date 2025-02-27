@@ -10,9 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^6.4.6",
     "@reduxjs/toolkit": "^2.5.1",
     "@tailwindcss/vite": "^4.0.8",
     "axios": "^1.7.9",
+    "firebase": "^11.3.1",
     "formik": "^2.4.6",
     "js-cookie": "^3.0.5",
     "react": "^19.0.0",
