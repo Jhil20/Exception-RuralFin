@@ -153,6 +153,34 @@ const loginUser = asyncHandler(async (req, res) => {
     );
 });
 
+const getAllUsers = asyncHandler(async (req, res) => {
+  try {
+    const users = await Prisma.user.findMany({
+      select: {
+        user_id: true,
+        full_name: true,
+        phone_number: true,
+        email: true,
+        age: true,
+        income: true,
+        gender: true,
+        budget_limit: true,
+        address: true,
+        pincode: true,
+        state: true,
+        city: true,
+        created_at: true,
+      },
+    });
+
+    res.status(200).json(new ApiResponse(200, { users }, "Users fetched successfully"));
+  } catch (error) {
+    res.status(500).json(new ApiResponse(500, {}, "Failed to fetch users"));
+  }
+});
+
+
+
 const logoutUser = asyncHandler(async (req, res) => {
   console.log(req.user.user_id);
 
@@ -266,6 +294,6 @@ const notificationToUser = asyncHandler(async (req, res) => {
 })
 
 
-export { createUser, loginUser, logoutUser, totalAgent, notificationToUser };
+export { createUser, loginUser, logoutUser, totalAgent, notificationToUser,getAllUsers };
 
 

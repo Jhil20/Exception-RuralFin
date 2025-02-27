@@ -6,17 +6,23 @@ import Cookies from "js-cookie";
 import AgentCard from "../components/AgentCard";
 import RecentTransactionCard from "../components/RecentTransactionCard";
 import axios from "axios";
+import UserCard from "../components/UserCard";
+import {jwtDecode} from "jwt-decode";
 
 const UserDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const tokenData = jwtDecode(Cookies.get("jwt-token"));
+  console.log(tokenData);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showAgentTranscationOptions, setShowAgentTranscationOptions] =
     useState(false);
   const [showSend, setShowSend] = useState(false);
   const [showDeposit, setShowDeposit] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
-  const [showRecentTransactionInfo, setShowRecentTransactionInfo] =useState(false);
+  const [showRecentTransactionInfo, setShowRecentTransactionInfo] =
+    useState(false);
+  const [allUsers, setAllUsers] = useState([]);
 
   const [showSendFavorites, setShowSendFavorites] = useState(true);
   const handleLogout = () => {
@@ -37,19 +43,20 @@ const UserDashboard = () => {
   };
 
   useEffect(() => {
-    if(!showSendFavorites){
+    if (!showSendFavorites) {
       getUsers();
     }
   }, [showSendFavorites]);
 
-  const getUsers=async()=>{
-    try{
+  const getUsers = async () => {
+    try {
       const result = await axios.get("http://localhost:5000/users");
-      console.log("result",result)
-    }catch(error){
+      console.log("result", result);
+      setAllUsers(result?.data?.data?.users);
+    } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   return (
     <div className="w-full p-4 bg-gray-50 h-screen">
@@ -194,9 +201,9 @@ const UserDashboard = () => {
               </div>
             </div>
             <div className="flex h-10/12 justify-center items-center">
-              {showSendFavorites && <h2>show favourites </h2>}
+              {showSendFavorites && <h2>show favourites</h2>}
               {!showSendFavorites && (
-                <div className="w-full h-full flex justify-center items-start">
+                <div className="w-full h-full flex flex-wrap justify-center content-start items-start">
                   <div className="w-8/12 mt-6">
                     <input
                       onChange={handleSendIdSearchChange}
@@ -206,7 +213,16 @@ const UserDashboard = () => {
                       className="w-full h-12 border-2 hover:border-black/60 transition duration-500 border-gray-200 rounded-lg p-4 mb-4"
                     />
                   </div>
-
+                  <div className="w-full grid grid-cols-2 gap-4">
+                    {allUsers
+                      .filter((user) => {
+                        if (user.user_id == tokenData.user_id) return user;
+                      })
+                      .slice(0, 6)
+                      .map((user) => (
+                        <UserCard key={user.user_id} user={user} />
+                      ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -352,7 +368,7 @@ const UserDashboard = () => {
         </div>
       )}
 
-{showRecentTransactionInfo && (
+      {showRecentTransactionInfo && (
         <div className="h-full w-full bg-gray-900/80  fixed top-0 left-0 z-50 flex justify-center items-center">
           <div className="bg-white rounded-lg p-4 shadow-lg h-9/12 w-5/12">
             <div className="flex justify-between items-start mb-2 h-1/12">
@@ -379,7 +395,7 @@ const UserDashboard = () => {
                 </svg>
               </button>
             </div>
-            
+
             <div className="flex h-11/12 justify-center items-center">
               <h1>show transaction information</h1>
             </div>
@@ -618,13 +634,19 @@ const UserDashboard = () => {
           <h2 className="text-lg font-semibold mb-4">Recent Transactions</h2>
           <div className="space-y-3">
             {/* Transaction 1 */}
-            <RecentTransactionCard setShowRecentTransactionInfo={setShowRecentTransactionInfo} />
+            <RecentTransactionCard
+              setShowRecentTransactionInfo={setShowRecentTransactionInfo}
+            />
 
             {/* Transaction 2 */}
-            <RecentTransactionCard setShowRecentTransactionInfo={setShowRecentTransactionInfo} />
+            <RecentTransactionCard
+              setShowRecentTransactionInfo={setShowRecentTransactionInfo}
+            />
 
             {/* Transaction 3 */}
-            <RecentTransactionCard setShowRecentTransactionInfo={setShowRecentTransactionInfo} />
+            <RecentTransactionCard
+              setShowRecentTransactionInfo={setShowRecentTransactionInfo}
+            />
           </div>
         </div>
       </div>
