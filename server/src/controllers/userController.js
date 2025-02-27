@@ -264,7 +264,68 @@ const notificationToUser = asyncHandler(async (req, res) => {
   )
 })
 
+const getAllUser = asyncHandler(async (req,res)=>{
+  const allUser = await Prisma.user.findMany();
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        user:allUser
+      },
+      "All user fetched successfully"
+    )
+  )
+})
 
-export { createUser, loginUser, logoutUser, totalAgent, notificationToUser };
+const getUserById = asyncHandler(async(req,res)=>{
+  const user_id = req.body.user_id;
+  if(!user_id)
+  {
+    throw new ApiError(400,"Enter user Id");
+  }
+  const userById =await Prisma.user.findUnique({
+    where:{
+      user_id:user_id
+    }
+  })
+
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        user:userById
+      },
+      "User fetched successfully"
+    )
+  )
+})
+
+const getWalletId = asyncHandler(async (req,res)=>{
+  const user_id = req.body.user_id;
+  if(!user_id)
+  {
+    throw new ApiError(400,"Enter user Id");
+  }
+  const wallet_id_balance = await Prisma.userWallet.findUnique({
+    where:{
+      user_id:user_id
+    },
+    select:{
+      wallet_id:true,
+      user_balance:true
+    }
+  }) 
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        wallet:wallet_id_balance
+      },
+      "wallet fetched successfully"
+    )
+  )
+})
+
+export { createUser, loginUser, logoutUser, totalAgent, notificationToUser,getAllUser,getUserById,getWalletId };
 
 
