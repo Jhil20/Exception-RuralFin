@@ -28,45 +28,53 @@ const generateRefreshAndAccessTokens=async(existedAgent)=>{
 
 const createAgent = asyncHandler(async(req,res)=>{
     var{
-        agent_name,
-        agent_phone,
+        full_name,
+        phone_num,
         email,
-        location,
-        securityDeposit,
-        balance
+        address,
+        pincode,
+        city,
+        state,
+        bank_details
     }=req.body;
 
     console.log("inside agent create controller")
 
     try {
-        if (!agent_name || agent_name.trim() === '') {
+        if (!full_name || full_name.trim() === '') {
             throw new ApiError(400, "Full name is required");
         }
-        if (!/^[a-zA-Z\s]+$/.test(agent_name)) {
+        if (!/^[a-zA-Z\s]+$/.test(full_name)) {
             throw new ApiError(400, "Full name can only contain alphabets and spaces");
         }
-        if (!agent_phone || !/^\d{10}$/.test(agent_phone)) {
+        if (!phone_num || !/^\d{10}$/.test(phone_num)) {
             throw new ApiError(400, "Phone number must be exactly 10 digits");
         }
         if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
             throw new ApiError(400, "Invalid email format");
         }
-        if (!location || location.trim() === '') {
+        if (!address || address.trim() === '') {
             throw new ApiError(400, "Location is required");
         }
-        if (isNaN(securityDeposit) || securityDeposit < 500) {
-            throw new ApiError(400, "Security deposit must be at least 500.00");
+        if (!pincode || pincode.trim() === '') {
+            throw new ApiError(400, "Location is required");
         }
-        if (balance < 0) {
-            throw new ApiError(400, "Balance cannot be negative");
+        if (!city || city.trim() === '') {
+            throw new ApiError(400, "Location is required");
+        }
+        if (!state || state.trim() === '') {
+            throw new ApiError(400, "Location is required");
+        }
+        if (!bank_details) {
+            throw new ApiError(400, "Bank details are required.");
+        }
+        if (!bank_details || !/^\d{6,18}$/.test(bank_details)) {
+            throw new ApiError(400, "Invalid bank account number. It should be between 6 to 18 digits.");
         }
 
-        const phone=Number(agent_phone);
-        console.log(phone)
-        
         const agent = await Prisma.agent.findUnique({
             where: {
-                agent_phone: phone
+                phone_num: phone_num
             }
         });
         
@@ -76,12 +84,14 @@ const createAgent = asyncHandler(async(req,res)=>{
 
         const newAgent=await Prisma.agent.create({
             data: {
-                agent_name,
-                agent_phone,
+                full_name,
+                phone_num,
                 email,
-                location,
-                securityDeposit,
-                balance
+                address,
+                pincode,
+                city,
+                state,
+                bank_details
             }
         })
         console.log("new agent",newAgent);
@@ -96,13 +106,13 @@ const createAgent = asyncHandler(async(req,res)=>{
 })
 
 const loginAgent = asyncHandler(async(req,res)=>{
-    const{agent_phone}=req.body;
-    if(!agent_phone){
+    const{phone_num}=req.body;
+    if(!phone_num){
         throw new ApiError(400,"Phone number is not entered");
     }
     const existedAgent=await Prisma.agent.findUnique({
         where:{
-            agent_phone
+            phone_num
         }
     })
 

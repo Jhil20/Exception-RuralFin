@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { userLoggedout } from "../redux/slices/signInSlice";
 import { useDispatch } from "react-redux";
@@ -17,6 +17,12 @@ const UserDashboard = () => {
     dispatch(userLoggedout());
     navigate("/login");
   };
+
+  const getUser=
+
+  useEffect(()=>{
+
+  },[])
 
   return (
     <div className="w-full p-4 bg-gray-50 h-screen">

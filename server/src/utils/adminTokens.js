@@ -1,14 +1,11 @@
 import jwt from "jsonwebtoken";
-import Prisma from "./prisma.js"
+import Prisma from "../utils/prisma.js"
 import { UsageRecordInstance } from "twilio/lib/rest/supersim/v1/usageRecord.js";
 
-const generateAccessToken = function (agent) {
+const generateAccessToken = function (admin) {
     return jwt.sign(
         {
-            agent_id:agent.agent_id,
-            email:agent.email,
-            phone_num:agent.phone_num,
-            full_name:agent.full_name
+            admin_id:admin.admin_id,
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
@@ -17,10 +14,10 @@ const generateAccessToken = function (agent) {
     )
 }
 
-const generateRefreshToken = function (agent) {
+const generateRefreshToken = function (admin) {
     return jwt.sign(
         {
-            agent_id:agent.agent_id,
+            admin_id:admin.admin_id,
         },
         process.env.REFRESH_TOKEN_SECRET,
         {
