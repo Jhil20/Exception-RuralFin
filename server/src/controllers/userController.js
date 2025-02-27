@@ -266,6 +266,6 @@ const notificationToUser = asyncHandler(async (req, res) => {
 })
 
 
-export { createUser, loginUser, logoutUser, totalAgent, notificationToUser ,getAllUsers};
+export { createUser, loginUser, logoutUser, totalAgent, notificationToUser };
 
 
