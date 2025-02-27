@@ -9,8 +9,9 @@ const UserDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showAgentTranscationOptions, setShowAgentTranscationOptions] =
-    useState(false);
+  const [showAgentTranscationOptions, setShowAgentTranscationOptions] = useState(false);
+  const [showSend, setShowSend] = useState(false);
+  const [showSendFavorites, setShowSendFavorites] = useState(true);
   const handleLogout = () => {
     Cookies.remove("jwt-token");
     console.log("logout clled");
@@ -18,11 +19,13 @@ const UserDashboard = () => {
     navigate("/login");
   };
 
-  const getUser=
+  const [searchIdValue, setSearchIdValue] = useState("");
 
-  useEffect(()=>{
+  const handleSendIdSearchChange = (e) => {
+    setSearchIdValue(e.target.value);
+  }
 
-  },[])
+  useEffect(() => {}, []);
 
   return (
     <div className="w-full p-4 bg-gray-50 h-screen">
@@ -116,6 +119,51 @@ const UserDashboard = () => {
           </div>
         </div>
       )}
+
+      {showSend && (
+        <div className="h-full w-full bg-gray-900/80  fixed top-0 left-0 z-50 flex justify-center items-center">
+          <div className="bg-white rounded-lg p-4 shadow-lg h-10/12 w-6/12">
+            <div className="flex justify-between items-start mb-4 h-1/12">
+              <h1 className="text-lg font-semibold ml-2">Send money to User</h1>
+              <button
+                className="cursor-pointer rounded-full w-10 hover:bg-gray-200 transition-all duration-500 flex justify-center items-center p-2"
+                onClick={() => setShowSend(false)}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-gray-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="flex w-full h-1/12">
+              <div onClick={()=>setShowSendFavorites(true)} className={`w-1/2 h-full  mr-4 ${showSendFavorites?"bg-blue-900 shadow-black/50 text-white":"bg-blue-100 text-black"} border-1  hover:bg-blue-900 hover:text-white hover:shadow-black/50 transition duration-700 cursor-pointer border-black/20 shadow-lg flex justify-center items-center text-lg font-semibold rounded-xl`}>Favourites</div>
+              <div onClick={()=>setShowSendFavorites(false)} className={`w-1/2 h-full ${!showSendFavorites?"bg-blue-900 text-white shadow-black/50 ":"bg-blue-100 text-black"}bg-blue-100 border-1 hover:bg-blue-900 hover:text-white hover:shadow-black/50 transition duration-700 cursor-pointer border-black/20 shadow-lg flex justify-center items-center text-lg font-semibold rounded-xl`}>Find User</div>
+            </div>
+            <div className="flex h-10/12 justify-center items-center">
+              {showSendFavorites &&(
+                <h2>show favourites </h2>
+              )}
+              {!showSendFavorites &&(
+                <div className="w-full h-full flex justify-center items-start">
+                  <div className="w-8/12 mt-6">
+                  <input onChange={handleSendIdSearchChange} type="text" value={searchIdValue} placeholder="Enter Rural Fin Id" className="w-full h-12 border-2 hover:border-black/60 transition duration-500 border-gray-200 rounded-lg p-4 mb-4" />
+                    </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       <div className="bg-white rounded-lg p-4 mb-4 shadow-sm flex justify-between items-center">
         <Link to="/userProfile" className=" relative z-0">
           <div className="flex cursor-pointer items-center">
@@ -154,7 +202,7 @@ const UserDashboard = () => {
               e.stopPropagation(); // Prevent Link navigation
               handleLogout();
             }}
-            className="w-30  relative z-10 transition-all duration-700 bg-gradient-to-tr from-blue-500 to-blue-800 hover:from-blue-800 hover:to-blue-500 text-white flex justify-center items-center rounded-xl p-2 h-12 pb-3 ml-2 font-semibold text-lg cursor-pointer"
+            className="w-30  relative z-10 transition duration-700 bg-gradient-to-tr from-blue-500 to-blue-900 hover:from-blue-900 hover:to-blue-500 text-white flex justify-center items-center rounded-xl p-2 h-12 pb-3 ml-2 font-semibold text-lg cursor-pointer"
           >
             Logout
           </button>
@@ -166,7 +214,7 @@ const UserDashboard = () => {
         <div className="w-2/3">
           <div className="grid w-full grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             {/* Balance Card */}
-            <div className=" bg-gradient-to-r cursor-default from-blue-500 to-blue-800 shadow-md shadow-gray-400 ring-blue-800 text-white rounded-lg p-4">
+            <div className=" bg-gradient-to-r cursor-default from-blue-900 to-blue-500 shadow-md shadow-gray-400 ring-blue-800 text-white rounded-lg p-4">
               <div className="mb-4">
                 <svg
                   className="h-6 w-6 text-white"
@@ -187,7 +235,7 @@ const UserDashboard = () => {
             </div>
 
             {/* Rewards Card */}
-            <div className="bg-gradient-to-r cursor-default from-purple-500 to-purple-800 text-white rounded-lg p-4 shadow-md shadow-gray-400">
+            <div className="bg-gradient-to-r cursor-default from-purple-900 to-purple-500 text-white rounded-lg p-4 shadow-md shadow-gray-400">
               <div className="mb-4">
                 <svg
                   className="h-6 w-6 text-white"
@@ -208,7 +256,7 @@ const UserDashboard = () => {
             </div>
 
             {/* Activity Card */}
-            <div className="bg-gradient-to-r cursor-default shadow-md shadow-gray-400 from-green-500 to-green-800 text-white rounded-lg p-4">
+            <div className="bg-gradient-to-r cursor-default shadow-md shadow-gray-400 from-green-800 to-green-500 text-white rounded-lg p-4">
               <div className="mb-4">
                 <svg
                   className="h-6 w-6 text-white"
@@ -247,7 +295,10 @@ const UserDashboard = () => {
                 <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
                 <div className="grid grid-cols-5 gap-4">
                   {/* Send */}
-                  <button className="flex flex-col items-center justify-center p-4 border hover:shadow-black/40 cursor-pointer border-gray-200 shadow-lg hover:bg-gray-200 transition-all duration-500 rounded-lg">
+                  <button
+                    onClick={() => setShowSend(true)}
+                    className="flex flex-col items-center justify-center p-4 border hover:shadow-black/40 cursor-pointer border-gray-200 shadow-lg hover:bg-gray-200 transition-all duration-500 rounded-lg"
+                  >
                     <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mb-2">
                       <svg
                         className="h-5 w-5 text-gray-900"
