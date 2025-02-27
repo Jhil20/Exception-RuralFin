@@ -7,6 +7,7 @@ import {
 } from "../utils/tokenMethods.js";
 import Prisma from "../utils/prisma.js";
 import bcrypt from "bcrypt"
+import { TransactionType } from "@prisma/client";
 
 
 const generateRefreshAndAccessTokens = async (existedUser) => {
@@ -174,31 +175,48 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "user logged out"));
 });
 
-const userActivity = asyncHandler(async (user_id) => {
+const userActivity = asyncHandler(async (req, res) => {
+  const user_id = req.body.user_id;
   const today = new Date();
-  const formattedDate = today.toISOString().split('T')[0];
-  // Example: "2025-02-26"
+
+  // Start of the day (00:00:00)
+  const startOfDay = new Date(today);
+  startOfDay.setUTCHours(0, 0, 0, 0);
+
+  // End of the day (23:59:59)
+  const endOfDay = new Date(today);
+  endOfDay.setUTCHours(23, 59, 59, 999);
 
   const activityPerDayAgent = await Prisma.userAgentTransaction.count({
     where: {
       user_id: user_id,
       date_time: {
-        gte: new Date(today + "T00:00:00.000Z"),
-        lt: new Date(today + "T23:59:59.999Z")
+        gte: startOfDay,
+        lt: endOfDay
       }
     }
-  })
+  });
+
   const activityPerDayUser = await Prisma.peerToPeerTransaction.count({
     where: {
-      user_id: user_id,
+      sender_id: user_id,
       date_time: {
-        gte: new Date(today + "T00:00:00.000Z"),
-        lt: new Date(today + "T23:59:59.999Z")
+        gte: startOfDay,
+        lt: endOfDay
       }
     }
-  })
+  });
+
   let totalTransactionPerDay = activityPerDayAgent + activityPerDayUser;
-})
+  
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      { Transaction: totalTransactionPerDay },
+      "Per day transaction fetched"
+    )
+  );
+});
 
 
 const totalAgent = asyncHandler(async (req, res) => {
@@ -326,6 +344,6 @@ const getWalletId = asyncHandler(async (req,res)=>{
   )
 })
 
-export { createUser, loginUser, logoutUser, totalAgent, notificationToUser,getAllUser,getUserById,getWalletId };
+export { createUser, loginUser, logoutUser, totalAgent, notificationToUser,getAllUser,getUserById,getWalletId,userActivity };
 
 

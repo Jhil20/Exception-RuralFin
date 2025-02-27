@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createUser,loginUser,logoutUser, totalAgent,notificationToUser,getAllUser,getUserById,getWalletId } from "../controllers/userController.js";
+import { createUser,loginUser,logoutUser, totalAgent,notificationToUser,getAllUser,getUserById,getWalletId,userActivity } from "../controllers/userController.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { getAllTransactionUser } from "../controllers/transactionController.js";
 
@@ -14,5 +14,5 @@ router.route("/getAllTransaction").post(getAllTransactionUser)
 router.route("/getAllUser").get(getAllUser);
 router.route("/getById").get(getUserById);
 router.route("/getWallet").get(getWalletId);
-
-export default router 
+router.route("/userActivity").get(userActivity)
+export default router
