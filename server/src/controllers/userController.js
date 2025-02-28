@@ -96,67 +96,12 @@ const createUser = asyncHandler(async (req, res) => {
     if (!user_pin || !/^\d{4,6}$/.test(user_pin)) {
       throw new ApiError(400, "User PIN must be a 4 to 6 digit number");
     }
-    const validStates = [
-      "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
-      "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
-      "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram",
-      "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
-      "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
-      "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu",
-      "Delhi", "Lakshadweep", "Puducherry", "Jammu & Kashmir", "Ladakh"
-    ];
     if (!state) {
       throw new ApiError(400, "State Field is empty");
     }
-    if (!validStates.includes(state)) {
-      throw new ApiError(400, "Enter appropriate State")
-    }
-
-    const stateCities = {
-      "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur", "Tirupati", "Nellore", "Kurnool", "Rajahmundry", "Kadapa", "Anantapur"],
-      "Arunachal Pradesh": ["Itanagar", "Tawang", "Ziro", "Pasighat", "Bomdila", "Roing", "Daporijo"],
-      "Assam": ["Guwahati", "Dibrugarh", "Silchar", "Jorhat", "Tezpur", "Tinsukia", "Nagaon"],
-      "Bihar": ["Patna", "Gaya", "Bhagalpur", "Muzaffarpur", "Purnia", "Darbhanga", "Begusarai", "Arrah", "Bettiah"],
-      "Chhattisgarh": ["Raipur", "Bilaspur", "Durg", "Bhilai", "Korba", "Jagdalpur", "Ambikapur"],
-      "Goa": ["Panaji", "Margao", "Vasco da Gama", "Mapusa", "Ponda"],
-      "Gujarat": ["Ahmedabad", "Surat", "Vadodara", "Rajkot", "Gandhinagar", "Bhavnagar", "Jamnagar", "Junagadh", "Anand"],
-      "Haryana": ["Chandigarh", "Faridabad", "Gurugram", "Panipat", "Ambala", "Hisar", "Rohtak", "Yamunanagar"],
-      "Himachal Pradesh": ["Shimla", "Manali", "Dharamshala", "Mandi", "Kullu", "Chamba", "Solan", "Bilaspur"],
-      "Jharkhand": ["Ranchi", "Jamshedpur", "Dhanbad", "Bokaro", "Hazaribagh", "Deoghar", "Giridih"],
-      "Karnataka": ["Bengaluru", "Mysuru", "Hubballi", "Mangaluru", "Belagavi", "Davangere", "Shivamogga", "Ballari"],
-      "Kerala": ["Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur", "Kollam", "Palakkad", "Kannur", "Alappuzha"],
-      "Madhya Pradesh": ["Bhopal", "Indore", "Gwalior", "Jabalpur", "Ujjain", "Satna", "Sagar", "Ratlam"],
-      "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik", "Aurangabad", "Solapur", "Amravati", "Kolhapur", "Latur"],
-      "Manipur": ["Imphal", "Thoubal", "Bishnupur", "Kakching", "Ukhrul", "Senapati"],
-      "Meghalaya": ["Shillong", "Tura", "Nongstoin", "Jowai", "Williamnagar"],
-      "Mizoram": ["Aizawl", "Lunglei", "Champhai", "Saiha", "Kolasib"],
-      "Nagaland": ["Kohima", "Dimapur", "Mokokchung", "Tuensang", "Mon", "Zunheboto"],
-      "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela", "Sambalpur", "Berhampur", "Puri", "Balasore", "Jeypore"],
-      "Punjab": ["Chandigarh", "Ludhiana", "Amritsar", "Jalandhar", "Patiala", "Bathinda", "Hoshiarpur"],
-      "Rajasthan": ["Jaipur", "Udaipur", "Jodhpur", "Kota", "Ajmer", "Bikaner", "Alwar", "Bharatpur"],
-      "Sikkim": ["Gangtok", "Namchi", "Mangan", "Gyalshing", "Jorethang"],
-      "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem", "Tirunelveli", "Erode", "Vellore"],
-      "Telangana": ["Hyderabad", "Warangal", "Nizamabad", "Karimnagar", "Khammam", "Ramagundam", "Mahbubnagar"],
-      "Tripura": ["Agartala", "Udaipur", "Dharmanagar", "Kailashahar", "Ambassa"],
-      "Uttar Pradesh": ["Lucknow", "Kanpur", "Agra", "Varanasi", "Meerut", "Prayagraj", "Bareilly", "Moradabad", "Gorakhpur"],
-      "Uttarakhand": ["Dehradun", "Haridwar", "Rishikesh", "Haldwani", "Nainital", "Roorkee", "Kashipur"],
-      "West Bengal": ["Kolkata", "Howrah", "Durgapur", "Siliguri", "Asansol", "Kharagpur", "Haldia"],
-
-      // Union Territories
-      "Andaman and Nicobar Islands": ["Port Blair"],
-      "Chandigarh": ["Chandigarh"],
-      "Dadra and Nagar Haveli and Daman and Diu": ["Daman", "Silvassa"],
-      "Delhi": ["New Delhi"],
-      "Lakshadweep": ["Kavaratti"],
-      "Puducherry": ["Puducherry", "Karaikal", "Mahe", "Yanam"],
-      "Jammu & Kashmir": ["Srinagar", "Jammu", "Anantnag", "Baramulla"],
-      "Ladakh": ["Leh", "Kargil"]
-    };
+    
     if (!city) {
       throw new ApiError(400, "City field is empty");
-    }
-    if (!stateCities[state].includes(city)) {
-      throw new ApiError(400, "Enter Appropriate City");
     }
 
     const user = await Prisma.user.findUnique({

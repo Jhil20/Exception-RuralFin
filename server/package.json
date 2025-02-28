@@ -24,6 +24,7 @@
     "nodemon": "^3.1.9",
     "pg": "^8.13.3",
     "postgresql": "^0.0.1",
+    "razorpay": "^2.9.6",
     "router": "^2.1.0",
     "twilio": "^5.4.5"
   },
