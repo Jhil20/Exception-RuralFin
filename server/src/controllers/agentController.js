@@ -6,31 +6,33 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import nodemailer from "nodemailer"
 import { generateWalletId } from "./userController.js";
 import bcrypt from "bcrypt"
+import instance from "../utils/razorpay.js";
+import Razorpay from "razorpay";
 
-const generateRefreshAndAccessTokens=async(existedAgent)=>{
-    try{
+const generateRefreshAndAccessTokens = async (existedAgent) => {
+    try {
         console.log(existedAgent);
         const accessToken = generateAccessToken(existedAgent);
-        const refreshToken=generateRefreshToken(existedAgent);
-        existedAgent.refresh_token=refreshToken;
+        const refreshToken = generateRefreshToken(existedAgent);
+        existedAgent.refresh_token = refreshToken;
         await Prisma.agent.update({
-            where:{
-                agent_id:existedAgent.agent_id
+            where: {
+                agent_id: existedAgent.agent_id
             },
-            data:{
+            data: {
                 refresh_token: refreshToken
             }
         })
 
-        return{refreshToken,accessToken};
+        return { refreshToken, accessToken };
     }
-    catch(error){
-        throw new ApiError(500,"something went wrong in creating refresh and access token");
+    catch (error) {
+        throw new ApiError(500, "something went wrong in creating refresh and access token");
     }
 }
 
-const createAgent = asyncHandler(async(req,res)=>{
-    var{
+const createAgent = asyncHandler(async (req, res) => {
+    var {
         full_name,
         phone_num,
         email,
@@ -41,7 +43,7 @@ const createAgent = asyncHandler(async(req,res)=>{
         bank_details,
         security_deposit,
         payment_mode
-    }=req.body;
+    } = req.body;
 
     console.log("inside agent create controller")
 
@@ -76,17 +78,14 @@ const createAgent = asyncHandler(async(req,res)=>{
         if (!bank_details || !/^\d{6,18}$/.test(bank_details)) {
             throw new ApiError(400, "Invalid bank account number. It should be between 6 to 18 digits.");
         }
-        if(!security_deposit)
-        {
-            throw new ApiError(400,"Security deposit is no entered");
+        if (!security_deposit) {
+            throw new ApiError(400, "Security deposit is no entered");
         }
-        if(!payment_mode)
-        {
-            throw new ApiError(400,"Enter the payment mode");
+        if (!payment_mode) {
+            throw new ApiError(400, "Enter the payment mode");
         }
-        if(!payment_mode=='CASH' || !payment_mode=='DIGITAL')
-        {
-            throw new ApiError(400,"Enter valid payment mode");
+        if (!payment_mode == 'CASH' || !payment_mode == 'DIGITAL') {
+            throw new ApiError(400, "Enter valid payment mode");
         }
 
         const agent = await Prisma.agent.findUnique({
@@ -94,12 +93,12 @@ const createAgent = asyncHandler(async(req,res)=>{
                 phone_num: phone_num
             }
         });
-        
-        if(agent){
+
+        if (agent) {
             throw new ApiError(400, "Agent phone number already  exists");
         }
 
-        const newAgent=await Prisma.agent.create({
+        const newAgent = await Prisma.agent.create({
             data: {
                 full_name,
                 phone_num,
@@ -112,114 +111,111 @@ const createAgent = asyncHandler(async(req,res)=>{
             }
         })
         await Prisma.agentAdminTransaction.create({
-            data:{
-                agent_id:newAgent.agent_id,
-                security_deposit_amt:security_deposit,
-                isPending:"PENDING",
-                payment_mode:payment_mode
+            data: {
+                agent_id: newAgent.agent_id,
+                security_deposit_amt: security_deposit,
+                isPending: "PENDING",
+                payment_mode: payment_mode
             }
         })
-        console.log("new agent",newAgent);
+        console.log("new agent", newAgent);
 
         res.status(200).json(
             new ApiResponse(200, "Agent registered successfully")
-        )        
-}
- catch (error) {
-    res.status(error.statusCode || 500).json({ message: error.message || "Internal Server Error" });
-}
+        )
+    }
+    catch (error) {
+        res.status(error.statusCode || 500).json({ message: error.message || "Internal Server Error" });
+    }
 })
 
-const loginAgent = asyncHandler(async(req,res)=>{
-    const{phone_num}=req.body;
-    if(!phone_num){
-        throw new ApiError(400,"Phone number is not entered");
+const loginAgent = asyncHandler(async (req, res) => {
+    const { phone_num } = req.body;
+    if (!phone_num) {
+        throw new ApiError(400, "Phone number is not entered");
     }
-    const existedAgent=await Prisma.agent.findUnique({
-        where:{
+    const existedAgent = await Prisma.agent.findUnique({
+        where: {
             phone_num
         }
     })
 
-    if(!existedAgent){
-        throw new ApiError(404,"Agent not exists");
+    if (!existedAgent) {
+        throw new ApiError(404, "Agent not exists");
     }
 
-    const {refreshToken,accessToken}=await generateRefreshAndAccessTokens(existedAgent);
+    const { refreshToken, accessToken } = await generateRefreshAndAccessTokens(existedAgent);
     console.log(refreshToken);
     console.log(accessToken);
-    
-    
+
+
     const options = {
         httpOnly: true,
         secure: true
     }
     return res.status(200)
-    .cookie("accessToken",accessToken,options)
-    .cookie("refreshToken",refreshToken,options)
-    .json(
-        new ApiResponse(
-            200,
-            {
-                agent: existedAgent
-            },
-            "User logged in successfully"
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    agent: existedAgent
+                },
+                "User logged in successfully"
+            )
         )
-    )
 })
 
-const logoutAgent=asyncHandler(async(req,res)=>{
+const logoutAgent = asyncHandler(async (req, res) => {
     await Prisma.agent.update({
-        where:{
-            agent_id:agent.agent_id
+        where: {
+            agent_id: agent.agent_id
         },
-        data:{
-            refreshToken:null
+        data: {
+            refreshToken: null
         }
     })
 
-    const options={
-        httpOnly:true,
-        secure:true
+    const options = {
+        httpOnly: true,
+        secure: true
     }
-    
+
     return res
-    .status(200)
-    .clearCookie("accessToken",options)
-    .clearCookie("refreshToken",options)
-    .json(new ApiResponse(200,{},"Agent logged out"))
+        .status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(new ApiResponse(200, {}, "Agent logged out"))
 })
 
-const walletCreation = asyncHandler(async(req,res)=>{
-    const {agent_id,agent_pin} = req.body;
-    if(!agent_id)
-    {
-        throw new ApiError(400,"Agent ID is required");
+const walletCreation = asyncHandler(async (req, res) => {
+    const { agent_id, agent_pin } = req.body;
+    if (!agent_id) {
+        throw new ApiError(400, "Agent ID is required");
     }
-    if(!agent_pin)
-    {
-        throw new ApiError(400,"PIN is required");
+    if (!agent_pin) {
+        throw new ApiError(400, "PIN is required");
     }
     const agent = await Prisma.agentAdminTransaction.findUnique({
-        where:{
-            agent_id:agent_id
+        where: {
+            agent_id: agent_id
         },
-        select:{
-            isPending:true,
-            security_deposit_amt:true
+        select: {
+            isPending: true,
+            security_deposit_amt: true
         }
     })
-    if(agent.isPending == "PENDING")
-    {
-        throw new ApiError(400,"Complete the security payment first");
+    if (agent.isPending == "PENDING") {
+        throw new ApiError(400, "Complete the security payment first");
     }
-    const hashedPin = await bcrypt.hash(agent_pin,10);
+    const hashedPin = await bcrypt.hash(agent_pin, 10);
     await Prisma.agentWallet.create({
-        data:{
-            wallet_id:generateWalletId()+"-AGENT",
-            agent_id:agent_id,
-            agent_pin:hashedPin,
-            wallet_balance:agent.security_deposit_amt
+        data: {
+            wallet_id: generateWalletId() + "-AGENT",
+            agent_id: agent_id,
+            agent_pin: hashedPin,
+            wallet_balance: agent.security_deposit_amt
         }
     })
     res.status(200).json(
@@ -230,4 +226,39 @@ const walletCreation = asyncHandler(async(req,res)=>{
     )
 })
 
-export  {createAgent,loginAgent,logoutAgent,walletCreation}
+const securityDepositPayment = asyncHandler(async (req, res) => {
+    const { amount } = req.body;
+    const options = {
+        amount: amount * 100,
+        currency: "INR"
+    }
+
+    const payment = await instance.orders.create(options)
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            {
+                razorpay: payment
+            }
+        )
+    )
+})
+
+//to be done after backend
+const verifyPayment = asyncHandler(async (req, res) => {
+    console.log(req.body)
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+
+    const generated_signature = crypto
+        .createHmac("sha256", process.env.RAZORPAY_SECRET)
+        .update(razorpay_order_id + "|" + razorpay_payment_id)
+        .digest("hex");
+
+    if (generated_signature === razorpay_signature) {
+        // Payment successful, update wallet balance or notify admin
+        res.json({ success: true, message: "Payment verified successfully!" });
+    } else {
+        res.status(400).json({ success: false, message: "Payment verification failed!" });
+    }
+})
+export { createAgent, loginAgent, logoutAgent, walletCreation, securityDepositPayment,verifyPayment }
