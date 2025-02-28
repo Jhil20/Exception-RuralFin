@@ -65,6 +65,7 @@ model UserWallet {
   created_at  DateTime @default(now())
 
   user        User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
 }
 
 // Agent Model
@@ -98,6 +99,8 @@ model AgentWallet {
   agent_id       String  @unique
 
   agent         Agent @relation(fields: [agent_id], references: [agent_id], onDelete: Cascade)
+
+   transactions  UserAgentTransaction[] @relation("AgentWalletTransactions")
 }
 
 // Agent-Admin Transactions
@@ -123,6 +126,7 @@ model UserAgentTransaction {
   user         User  @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   agent        Agent @relation(fields: [agent_id], references: [agent_id], onDelete: Cascade)
 }
+
 
 // Peer-to-Peer Transactions
 model PeerToPeerTransaction {

@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import Prisma from "../utils/prisma.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/agentTokens.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import nodemailer from "nodemailer"
 
 const generateRefreshAndAccessTokens=async(existedAgent)=>{
     try{
@@ -164,5 +165,6 @@ const logoutAgent=asyncHandler(async(req,res)=>{
     .clearCookie("refreshToken",options)
     .json(new ApiResponse(200,{},"Agent logged out"))
 })
+
 
 export  {createAgent,loginAgent,logoutAgent}
