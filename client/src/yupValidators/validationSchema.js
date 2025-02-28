@@ -54,7 +54,7 @@ export const PTPvalidationSchema = Yup.object().shape({
   amount: Yup.number()
     .moreThan(0, "Amount must be greater than zero")
     .required("Amount is required"),
-    user_pin: Yup.string()
+  user_pin: Yup.string()
     .matches(/^\d{4}$/, "PIN must be exactly 4 digits") // Ensures exactly 4 digits
     .required("PIN is required"),
 });
@@ -66,19 +66,32 @@ export const otpValidationSchema = Yup.object().shape({
 });
 
 export const agentValidationSchema = Yup.object().shape({
-  agent_name: Yup.string().required("Agent Name is required"),
-  agent_phone: Yup.string()
+  full_name: Yup.string().required("Agent Name is required"),
+  phone_num: Yup.string()
     .required("Phone Number is required")
     .matches(/^[0-9]+$/, "Phone Number must be digits only")
     .min(10, "Phone Number must be at least 10 digits"),
   email: Yup.string()
     .email("Invalid email format")
     .required("Email is required"),
-  location: Yup.string().required("Location is required"),
-  securityDeposit: Yup.number()
-    .required("Security Deposit is required")
-    .positive("Must be a positive number"),
-  balance: Yup.number()
-    .required("Balance is required")
-    .positive("Must be a positive number"),
+  bank_details: Yup.string()
+    .matches(/^\d{6,18}$/, "Bank acc. no. should be between 6-18 digits.")
+    .required("Bank acc. number is required"),
+  security_deposit: Yup.number()
+    .min(10000, "Deposit must be greater than 10000")
+    .typeError("Security deposit must be a number")
+    .required("Security deposit is required"),
+  payment_mode: Yup.string()
+    .oneOf(["CASH", "DIGITAL"], "Enter a valid payment mode (CASH or DIGITAL)")
+    .required("Payment mode is required"),
+});
+
+export const agentSignupValidationSchema2 = Yup.object().shape({
+  address: Yup.string()
+    .trim()
+    .required("Street Address is required")
+    .min(5, "Address must be at least 5 characters long"),
+  city: Yup.string().trim().required("City is required"),
+  state: Yup.string().trim().required("State is required"),
+  pincode: Yup.string().required("Pincode is required"),
 });

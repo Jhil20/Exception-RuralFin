@@ -12,6 +12,7 @@ import {
 } from "../yupValidators/validationSchema";
 import { userLoggedin } from "../redux/slices/signInSlice";
 import UserSignupForm from "../components/UserSignupForm";
+import AgentSignupForm from "../components/AgentSignupForm";
 
 const Login = () => {
   const [showLogin, setShowLogin] = useState(true);
@@ -53,18 +54,7 @@ const Login = () => {
     console.log("otp login");
   };
 
-  const handleAgentSubmit = async (values) => {
-    console.log("in agent sigunp", values);
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/agent/register",
-        values
-      ); /// backend not working for create agent
-      console.log("response", response);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+
 
   
 
@@ -154,145 +144,7 @@ const Login = () => {
           {!showAgent && <UserSignupForm showAgent={showAgent} error={error} setShowLogin={setShowLogin}/>}
           
           {showAgent && (
-            <Formik
-              initialValues={{
-                agent_name: "",
-                agent_phone: "",
-                email: "",
-                location: "",
-                securityDeposit: "",
-                balance: "",
-              }}
-              validationSchema={agentValidationSchema}
-              onSubmit={handleAgentSubmit}
-            >
-              <Form className="space-y-4 flex flex-wrap">
-                {/* Agent Name */}
-                <div className="flex-auto mr-3">
-                  <label className="block text-gray-700 mb-1 ml-1">
-                    Agent Name*
-                  </label>
-                  <Field
-                    name="agent_name"
-                    className="w-full p-2 border hover:ring-[1px] ring-gray-700 transition-all duration-500 border-gray-300 rounded-md"
-                  />
-                  <ErrorMessage
-                    name="agent_name"
-                    component="p"
-                    className="text-red-500 text-sm"
-                  />
-                </div>
-
-                {/* Agent Phone */}
-                <div className="flex-auto">
-                  <label className="block text-gray-700 mb-1 ml-1">
-                    Agent Phone*
-                  </label>
-                  <Field
-                    name="agent_phone"
-                    className="w-full p-2 border hover:ring-[1px] ring-gray-700 transition-all duration-500 border-gray-300 rounded-md"
-                  />
-                  <ErrorMessage
-                    name="agent_phone"
-                    component="p"
-                    className="text-red-500 text-sm"
-                  />
-                </div>
-
-                {/* Email */}
-                <div className="flex-auto mr-3">
-                  <label className="block text-gray-700 mb-1 ml-1">
-                    Email*
-                  </label>
-                  <Field
-                    type="email"
-                    name="email"
-                    className="w-full p-2 border hover:ring-[1px] ring-gray-700 transition-all duration-500 border-gray-300 rounded-md"
-                  />
-                  <ErrorMessage
-                    name="email"
-                    component="p"
-                    className="text-red-500 text-sm"
-                  />
-                </div>
-
-                {/* Location */}
-                <div className="flex-auto mr-3">
-                  <label className="block text-gray-700 mb-1 ml-1">
-                    Location*
-                  </label>
-                  <Field
-                    name="location"
-                    className="w-full p-2 border hover:ring-[1px] ring-gray-700 transition-all duration-500 border-gray-300 rounded-md"
-                  />
-                  <ErrorMessage
-                    name="location"
-                    component="p"
-                    className="text-red-500 text-sm"
-                  />
-                </div>
-
-                {/* Security Deposit */}
-                <div className="flex-auto mr-3">
-                  <label className="block text-gray-700 mb-1 ml-1">
-                    Security Deposit*
-                  </label>
-                  <Field
-                    type="number"
-                    name="securityDeposit"
-                    className="w-full p-2 border hover:ring-[1px] ring-gray-700 transition-all duration-500 border-gray-300 rounded-md no-spinner"
-                  />
-                  <ErrorMessage
-                    name="securityDeposit"
-                    component="p"
-                    className="text-red-500 text-sm"
-                  />
-                </div>
-
-                {/* Balance */}
-                <div className="flex-auto">
-                  <label className="block text-gray-700 mb-1 ml-1">
-                    Balance*
-                  </label>
-                  <Field
-                    type="number"
-                    name="balance"
-                    className="w-full p-2 border hover:ring-[1px] ring-gray-700 transition-all duration-500 border-gray-300 rounded-md no-spinner"
-                  />
-                  <ErrorMessage
-                    name="balance"
-                    component="p"
-                    className="text-red-500 text-sm"
-                  />
-                </div>
-
-                {error && (
-                  <h1 className="text-md text-red-500 font-bold">
-                    {error || "Something Went Wrong. Please Try Again"}
-                  </h1>
-                )}
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  className="w-full bg-blue-700 text-white cursor-pointer py-2 rounded-md hover:bg-blue-800 transition-all duration-500"
-                >
-                  Submit
-                </button>
-
-                {/* Redirect to Login */}
-                <div className="w-full h-fit">
-                  <h1
-                    className="cursor-pointer text-center text-gray-700"
-                    onClick={() => {
-                      setShowLogin(true);
-                    }}
-                  >
-                    Already have an account? Sign in!!
-                  </h1>
-                </div>
-              </Form>
-            </Formik>
+            <AgentSignupForm  showAgent={showAgent} error={error} setShowLogin={setShowLogin}/>
           )}
 
           

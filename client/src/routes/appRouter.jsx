@@ -30,7 +30,7 @@ const appRouter = createBrowserRouter([
       {
         path:"/budget",
         element:<Budget/>,
-      }
+      },  
     ],
   },
 ]);

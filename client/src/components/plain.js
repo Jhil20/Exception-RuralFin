@@ -1,65 +1,4 @@
-import React, { useState } from "react";
-import Box from "@mui/material/Box";
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepLabel from "@mui/material/StepLabel";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import {
-  signupValidationSchema,
-  signupValidationSchema2,
-} from "../yupValidators/validationSchema";
-import CityAutocomplete from "./CityAutoComplete";
-import axios from "axios";
-import Cookies from "js-cookie";
-import { useDispatch } from "react-redux";
-import { userLoggedin } from "../redux/slices/signInSlice";
-
-const UserSignupForm = (props) => {
-  const steps = ["Personal Information", "Address Information"];
-  const [activeStep, setActiveStep] = useState(0);
-  const [profileData, setProfileData] = useState({});
-
-  const dispatch = useDispatch();
-
-  const handleNext = (values) => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    console.log("values", values);
-    setProfileData(values);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
-  const handleReset = () => {
-    setActiveStep(0);
-  };
-
-  const handleUserSignupSubmit = async (values) => {
-    console.log("hhhhhhh");
-    try {
-      const formData = { ...profileData, ...values };
-      console.log("formData", formData);
-      const response = await axios.post(
-        "http://localhost:5000/users/register",
-        formData
-      );
-      const token = response?.data?.data?.user?.refresh_token;
-      Cookies.set("jwt-token", token);
-      dispatch(userLoggedin());
-      props.setShowLogin(true);
-      // navigate("/");
-      console.log("response", response);
-    } catch (error) {
-      // setError(error?.response?.data?.message || "Something Went Wrong");
-      console.log("error", error);
-    }
-  };
-
-  return (
-    <Box sx={{ width: "100%" }}>
+<Box sx={{ width: "100%" }}>
       <Stepper activeStep={activeStep} className="mb-6">
         {steps.map((label, index) => {
           const stepProps = {};
@@ -332,7 +271,3 @@ const UserSignupForm = (props) => {
         </>
       )}
     </Box>
-  );
-};
-
-export default UserSignupForm;

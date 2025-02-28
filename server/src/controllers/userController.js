@@ -513,6 +513,6 @@ const getUserByWalletId = asyncHandler(async (req, res) => {
 });
 
 
-export { createUser, loginUser, logoutUser, totalAgent,getUserByWalletId, notificationToUser,getAllUser,getUserById,getWalletId,userActivity };
+export { createUser, loginUser, logoutUser, totalAgent,getUserByWalletId,generateWalletId, notificationToUser,getAllUser,getUserById,getWalletId,userActivity };
 
 

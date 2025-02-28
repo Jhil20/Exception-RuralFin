@@ -28,7 +28,6 @@ const generateRefreshAndAccessToken = async (existedAdmin) => {
 }
 
 
-const loginAdmin = asyncHandler(async (req, res) => {
 
 const loginAdmin = asyncHandler(async (req, res) => {
 
