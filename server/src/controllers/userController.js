@@ -344,6 +344,6 @@ const getWalletId = asyncHandler(async (req,res)=>{
   )
 })
 
-export { createUser, loginUser, logoutUser, totalAgent, notificationToUser,getAllUser,getUserById,getWalletId,userActivity };
+export { createUser, loginUser, logoutUser, totalAgent, notificationToUser,getAllUser,getUserById,getWalletId,userActivity,generateWalletId };
 
 
