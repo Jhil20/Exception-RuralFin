@@ -7,14 +7,19 @@ import AgentCard from "../components/AgentCard";
 import RecentTransactionCard from "../components/RecentTransactionCard";
 import axios from "axios";
 import UserCard from "../components/UserCard";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import { PTPvalidationSchema } from "../yupValidators/validationSchema";
 
 const UserDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const tokenData = jwtDecode(Cookies.get("jwt-token"));
-  console.log(tokenData);
+  // console.log(tokenData);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showUserProfile, setShowUserProfile] = useState(false);
+  const [userProfileData, setUserProfileData] = useState({});
+  const [userWalletData, setUserWalletData] = useState({});
   const [showAgentTranscationOptions, setShowAgentTranscationOptions] =
     useState(false);
   const [showSend, setShowSend] = useState(false);
@@ -23,8 +28,11 @@ const UserDashboard = () => {
   const [showRecentTransactionInfo, setShowRecentTransactionInfo] =
     useState(false);
   const [allUsers, setAllUsers] = useState([]);
-
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [errors, setErrors] = useState("");
   const [showSendFavorites, setShowSendFavorites] = useState(true);
+  const [showPTP, setShowPTP] = useState(false);
+  const [recieverId, setRecieverId] = useState("");
   const handleLogout = () => {
     Cookies.remove("jwt-token");
     console.log("logout clled");
@@ -39,7 +47,32 @@ const UserDashboard = () => {
   const [searchIdValue, setSearchIdValue] = useState("");
 
   const handleSendIdSearchChange = (e) => {
-    setSearchIdValue(e.target.value);
+    setSearchIdValue(e.target.value.toUpperCase());
+    setFilteredUsers(allUsers);
+    setErrors("");
+  };
+
+  useEffect(() => {
+    // if (showUserProfile) {
+    getUserProfile();
+    // }
+  }, [showUserProfile]);
+
+  const getUserProfile = async () => {
+    try {
+      const result = await axios.get(
+        `http://localhost:5000/users/${tokenData.user_id}`
+      );
+      const result2 = await axios.get(
+        `http://localhost:5000/users/getWallet/${tokenData.user_id}`
+      );
+      // console.log("result2", result2);
+      // console.log("result", result);
+      setUserWalletData(result2?.data?.data?.wallet);
+      setUserProfileData(result?.data?.data?.user);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -51,12 +84,64 @@ const UserDashboard = () => {
   const getUsers = async () => {
     try {
       const result = await axios.get("http://localhost:5000/users");
-      console.log("result", result);
-      setAllUsers(result?.data?.data?.users);
+      // console.log("result all usera", result);
+      setAllUsers(result?.data?.data?.user);
+      setFilteredUsers(result?.data?.data?.user);
     } catch (error) {
       console.log(error);
     }
   };
+
+  const handleUpiSearch = async () => {
+    const pattern = /^[A-Z]{3}@RURALFIN$/;
+    if (!pattern.test(searchIdValue)) {
+      setErrors("Invalid RURAL-FIN UPI ID");
+      return;
+    } else {
+      console.log("ncjdnjansjnaskc", searchIdValue);
+      setErrors("");
+    }
+
+    try {
+      const result = await axios.post(
+        `http://localhost:5000/users/getUserByWallet/${searchIdValue}`
+      );
+      console.log("result of wallet id search", result);
+      setFilteredUsers([result?.data?.data?.user]);
+      if (result?.data?.data?.user?.user_id == tokenData.user_id) {
+        setErrors("You cannot send money to yourself");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleTransactionSubmit = async (values) => {
+    try {
+      const senderId = tokenData.user_id;
+      const recipientId = recieverId;
+
+      const response1=await axios.get(`http://localhost:5000/transaction/getWalletByUser/${senderId}`);
+      const response2=await axios.get(`http://localhost:5000/transaction/getWalletByUser/${recipientId}`);
+      console.log("response1",response1);
+      console.log("response2",response2);
+      const sender_id=response1?.data?.data?.wallet_id;
+      const recipient_id=response2?.data?.data?.wallet_id;
+      const formData = { ...values, sender_id, recipient_id };
+      console.log("form data", formData);
+      const result = await axios.post(
+        "http://localhost:5000/transaction/userTouser",
+        formData
+      );
+      console.log("result of transaction", result);
+    } catch (error) {
+      console.log("error in transaction", error);
+    }
+  };
+
+  // console.log("filter users",allUsers?.filter((user) => {
+  //   if (user.user_id != tokenData.user_id) return user;
+  // }))
 
   return (
     <div className="w-full p-4 bg-gray-50 h-screen">
@@ -153,7 +238,91 @@ const UserDashboard = () => {
 
       {showSend && (
         <div className="h-full w-full bg-gray-900/80  fixed top-0 left-0 z-50 flex justify-center items-center">
-          <div className="bg-white rounded-lg p-4 shadow-lg h-10/12 w-6/12">
+          <div className="bg-white rounded-lg p-4 px-8 shadow-lg h-10/12 w-6/12">
+            {showPTP && (
+              <div className="h-full w-full bg-gray-900/30 fixed top-0 left-0 z-50 flex justify-center items-center">
+                <div className="bg-white rounded-lg p-4 px-8 shadow-lg h-6/12 w-3/12">
+                  <div className="flex justify-between items-start mb-2 h-1/12">
+                    <h1 className="text-lg mt-1 font-semibold ml-2">
+                      Transaction Panel
+                    </h1>
+                    <button
+                      className="cursor-pointer rounded-full w-10 hover:bg-gray-200 transition-all duration-500 flex justify-center items-center p-2"
+                      onClick={() => setShowPTP(false)}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6 text-gray-500"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="h-11/12 w-full">
+                    <Formik
+                      initialValues={{
+                        sender_id: "",
+                        recipient_id: "",
+                        amount: "",
+                        user_pin: "",
+                      }}
+                      validationSchema={PTPvalidationSchema}
+                      onSubmit={handleTransactionSubmit}
+                    >
+                      <Form className="space-y-4 flex mt-6 items-center content-center h-10/12 justify-center flex-wrap w-full">
+                        <div className="flex-auto w-full">
+                          <label className="block text-gray-700 mb-1 ml-1">
+                            Enter Amount*
+                          </label>
+                          <Field
+                            name="amount"
+                            type="number"
+                            className="w-full p-2 no-spinner border hover:ring-[1px] ring-gray-700 transition-all duration-500 border-gray-300 rounded-md"
+                          />
+                          <ErrorMessage
+                            name="amount"
+                            component="p"
+                            className="text-red-500 text-sm"
+                          />
+                        </div>
+                        <div className="flex-auto w-full">
+                          <label className="block text-gray-700 mb-1 ml-1">
+                            Enter PIN*
+                          </label>
+                          <Field
+                            name="user_pin"
+                            placeholder="XXXX"
+                            className="w-full p-2 border hover:ring-[1px] ring-gray-700 transition-all duration-500 border-gray-300 rounded-md"
+                          />
+                          <ErrorMessage
+                            name="user_pin"
+                            component="p"
+                            className="text-red-500 text-sm"
+                          />
+                        </div>
+                        <div className="w-full flex justify-center mt-4">
+                          <button
+                            type="submit"
+                            className="w-7/12 h-10 bg-gradient-to-tr from-blue-600 to-blue-950 rounded-lg hover:from-blue-950 hover:to-blue-600 shadow-lg shadow-black/30 cursor-pointer hover:shadow-black/60 text-white text-lg font-bold transition duration-700"
+                          >
+                            Submit
+                          </button>
+                        </div>
+                      </Form>
+                    </Formik>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex justify-between items-start mb-2 h-1/12">
               <h1 className="text-lg mt-1 font-semibold ml-2">
                 Send money to User
@@ -204,23 +373,37 @@ const UserDashboard = () => {
               {showSendFavorites && <h2>show favourites</h2>}
               {!showSendFavorites && (
                 <div className="w-full h-full flex flex-wrap justify-center content-start items-start">
-                  <div className="w-8/12 mt-6">
+                  <div className="w-full flex justify-center items-center mt-6">
                     <input
                       onChange={handleSendIdSearchChange}
                       type="text"
                       value={searchIdValue}
                       placeholder="Enter Rural Fin Id"
-                      className="w-full h-12 border-2 hover:border-black/60 transition duration-500 border-gray-200 rounded-lg p-4 mb-4"
+                      className="w-7/12 h-12 mr-6 border-2 hover:border-black/60 transition duration-500 border-gray-200 rounded-lg p-4"
                     />
+                    <button
+                      onClick={handleUpiSearch}
+                      className="h-12 text-xl font-semibold hover:shadow-lg hover:shadow-black/50 w-32 rounded-xl text-white bg-gradient-to-tr from-blue-600 to-blue-950 bg-blue-400 transition duration-700 cursor-pointer hover:from-blue-950 hover:to-blue-600"
+                    >
+                      Search
+                    </button>
                   </div>
+                  <p className="w-full ml-20 mt-1 mb-6 text-red-700">
+                    {errors}
+                  </p>
                   <div className="w-full grid grid-cols-2 gap-4">
-                    {allUsers
-                      .filter((user) => {
-                        if (user.user_id == tokenData.user_id) return user;
+                    {filteredUsers
+                      ?.filter((user) => {
+                        if (user.user_id != tokenData.user_id) return user;
                       })
                       .slice(0, 6)
                       .map((user) => (
-                        <UserCard key={user.user_id} user={user} />
+                        <UserCard
+                          key={user.user_id}
+                          user={user}
+                          setShowPTP={setShowPTP}
+                          setRecieverId={setRecieverId}
+                        />
                       ))}
                   </div>
                 </div>
@@ -403,14 +586,123 @@ const UserDashboard = () => {
         </div>
       )}
 
+      {showUserProfile && (
+        <div className="h-full w-full bg-gray-900/80  fixed top-0 left-0 z-50 flex justify-center items-center">
+          <div className="bg-gradient-to-tr from-white to-blue-400 rounded-lg p-4 pb-0 shadow-lg h-8/12 w-7/12">
+            <div className="flex justify-between items-start h-1/12">
+              <h1 className="text-xl font-bold ml-2"></h1>
+              <button
+                className="cursor-pointer rounded-full w-10 transition-all duration-500 flex justify-center items-center p-2"
+                onClick={() => setShowUserProfile(false)}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-gray-900"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="flex h-11/12 w-full justify-center items-center">
+              <div className="w-3/12 h-full flex justify-center mr-4 mt-10 items-start">
+                <div className="w-40 h-40 rounded-full text-white flex justify-center hover:from-blue-900 hover:to-blue-500 transition duration-700 items-center bg-gradient-to-tr from-blue-500 to-blue-900 ">
+                  <h2 className="text-5xl font-bold">
+                    {userProfileData?.full_name?.[0].toUpperCase()}
+                    {userProfileData?.full_name
+                      ?.split(" ")?.[1][0]
+                      .toUpperCase()}
+                  </h2>
+                </div>
+              </div>
+              <div className="w-9/12 flex h-full">
+                <div className="w-1/2 h-full">
+                  <h2 className="text-2xl font-bold mt-2">
+                    Personal Information
+                  </h2>
+                  <h2 className="text-lg font-semibold mt-6">
+                    Full Name: {userProfileData?.full_name}
+                  </h2>
+                  <h2 className="text-lg font-semibold mt-2">
+                    Email: {userProfileData?.email}
+                  </h2>
+                  <h2 className="text-lg font-semibold mt-2">
+                    Phone : {userProfileData?.phone_number}
+                  </h2>
+                  <h2 className="text-lg font-semibold mt-2">
+                    Age: {userProfileData?.age}
+                  </h2>
+                  <h2 className="text-lg font-semibold mt-2">
+                    Gender: {userProfileData?.gender}
+                  </h2>
+                  <h2 className="text-lg font-semibold mt-2">
+                    Street Address: {userProfileData?.address}
+                  </h2>
+                  <h2 className="text-lg font-semibold mt-2">
+                    City: {userProfileData?.city}
+                  </h2>
+                  <h2 className="text-lg font-semibold mt-2">
+                    State: {userProfileData?.state}
+                  </h2>
+                  <h2 className="text-lg font-semibold mt-2">
+                    Pincode: {userProfileData?.pincode}
+                  </h2>
+                </div>
+                <div className="w-1/2 h-full">
+                  <h2 className="text-2xl font-bold mt-2">
+                    Wallet Information
+                  </h2>
+                  <h2 className="text-lg font-semibold mt-6">
+                    Budget Limit: Rs. {userProfileData?.budget_limit}
+                  </h2>
+                  <h2 className="text-lg font-semibold mt-2">
+                    Income: Rs. {userProfileData?.income}
+                  </h2>
+                  <h2 className="text-lg font-semibold mt-2">
+                    Joined At:{" "}
+                    <i>
+                      {new Date(userProfileData?.created_at).toLocaleDateString(
+                        "en-GB"
+                      )}
+                    </i>
+                  </h2>
+                  <h2 className="text-lg font-semibold mt-2">
+                    Wallet Balance: {userWalletData?.user_balance}
+                  </h2>
+                  <h2 className="text-lg font-semibold mt-2">
+                    Wallet UPI Id:{" "}
+                    <i>{userWalletData?.wallet_id.toLowerCase()}</i>
+                  </h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded-lg p-4 mb-4 shadow-sm flex justify-between items-center">
-        <Link to="/userProfile" className=" relative z-0">
+        <Link
+          onClick={() => setShowUserProfile(true)}
+          className=" relative z-0"
+        >
           <div className="flex cursor-pointer items-center">
-            <div className="w-10 h-10 rounded-full bg-blue-500 mr-4">
-              {/* User Icon */}
+            <div className="w-12 h-12 flex justify-center items-center rounded-full transition duration-700 bg-gradient-to-tr from-blue-500 to-blue-900 hover:from-blue-900 hover:to-blue-500 mr-4">
+              <h2 className="text-lg text-white font-semibold mb-[1px]">
+                {userProfileData?.full_name?.[0].toUpperCase()}
+                {userProfileData?.full_name?.split(" ")?.[1][0].toUpperCase()}
+              </h2>
             </div>
             <div>
-              <h1 className="text-xl font-semibold">Welcome back, User!</h1>
+              <h1 className="text-xl font-semibold">
+                Welcome back, {userProfileData?.full_name}!
+              </h1>
               <p className="text-gray-500 text-sm">Your financial summary</p>
             </div>
           </div>
@@ -470,7 +762,9 @@ const UserDashboard = () => {
                 </svg>
               </div>
               <div className="text-sm mb-1">Balance</div>
-              <div className="text-2xl font-bold">₹10,000</div>
+              <div className="text-2xl font-bold">
+                ₹{userProfileData?.user_balance || 0}
+              </div>
             </div>
 
             {/* Rewards Card */}

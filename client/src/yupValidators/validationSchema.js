@@ -25,13 +25,15 @@ export const signupValidationSchema = Yup.object().shape({
     .required("Age is required"),
   income: Yup.number()
     .min(0, "Income cannot be negative")
-    .max(10000000,"Income cannot be more than 10,000,000")
+    .max(10000000, "Income cannot be more than 10,000,000")
     .required("Income is required"),
   budget_limit: Yup.number()
     .min(0, "Budget cannot be negative")
     .required("Budget Limit is required")
-    .when("income", (income, schema) => 
-      income ? schema.max(income, "Budget Limit cannot be more than Income") : schema
+    .when("income", (income, schema) =>
+      income
+        ? schema.max(income, "Budget Limit cannot be more than Income")
+        : schema
     ),
 });
 
@@ -42,8 +44,16 @@ export const signupValidationSchema2 = Yup.object().shape({
     .min(5, "Address must be at least 5 characters long"),
   city: Yup.string().trim().required("City is required"),
   state: Yup.string().trim().required("State is required"),
-  pincode: Yup.string()
-    .required("Pincode is required"),
+  pincode: Yup.string().required("Pincode is required"),
+  user_pin: Yup.string()
+    .matches(/^\d{4}$/, "PIN must be exactly 4 digits") // Ensures exactly 4 digits
+    .required("PIN is required"),
+});
+
+export const PTPvalidationSchema = Yup.object().shape({
+  amount: Yup.number()
+    .moreThan(0, "Amount must be greater than zero")
+    .required("Amount is required"),
     user_pin: Yup.string()
     .matches(/^\d{4}$/, "PIN must be exactly 4 digits") // Ensures exactly 4 digits
     .required("PIN is required"),

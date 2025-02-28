@@ -312,7 +312,7 @@ const UserSignupForm = (props) => {
                     Back
                   </Button>
 
-                  <Box sx={{ flex: "1 1 auto" }} />
+                  <Box sx={{ flex: "1 1 auto" }} className="cursor-pointer"/>
 
                   <button type="submit">
                     Sign Up
