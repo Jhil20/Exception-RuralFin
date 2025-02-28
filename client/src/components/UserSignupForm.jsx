@@ -247,7 +247,7 @@ const UserSignupForm = (props) => {
 
                   <Box sx={{ flex: "1 1 auto" }} />
 
-                  <button type="submit">
+                  <button type="submit" className="cursor-pointer w-20 py-2 bg-gradient-to-tr from-blue-600 to-blue-950 text-white rounded-lg shadow-lg hover:from-blue-950 hover:to-blue-600 transition duration-700 hover:shadow-black/40">
                     {activeStep === steps.length - 1 ? "Finish" : "Next"}
                   </button>
                 </Box>
@@ -313,7 +313,7 @@ const UserSignupForm = (props) => {
 
                   <Box sx={{ flex: "1 1 auto" }} className="cursor-pointer" />
 
-                  <button type="submit">Sign Up</button>
+                  <button type="submit" className="cursor-pointer bg-gradient-to-tr from-blue-600 to-blue-950 hover:from-blue-950 hover:to-blue-600 duration-700 bg-blue-700 text-white py-2 px-6 rounded-md hover:bg-blue-800 transition shadow-lg shadow-black/30 hover:shadow-black/50">Sign Up</button>
                 </Box>
               </Form>
             </Formik>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -22,9 +22,8 @@ const Login = () => {
   const [otpNumber, setOtpNumber] = useState(null);
   const [showOtp, setShowOtp] = useState(false);
   const [showAgent, setShowAgent] = useState(false);
-  const [userSignupFirst,setUserSignupFirst] = useState(true);
-  const [userSignupSecond,setUserSignupSecond] = useState(false);
-
+  const [userSignupFirst, setUserSignupFirst] = useState(true);
+  const [userSignupSecond, setUserSignupSecond] = useState(false);
   const handleLogin = async (values) => {
     console.log("values", values);
     try {
@@ -50,21 +49,11 @@ const Login = () => {
     }
   };
 
-  const handleOtpLogin = () => {
-    console.log("otp login");
-  };
 
-
-
-  
 
   if (showLogin) {
     return (
       <div className="flex justify-center items-center h-[90.7vh] bg-gray-300">
-        {/* {showOtp && (
-          
-        )} */}
-
         {!showOtp && (
           <div className="bg-white min-h-80 h-fit  p-6 rounded-lg hover:shadow-2xl transition-all duration-500 hover:ring-[906px] overflow-clip z-1 relative ring-gray-400 shadow-lg w-96">
             <h2 className="text-2xl font-bold text-center text-gray-700 mb-4">
@@ -123,32 +112,49 @@ const Login = () => {
   } else {
     return (
       <div className="flex justify-center items-center h-[90.7vh] bg-gray-100">
-        <div className="bg-white hover:ring-[960px] content-start ring-gray-400 min-h-9/12 h-fit transition-all duration-600 relative z-1 flex flex-wrap justify-center items-center p-8 rounded-lg shadow-lg w-5/12">
-          <h2 className="text-2xl text-gray-800 w-full font-bold text-center mb-4 h-fit">
-            Create your RuralFin account
-          </h2>
-          <div className="w-5/12 flex h-10 mb-4">
-            <div
-              onClick={() => setShowAgent(false)}
-              className={`w-1/2 cursor-pointer ${showAgent?'bg-gray-300 text-gray-800':'bg-gray-800 text-gray-200'} hover:ring-2 ring-gray-800 transition-all duration-600 flex mr-2 bg-gray-300 rounded-l-2xl justify-center items-center`}
-            >
-              <h2 className="text-md  font-semibold">User</h2>
+        
+          <div className="bg-white hover:ring-[960px] content-start ring-gray-400 min-h-9/12 h-fit transition-all duration-600 relative z-1 flex flex-wrap justify-center items-center p-8 rounded-lg shadow-lg w-5/12">
+            <h2 className="text-2xl text-gray-800 w-full font-bold text-center mb-4 h-fit">
+              Create your RuralFin account
+            </h2>
+            <div className="w-5/12 flex h-10 mb-4">
+              <div
+                onClick={() => setShowAgent(false)}
+                className={`w-1/2 cursor-pointer ${
+                  showAgent
+                    ? "bg-gray-300 text-gray-800"
+                    : "bg-gray-800 text-gray-200"
+                } hover:ring-2 ring-gray-800 transition-all duration-600 flex mr-2 bg-gray-300 rounded-l-2xl justify-center items-center`}
+              >
+                <h2 className="text-md  font-semibold">User</h2>
+              </div>
+              <div
+                onClick={() => setShowAgent(true)}
+                className={`w-1/2 cursor-pointer ${
+                  showAgent
+                    ? "bg-gray-800 text-gray-200"
+                    : "bg-gray-300 text-gray-800"
+                } hover:ring-2 ring-gray-800 transition-all duration-600 flex mr-2 bg-gray-300 rounded-r-2xl justify-center items-center`}
+              >
+                <h2 className="text-md  font-semibold">Agent</h2>
+              </div>
             </div>
-            <div
-              onClick={() => setShowAgent(true)}
-              className={`w-1/2 cursor-pointer ${showAgent?'bg-gray-800 text-gray-200':'bg-gray-300 text-gray-800'} hover:ring-2 ring-gray-800 transition-all duration-600 flex mr-2 bg-gray-300 rounded-r-2xl justify-center items-center`}
-            >
-              <h2 className="text-md  font-semibold">Agent</h2>
-            </div>
-          </div>
-          {!showAgent && <UserSignupForm showAgent={showAgent} error={error} setShowLogin={setShowLogin}/>}
-          
-          {showAgent && (
-            <AgentSignupForm  showAgent={showAgent} error={error} setShowLogin={setShowLogin}/>
-          )}
+            {!showAgent && (
+              <UserSignupForm
+                showAgent={showAgent}
+                error={error}
+                setShowLogin={setShowLogin}
+              />
+            )}
 
-          
-        </div>
+            {showAgent && (
+              <AgentSignupForm
+                showAgent={showAgent}
+                error={error}
+                setShowLogin={setShowLogin}
+              />
+            )}
+          </div>
       </div>
     );
   }

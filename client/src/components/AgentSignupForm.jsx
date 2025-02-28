@@ -17,7 +17,6 @@ const AgentSignupForm = (props) => {
   const steps = ["Personal Information", "Address Information"];
   const [activeStep, setActiveStep] = useState(0);
   const [profileData, setProfileData] = useState({});
-
   const handleNext = (values) => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     console.log("values", values);
@@ -26,10 +25,6 @@ const AgentSignupForm = (props) => {
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
-  const handleReset = () => {
-    setActiveStep(0);
   };
 
   const handleAgentSignupSubmit = async (values) => {
@@ -42,12 +37,15 @@ const AgentSignupForm = (props) => {
         formData
       ); /// backend not working for create agent
       console.log("response", response);
+      if (response?.data?.data == "Agent registered successfully") {
+      }
     } catch (error) {
       console.log(error);
     }
   };
   return (
     <div>
+
       <Box sx={{ width: "100%" }}>
         <Stepper activeStep={activeStep} className="mb-6">
           {steps.map((label, index) => {
@@ -66,7 +64,7 @@ const AgentSignupForm = (props) => {
             initialValues={{
               full_name: profileData.full_name || "",
               phone_num: profileData.phone_num || "",
-              email: profileData.email || "",   
+              email: profileData.email || "",
               bank_details: profileData.bank_details || "",
               security_deposit: profileData.security_deposit || "",
               payment_mode: profileData.payment_mode || "",
@@ -199,11 +197,11 @@ const AgentSignupForm = (props) => {
                   disabled={activeStep === 0}
                   onClick={handleBack}
                   sx={{ mr: 1 }}
-                  className={` ${
-                    activeStep === 0
-                      ? "cursor-pointer text-3xl bg-gray-500 border-2 border-black py-2 px-6 w-20 rounded-md  transition shadow-lg "
-                      : "cursor-pointer w-20 text-white bg-gradient-to-tr from-blue-600 to-blue-950 hover:from-blue-950 hover:to-blue-600 duration-700 bg-blue-700  py-2 px-6 rounded-md hover:bg-blue-800 transition shadow-lg shadow-black/20 hover:shadow-black/50"
-                  }`}
+                //   className={` ${
+                //     activeStep === 0
+                //       ? "cursor-pointer text-3xl bg-gray-500 border-2 border-black py-2 px-6 w-20 rounded-md  transition shadow-lg "
+                //       : "cursor-pointer w-20 text-white bg-gradient-to-tr from-blue-600 to-blue-950 hover:from-blue-950 hover:to-blue-600 duration-700 bg-blue-700  py-2 px-6 rounded-md hover:bg-blue-800 transition shadow-lg shadow-black/20 hover:shadow-black/50"
+                //   }`}
                 >
                   Back
                 </Button>
@@ -290,7 +288,7 @@ const AgentSignupForm = (props) => {
 
                 <Box sx={{ flex: "1 1 auto" }} className="cursor-pointer" />
 
-                <button type="submit">Sign Up</button>
+                <button type="submit" className="cursor-pointer bg-gradient-to-tr from-blue-600 to-blue-950 hover:from-blue-950 hover:to-blue-600 duration-700 bg-blue-700 text-white py-2 px-6 rounded-md hover:bg-blue-800 transition shadow-lg shadow-black/30 hover:shadow-black/50">Sign Up</button>
               </Box>
             </Form>
           </Formik>
