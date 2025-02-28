@@ -22,6 +22,10 @@ const pTop=asyncHandler(async(req,res)=>{
         if (!senderWallet) {
             throw new ApiError(400,"Sender wallet not found");
           }
+          if(senderWallet.user_balance < amount)
+          {
+            throw new ApiError(400,"you dont have enough balance to make payment");
+          }
         
           const recipientWallet = await Prisma.userWallet.findUnique({
             where: { wallet_id: recipient_id },
