@@ -36,7 +36,7 @@ const pTop=asyncHandler(async(req,res)=>{
           if (!recipientWallet) {
             throw new ApiError(400,"Recipient wallet not found");
           }
-          const sid=await Prisma.UserWallet.findUnique({
+          const sid=await Prisma.userWallet.findUnique({
             where:{
                 wallet_id:sender_id,
             },
@@ -45,7 +45,7 @@ const pTop=asyncHandler(async(req,res)=>{
             }
           })
 
-          const rid=await Prisma.UserWallet.findUnique({
+          const rid=await Prisma.userWallet.findUnique({
             where:{
                 wallet_id:recipient_id
             },
@@ -67,7 +67,7 @@ const pTop=asyncHandler(async(req,res)=>{
                 data: { user_balance: { increment: amount } },
               }),
 
-              Prisma.PeerToPeerTransaction.create({
+              Prisma.peerToPeerTransaction.create({
                 data:{
                     sender_id:sid.user_id,
                     recipient_id:rid.user_id,

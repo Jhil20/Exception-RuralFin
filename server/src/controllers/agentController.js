@@ -3,6 +3,9 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import Prisma from "../utils/prisma.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/agentTokens.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import nodemailer from "nodemailer"
+import { generateWalletId } from "./userController.js";
+import bcrypt from "bcrypt"
 
 const generateRefreshAndAccessTokens=async(existedAgent)=>{
     try{
@@ -35,7 +38,9 @@ const createAgent = asyncHandler(async(req,res)=>{
         pincode,
         city,
         state,
-        bank_details
+        bank_details,
+        security_deposit,
+        payment_mode
     }=req.body;
 
     console.log("inside agent create controller")
@@ -71,6 +76,18 @@ const createAgent = asyncHandler(async(req,res)=>{
         if (!bank_details || !/^\d{6,18}$/.test(bank_details)) {
             throw new ApiError(400, "Invalid bank account number. It should be between 6 to 18 digits.");
         }
+        if(!security_deposit)
+        {
+            throw new ApiError(400,"Security deposit is no entered");
+        }
+        if(!payment_mode)
+        {
+            throw new ApiError(400,"Enter the payment mode");
+        }
+        if(!payment_mode=='CASH' || !payment_mode=='DIGITAL')
+        {
+            throw new ApiError(400,"Enter valid payment mode");
+        }
 
         const agent = await Prisma.agent.findUnique({
             where: {
@@ -92,6 +109,14 @@ const createAgent = asyncHandler(async(req,res)=>{
                 city,
                 state,
                 bank_details,
+            }
+        })
+        await Prisma.agentAdminTransaction.create({
+            data:{
+                agent_id:newAgent.agent_id,
+                security_deposit_amt:security_deposit,
+                isPending:"PENDING",
+                payment_mode:payment_mode
             }
         })
         console.log("new agent",newAgent);
@@ -165,4 +190,44 @@ const logoutAgent=asyncHandler(async(req,res)=>{
     .json(new ApiResponse(200,{},"Agent logged out"))
 })
 
-export  {createAgent,loginAgent,logoutAgent}
+const walletCreation = asyncHandler(async(req,res)=>{
+    const {agent_id,agent_pin} = req.body;
+    if(!agent_id)
+    {
+        throw new ApiError(400,"Agent ID is required");
+    }
+    if(!agent_pin)
+    {
+        throw new ApiError(400,"PIN is required");
+    }
+    const agent = await Prisma.agentAdminTransaction.findUnique({
+        where:{
+            agent_id:agent_id
+        },
+        select:{
+            isPending:true,
+            security_deposit_amt:true
+        }
+    })
+    if(agent.isPending == "PENDING")
+    {
+        throw new ApiError(400,"Complete the security payment first");
+    }
+    const hashedPin = await bcrypt.hash(agent_pin,10);
+    await Prisma.agentWallet.create({
+        data:{
+            wallet_id:generateWalletId()+"-AGENT",
+            agent_id:agent_id,
+            agent_pin:hashedPin,
+            wallet_balance:agent.security_deposit_amt
+        }
+    })
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            "Wallet Creation successfully"
+        )
+    )
+})
+
+export  {createAgent,loginAgent,logoutAgent,walletCreation}

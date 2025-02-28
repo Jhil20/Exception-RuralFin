@@ -3,37 +3,38 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { generateAccessToken } from "../utils/adminTokens.js";
+import dotenv from "dotenv"
 import Prisma from "../utils/prisma.js"
-import transporter from "../utils/emailTransporter.js";
-import hbs from "nodemailer-express-handlebars";
+import nodemailer from "nodemailer"
 
-
-const generateRefreshAndAccessToken=async(existedAdmin)=>{
-    try{
-        const accessToken=generateAccessToken(existedAdmin);
-        const refreshToken=generateRefreshToken(existedAdmin);
+const generateRefreshAndAccessToken = async (existedAdmin) => {
+    try {
+        const accessToken = generateAccessToken(existedAdmin);
+        const refreshToken = generateRefreshToken(existedAdmin);
         await Prisma.admin.update({
-            where:{
-                admin_id:existedAdmin.admin_id
+            where: {
+                admin_id: existedAdmin.admin_id
             },
-            data:{
+            data: {
                 refresh_token: refreshToken
             }
         })
-        return{refreshToken,accessToken};
+        return { refreshToken, accessToken };
     }
-    catch(error){
-        throw new ApiError(500,"something went wrong in creating refresh and access token");
+    catch (error) {
+        throw new ApiError(500, "something went wrong in creating refresh and access token");
     }
 
 }
 
 
-const loginAdmin=asyncHandler(async(req,res)=>{
-    
-    const {admin_id}=req.body;
+const loginAdmin = asyncHandler(async (req, res) => {
 
-    if(!admin_id){
+const loginAdmin = asyncHandler(async (req, res) => {
+
+    const { admin_id } = req.body;
+
+    if (!admin_id) {
         throw new ApiError(400, "Admin Id is not entered");
     }
     if (admin_id !== "4323") {
@@ -45,88 +46,105 @@ const loginAdmin=asyncHandler(async(req,res)=>{
         throw new ApiError(404, "Admin does not exist");
     }
 
-    const {refreshToken,accessToken}=await
-    generateRefreshAndAccessToken(existedAdmin);
+    const { refreshToken, accessToken } = await
+        generateRefreshAndAccessToken(existedAdmin);
     const options = {
         httpOnly: true,
         secure: true
     }
     return res.status(200)
-    .cookie("accessToken",accessToken,options)
-    .cookie("refreshToken",refreshToken,options)
-    .json(
-        new ApiResponse(
-            200,
-            {
-                admin: existedAdmin
-            },
-            "Admin logged in successfully"
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    admin: existedAdmin
+                },
+                "Admin logged in successfully"
+            )
         )
-    )
 })
 
-const logoutAdmin=asyncHandler(async(req,res)=>{
+const logoutAdmin = asyncHandler(async (req, res) => {
     await Prisma.admin.update({
-        where:{
-            admin_id:admin.admin_id
+        where: {
+            admin_id: admin.admin_id
         },
-        data:{
-            refreshToken:null
+        data: {
+            refreshToken: null
         }
     })
 
-    const options={
-        httpOnly:true,
-        secure:true
+    const options = {
+        httpOnly: true,
+        secure: true
     }
-    
+
     return res
-    .status(200)
-    .clearCookie("accessToken",options)
-    .clearCookie("refreshToken",options)
-    .json(new ApiResponse(200,{},"Admin logged out"))
+        .status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(new ApiResponse(200, {}, "Admin logged out"))
 })
 
-const allPendingAgents = asyncHandler(async (req,res)=>{
+const allPendingAgents = asyncHandler(async (req, res) => {
     const pendingAgents = await Prisma.agent.findMany({
-        where:{
-            status:"ACTIVE"
+        where: {
+            status: "INACTIVE"
         }
     })
     console.log(pendingAgents);
-    
+
     res.status(200).json(
         new ApiResponse(
             200,
             {
-                Agents : pendingAgents
+                Agents: pendingAgents
             },
             "Pending agents fetched successfully"
         )
     )
 })
 
-const acceptPendingAgents = asyncHandler(async (req,res) => {
-    const {email} = req.body;
-    const mailOptions = {
-        from: 'Ruralfin@gmail.com', // Sender address
-        to: email, // List of recipients
-        subject: 'Approval from Admin, RuralFin', // Subject line
-        html: '<h2 style="color:#ff6600;">Hello People!, Welcome to Bacancy!</h2>',
-    };
+const acceptPendingAgent = asyncHandler(async (req, res) => {
+    const { agent_id,email } = req.body;
+    console.log(email)
+    // 🔍 Check if agent exists and is pending
+    const agent = await Prisma.agent.findUnique({
+        where: { agent_id: agent_id }
+    });
+    console.log(agent);
 
-    transporter.sendMail(mailOptions, function(err, info) {
-    if (err) {
-        console.log(err)
-    } else {
-        console.log(info);
+    if (!agent) {
+        throw new ApiError(400, "Agent doesn't exists")
     }
-    res.status(200).json(
-        new ApiResponse(
-            200,"mail sent successfully"
-        )
-    )
-    })
-})
 
-export {loginAdmin,logoutAdmin,allPendingAgents,acceptPendingAgents};
+    await Prisma.agent.update({
+        where: { agent_id: agent_id },
+        data: { status: "ACTIVE" }
+    });
+
+    
+    const transporter = nodemailer.createTransport({
+        secure: true,
+        host: 'smtp.gmail.com',
+        port: 465,
+        auth: {
+            user: process.env.MAIL_ID,
+            pass: process.env.MAIL_PASSWORD
+        }
+    }
+    );
+    await transporter.sendMail({
+        from: `"Admin" <${process.env.MAIL_ID}>`,
+        to: email,
+        subject: "Agent Request Approved",
+        text: `Dear ${agent.full_name},\n\nYour request has been approved. You can now log in and proceed with the next steps.\n\nRegards,\nAdmin`
+    });
+    res.status(200).json({
+        message: "Agent status updated to ACTIVE, and email sent successfully!"
+    });
+
+})
+export { loginAdmin, logoutAdmin, allPendingAgents, acceptPendingAgent };
