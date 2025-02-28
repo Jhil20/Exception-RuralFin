@@ -81,10 +81,35 @@ const pTop=asyncHandler(async(req,res)=>{
       }
 })
 
+const getAllTransactionUser = asyncHandler(async(req,res)=>{
+  const user_id = req.body.user_id;
+  console.log(user_id)
+  if(!user_id)
+  {
+    throw new ApiError(400,"please provide the user ID");
+  }
+  const allUserTransaction = await Prisma.peerToPeerTransaction.findMany({
+    where:{
+      OR:[
+        {sender_id:user_id},
+        {recipient_id:user_id}
+      ]
+    }
+  })
+  if(!allUserTransaction)
+  {
+    throw new ApiError(400,"Transaction related to that user not found");
+  }
 
-const userToagent=asyncHandler(async(req,res)=>{
-    const {user_id, agent_id, amount,transaction_type}=req.body;
-      
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        Transaction:allUserTransaction
+      },
+      "All transaction fetched successfully"
+    )
+  )
 })
 
-export {pTop}
+export {pTop,getAllTransactionUser}
