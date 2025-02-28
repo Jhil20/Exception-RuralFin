@@ -35,7 +35,9 @@ const createAgent = asyncHandler(async(req,res)=>{
         pincode,
         city,
         state,
-        bank_details
+        bank_details,
+        security_deposit,
+        payment_mode
     }=req.body;
 
     console.log("inside agent create controller")
@@ -71,6 +73,18 @@ const createAgent = asyncHandler(async(req,res)=>{
         if (!bank_details || !/^\d{6,18}$/.test(bank_details)) {
             throw new ApiError(400, "Invalid bank account number. It should be between 6 to 18 digits.");
         }
+        if(!security_deposit)
+        {
+            throw new ApiError(400,"Security deposit is no entered");
+        }
+        if(!payment_mode)
+        {
+            throw new ApiError(400,"Enter the payment mode");
+        }
+        if(!payment_mode=='CASH' || !payment_mode=='DIGITAL')
+        {
+            throw new ApiError(400,"Enter valid payment mode");
+        }
 
         const agent = await Prisma.agent.findUnique({
             where: {
@@ -91,7 +105,15 @@ const createAgent = asyncHandler(async(req,res)=>{
                 pincode,
                 city,
                 state,
-                bank_details
+                bank_details,
+            }
+        })
+        await Prisma.agentAdminTransaction.create({
+            data:{
+                agent_id:newAgent.agent_id,
+                security_deposit_amt:security_deposit,
+                isPending:"PENDING",
+                payment_mode:payment_mode
             }
         })
         console.log("new agent",newAgent);

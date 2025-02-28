@@ -91,7 +91,7 @@ const logoutAdmin=asyncHandler(async(req,res)=>{
 const allPendingAgents = asyncHandler(async (req,res)=>{
     const pendingAgents = await Prisma.agent.findMany({
         where:{
-            status:"ACTIVE"
+            status:"INACTIVE"
         }
     })
     console.log(pendingAgents);
@@ -108,13 +108,22 @@ const allPendingAgents = asyncHandler(async (req,res)=>{
 })
 
 const acceptPendingAgents = asyncHandler(async (req,res) => {
-    const {email} = req.body;
+    const {email,agent_id} = req.body;
     const mailOptions = {
         from: 'Ruralfin@gmail.com', // Sender address
         to: email, // List of recipients
         subject: 'Approval from Admin, RuralFin', // Subject line
         html: '<h2 style="color:#ff6600;">Hello People!, Welcome to Bacancy!</h2>',
     };
+
+    await Prisma.agent.update({
+        where:{
+            agent_id:agent_id
+        },
+        data:{
+            status:"ACTIVE"
+        }
+    })
 
     transporter.sendMail(mailOptions, function(err, info) {
     if (err) {
@@ -124,7 +133,7 @@ const acceptPendingAgents = asyncHandler(async (req,res) => {
     }
     res.status(200).json(
         new ApiResponse(
-            200,"mail sent successfully"
+            200,"mail sent successfully and agent accepted"
         )
     )
     })
