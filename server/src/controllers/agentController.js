@@ -43,8 +43,8 @@ const createAgent = asyncHandler(async (req, res) => {
         bank_details,
         security_deposit,
         payment_mode
-    } = req.body;
-
+    }=req.body;
+    bank_details=bank_details.toString();
     console.log("inside agent create controller")
 
     try {
@@ -110,6 +110,8 @@ const createAgent = asyncHandler(async (req, res) => {
                 bank_details,
             }
         })
+
+        console.log("new agent",newAgent);
         await Prisma.agentAdminTransaction.create({
             data: {
                 agent_id: newAgent.agent_id,

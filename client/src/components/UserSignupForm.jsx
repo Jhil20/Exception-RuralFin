@@ -6,20 +6,22 @@ import StepLabel from "@mui/material/StepLabel";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { ErrorMessage, Field, Form, Formik } from "formik";
-import { signupValidationSchema, signupValidationSchema2 } from "../yupValidators/validationSchema";
+import {
+  signupValidationSchema,
+  signupValidationSchema2,
+} from "../yupValidators/validationSchema";
 import CityAutocomplete from "./CityAutoComplete";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useDispatch } from "react-redux";
 import { userLoggedin } from "../redux/slices/signInSlice";
 
-const steps = ["Personal Information", "Address Information"];
-
 const UserSignupForm = (props) => {
+  const steps = ["Personal Information", "Address Information"];
   const [activeStep, setActiveStep] = useState(0);
   const [profileData, setProfileData] = useState({});
 
-  const dispatch=useDispatch();
+  const dispatch = useDispatch();
 
   const handleNext = (values) => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -36,10 +38,10 @@ const UserSignupForm = (props) => {
   };
 
   const handleUserSignupSubmit = async (values) => {
-    console.log("hhhhhhh")
+    console.log("hhhhhhh");
     try {
-      const formData={...profileData,...values};
-      console.log("formData",formData)
+      const formData = { ...profileData, ...values };
+      console.log("formData", formData);
       const response = await axios.post(
         "http://localhost:5000/users/register",
         formData
@@ -245,7 +247,7 @@ const UserSignupForm = (props) => {
 
                   <Box sx={{ flex: "1 1 auto" }} />
 
-                  <button type="submit">
+                  <button type="submit" className="cursor-pointer w-20 py-2 bg-gradient-to-tr from-blue-600 to-blue-950 text-white rounded-lg shadow-lg hover:from-blue-950 hover:to-blue-600 transition duration-700 hover:shadow-black/40">
                     {activeStep === steps.length - 1 ? "Finish" : "Next"}
                   </button>
                 </Box>
@@ -266,7 +268,6 @@ const UserSignupForm = (props) => {
               onSubmit={handleUserSignupSubmit}
             >
               <Form className="space-y-4 flex flex-wrap w-full">
-
                 {/* Address */}
                 <div className="flex-auto mr-3">
                   <label className="block text-gray-700 mb-1 ml-1">
@@ -283,8 +284,6 @@ const UserSignupForm = (props) => {
                   />
                 </div>
                 <CityAutocomplete />
-
-                
 
                 {props.error && (
                   <h1 className="text-md text-red-500 font-bold">
@@ -312,11 +311,9 @@ const UserSignupForm = (props) => {
                     Back
                   </Button>
 
-                  <Box sx={{ flex: "1 1 auto" }} />
+                  <Box sx={{ flex: "1 1 auto" }} className="cursor-pointer" />
 
-                  <button type="submit">
-                    Sign Up
-                  </button>
+                  <button type="submit" className="cursor-pointer bg-gradient-to-tr from-blue-600 to-blue-950 hover:from-blue-950 hover:to-blue-600 duration-700 bg-blue-700 text-white py-2 px-6 rounded-md hover:bg-blue-800 transition shadow-lg shadow-black/30 hover:shadow-black/50">Sign Up</button>
                 </Box>
               </Form>
             </Formik>

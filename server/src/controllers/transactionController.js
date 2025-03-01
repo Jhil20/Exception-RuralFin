@@ -6,18 +6,23 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 const pTop=asyncHandler(async(req,res)=>{
     const {sender_id, recipient_id, amount,user_pin }=req.body;
 
+    console.log(sender_id, recipient_id, amount,user_pin);
+
     if(!sender_id || !recipient_id || !amount || amount<=0 || !user_pin)
     {
         throw new ApiError(400,"Invalid transaction details")
     }
 
     try{
-        const senderWallet= await Prisma.UserWallet.findUnique({
+      console.log("inside try")
+        const senderWallet= await Prisma.userWallet.findUnique({
             where:{
                 wallet_id: sender_id
             },
             select: { user_balance: true, user_pin: true },
         })
+
+        console.log("sender wallet",senderWallet)
 
         if (!senderWallet) {
             throw new ApiError(400,"Sender wallet not found");
@@ -116,4 +121,27 @@ const getAllTransactionUser = asyncHandler(async(req,res)=>{
   )
 })
 
-export {pTop,getAllTransactionUser}
+
+const getWalletIdByUserId = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  
+  if (!id) {
+    throw new ApiError(400, "User ID is required");
+  }
+  console.log("inside wallet by user id")
+  const wallet = await Prisma.userWallet.findUnique({
+    where: { user_id:id },
+    select: { wallet_id: true },
+  });
+  console.log("wallet",wallet)
+  if (!wallet) {
+    throw new ApiError(404, "Wallet not found for the given user ID");
+  }
+
+  res.status(200).json(
+    new ApiResponse(200, { wallet_id: wallet.wallet_id }, "Wallet ID fetched successfully")
+  );
+});
+
+
+export {pTop,getAllTransactionUser,getWalletIdByUserId}

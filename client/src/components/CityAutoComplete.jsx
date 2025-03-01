@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Field, ErrorMessage, useFormikContext } from "formik";
 
-const CityAutocomplete = () => {
+const CityAutocomplete = (props) => {
   const [suggestions, setSuggestions] = useState([]);
   const [query, setQuery] = useState("");
   const [validCity, setValidCity] = useState(false);
@@ -133,26 +133,28 @@ const CityAutocomplete = () => {
           className="text-red-500 text-sm"
         />
       </div>
-      <div className="flex-auto mr-3">
-        <label className="block text-gray-700 mb-1 ml-1">
-          Transaction Pin*
-        </label>
-        <Field
-          type="text"
-          name="user_pin"
-          className="w-full p-2 border hover:ring-[1px] .no-spinner ring-gray-700 transition-all duration-500 border-gray-300 rounded-md"
-          onInput={(e) => {
-            if (e.target.value.length > 4) {
-              e.target.value = e.target.value.slice(0, 4); // Limit to 4 digits
-            }
-          }}
-        />
-        <ErrorMessage
-          name="user_pin"
-          component="p"
-          className="text-red-500 text-sm"
-        />
-      </div>
+      {!props.showAgent && (
+        <div className="flex-auto mr-3">
+          <label className="block text-gray-700 mb-1 ml-1">
+            Transaction Pin*
+          </label>
+          <Field
+            type="text"
+            name="user_pin"
+            className="w-full p-2 border hover:ring-[1px] .no-spinner ring-gray-700 transition-all duration-500 border-gray-300 rounded-md"
+            onInput={(e) => {
+              if (e.target.value.length > 4) {
+                e.target.value = e.target.value.slice(0, 4); // Limit to 4 digits
+              }
+            }}
+          />
+          <ErrorMessage
+            name="user_pin"
+            component="p"
+            className="text-red-500 text-sm"
+          />
+        </div>
+      )}
     </div>
   );
 };
