@@ -6,8 +6,8 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import nodemailer from "nodemailer"
 import { generateWalletId } from "./userController.js";
 import bcrypt from "bcrypt"
-import instance from "../utils/razorpay.js";
-import Razorpay from "razorpay";
+// import instance from "../utils/razorpay.js";
+// import Razorpay from "razorpay";
 
 const generateRefreshAndAccessTokens = async (existedAgent) => {
     try {
@@ -240,27 +240,27 @@ const securityDepositPayment = asyncHandler(async (req, res) => {
         new ApiResponse(
             200,
             {
-                razorpay: payment
+                // razorpay: payment
             }
         )
     )
 })
 
 //to be done after backend
-const verifyPayment = asyncHandler(async (req, res) => {
-    console.log(req.body)
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+// const verifyPayment = asyncHandler(async (req, res) => {
+//     console.log(req.body)
+//     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
-    const generated_signature = crypto
-        .createHmac("sha256", process.env.RAZORPAY_SECRET)
-        .update(razorpay_order_id + "|" + razorpay_payment_id)
-        .digest("hex");
+//     const generated_signature = crypto
+//         .createHmac("sha256", process.env.RAZORPAY_SECRET)
+//         .update(razorpay_order_id + "|" + razorpay_payment_id)
+//         .digest("hex");
 
-    if (generated_signature === razorpay_signature) {
-        // Payment successful, update wallet balance or notify admin
-        res.json({ success: true, message: "Payment verified successfully!" });
-    } else {
-        res.status(400).json({ success: false, message: "Payment verification failed!" });
-    }
-})
-export { createAgent, loginAgent, logoutAgent, walletCreation, securityDepositPayment,verifyPayment }
+//     if (generated_signature === razorpay_signature) {
+//         // Payment successful, update wallet balance or notify admin
+//         res.json({ success: true, message: "Payment verified successfully!" });
+//     } else {
+//         res.status(400).json({ success: false, message: "Payment verification failed!" });
+//     }
+// })
+export { createAgent, loginAgent, logoutAgent, walletCreation, securityDepositPayment }

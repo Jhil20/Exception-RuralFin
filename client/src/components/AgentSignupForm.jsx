@@ -221,7 +221,7 @@ const AgentSignupForm = (props) => {
                 <h1
                   className="cursor-pointer text-center text-gray-700"
                   onClick={() => {
-                    setShowLogin(true);
+                    props?.setShowLogin(true);
                   }}
                 >
                   Already have an account? Sign in!!

@@ -5,11 +5,12 @@ import { useDispatch } from "react-redux";
 import Cookies from "js-cookie";
 import AgentCard from "../components/AgentCard";
 import RecentTransactionCard from "../components/RecentTransactionCard";
-import axios from "axios";
+import axios, { all } from "axios";
 import UserCard from "../components/UserCard";
 import { jwtDecode } from "jwt-decode";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { PTPvalidationSchema } from "../yupValidators/validationSchema";
+import { ToastContainer, toast } from "react-toastify";
 
 const UserDashboard = () => {
   const dispatch = useDispatch();
@@ -33,6 +34,17 @@ const UserDashboard = () => {
   const [showSendFavorites, setShowSendFavorites] = useState(true);
   const [showPTP, setShowPTP] = useState(false);
   const [recieverId, setRecieverId] = useState("");
+  const [allTransactions, setAllTransactions] = useState([]);
+  const [todaysTransactions, setTodaysTransactions] = useState([]);
+  const [allAgents, setAllAgents] = useState([]);
+  const [filteredAgents, setFilteredAgents] = useState([]);
+  const [recentTransactionInfo, setRecentTransactionInfo] = useState({});
+  const [recentTransactionSender, setRecentTransactionSender] = useState({});
+  const [recentTransactionReceiver, setRecentTransactionReceiver] = useState(
+    {}
+  );
+  const [refreshData, setRefreshData] = useState(false);
+
   const handleLogout = () => {
     Cookies.remove("jwt-token");
     console.log("logout clled");
@@ -52,11 +64,27 @@ const UserDashboard = () => {
     setErrors("");
   };
 
+  const getAllTransactions = async () => {
+    try {
+      const result = await axios.get(
+        `http://localhost:5000/transaction/getAllTransactions/${tokenData.user_id}`
+      );
+      // console.log("result of all transactions", result);
+      setAllTransactions(result?.data?.data?.Transaction);
+      const result2=await axios.get(`http://localhost:5000/users/userActivity/`,tokenData.user_id);
+      // console.log("result of all transactions 2", result2);
+      setTodaysTransactions(result2?.data?.data?.Transaction);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     // if (showUserProfile) {
+    getAllTransactions();
     getUserProfile();
     // }
-  }, [showUserProfile]);
+  }, [refreshData]);
 
   const getUserProfile = async () => {
     try {
@@ -68,8 +96,21 @@ const UserDashboard = () => {
       );
       // console.log("result2", result2);
       // console.log("result", result);
+      // console.log("user profile data", result?.data?.data?.user);
+      // console.log("user wallet data", result2?.data?.data?.wallet);
       setUserWalletData(result2?.data?.data?.wallet);
       setUserProfileData(result?.data?.data?.user);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getAgents = async () => {
+    try {
+      const result = await axios.get("http://localhost:5000/users/getagent/");
+      console.log("result of all agents", result);
+      setAllAgents(result?.data?.data?.agent);
+      setFilteredAgents(result?.data?.data?.agent);
     } catch (error) {
       console.log(error);
     }
@@ -78,8 +119,42 @@ const UserDashboard = () => {
   useEffect(() => {
     if (!showSendFavorites) {
       getUsers();
+      getAgents();
     }
   }, [showSendFavorites]);
+
+  useEffect(() => {
+    if (showRecentTransactionInfo) {
+      getTransactionInfo();
+    }
+  }, [showRecentTransactionInfo]);
+
+  const getTransactionInfo = async () => {
+    console.log("showRecentTransactionInfo", recentTransactionInfo);
+    const senderData = await axios.get(
+      `http://localhost:5000/users/${recentTransactionInfo.sender_id}`
+    );
+    const receiverData = await axios.get(
+      `http://localhost:5000/users/${recentTransactionInfo.recipient_id}`
+    );
+    console.log("transaction info", recentTransactionInfo);
+    console.log("sender data", senderData);
+    console.log("receiver data", receiverData);
+    setRecentTransactionSender(senderData?.data?.data?.user);
+    setRecentTransactionReceiver(receiverData?.data?.data?.user);
+    const senderWallet = await axios.get(
+      `http://localhost:5000/transaction/getWalletByUser/${recentTransactionInfo.sender_id}`
+    );
+    const receiverWallet = await axios.get(
+      `http://localhost:5000/transaction/getWalletByUser/${recentTransactionInfo.recipient_id}`
+    );
+    console.log("sender wallet", senderWallet);
+    console.log("receiver wallet", receiverWallet);
+    const senderWid = senderWallet?.data?.data?.wallet_id;
+    const receiverWid = receiverWallet?.data?.data?.wallet_id;
+    setRecentTransactionSender({ ...recentTransactionSender, senderWid });
+    setRecentTransactionReceiver({ ...recentTransactionReceiver, receiverWid });
+  };
 
   const getUsers = async () => {
     try {
@@ -121,30 +196,53 @@ const UserDashboard = () => {
       const senderId = tokenData.user_id;
       const recipientId = recieverId;
 
-      const response1=await axios.get(`http://localhost:5000/transaction/getWalletByUser/${senderId}`);
-      const response2=await axios.get(`http://localhost:5000/transaction/getWalletByUser/${recipientId}`);
-      console.log("response1",response1);
-      console.log("response2",response2);
-      const sender_id=response1?.data?.data?.wallet_id;
-      const recipient_id=response2?.data?.data?.wallet_id;
+      const response1 = await axios.get(
+        `http://localhost:5000/transaction/getWalletByUser/${senderId}`
+      );
+      const response2 = await axios.get(
+        `http://localhost:5000/transaction/getWalletByUser/${recipientId}`
+      );
+      console.log("response1", response1);
+      console.log("response2", response2);
+      const sender_id = response1?.data?.data?.wallet_id;
+      const recipient_id = response2?.data?.data?.wallet_id;
       const formData = { ...values, sender_id, recipient_id };
       console.log("form data", formData);
       const result = await axios.post(
         "http://localhost:5000/transaction/userTouser",
         formData
       );
+      if (result?.data?.data == "Transaction successful") {
+        toast.success("Transaction successful");
+        setShowPTP(false);
+        setShowSend(false);
+        setRefreshData(!refreshData);
+      }
       console.log("result of transaction", result);
     } catch (error) {
       console.log("error in transaction", error);
+      if(error?.response?.data?.error=="you dont have enough balance to make payment"){
+        toast.error("Not enough balance to make payment");
+        setShowPTP(false);
+        setShowSend(false);
+        setRefreshData(!refreshData);
+      }
     }
   };
 
-  // console.log("filter users",allUsers?.filter((user) => {
-  //   if (user.user_id != tokenData.user_id) return user;
-  // }))
-
   return (
     <div className="w-full p-4 bg-gray-50 h-screen">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       {/* Header Section */}
       {showNotifications && (
         <div className="h-full w-full bg-gray-900/80  fixed top-0 left-0 z-50 flex justify-center items-center">
@@ -465,15 +563,34 @@ const UserDashboard = () => {
             <div className="flex h-10/12 justify-center items-center">
               {showSendFavorites && <h2>show favourites </h2>}
               {!showSendFavorites && (
-                <div className="w-full h-full flex justify-center items-start">
-                  <div className="w-8/12 mt-6">
+                <div className="w-full h-full flex flex-wrap justify-center content-start items-start">
+                  <div className="w-full flex justify-center items-center mt-6">
                     <input
                       onChange={handleSendIdSearchChange}
                       type="text"
                       value={searchIdValue}
                       placeholder="Enter Rural Fin Id"
-                      className="w-full h-12 border-2 hover:border-black/60 transition duration-500 border-gray-200 rounded-lg p-4 mb-4"
+                      className="w-7/12 h-12 mr-6 border-2 hover:border-black/60 transition duration-500 border-gray-200 rounded-lg p-4"
                     />
+                    <button
+                      onClick={handleUpiSearch}
+                      className="h-12 text-xl font-semibold hover:shadow-lg hover:shadow-black/50 w-32 rounded-xl text-white bg-gradient-to-tr from-blue-600 to-blue-950 bg-blue-400 transition duration-700 cursor-pointer hover:from-blue-950 hover:to-blue-600"
+                    >
+                      Search
+                    </button>
+                  </div>
+                  <p className="w-full ml-20 mt-1 mb-6 text-red-700">
+                    {errors}
+                  </p>
+                  <div className="w-full grid grid-cols-2 gap-4">
+                    {filteredUsers
+                      ?.filter((user) => {
+                        if (user.user_id != tokenData.user_id) return user;
+                      })
+                      .slice(0, 6)
+                      .map((agent) => (
+                        <AgentCard />
+                      ))}
                   </div>
                 </div>
               )}
@@ -552,15 +669,16 @@ const UserDashboard = () => {
       )}
 
       {showRecentTransactionInfo && (
-        <div className="h-full w-full bg-gray-900/80  fixed top-0 left-0 z-50 flex justify-center items-center">
-          <div className="bg-white rounded-lg p-4 shadow-lg h-9/12 w-5/12">
-            <div className="flex justify-between items-start mb-2 h-1/12">
+        <div className="h-full w-full bg-gray-900/80 fixed top-0 left-0 z-50 flex justify-center items-center">
+          <div className="bg-white rounded-lg p-4 shadow-lg h-5/12 w-4/12">
+            {/* Header */}
+            <div className="flex justify-between items-start mb-0 h-1/12">
               <h1 className="text-lg mt-1 font-semibold ml-2">
-                Transaction information
+                Transaction Information
               </h1>
               <button
-                className="cursor-pointer rounded-full w-10 hover:bg-gray-200 transition-all duration-500 flex justify-center items-center p-2"
                 onClick={() => setShowRecentTransactionInfo(false)}
+                className="cursor-pointer rounded-full w-10 hover:bg-gray-200 transition-all duration-500 flex justify-center items-center p-2"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -579,8 +697,42 @@ const UserDashboard = () => {
               </button>
             </div>
 
-            <div className="flex h-11/12 justify-center items-center">
-              <h1>show transaction information</h1>
+            {/* Transaction Details */}
+            <div className="h-11/12 flex flex-wrap content-center overflow-auto p-2">
+              <div className="w-full">
+                <h2 className="text-lg font-semibold mb-1">
+                  Transaction Details
+                </h2>
+                <h2>Amount: ₹{recentTransactionInfo?.amount}</h2>
+                <h2>
+                  Time:{" "}
+                  {new Date(
+                    recentTransactionInfo?.date_time
+                  ).toLocaleTimeString()}
+                </h2>
+              </div>
+
+              {/* Sender Details */}
+              <div className="grid w-full grid-cols-2">
+                <div>
+                  <h2 className="text-lg font-semibold mt-4">
+                    Sender Information
+                  </h2>
+                  <h2>Name: {recentTransactionSender?.full_name}</h2>
+                  <h2>Phone: {recentTransactionSender?.phone_number}</h2>
+                  <h2>Wallet ID: {recentTransactionSender?.senderWid}</h2>
+                </div>
+
+                {/* Receiver Details */}
+                <div>
+                  <h2 className="text-lg font-semibold mt-4">
+                    Receiver Information
+                  </h2>
+                  <h2>Name: {recentTransactionReceiver?.full_name}</h2>
+                  <h2>Phone: {recentTransactionReceiver?.phone_number}</h2>
+                  <h2>Wallet ID: {recentTransactionReceiver?.receiverWid}</h2>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -763,7 +915,7 @@ const UserDashboard = () => {
               </div>
               <div className="text-sm mb-1">Balance</div>
               <div className="text-2xl font-bold">
-                ₹{userProfileData?.user_balance || 0}
+                ₹{userWalletData?.user_balance}
               </div>
             </div>
 
@@ -806,7 +958,9 @@ const UserDashboard = () => {
                 </svg>
               </div>
               <div className="text-sm mb-1">Activity</div>
-              <div className="text-2xl font-bold">12 trans</div>
+              <div className="text-2xl font-bold">
+                {todaysTransactions} trans
+              </div>
             </div>
           </div>
 
@@ -851,7 +1005,7 @@ const UserDashboard = () => {
                   </button>
 
                   {/* Deposit */}
-                  <button
+                  {/* <button
                     onClick={() => setShowDeposit(true)}
                     className="flex flex-col items-center hover:shadow-black/40 justify-center p-4 border cursor-pointer border-gray-200 shadow-lg hover:bg-gray-200 transition-all duration-500 rounded-lg"
                   >
@@ -871,10 +1025,10 @@ const UserDashboard = () => {
                       </svg>
                     </div>
                     <span className="text-sm">Deposit</span>
-                  </button>
+                  </button> */}
 
                   {/* Withdraw */}
-                  <button
+                  {/* <button
                     onClick={() => setShowWithdraw(true)}
                     className="flex flex-col items-center hover:shadow-black/40 justify-center p-4 border cursor-pointer border-gray-200 shadow-lg hover:bg-gray-200 transition-all duration-500 rounded-lg"
                   >
@@ -894,7 +1048,7 @@ const UserDashboard = () => {
                       </svg>
                     </div>
                     <span className="text-sm">Withdraw</span>
-                  </button>
+                  </button> */}
 
                   {/* Budget */}
                   <button
@@ -928,19 +1082,39 @@ const UserDashboard = () => {
           <h2 className="text-lg font-semibold mb-4">Recent Transactions</h2>
           <div className="space-y-3">
             {/* Transaction 1 */}
-            <RecentTransactionCard
+
+            {allTransactions.length > 0 &&
+              allTransactions
+                .sort((a, b) => new Date(b.date_time) - new Date(a.date_time))
+                ?.slice(0, 5)
+                .map((transaction, index) => (
+                  <RecentTransactionCard
+                    index={index}
+                    key={transaction.transaction_id}
+                    setShowRecentTransactionInfo={setShowRecentTransactionInfo}
+                    data={transaction}
+                    setRecentTransactionInfo={setRecentTransactionInfo}
+                  />
+                ))}
+
+            {allTransactions.length === 0 && (
+              <h2 className="text-lg w-full text-center font-semibold text-gray-500">
+                No transactions yet
+              </h2>
+            )}
+            {/* <RecentTransactionCard
               setShowRecentTransactionInfo={setShowRecentTransactionInfo}
-            />
+            /> */}
 
             {/* Transaction 2 */}
-            <RecentTransactionCard
+            {/* <RecentTransactionCard
               setShowRecentTransactionInfo={setShowRecentTransactionInfo}
-            />
+            /> */}
 
             {/* Transaction 3 */}
-            <RecentTransactionCard
+            {/* <RecentTransactionCard
               setShowRecentTransactionInfo={setShowRecentTransactionInfo}
-            />
+            /> */}
           </div>
         </div>
       </div>

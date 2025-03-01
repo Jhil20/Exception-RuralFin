@@ -14,7 +14,7 @@ router.route("/notifyUser").post(notificationToUser)
 router.route("/getAllTransaction").post(getAllTransactionUser)
 router.route("/getAllUser").get(getAllUser);
 router.route("/getUserByWallet/:id").post(getUserByWalletId);
+router.route("/userActivity").get(userActivity)
 router.route("/:id").get(getUserById);
 router.route("/getWallet/:id").get(getWalletId);
-router.route("/userActivity").get(userActivity)
 export default router

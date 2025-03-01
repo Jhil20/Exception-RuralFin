@@ -302,7 +302,7 @@ const totalAgent = asyncHandler(async (req, res) => {
   const allAgent = await Prisma.agent.findMany(
     {
       where: {
-        status: "ACTIVE"
+        status: "INACTIVE"
       }
     }
   )

@@ -1,7 +1,7 @@
 import React from "react";
 
 const AgentCard = (props) => {
-  const handleClick = props.onClick;
+  const handleClick = props?.onClick;
   return (
     <div
       onClick={() => handleClick(true)}

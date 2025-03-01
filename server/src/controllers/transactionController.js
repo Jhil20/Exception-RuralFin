@@ -91,7 +91,7 @@ const pTop=asyncHandler(async(req,res)=>{
 })
 
 const getAllTransactionUser = asyncHandler(async(req,res)=>{
-  const user_id = req.body.user_id;
+  const user_id = req.params.id;
   console.log(user_id)
   if(!user_id)
   {
