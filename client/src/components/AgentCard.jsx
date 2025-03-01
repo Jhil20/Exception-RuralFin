@@ -2,7 +2,7 @@ import React from "react";
 
 const AgentCard = (props) => {
   const handleClick = props?.onClick;
-  console.log("props data in agent card", props?.data);
+  // console.log("props data in agent card", props?.data);
   return (
     <div
       onClick={() => handleClick(true)}

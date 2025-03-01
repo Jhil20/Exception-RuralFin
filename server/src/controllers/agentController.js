@@ -35,6 +35,7 @@ const createAgent = asyncHandler(async (req, res) => {
     var {
         full_name,
         phone_num,
+        password,
         email,
         address,
         pincode,
@@ -48,8 +49,12 @@ const createAgent = asyncHandler(async (req, res) => {
     console.log("inside agent create controller")
 
     try {
-        if (!full_name || full_name.trim() === '') {
+        if (!full_name || full_name.trim() === '' ) {
             throw new ApiError(400, "Full name is required");
+        }
+        if(!password)
+        {
+            throw new ApiError(400,"Passowrd is required")
         }
         if (!/^[a-zA-Z\s]+$/.test(full_name)) {
             throw new ApiError(400, "Full name can only contain alphabets and spaces");
@@ -97,17 +102,20 @@ const createAgent = asyncHandler(async (req, res) => {
         if (agent) {
             throw new ApiError(400, "Agent phone number already  exists");
         }
+         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newAgent = await Prisma.agent.create({
             data: {
                 full_name,
                 phone_num,
                 email,
+                password:hashedPassword,
                 address,
                 pincode,
                 city,
                 state,
                 bank_details,
+                password,
             }
         })
 
@@ -131,26 +139,30 @@ const createAgent = asyncHandler(async (req, res) => {
     }
 })
 
-const loginAgent = asyncHandler(async (req, res) => {
-    const { phone_num } = req.body;
-    if (!phone_num) {
-        throw new ApiError(400, "Phone number is not entered");
-    }
-    const existedAgent = await Prisma.agent.findUnique({
-        where: {
-            phone_num
-        }
+const loginAgent = asyncHandler(async(req,res)=>{
+    const{phone_num,password}=req.body;
+    if (!phone_num || !password) {
+        throw new ApiError(400, "Phone number and password is not entered");
+      }
+    const existedAgent=await Prisma.agent.findUnique({
+        where:{
+            phone_num,
+        },
     })
 
     if (!existedAgent) {
         throw new ApiError(404, "Agent not exists");
     }
+    //  const isPasswordValid = await bcrypt.compare(password, existedAgent.password);
+      if (existedAgent.password!=password) {
+        throw new ApiError(400, "Invalid password");
+      }
 
     const { refreshToken, accessToken } = await generateRefreshAndAccessTokens(existedAgent);
     console.log(refreshToken);
     console.log(accessToken);
 
-
+    
     const options = {
         httpOnly: true,
         secure: true
@@ -164,7 +176,7 @@ const loginAgent = asyncHandler(async (req, res) => {
                 {
                     agent: existedAgent
                 },
-                "User logged in successfully"
+                "Agent logged in successfully"
             )
         )
 })
@@ -263,4 +275,82 @@ const verifyPayment = asyncHandler(async (req, res) => {
         res.status(400).json({ success: false, message: "Payment verification failed!" });
     }
 })
-export { createAgent, loginAgent, logoutAgent, walletCreation, securityDepositPayment,verifyPayment }
+
+// Get agent by ID
+const getAgentById = asyncHandler(async (req, res) => {
+    const { agent_id } = req.params;
+    
+    if (!agent_id) {
+      throw new ApiError(400, "Agent ID is required");
+    }
+    
+    try {
+      const agent = await Prisma.agent.findUnique({
+        where: {
+          agent_id: agent_id
+        }
+      });
+      
+      if (!agent) {
+        throw new ApiError(404, "Agent not found");
+      }
+      
+      // Remove sensitive information
+      const { password, refresh_token, ...agentData } = agent;
+      
+      return res.status(200).json(
+        new ApiResponse(
+          200,
+          { agent: agentData },
+          "Agent details fetched successfully"
+        )
+      );
+    } catch (error) {
+      throw new ApiError(error.statusCode || 500, error.message || "Failed to fetch agent details");
+    }
+  });
+  
+  // Get agent wallet by agent ID
+  const getAgentWalletByAgentId = asyncHandler(async (req, res) => {
+    const { agent_id } = req.params;
+    
+    if (!agent_id) {
+      throw new ApiError(400, "Agent ID is required");
+    }
+    
+    try {
+      const agentWallet = await Prisma.agentWallet.findUnique({
+        where: {
+          agent_id: agent_id
+        }
+      });
+      
+      if (!agentWallet) {
+        throw new ApiError(404, "Agent wallet not found");
+      }
+      
+      // Remove sensitive information
+      const { agent_pin, ...walletData } = agentWallet;
+      
+      return res.status(200).json(
+        new ApiResponse(
+          200,
+          { wallet: walletData },
+          "Agent wallet details fetched successfully"
+        )
+      );
+    } catch (error) {
+      throw new ApiError(error.statusCode || 500, error.message || "Failed to fetch agent wallet details");
+    }
+  });
+  
+  export { 
+    createAgent, 
+    loginAgent, 
+    logoutAgent, 
+    walletCreation, 
+    securityDepositPayment, 
+    verifyPayment,
+    getAgentById,
+    getAgentWalletByAgentId 
+  };

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { userLoggedout } from "../redux/slices/signInSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Cookies from "js-cookie";
 import AgentCard from "../components/AgentCard";
 import RecentTransactionCard from "../components/RecentTransactionCard";
@@ -13,8 +13,10 @@ import { PTPvalidationSchema } from "../yupValidators/validationSchema";
 import { ToastContainer, toast } from "react-toastify";
 
 const UserDashboard = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+
   const tokenData = jwtDecode(Cookies.get("jwt-token"));
   // console.log(tokenData);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -44,10 +46,23 @@ const UserDashboard = () => {
     {}
   );
   const [refreshData, setRefreshData] = useState(false);
+  const isSignedIn = useSelector((state) => state.signin.isSignedIn);
+
+  const goToMoneyMaze = () => {
+    navigate("/moneyMaze");
+  }
+
+  const FarmToFortune = () => {
+    navigate("/farmToFortune");
+  }
+
+  // if(!isSignedIn){
+  //   navigate("/login");
+  // }
 
   const handleLogout = () => {
     Cookies.remove("jwt-token");
-    console.log("logout clled");
+    // console.log("logout clled");
     dispatch(userLoggedout());
     navigate("/login");
   };
@@ -529,10 +544,10 @@ const UserDashboard = () => {
 
       {showDeposit && (
         <div className="h-full w-full bg-gray-900/80  fixed top-0 left-0 z-50 flex justify-center items-center">
-          <div className="bg-white rounded-lg p-4 shadow-lg h-10/12 w-6/12">
+          <div className="bg-white rounded-lg p-4 shadow-lg h-5/12 w-4/12">
             <div className="flex justify-between items-start mb-2 h-1/12">
               <h1 className="text-lg mt-1 font-semibold ml-2">
-                Deposit money in your account
+                Financial Based Gaming Lessons
               </h1>
               <button
                 className="cursor-pointer rounded-full w-10 hover:bg-gray-200 transition-all duration-500 flex justify-center items-center p-2"
@@ -554,62 +569,14 @@ const UserDashboard = () => {
                 </svg>
               </button>
             </div>
-            <div className="flex w-full h-1/12">
-              <div
-                onClick={() => setShowSendFavorites(true)}
-                className={`w-1/2 h-full  mr-4 ${
-                  showSendFavorites
-                    ? "bg-blue-900 shadow-black/50 text-white"
-                    : "bg-blue-100 text-black"
-                } border-1  hover:bg-blue-900 hover:text-white hover:shadow-black/50 transition duration-700 cursor-pointer border-black/20 shadow-lg flex justify-center items-center text-lg font-semibold rounded-xl`}
-              >
-                Favourite Agents
-              </div>
-              <div
-                onClick={() => setShowSendFavorites(false)}
-                className={`w-1/2 h-full ${
-                  !showSendFavorites
-                    ? "bg-blue-900 text-white shadow-black/50 "
-                    : "bg-blue-100 text-black"
-                }bg-blue-100 border-1 hover:bg-blue-900 hover:text-white hover:shadow-black/50 transition duration-700 cursor-pointer border-black/20 shadow-lg flex justify-center items-center text-lg font-semibold rounded-xl`}
-              >
-                Find Agent
-              </div>
-            </div>
+            
             <div className="flex h-10/12 justify-center items-center">
-              {showSendFavorites && <h2>show favourites </h2>}
-              {!showSendFavorites && (
-                <div className="w-full h-full flex flex-wrap justify-center content-start items-start">
-                  <div className="w-full flex justify-center items-center mt-6">
-                    <input
-                      onChange={handleSendIdSearchChange}
-                      type="text"
-                      value={searchIdValue}
-                      placeholder="Enter Rural Fin Id"
-                      className="w-7/12 h-12 mr-6 border-2 hover:border-black/60 transition duration-500 border-gray-200 rounded-lg p-4"
-                    />
-                    <button
-                      onClick={handleUpiSearch}
-                      className="h-12 text-xl font-semibold hover:shadow-lg hover:shadow-black/50 w-32 rounded-xl text-white bg-gradient-to-tr from-blue-600 to-blue-950 bg-blue-400 transition duration-700 cursor-pointer hover:from-blue-950 hover:to-blue-600"
-                    >
-                      Search
-                    </button>
-                  </div>
-                  <p className="w-full ml-20 mt-1 mb-6 text-red-700">
-                    {errors}
-                  </p>
-                  <div className="w-full grid grid-cols-2 gap-4">
-                    {filteredUsers
-                      ?.filter((user) => {
-                        if (user.user_id != tokenData.user_id) return user;
-                      })
-                      .slice(0, 6)
-                      .map((agent) => (
-                        <AgentCard />
-                      ))}
-                  </div>
-                </div>
-              )}
+              <div onClick={()=>goToMoneyMaze()} className="w-40 h-10 bg-gradient-to-tr from-blue-600 to-blue-950 rounded-xl text-white font-bold flex justify-center items-center mr-4 shadow-lg hover:shadow-black/40 cursor-pointer hover:from-blue-950 hover:to-blue-600 transition duration-700">
+                <button className="w-full h-full">Money Maze</button>
+              </div>
+              <div onClick={()=>FarmToFortune()} className="w-40 h-10 bg-gradient-to-tr from-green-600 to-green-900 rounded-xl text-white font-bold flex justify-center items-center shadow-lg hover:shadow-black/40 cursor-pointer hover:from-green-900 hover:to-green-600 transition duration-700">
+                  <button className="w-full h-full">Farm To Fortune</button>
+              </div>
             </div>
           </div>
         </div>
@@ -988,9 +955,11 @@ const UserDashboard = () => {
                 <div className="space-y-3 grid grid-cols-2 gap-4 gap-y-2">
                   {/* Agent 1 */}
                   {allAgents.map((agent) => (
-                    <AgentCard onClick={setShowAgentTranscationOptions} data={agent} />
+                    <AgentCard
+                      onClick={setShowAgentTranscationOptions}
+                      data={agent}
+                    />
                   ))}
-                  
                 </div>
               </div>
 
@@ -1022,7 +991,7 @@ const UserDashboard = () => {
                   </button>
 
                   {/* Deposit */}
-                  {/* <button
+                  <button
                     onClick={() => setShowDeposit(true)}
                     className="flex flex-col items-center hover:shadow-black/40 justify-center p-4 border cursor-pointer border-gray-200 shadow-lg hover:bg-gray-200 transition-all duration-500 rounded-lg"
                   >
@@ -1041,8 +1010,8 @@ const UserDashboard = () => {
                         />
                       </svg>
                     </div>
-                    <span className="text-sm">Deposit</span>
-                  </button> */}
+                    <span className="text-sm">Gaming Lessons</span>
+                  </button>
 
                   {/* Withdraw */}
                   {/* <button

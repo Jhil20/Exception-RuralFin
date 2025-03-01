@@ -5,6 +5,9 @@ export const loginValidationSchema = Yup.object().shape({
   phone_number: Yup.string()
     .matches(/^\d{10}$/, "Phone number must be 10 digits")
     .required("Phone number is required"),
+    password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
 });
 
 // Validation Schema

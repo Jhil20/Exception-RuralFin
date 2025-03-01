@@ -12,6 +12,7 @@ import StepLabel from "@mui/material/StepLabel";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import CityAutocomplete from "./CityAutoComplete";
+import { useNavigate } from "react-router-dom";
 
 const AgentSignupForm = (props) => {
   const steps = ["Personal Information", "Address Information"];
@@ -38,6 +39,7 @@ const AgentSignupForm = (props) => {
       ); /// backend not working for create agent
       console.log("response", response);
       if (response?.data?.data == "Agent registered successfully") {
+        setShowLogin(true);
       }
     } catch (error) {
       console.log(error);
