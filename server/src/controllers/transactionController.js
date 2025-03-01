@@ -2,6 +2,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import Prisma from "../utils/prisma.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import bcrypt from "bcrypt"
 
 const pTop=asyncHandler(async(req,res)=>{
     const {sender_id, recipient_id, amount,user_pin }=req.body;
@@ -144,4 +145,85 @@ const getWalletIdByUserId = asyncHandler(async (req, res) => {
 });
 
 
-export {pTop,getAllTransactionUser,getWalletIdByUserId}
+const userAgentTransactionDeposit = asyncHandler(async (req,res)=>{
+  const {userWalletId,agentWalletId,amount,agentPin} = req.body;
+  if(!userWalletId)
+  {
+      throw new ApiError(400,"User Wallet Id is required");
+  }
+  if(!agentWalletId)
+  {
+      throw new ApiError(400,"Agent Wallet Id is required");
+  }
+  if(!amount)
+  {
+      throw new ApiError(400,"Enter Amount");
+  }
+  if(!agentPin)
+  {
+      throw new ApiError(400,"Agent Pin is required");
+  }
+
+  const user = await Prisma.userWallet.findUnique({
+      where:{
+          wallet_id:userWalletId
+      }
+  })
+  if(!user)
+  {
+    throw new ApiError(400,"user does not exist")
+  }
+
+  const Agent = await Prisma.agentWallet.findUnique({
+    where:{
+      wallet_id:agentWalletId
+    }
+  })
+
+  if(!Agent)
+  {
+    throw new ApiError(400,"Agent does not exist");
+  }
+
+  await Prisma.$transaction([
+    Prisma.userWallet.update({
+      where:{
+        wallet_id:userWalletId
+      },
+      data:{
+        user_balance:{
+          increment:amount
+        }
+      }
+    }),
+
+    Prisma.agentWallet.update({
+      where:{
+        wallet_id:agentWalletId
+      },
+      data:{
+        wallet_balance:{
+          decrement:amount
+        }
+      }
+    }),
+
+    Prisma.userAgentTransaction.create({
+      data:{
+        user_id:user.user_id,
+        agent_id:Agent.agent_id,
+        amount:amount,
+        transaction_type:"DEPOSIT",
+      }
+    })
+  ])
+
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      "Transaction Successfully Done"
+    )
+  )
+
+})
+export {pTop,getAllTransactionUser,getWalletIdByUserId,userAgentTransactionDeposit}

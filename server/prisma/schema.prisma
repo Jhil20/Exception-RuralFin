@@ -58,6 +58,7 @@ model User {
   NotificationRecipent NotificationUser[] @relation(name: "notification-recipent")
 
   userWallet UserWallet?
+  userNotify        NotificationAgent[] @relation(name: "notification-user")
 }
 
 // User Wallet Model
@@ -91,6 +92,7 @@ model Agent {
   user                UserAgentTransaction[]
   agentWallet         AgentWallet?
   agentAdmin          AgentAdminTransaction?
+  agentNotify         NotificationAgent[] @relation(name: "notification-agent")
 }
 
 // Agent Wallet Model
@@ -152,4 +154,16 @@ model NotificationUser {
 
   sender    User @relation(name: "notification-sender", fields: [sender_id], references: [user_id], onDelete: Cascade)
   receipent User @relation(name: "notification-recipent", fields: [recipent_id], references: [user_id], onDelete: Cascade)
+}
+
+model NotificationAgent {
+  id          String   @id @default(uuid())
+  agent_id    String // The recipient of the notification
+  user_id     String // The user who sent the notification
+  message     String // Custom message
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  agent    Agent @relation(name: "notification-agent", fields: [agent_id], references: [agent_id], onDelete: Cascade)
+  user User @relation(name: "notification-user", fields: [user_id], references: [user_id], onDelete: Cascade)
 }
