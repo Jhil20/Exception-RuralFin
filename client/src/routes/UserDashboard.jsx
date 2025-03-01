@@ -44,6 +44,10 @@ const UserDashboard = () => {
     navigate("/budget");
   };
 
+const setgame=()=>{
+  navigate("/game")
+}
+
   const [searchIdValue, setSearchIdValue] = useState("");
 
   const handleSendIdSearchChange = (e) => {
@@ -876,6 +880,29 @@ const UserDashboard = () => {
                   {/* Withdraw */}
                   <button
                     onClick={() => setShowWithdraw(true)}
+                    className="flex flex-col items-center hover:shadow-black/40 justify-center p-4 border cursor-pointer border-gray-200 shadow-lg hover:bg-gray-200 transition-all duration-500 rounded-lg"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mb-2">
+                      <svg
+                        className="h-5 w-5 text-gray-900"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17 13l-5 5m0 0l-5-5m5 5V6"
+                        />
+                      </svg>
+                    </div>
+                    <span className="text-sm">Withdraw</span>
+                  </button>
+
+                  {/*GAME*/}
+                  <button
+                    onClick={() => setgame(true)}
                     className="flex flex-col items-center hover:shadow-black/40 justify-center p-4 border cursor-pointer border-gray-200 shadow-lg hover:bg-gray-200 transition-all duration-500 rounded-lg"
                   >
                     <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mb-2">

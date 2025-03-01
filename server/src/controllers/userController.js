@@ -440,6 +440,11 @@ const getNotification = asyncHandler(async (req,res)=>{
 
 })
 
-export { createUser, loginUser, logoutUser, totalAgent, notificationToUser,getAllUser,getUserById,getWalletId,userActivity,generateWalletId,getNotification };
+const generateRequestDeposit = asyncHandler(async(req,res)=>{
+  const {agentWalletId,user_id,amount} = req.body;
+  
+})
+
+export { createUser, loginUser, logoutUser, totalAgent, notificationToUser,getAllUser,getUserById,getWalletId,userActivity,getNotification ,generateWalletId};
 
 

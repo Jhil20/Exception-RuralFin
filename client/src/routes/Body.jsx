@@ -2,40 +2,65 @@ import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
+import { Button } from "@mui/material";
 
 const Body = () => {
   const navigate = useNavigate();
   const isSignedIn = useSelector((state) => state.signin.isSignedIn);
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-6 space-y-8">
-      {/* Landing Page */}
-      <div className="rounded-2xl bg-white p-6 shadow-lg">
-        <div className="flex justify-between items-center mb-8">
-          <div className="text-2xl font-bold text-blue-600">RuralFin</div>
-          <div className="flex gap-6">
-            <button className="px-4 py-2 rounded-lg hover:bg-blue-50">About</button>
-            <button className="px-4 py-2 rounded-lg hover:bg-blue-50">Services</button>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg">Get Started</button>
+    <div className="bg-gray-100 min-h-screen flex flex-col">
+      <header className="bg-white shadow p-4 flex justify-between items-center">
+        <h1 className="text-2xl font-bold">My Website</h1>
+        <nav>
+          <Button className="mr-4" variant="ghost">Home</Button>
+          <Button className="mr-4" variant="ghost">About</Button>
+          <Button className="mr-4" variant="ghost">Services</Button>
+          <Button className="mr-4" variant="ghost">Contact</Button>
+        </nav>
+      </header>
+
+      <main className="flex-grow flex flex-col items-center justify-center">
+        <section className="text-center mb-8">
+          <h2 className="text-4xl font-bold mb-4">Welcome to Our Website</h2>
+          <p className="text-lg text-gray-600 mb-6">
+            Discover amazing services and features with us!
+          </p>
+          <Button className="px-6 py-2 bg-blue-500 text-white rounded-md shadow-md">
+            Get Started
+          </Button>
+        </section>
+
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl p-4">
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-2">Feature 1</h3>
+            <p className="text-gray-700 mb-4">
+              Learn more about our first amazing feature that can help you.
+            </p>
+            <Button variant="outline">Learn More</Button>
           </div>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-8 mb-8">
-          <div className="space-y-4">
-            <h1 className="text-4xl font-bold">Banking Made Simple for Everyone</h1>
-            <p className="text-gray-600">Secure, Fast, and Reliable Financial Services at Your Fingertips</p>
-            <div className="flex gap-4">
-              <button className="px-6 py-3 bg-blue-600 text-white rounded-xl flex items-center gap-2">
-                Start Banking <ArrowUpRight size={20} />
-              </button>
-              <button className="px-6 py-3 border border-blue-600 text-blue-600 rounded-xl">Learn More</button>
-            </div>
+
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-2">Feature 2</h3>
+            <p className="text-gray-700 mb-4">
+              Discover how this feature makes everything more efficient.
+            </p>
+            <Button variant="outline">Explore</Button>
           </div>
-          <div className="bg-blue-100 rounded-2xl h-64 flex items-center justify-center">
-            Interactive Animation Area
+
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-2">Feature 3</h3>
+            <p className="text-gray-700 mb-4">
+              A feature designed to improve your experience significantly.
+            </p>
+            <Button variant="outline">Try Now</Button>
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
+
+      <footer className="bg-white p-4 text-center shadow">
+        © 2025 My Website. All rights reserved.
+      </footer>
     </div>
   );
 };
