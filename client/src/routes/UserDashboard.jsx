@@ -71,7 +71,10 @@ const UserDashboard = () => {
       );
       // console.log("result of all transactions", result);
       setAllTransactions(result?.data?.data?.Transaction);
-      const result2=await axios.get(`http://localhost:5000/users/userActivity/`,tokenData.user_id);
+      const result2 = await axios.get(
+        `http://localhost:5000/users/userActivity/`,
+        tokenData.user_id
+      );
       // console.log("result of all transactions 2", result2);
       setTodaysTransactions(result2?.data?.data?.Transaction);
     } catch (error) {
@@ -83,6 +86,7 @@ const UserDashboard = () => {
     // if (showUserProfile) {
     getAllTransactions();
     getUserProfile();
+    getAgents();
     // }
   }, [refreshData]);
 
@@ -212,6 +216,15 @@ const UserDashboard = () => {
         "http://localhost:5000/transaction/userTouser",
         formData
       );
+      const notify = await axios.post(
+        "http://localhost:5000/users/notifyUser",
+        {
+          user_id: senderId,
+          receipent_wallet_id: recipient_id,
+          amount: formData.amount,
+        }
+      );
+      console.log("notify result", notify);
       if (result?.data?.data == "Transaction successful") {
         toast.success("Transaction successful");
         setShowPTP(false);
@@ -221,7 +234,10 @@ const UserDashboard = () => {
       console.log("result of transaction", result);
     } catch (error) {
       console.log("error in transaction", error);
-      if(error?.response?.data?.error=="you dont have enough balance to make payment"){
+      if (
+        error?.response?.data?.error ==
+        "you dont have enough balance to make payment"
+      ) {
         toast.error("Not enough balance to make payment");
         setShowPTP(false);
         setShowSend(false);
@@ -967,18 +983,19 @@ const UserDashboard = () => {
           <div className="grid grid-cols-2 w-full md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               {/* Agent Selection Section */}
-              <div className="bg-white rounded-lg p-4 shadow-sm mb-4">
+              <div className="bg-white min-h-[38vh] rounded-lg p-4 shadow-sm mb-4">
                 <h2 className="text-lg font-semibold mb-4">Select an Agent</h2>
                 <div className="space-y-3 grid grid-cols-2 gap-4 gap-y-2">
                   {/* Agent 1 */}
-                  <AgentCard onClick={setShowAgentTranscationOptions} />
-                  <AgentCard onClick={setShowAgentTranscationOptions} />
-                  <AgentCard onClick={setShowAgentTranscationOptions} />
+                  {allAgents.map((agent) => (
+                    <AgentCard onClick={setShowAgentTranscationOptions} data={agent} />
+                  ))}
+                  
                 </div>
               </div>
 
               {/* Quick Actions */}
-              <div className="bg-white w-full rounded-lg p-4 shadow-sm">
+              <div className="bg-white min-h-1/3 w-full rounded-lg p-4 shadow-sm">
                 <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
                 <div className="grid grid-cols-5 gap-4">
                   {/* Send */}
@@ -1079,14 +1096,14 @@ const UserDashboard = () => {
         </div>
         {/* Recent Transactions */}
         <div className="bg-white w-1/3 rounded-lg p-4 shadow-sm">
-          <h2 className="text-lg font-semibold mb-4">Recent Transactions</h2>
-          <div className="space-y-3">
+          <h2 className="text-lg font-semibold mb-2">Recent Transactions</h2>
+          <div className="space-y-2">
             {/* Transaction 1 */}
 
             {allTransactions.length > 0 &&
               allTransactions
                 .sort((a, b) => new Date(b.date_time) - new Date(a.date_time))
-                ?.slice(0, 5)
+                ?.slice(0, 7)
                 .map((transaction, index) => (
                   <RecentTransactionCard
                     index={index}

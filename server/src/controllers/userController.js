@@ -314,7 +314,9 @@ const totalAgent = asyncHandler(async (req, res) => {
 })
 
 const notificationToUser = asyncHandler(async (req,res)=>{
+  console.log("inside notify")
   const {user_id,receipent_wallet_id,amount} = req.body;
+  console.log("req body",req.body)
   const receipent_id = await Prisma.UserWallet.findUnique({
     where:{
       wallet_id:receipent_wallet_id
@@ -338,6 +340,7 @@ const notificationToUser = asyncHandler(async (req,res)=>{
       message: `${amount} is sent`
     }
   })
+  console.log("hhhhhhhhhhh")
   await Prisma.notificationUser.create({
     data: {
       sender: {

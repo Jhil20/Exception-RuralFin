@@ -94,6 +94,8 @@ const UserSignupForm = (props) => {
                 age: profileData.age || "",
                 income: profileData.income || "",
                 budget_limit: profileData.budget_limit || "",
+                password: profileData.password || "",
+                confirmPassword: profileData.confirmPassword || "",
               }}
               validationSchema={signupValidationSchema}
               onSubmit={handleNext}
@@ -117,7 +119,7 @@ const UserSignupForm = (props) => {
 
                 {/* Phone Number */}
                 <div className="flex-auto">
-                  <label className="block text-gray-700 mb-1 ml-1">
+                  <label className="block text-gray-700 mb-1 ml-1 mr-2">
                     Phone Number*
                   </label>
                   <Field
@@ -172,7 +174,7 @@ const UserSignupForm = (props) => {
 
                 {/* Age */}
                 <div className="flex-2/12">
-                  <label className="block text-gray-700 mb-1 ml-1">Age*</label>
+                  <label className="block text-gray-700 mb-1 ml-1 mr-2">Age*</label>
                   <Field
                     type="text"
                     name="age"
@@ -219,6 +221,38 @@ const UserSignupForm = (props) => {
                   />
                 </div>
 
+                <div className="flex-auto mr-3">
+                  <label className="block text-gray-700 mb-1 ml-1">
+                    Password*
+                  </label>
+                  <Field
+                    type="text"
+                    name="password"
+                    className="w-full p-2 border hover:ring-[1px] ring-gray-700 transition-all duration-500 border-gray-300 rounded-md no-spinner"
+                  />
+                  <ErrorMessage
+                    name="password"
+                    component="p"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
+
+                <div className="flex-auto">
+                  <label className="block text-gray-700 mb-1 ml-1">
+                    Confirm Password*
+                  </label>
+                  <Field
+                    type="text"
+                    name="confirmPassword"
+                    className="w-full p-2 border hover:ring-[1px] ring-gray-700 transition-all duration-500 border-gray-300 rounded-md no-spinner"
+                  />
+                  <ErrorMessage
+                    name="confirmPassword"
+                    component="p"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
+
                 {props.error && (
                   <h1 className="text-md text-red-500 font-bold">
                     {error || "Something Went Wrong. Please Try Again"}
@@ -233,7 +267,7 @@ const UserSignupForm = (props) => {
                   Sign Up
                 </button> */}
                 <Box
-                  sx={{ display: "flex", flexDirection: "row", pt: 2 }}
+                  sx={{ display: "flex", flexDirection: "row", }}
                   className="w-full"
                 >
                   <Button

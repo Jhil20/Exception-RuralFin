@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import {createAgent, loginAgent, logoutAgent,walletCreation,securityDepositPayment}from "../controllers/agentController.js"
+// import {createAgent, loginAgent, logoutAgent,walletCreation,securityDepositPayment}from "../controllers/agentController.js"
 import {createAgent, loginAgent, logoutAgent,walletCreation,securityDepositPayment,verifyPayment}from "../controllers/agentController.js"
 import { userAgentTransactionDeposit } from "../controllers/transactionController.js";
 
