@@ -49,12 +49,12 @@ const generateWalletId = () => {
 
 
 const createUser = asyncHandler(async (req, res) => {
-  var { full_name, phone_number, email, age, income, gender, budget_limit, address, pincode, state, city, user_pin } =
+  var { full_name, phone_number, password,email, age, income, gender, budget_limit, address, pincode, state, city, user_pin } =
     req.body;
 
 
   try {
-    if (!full_name || full_name.trim() === "") {
+    if (!full_name || full_name.trim() === "" || !password) {
       throw new ApiError(400, "Full name is required");
     }
     if (!/^[a-zA-Z\s]+$/.test(full_name)) {
@@ -112,7 +112,7 @@ const createUser = asyncHandler(async (req, res) => {
     // console.log("user in back",user,user_pin)
     const saltRounds = 10;
     const hashedPin = await bcrypt.hash(user_pin, saltRounds);
-    // console.log("hashed pin", hashedPin);
+    console.log("hashed pin", hashedPin);
     if (user) {
       throw new ApiError(400, "User already exists");
     }
@@ -121,6 +121,7 @@ const createUser = asyncHandler(async (req, res) => {
         full_name,
         phone_number,
         email,
+        password:hashedPassword,
         age,
         income,
         gender,
@@ -161,12 +162,12 @@ const createUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
   const { phone_number } = req.body;
-  // console.log(phone_number);
+  console.log(phone_number);
   if (!/^\d{10}$/.test(phone_number)) {
     throw new ApiError(400, "Phone number must be exactly 10 digits");
   }
-  if (!phone_number) {
-    throw new ApiError(400, "Phone number is not entered");
+  if (!phone_number || !password) {
+    throw new ApiError(400, "Phone number and password is not entered");
   }
   const existedUser = await Prisma.user.findUnique({
     where: {
@@ -176,7 +177,7 @@ const loginUser = asyncHandler(async (req, res) => {
   if (!existedUser) {
     throw new ApiError(404, "User does not exist");
   }
-  // console.log(existedUser);
+  console.log(existedUser);
   const { refreshToken, accessToken } = await generateRefreshAndAccessTokens(
     existedUser
   );
@@ -411,67 +412,6 @@ const getWalletId = asyncHandler(async (req,res)=>{
   )
 })
 
-const getUserByWalletId = asyncHandler(async (req, res) => {
-  const  wallet_id  = req.params.id;
-// console.log("hhdiidisajidjias",wallet_id,req.params.id)
-  if (!wallet_id) {
-    throw new ApiError(400, "Wallet ID is required");
-  }
-
-  // Check if the wallet exists
-  const wallet = await Prisma.userWallet.findUnique({
-    where: { wallet_id },
-    select: { user_id: true },
-  });
-  console.log("wallet in backend",wallet)
-
-  if (!wallet) {
-    throw new ApiError(404, "Wallet ID not found");
-  }
-
-  // Fetch user details
-  const user = await Prisma.user.findUnique({
-    where: { user_id: wallet.user_id },
-  });
-
-  if (!user) {
-    throw new ApiError(404, "User not found");
-  }
-
-  res.status(200).json(
-    new ApiResponse(200, { user }, "User fetched successfully")
-  );
-});
-
-
-const getNotification = asyncHandler(async (req,res)=>{
-  const {receipent_id} = req.body;
-  if(!receipent_id)
-  {
-    throw new ApiError(400,"ID is must");
-  }
-  const receivedPaymentNotification = await Prisma.notificationUser.findMany({
-    where:{
-      recipent_id:receipent_id
-    }
-  })
-  if(!receivedPaymentNotification)
-  {
-    throw new ApiError(400,"you do not have any received payment notification");
-  }
-
-  res.status(200).json(
-    new ApiResponse(
-      200,
-      {
-        notification:receivedPaymentNotification
-      },
-      "Notification fetched successfully"
-    )
-  )
-
-})
-
-export { createUser, loginUser, logoutUser, totalAgent,getUserByWalletId,generateWalletId, notificationToUser,getAllUser,getUserById,getWalletId,userActivity,getNotification };
+export { createUser, loginUser, logoutUser, totalAgent, notificationToUser,getAllUser,getUserById,getWalletId,userActivity,generateWalletId };
 
 
