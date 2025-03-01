@@ -5,11 +5,11 @@ import cors from "cors"
 const app = express()
 
 app.use(cors({
-    // origin:process.env.CORS_ORIGIN,
-    // credentials:true
-    origin: 'http://localhost:5174',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    origin:process.env.CORS_ORIGIN,
+    credentials:true
+    // origin: 'http://localhost:5174',
+    // methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    // allowedHeaders: ['Content-Type', 'Authorization']
 }))
 
 
