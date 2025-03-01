@@ -141,6 +141,34 @@ const createAgent = asyncHandler(async (req, res) => {
     }
 })
 
+const createWallet = asyncHandler(async (req,res)=>{
+    const {agent_id,agent_pin} = req.body;
+
+    if(!agent_id)
+    {
+        throw new ApiError(400,"agent ID is required");
+    }
+    if(!agent_pin)
+    {
+        throw new ApiError(400,"agent pin is required");
+    }
+
+    await Prisma.agentWallet.create({
+        data:{
+            wallet_id:generateWalletId+"-AGENT",
+            agent_id:agent_id,
+            agent_pin:agent_pin
+        }
+    })
+
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            "wallet created successfully"
+        )
+    )
+})
+
 const loginAgent = asyncHandler(async (req, res) => {
     const { phone_num, password } = req.body;
     if (!phone_num || !password) {
@@ -203,63 +231,6 @@ const logoutAgent = asyncHandler(async (req, res) => {
         .clearCookie("accessToken", options)
         .clearCookie("refreshToken", options)
         .json(new ApiResponse(200, {}, "Agent logged out"))
-})
-
-const walletCreation = asyncHandler(async (req, res) => {
-    const { agent_id, agent_pin } = req.body;
-    if (!agent_id) {
-        throw new ApiError(400, "Agent ID is required");
-    }
-    if (!agent_pin) {
-        throw new ApiError(400, "PIN is required");
-    }
-    const agent = await Prisma.agentAdminTransaction.findUnique({
-        where: {
-            agent_id: agent_id
-        },
-        select: {
-            isPending: true,
-            security_deposit_amt: true
-        }
-    })
-
-    res.status(200).json(
-        new ApiResponse(
-            200,
-            "Wallet Creation successfully"
-        )
-    )
-})
-
-const securityDepositPayment = asyncHandler(async (req, res) => {
-    const { amount } = req.body;
-    
-    res.status(200).json(
-        new ApiResponse(
-            200,
-            {
-                // razorpay: payment
-            }
-        )
-    )
-})
-
-// to be done after backend
-const verifyPayment = asyncHandler(async (req, res) => {
-    console.log(req.body)
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
-
-    const generated_signature = crypto
-        .createHmac("sha256", process.env.RAZORPAY_SECRET)
-        .update(razorpay_order_id + "|" + razorpay_payment_id)
-        .digest("hex");
-
-    if (generated_signature === razorpay_signature) {
-        // Payment successful, update wallet balance or notify admin
-        res.json({ success: true, message: "Payment verified successfully!" });
-    } else {
-        res.status(400).json({ success: false, message: "Payment verification failed!" });
-    }
 })
 
 // Get agent by ID
@@ -334,9 +305,7 @@ export {
     createAgent,
     loginAgent,
     logoutAgent,
-    walletCreation,
-    securityDepositPayment,
-    verifyPayment,
     getAgentById,
+    createWallet,
     getAgentWalletByAgentId
 };
