@@ -5,6 +5,9 @@ export const loginValidationSchema = Yup.object().shape({
   phone_number: Yup.string()
     .matches(/^\d{10}$/, "Phone number must be 10 digits")
     .required("Phone number is required"),
+    password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
 });
 
 // Validation Schema
@@ -35,6 +38,13 @@ export const signupValidationSchema = Yup.object().shape({
         ? schema.max(income, "Budget Limit cannot be more than Income")
         : schema
     ),
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password"), null], "Passwords must match")
+    .required("Confirm password is required"),
 });
 
 export const signupValidationSchema2 = Yup.object().shape({
@@ -84,6 +94,12 @@ export const agentValidationSchema = Yup.object().shape({
   payment_mode: Yup.string()
     .oneOf(["CASH", "DIGITAL"], "Enter a valid payment mode (CASH or DIGITAL)")
     .required("Payment mode is required"),
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password"), null], "Passwords must match")
+    .required("Confirm password is required"),
 });
 
 export const agentSignupValidationSchema2 = Yup.object().shape({

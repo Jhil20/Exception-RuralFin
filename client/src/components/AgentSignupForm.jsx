@@ -12,6 +12,7 @@ import StepLabel from "@mui/material/StepLabel";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import CityAutocomplete from "./CityAutoComplete";
+import { useNavigate } from "react-router-dom";
 
 const AgentSignupForm = (props) => {
   const steps = ["Personal Information", "Address Information"];
@@ -38,6 +39,7 @@ const AgentSignupForm = (props) => {
       ); /// backend not working for create agent
       console.log("response", response);
       if (response?.data?.data == "Agent registered successfully") {
+        setShowLogin(true);
       }
     } catch (error) {
       console.log(error);
@@ -45,7 +47,6 @@ const AgentSignupForm = (props) => {
   };
   return (
     <div>
-
       <Box sx={{ width: "100%" }}>
         <Stepper activeStep={activeStep} className="mb-6">
           {steps.map((label, index) => {
@@ -68,11 +69,13 @@ const AgentSignupForm = (props) => {
               bank_details: profileData.bank_details || "",
               security_deposit: profileData.security_deposit || "",
               payment_mode: profileData.payment_mode || "",
+              password: profileData.password || "",
+              confirmPassword: profileData.confirmPassword || "",
             }}
             validationSchema={agentValidationSchema}
             onSubmit={handleNext}
           >
-            <Form className="space-y-4 flex flex-wrap">
+            <Form className="space-y-4 flex flex-wrap w-full">
               {/* Agent Name */}
               <div className="flex-auto mr-3">
                 <label className="block text-gray-700 mb-1 ml-1">
@@ -90,7 +93,7 @@ const AgentSignupForm = (props) => {
               </div>
 
               {/* Agent Phone */}
-              <div className="flex-auto">
+              <div className="flex-auto ">
                 <label className="block text-gray-700 mb-1 ml-1">
                   Agent Phone*
                 </label>
@@ -174,6 +177,38 @@ const AgentSignupForm = (props) => {
                 />
               </div>
 
+              <div className="flex-auto mr-3">
+                <label className="block text-gray-700 mb-1 ml-1">
+                  Password*
+                </label>
+                <Field
+                  type="text"
+                  name="password"
+                  className="w-full p-2 border hover:ring-[1px] ring-gray-700 transition-all duration-500 border-gray-300 rounded-md no-spinner"
+                />
+                <ErrorMessage
+                  name="password"
+                  component="p"
+                  className="text-red-500 text-sm"
+                />
+              </div>
+
+              <div className="flex-auto">
+                <label className="block text-gray-700 mb-1 ml-1">
+                  Confirm Password*
+                </label>
+                <Field
+                  type="text"
+                  name="confirmPassword"
+                  className="w-full p-2 border hover:ring-[1px] ring-gray-700 transition-all duration-500 border-gray-300 rounded-md no-spinner"
+                />
+                <ErrorMessage
+                  name="confirmPassword"
+                  component="p"
+                  className="text-red-500 text-sm"
+                />
+              </div>
+
               {props?.error && (
                 <h1 className="text-md text-red-500 font-bold">
                   {error || "Something Went Wrong. Please Try Again"}
@@ -189,19 +224,19 @@ const AgentSignupForm = (props) => {
               </button> */}
 
               <Box
-                sx={{ display: "flex", flexDirection: "row", pt: 2 }}
-                className="w-full"
+                sx={{ display: "flex", flexDirection: "row" }}
+                className="w-full mb-0"
               >
                 <Button
                   color="inherit"
                   disabled={activeStep === 0}
                   onClick={handleBack}
                   sx={{ mr: 1 }}
-                //   className={` ${
-                //     activeStep === 0
-                //       ? "cursor-pointer text-3xl bg-gray-500 border-2 border-black py-2 px-6 w-20 rounded-md  transition shadow-lg "
-                //       : "cursor-pointer w-20 text-white bg-gradient-to-tr from-blue-600 to-blue-950 hover:from-blue-950 hover:to-blue-600 duration-700 bg-blue-700  py-2 px-6 rounded-md hover:bg-blue-800 transition shadow-lg shadow-black/20 hover:shadow-black/50"
-                //   }`}
+                  //   className={` ${
+                  //     activeStep === 0
+                  //       ? "cursor-pointer text-3xl bg-gray-500 border-2 border-black py-2 px-6 w-20 rounded-md  transition shadow-lg "
+                  //       : "cursor-pointer w-20 text-white bg-gradient-to-tr from-blue-600 to-blue-950 hover:from-blue-950 hover:to-blue-600 duration-700 bg-blue-700  py-2 px-6 rounded-md hover:bg-blue-800 transition shadow-lg shadow-black/20 hover:shadow-black/50"
+                  //   }`}
                 >
                   Back
                 </Button>
@@ -221,7 +256,7 @@ const AgentSignupForm = (props) => {
                 <h1
                   className="cursor-pointer text-center text-gray-700"
                   onClick={() => {
-                    setShowLogin(true);
+                    props?.setShowLogin(true);
                   }}
                 >
                   Already have an account? Sign in!!
@@ -288,7 +323,12 @@ const AgentSignupForm = (props) => {
 
                 <Box sx={{ flex: "1 1 auto" }} className="cursor-pointer" />
 
-                <button type="submit" className="cursor-pointer bg-gradient-to-tr from-blue-600 to-blue-950 hover:from-blue-950 hover:to-blue-600 duration-700 bg-blue-700 text-white py-2 px-6 rounded-md hover:bg-blue-800 transition shadow-lg shadow-black/30 hover:shadow-black/50">Sign Up</button>
+                <button
+                  type="submit"
+                  className="cursor-pointer bg-gradient-to-tr from-blue-600 to-blue-950 hover:from-blue-950 hover:to-blue-600 duration-700 bg-blue-700 text-white py-2 px-6 rounded-md hover:bg-blue-800 transition shadow-lg shadow-black/30 hover:shadow-black/50"
+                >
+                  Sign Up
+                </button>
               </Box>
             </Form>
           </Formik>

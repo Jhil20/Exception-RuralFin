@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const MoneyMaze = ({ onExit }) => {
+const MoneyMaze = () => {
   const gridSize = 5;
   const initialPlayer = { x: 0, y: 0, balance: 1000 };
   const [level, setLevel] = useState(1);
   const maxLevel = 3;
+  const navigate=useNavigate();
+    const onExit = () => {
+        navigate("/userDashboard");
+    }
   
   // Define different goal positions for each level
   const goals = {
@@ -171,70 +176,29 @@ const MoneyMaze = ({ onExit }) => {
   };
   
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      padding: '1rem',
-      backgroundColor: 'rgba(255, 255, 255, 0.9)',
-      borderRadius: '0.5rem',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      overflow: 'auto'
-    }}>
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Money Maze - Level {level}</h1>
-      <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Balance: ${player.balance}</h2>
+    <div className="flex justify-center items-center p-4 bg-white bg-opacity-90 rounded-lg shadow-lg w-full h-full">
+        <div>
+
+      <h1 className="text-xl font-bold mb-2">Money Maze - Level {level}</h1>
+      <h2 className="text-lg mb-4">Balance: ₹{player.balance}</h2>
       
       {message && (
-        <div style={{ 
-          marginBottom: '1rem', 
-          padding: '0.5rem', 
-          backgroundColor: gameOver ? (message.includes('Freedom') ? '#c6f6d5' : '#fed7d7') : '#e2e8f0',
-          borderRadius: '0.25rem',
-          fontWeight: gameOver ? 'bold' : 'normal'
-        }}>
+        <div className={`mb-4 p-2 rounded text-center ${gameOver ? (message.includes('Freedom') ? 'bg-green-200' : 'bg-red-200') : 'bg-gray-200'}`}>
           {message}
         </div>
       )}
       
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
-        gap: '0.5rem',
-        marginBottom: '1rem'
-      }}>
+      <div className={`grid gap-2 mb-4`} style={{ gridTemplateColumns: `repeat(${gridSize}, 1fr)` }}>
         {[...Array(gridSize)].map((_, y) =>
           [...Array(gridSize)].map((_, x) => (
             <div
               key={`${x}-${y}`}
-              style={{
-                width: '3.5rem',
-                height: '3.5rem',
-                backgroundColor: getCellColor(x, y),
-                border: '1px solid #cbd5e0',
-                borderRadius: '0.25rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.5rem',
-                position: 'relative'
-              }}
+              className="w-14 h-14 flex items-center justify-center border border-gray-300 rounded-md relative"
+              style={{ backgroundColor: getCellColor(x, y) }}
             >
               {getCellContent(x, y)}
               {player.x === x && player.y === y && (
-                <div style={{
-                  position: 'absolute',
-                  width: '100%',
-                  height: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '2rem',
-                  color: 'white',
-                  fontWeight: 'bold',
-                  textShadow: '0 0 3px black'
-                }}>
+                <div className="absolute w-full h-full flex items-center justify-center text-2xl text-white font-bold drop-shadow-md">
                   🧑
                 </div>
               )}
@@ -243,141 +207,40 @@ const MoneyMaze = ({ onExit }) => {
         )}
       </div>
       
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-        <button
-          onClick={() => movePlayer(0, -1)}
-          disabled={gameOver}
-          style={{
-            padding: '0.5rem 1rem',
-            backgroundColor: gameOver ? '#a0aec0' : '#4299e1',
-            color: 'white',
-            border: 'none',
-            borderRadius: '0.25rem',
-            cursor: gameOver ? 'not-allowed' : 'pointer'
-          }}
-        >
-          ⬆ Up
-        </button>
+      <div className="flex flex-col items-center gap-2">
+        <button onClick={() => movePlayer(0, -1)} disabled={gameOver} className={`px-4 py-2 text-white rounded ${gameOver ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500'}`}>⬆ Up</button>
         
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button
-            onClick={() => movePlayer(-1, 0)}
-            disabled={gameOver}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: gameOver ? '#a0aec0' : '#4299e1',
-              color: 'white',
-              border: 'none',
-              borderRadius: '0.25rem',
-              cursor: gameOver ? 'not-allowed' : 'pointer'
-            }}
-          >
-            ⬅ Left
-          </button>
-          
-          <button
-            onClick={() => movePlayer(1, 0)}
-            disabled={gameOver}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: gameOver ? '#a0aec0' : '#4299e1',
-              color: 'white',
-              border: 'none',
-              borderRadius: '0.25rem',
-              cursor: gameOver ? 'not-allowed' : 'pointer'
-            }}
-          >
-            Right ➡
-          </button>
+        <div className="flex gap-2">
+          <button onClick={() => movePlayer(-1, 0)} disabled={gameOver} className={`px-4 py-2 text-white rounded ${gameOver ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500'}`}>⬅ Left</button>
+          <button onClick={() => movePlayer(1, 0)} disabled={gameOver} className={`px-4 py-2 text-white rounded ${gameOver ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500'}`}>Right ➡</button>
         </div>
         
-        <button
-          onClick={() => movePlayer(0, 1)}
-          disabled={gameOver}
-          style={{
-            padding: '0.5rem 1rem',
-            backgroundColor: gameOver ? '#a0aec0' : '#4299e1',
-            color: 'white',
-            border: 'none',
-            borderRadius: '0.25rem',
-            cursor: gameOver ? 'not-allowed' : 'pointer'
-          }}
-        >
-          Down ⬇
-        </button>
+        <button onClick={() => movePlayer(0, 1)} disabled={gameOver} className={`px-4 py-2 text-white rounded ${gameOver ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500'}`}>Down ⬇</button>
       </div>
       
-      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+      <div className="flex gap-2 mt-4">
         {gameOver && (
-          <button
-            onClick={resetGame}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: '#48bb78',
-              color: 'white',
-              border: 'none',
-              borderRadius: '0.25rem',
-              cursor: 'pointer'
-            }}
-          >
-            Play Again
-          </button>
+          <button onClick={resetGame} className="px-4 py-2 bg-green-500 text-white rounded">Play Again</button>
         )}
-        
         {levelComplete && (
-          <button
-            onClick={nextLevel}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: '#9f7aea',
-              color: 'white',
-              border: 'none',
-              borderRadius: '0.25rem',
-              cursor: 'pointer'
-            }}
-          >
-            Next Level
-          </button>
+          <button onClick={nextLevel} className="px-4 py-2 bg-purple-500 text-white rounded">Next Level</button>
         )}
-        
-        <button
-          onClick={onExit}
-          style={{
-            padding: '0.5rem 1rem',
-            backgroundColor: '#f56565',
-            color: 'white',
-            border: 'none',
-            borderRadius: '0.25rem',
-            cursor: 'pointer'
-          }}
-        >
-          Exit Game
-        </button>
+        <button onClick={onExit} className="px-4 py-2 bg-red-500 text-white rounded">Exit Game</button>
       </div>
+      </div>
+
       
-      <div style={{ marginTop: '1rem', fontSize: '0.875rem', textAlign: 'center' }}>
+      <div className="mt-4 text-sm text-center">
         <p>Reach the trophy 🏆 with a positive balance to complete the level!</p>
         <p>Current level: {level} of {maxLevel}</p>
         <p>Watch out for negative events that decrease your money:</p>
-        {level === 1 && (
-          <p>- Taxes 📝, Medical bills 🏥, Rent 🏠, Lawsuits ⚖</p>
-        )}
-        {level === 2 && (
-          <p>- Crypto losses ₿, Divorce 💔, Education costs 🎓, Mortgage 🏦, Fraud 🕵</p>
-        )}
-        {level === 3 && (
-          <p>- Market crash 📉, Bankruptcy 💣, Healthcare 💊, Debt 🔗, Tax audit 🔍</p>
-        )}
+        {level === 1 && <p>- Taxes 📝, Medical bills 🏥, Rent 🏠, Lawsuits ⚖</p>}
+        {level === 2 && <p>- Crypto losses ₿, Divorce 💔, Education costs 🎓, Mortgage 🏦, Fraud 🕵</p>}
+        {level === 3 && <p>- Market crash 📉, Bankruptcy 💣, Healthcare 💊, Debt 🔗, Tax audit 🔍</p>}
         <p>Collect positive events to increase your balance:</p>
-        {level === 1 && (
-          <p>- Stocks 📈, Bonuses 💰, Lottery wins 🎟, Business profits 🏢, Inheritance 📜, Donations 🎁</p>
-        )}
-        {level === 2 && (
-          <p>- Startup success 🚀, Real estate 🏘, Insurance payouts 🛡, Side hustle 💼, Promotion 📊</p>
-        )}
-        {level === 3 && (
-          <p>- IPO gains 🔔, Inheritance 📜, Investments 💎, Royalties 👑</p>
-        )}
+        {level === 1 && <p>- Stocks 📈, Bonuses 💰, Lottery wins 🎟, Business profits 🏢, Inheritance 📜, Donations 🎁</p>}
+        {level === 2 && <p>- Startup success 🚀, Real estate 🏘, Insurance payouts 🛡, Side hustle 💼, Promotion 📊</p>}
+        {level === 3 && <p>- IPO gains 🔔, Inheritance 📜, Investments 💎, Royalties 👑</p>}
       </div>
     </div>
   );

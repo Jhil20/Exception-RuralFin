@@ -5,9 +5,6 @@ import Login from "./Login";
 import UserDashboard from "./UserDashboard";
 import UserProfile from "./UserProfile";
 import Budget from "./Budget";
-import Game from "./game";
-import MoneyMaze from "../components/MoneyMaze";
-import FarmToFortune from "../components/FarmToFortune";
 
 const appRouter = createBrowserRouter([
   {
@@ -34,19 +31,6 @@ const appRouter = createBrowserRouter([
         path:"/budget",
         element:<Budget/>,
       },  
-      {
-        path:"/game",
-        element:<Game/>
-      },
-      {
-        path:"/money",
-        element:<MoneyMaze  />
-      },
-      {
-        path:"/farm",
-        element:<FarmToFortune  />
-      }
-
     ],
   },
 ]);

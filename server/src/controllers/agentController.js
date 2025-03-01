@@ -6,8 +6,8 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import nodemailer from "nodemailer"
 import { generateWalletId } from "./userController.js";
 import bcrypt from "bcrypt"
-import instance from "../utils/razorpay.js";
-import Razorpay from "razorpay";
+// import instance from "../utils/razorpay.js";
+// import Razorpay from "razorpay";
 
 const generateRefreshAndAccessTokens = async (existedAgent) => {
     try {
@@ -115,6 +115,7 @@ const createAgent = asyncHandler(async (req, res) => {
                 city,
                 state,
                 bank_details,
+                password,
             }
         })
 
@@ -152,8 +153,8 @@ const loginAgent = asyncHandler(async(req,res)=>{
     if (!existedAgent) {
         throw new ApiError(404, "Agent not exists");
     }
-     const isPasswordValid = await bcrypt.compare(password, existedAgent.password);
-      if (!isPasswordValid) {
+    //  const isPasswordValid = await bcrypt.compare(password, existedAgent.password);
+      if (existedAgent.password!=password) {
         throw new ApiError(400, "Invalid password");
       }
 
@@ -161,7 +162,7 @@ const loginAgent = asyncHandler(async(req,res)=>{
     console.log(refreshToken);
     console.log(accessToken);
 
-
+    
     const options = {
         httpOnly: true,
         secure: true
@@ -175,7 +176,7 @@ const loginAgent = asyncHandler(async(req,res)=>{
                 {
                     agent: existedAgent
                 },
-                "User logged in successfully"
+                "Agent logged in successfully"
             )
         )
 })
@@ -251,13 +252,13 @@ const securityDepositPayment = asyncHandler(async (req, res) => {
         new ApiResponse(
             200,
             {
-                razorpay: payment
+                // razorpay: payment
             }
         )
     )
 })
 
-//to be done after backend
+// to be done after backend
 const verifyPayment = asyncHandler(async (req, res) => {
     console.log(req.body)
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
@@ -274,4 +275,82 @@ const verifyPayment = asyncHandler(async (req, res) => {
         res.status(400).json({ success: false, message: "Payment verification failed!" });
     }
 })
-export { createAgent, loginAgent, logoutAgent, walletCreation, securityDepositPayment,verifyPayment }
+
+// Get agent by ID
+const getAgentById = asyncHandler(async (req, res) => {
+    const { agent_id } = req.params;
+    
+    if (!agent_id) {
+      throw new ApiError(400, "Agent ID is required");
+    }
+    
+    try {
+      const agent = await Prisma.agent.findUnique({
+        where: {
+          agent_id: agent_id
+        }
+      });
+      
+      if (!agent) {
+        throw new ApiError(404, "Agent not found");
+      }
+      
+      // Remove sensitive information
+      const { password, refresh_token, ...agentData } = agent;
+      
+      return res.status(200).json(
+        new ApiResponse(
+          200,
+          { agent: agentData },
+          "Agent details fetched successfully"
+        )
+      );
+    } catch (error) {
+      throw new ApiError(error.statusCode || 500, error.message || "Failed to fetch agent details");
+    }
+  });
+  
+  // Get agent wallet by agent ID
+  const getAgentWalletByAgentId = asyncHandler(async (req, res) => {
+    const { agent_id } = req.params;
+    
+    if (!agent_id) {
+      throw new ApiError(400, "Agent ID is required");
+    }
+    
+    try {
+      const agentWallet = await Prisma.agentWallet.findUnique({
+        where: {
+          agent_id: agent_id
+        }
+      });
+      
+      if (!agentWallet) {
+        throw new ApiError(404, "Agent wallet not found");
+      }
+      
+      // Remove sensitive information
+      const { agent_pin, ...walletData } = agentWallet;
+      
+      return res.status(200).json(
+        new ApiResponse(
+          200,
+          { wallet: walletData },
+          "Agent wallet details fetched successfully"
+        )
+      );
+    } catch (error) {
+      throw new ApiError(error.statusCode || 500, error.message || "Failed to fetch agent wallet details");
+    }
+  });
+  
+  export { 
+    createAgent, 
+    loginAgent, 
+    logoutAgent, 
+    walletCreation, 
+    securityDepositPayment, 
+    verifyPayment,
+    getAgentById,
+    getAgentWalletByAgentId 
+  };
