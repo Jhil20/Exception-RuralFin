@@ -33,6 +33,7 @@ const createAgent = asyncHandler(async(req,res)=>{
     var{
         full_name,
         phone_num,
+        password,
         email,
         address,
         pincode,
@@ -46,8 +47,12 @@ const createAgent = asyncHandler(async(req,res)=>{
     console.log("inside agent create controller")
 
     try {
-        if (!full_name || full_name.trim() === '') {
+        if (!full_name || full_name.trim() === '' ) {
             throw new ApiError(400, "Full name is required");
+        }
+        if(!password)
+        {
+            throw new ApiError(400,"Passowrd is required")
         }
         if (!/^[a-zA-Z\s]+$/.test(full_name)) {
             throw new ApiError(400, "Full name can only contain alphabets and spaces");
@@ -98,12 +103,14 @@ const createAgent = asyncHandler(async(req,res)=>{
         if(agent){
             throw new ApiError(400, "Agent phone number already  exists");
         }
+         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newAgent=await Prisma.agent.create({
             data: {
                 full_name,
                 phone_num,
                 email,
+                password:hashedPassword,
                 address,
                 pincode,
                 city,
@@ -131,19 +138,23 @@ const createAgent = asyncHandler(async(req,res)=>{
 })
 
 const loginAgent = asyncHandler(async(req,res)=>{
-    const{phone_num}=req.body;
-    if(!phone_num){
-        throw new ApiError(400,"Phone number is not entered");
-    }
+    const{phone_num,password}=req.body;
+    if (!phone_num || !password) {
+        throw new ApiError(400, "Phone number and password is not entered");
+      }
     const existedAgent=await Prisma.agent.findUnique({
         where:{
-            phone_num
-        }
+            phone_num,
+        },
     })
 
     if(!existedAgent){
         throw new ApiError(404,"Agent not exists");
     }
+     const isPasswordValid = await bcrypt.compare(password, existedAgent.password);
+      if (!isPasswordValid) {
+        throw new ApiError(400, "Invalid password");
+      }
 
     const {refreshToken,accessToken}=await generateRefreshAndAccessTokens(existedAgent);
     console.log(refreshToken);

@@ -46,13 +46,15 @@ const generateWalletId = () => {
   return `${randomLetters}@RURALFIN`;
 };
 
+
+
 const createUser = asyncHandler(async (req, res) => {
-  var { full_name, phone_number, email, age, income, gender, budget_limit, address, pincode, state, city, user_pin } =
+  var { full_name, phone_number, password,email, age, income, gender, budget_limit, address, pincode, state, city, user_pin } =
     req.body;
 
 
   try {
-    if (!full_name || full_name.trim() === "") {
+    if (!full_name || full_name.trim() === "" || !password) {
       throw new ApiError(400, "Full name is required");
     }
     if (!/^[a-zA-Z\s]+$/.test(full_name)) {
@@ -94,67 +96,12 @@ const createUser = asyncHandler(async (req, res) => {
     if (!user_pin || !/^\d{4,6}$/.test(user_pin)) {
       throw new ApiError(400, "User PIN must be a 4 to 6 digit number");
     }
-    const validStates = [
-      "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
-      "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
-      "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram",
-      "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
-      "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
-      "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu",
-      "Delhi", "Lakshadweep", "Puducherry", "Jammu & Kashmir", "Ladakh"
-    ];
     if (!state) {
       throw new ApiError(400, "State Field is empty");
     }
-    if (!validStates.includes(state)) {
-      throw new ApiError(400, "Enter appropriate State")
-    }
-
-    const stateCities = {
-      "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur", "Tirupati", "Nellore", "Kurnool", "Rajahmundry", "Kadapa", "Anantapur"],
-      "Arunachal Pradesh": ["Itanagar", "Tawang", "Ziro", "Pasighat", "Bomdila", "Roing", "Daporijo"],
-      "Assam": ["Guwahati", "Dibrugarh", "Silchar", "Jorhat", "Tezpur", "Tinsukia", "Nagaon"],
-      "Bihar": ["Patna", "Gaya", "Bhagalpur", "Muzaffarpur", "Purnia", "Darbhanga", "Begusarai", "Arrah", "Bettiah"],
-      "Chhattisgarh": ["Raipur", "Bilaspur", "Durg", "Bhilai", "Korba", "Jagdalpur", "Ambikapur"],
-      "Goa": ["Panaji", "Margao", "Vasco da Gama", "Mapusa", "Ponda"],
-      "Gujarat": ["Ahmedabad", "Surat", "Vadodara", "Rajkot", "Gandhinagar", "Bhavnagar", "Jamnagar", "Junagadh", "Anand"],
-      "Haryana": ["Chandigarh", "Faridabad", "Gurugram", "Panipat", "Ambala", "Hisar", "Rohtak", "Yamunanagar"],
-      "Himachal Pradesh": ["Shimla", "Manali", "Dharamshala", "Mandi", "Kullu", "Chamba", "Solan", "Bilaspur"],
-      "Jharkhand": ["Ranchi", "Jamshedpur", "Dhanbad", "Bokaro", "Hazaribagh", "Deoghar", "Giridih"],
-      "Karnataka": ["Bengaluru", "Mysuru", "Hubballi", "Mangaluru", "Belagavi", "Davangere", "Shivamogga", "Ballari"],
-      "Kerala": ["Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur", "Kollam", "Palakkad", "Kannur", "Alappuzha"],
-      "Madhya Pradesh": ["Bhopal", "Indore", "Gwalior", "Jabalpur", "Ujjain", "Satna", "Sagar", "Ratlam"],
-      "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik", "Aurangabad", "Solapur", "Amravati", "Kolhapur", "Latur"],
-      "Manipur": ["Imphal", "Thoubal", "Bishnupur", "Kakching", "Ukhrul", "Senapati"],
-      "Meghalaya": ["Shillong", "Tura", "Nongstoin", "Jowai", "Williamnagar"],
-      "Mizoram": ["Aizawl", "Lunglei", "Champhai", "Saiha", "Kolasib"],
-      "Nagaland": ["Kohima", "Dimapur", "Mokokchung", "Tuensang", "Mon", "Zunheboto"],
-      "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela", "Sambalpur", "Berhampur", "Puri", "Balasore", "Jeypore"],
-      "Punjab": ["Chandigarh", "Ludhiana", "Amritsar", "Jalandhar", "Patiala", "Bathinda", "Hoshiarpur"],
-      "Rajasthan": ["Jaipur", "Udaipur", "Jodhpur", "Kota", "Ajmer", "Bikaner", "Alwar", "Bharatpur"],
-      "Sikkim": ["Gangtok", "Namchi", "Mangan", "Gyalshing", "Jorethang"],
-      "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem", "Tirunelveli", "Erode", "Vellore"],
-      "Telangana": ["Hyderabad", "Warangal", "Nizamabad", "Karimnagar", "Khammam", "Ramagundam", "Mahbubnagar"],
-      "Tripura": ["Agartala", "Udaipur", "Dharmanagar", "Kailashahar", "Ambassa"],
-      "Uttar Pradesh": ["Lucknow", "Kanpur", "Agra", "Varanasi", "Meerut", "Prayagraj", "Bareilly", "Moradabad", "Gorakhpur"],
-      "Uttarakhand": ["Dehradun", "Haridwar", "Rishikesh", "Haldwani", "Nainital", "Roorkee", "Kashipur"],
-      "West Bengal": ["Kolkata", "Howrah", "Durgapur", "Siliguri", "Asansol", "Kharagpur", "Haldia"],
-
-      // Union Territories
-      "Andaman and Nicobar Islands": ["Port Blair"],
-      "Chandigarh": ["Chandigarh"],
-      "Dadra and Nagar Haveli and Daman and Diu": ["Daman", "Silvassa"],
-      "Delhi": ["New Delhi"],
-      "Lakshadweep": ["Kavaratti"],
-      "Puducherry": ["Puducherry", "Karaikal", "Mahe", "Yanam"],
-      "Jammu & Kashmir": ["Srinagar", "Jammu", "Anantnag", "Baramulla"],
-      "Ladakh": ["Leh", "Kargil"]
-    };
+    
     if (!city) {
       throw new ApiError(400, "City field is empty");
-    }
-    if (!stateCities[state].includes(city)) {
-      throw new ApiError(400, "Enter Appropriate City");
     }
 
     const user = await Prisma.user.findUnique({
@@ -162,10 +109,12 @@ const createUser = asyncHandler(async (req, res) => {
         phone_number: phone_number,
       },
     });
-    console.log("user in back",user,user_pin)
+    // console.log("user in back",user,user_pin)
     const saltRounds = 10;
     const hashedPin = await bcrypt.hash(user_pin, saltRounds);
-    console.log("hashed pin", hashedPin);
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    // console.log("hashed pin", hashedPin);
     if (user) {
       throw new ApiError(400, "User already exists");
     }
@@ -174,6 +123,7 @@ const createUser = asyncHandler(async (req, res) => {
         full_name,
         phone_number,
         email,
+        password:hashedPassword,
         age,
         income,
         gender,
@@ -193,7 +143,7 @@ const createUser = asyncHandler(async (req, res) => {
       }
     });
 
-    console.log("user", newUser);
+    // console.log("user", newUser);
     return res
       .status(200)
       .json(
@@ -213,13 +163,13 @@ const createUser = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-  const { phone_number } = req.body;
-  console.log(phone_number);
+  const { phone_number, password} = req.body;
+  // console.log(phone_number);
   if (!/^\d{10}$/.test(phone_number)) {
     throw new ApiError(400, "Phone number must be exactly 10 digits");
   }
-  if (!phone_number) {
-    throw new ApiError(400, "Phone number is not entered");
+  if (!phone_number || !password) {
+    throw new ApiError(400, "Phone number and password is not entered");
   }
   const existedUser = await Prisma.user.findUnique({
     where: {
@@ -229,12 +179,16 @@ const loginUser = asyncHandler(async (req, res) => {
   if (!existedUser) {
     throw new ApiError(404, "User does not exist");
   }
-  console.log(existedUser);
+  const isPasswordValid = await bcrypt.compare(password, existedUser.password);
+  if (!isPasswordValid) {
+    throw new ApiError(400, "Invalid password");
+  }
+  // console.log(existedUser);
   const { refreshToken, accessToken } = await generateRefreshAndAccessTokens(
     existedUser
   );
   const userCopy = { ...existedUser };
-  console.log(refreshToken);
+  // console.log(refreshToken);
   userCopy.phone_number = userCopy.phone_number.toString();
   const options = {
     httpOnly: true,
@@ -255,6 +209,34 @@ const loginUser = asyncHandler(async (req, res) => {
       )
     );
 });
+
+const getAllUsers = asyncHandler(async (req, res) => {
+  try {
+    const users = await Prisma.user.findMany({
+      select: {
+        user_id: true,
+        full_name: true,
+        phone_number: true,
+        email: true,
+        age: true,
+        income: true,
+        gender: true,
+        budget_limit: true,
+        address: true,
+        pincode: true,
+        state: true,
+        city: true,
+        created_at: true,
+      },
+    });
+
+    res.status(200).json(new ApiResponse(200, { users }, "Users fetched successfully"));
+  } catch (error) {
+    res.status(500).json(new ApiResponse(500, {}, "Failed to fetch users"));
+  }
+});
+
+
 
 const logoutUser = asyncHandler(async (req, res) => {
   console.log(req.user.user_id);
@@ -400,7 +382,9 @@ const getAllUser = asyncHandler(async (req,res)=>{
 })
 
 const getUserById = asyncHandler(async(req,res)=>{
-  const user_id = req.body.user_id;
+  // console.log("req body",req.params);
+  const user_id = req.params.id;
+  // console.log("user_id",user_id);
   if(!user_id)
   {
     throw new ApiError(400,"Enter user Id");
@@ -423,7 +407,7 @@ const getUserById = asyncHandler(async(req,res)=>{
 })
 
 const getWalletId = asyncHandler(async (req,res)=>{
-  const user_id = req.body.user_id;
+  const user_id = req.params.id;
   if(!user_id)
   {
     throw new ApiError(400,"Enter user Id");
@@ -448,6 +432,37 @@ const getWalletId = asyncHandler(async (req,res)=>{
   )
 })
 
-export { createUser, loginUser, logoutUser, totalAgent, notificationToUser,getAllUser,getUserById,getWalletId,userActivity,generateWalletId };
+const getUserByWalletId = asyncHandler(async (req, res) => {
+  const  wallet_id  = req.params.id;
+// console.log("hhdiidisajidjias",wallet_id,req.params.id)
+  if (!wallet_id) {
+    throw new ApiError(400, "Wallet ID is required");
+  }
+
+  // Check if the wallet exists
+  const wallet = await Prisma.userWallet.findUnique({
+    where: { wallet_id },
+    select: { user_id: true },
+  });
+  console.log("wallet in backend",wallet)
+
+  if (!wallet) {
+    throw new ApiError(404, "Wallet ID not found");
+  }
+
+  // Fetch user details
+  const user = await Prisma.user.findUnique({
+    where: { user_id: wallet.user_id },
+  });
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  res.status(200).json(
+    new ApiResponse(200, { user }, "User fetched successfully")
+  );
+});
 
 
+export { createUser, loginUser, logoutUser, totalAgent,getUserByWalletId,generateWalletId, notificationToUser,getAllUser,getUserById,getWalletId,userActivity };
