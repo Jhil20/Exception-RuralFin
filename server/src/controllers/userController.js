@@ -335,28 +335,14 @@ const notificationToUser = asyncHandler(async (req,res)=>{
           user_id: receipent_id.user_id
         }
       },
-      message: `${amount} is sent`
-    }
-  })
-  await Prisma.notificationUser.create({
-    data: {
-      sender: {
-        connect: {
-          user_id: receipent_id.user_id
-        }
-      },
-      receipent: {
-        connect: {
-          user_id: user_id
-        }
-      },
       message: `${amount} is received`
     }
   })
+  
   res.status(200).json(
     new ApiResponse(
       200,
-      "Agent is notified"
+      "notification sent"
     )
   )
 })
@@ -458,6 +444,34 @@ const getUserByWalletId = asyncHandler(async (req, res) => {
 });
 
 
-export { createUser, loginUser, logoutUser, totalAgent,getUserByWalletId,generateWalletId, notificationToUser,getAllUser,getUserById,getWalletId,userActivity };
+const getNotification = asyncHandler(async (req,res)=>{
+  const {receipent_id} = req.body;
+  if(!receipent_id)
+  {
+    throw new ApiError(400,"ID is must");
+  }
+  const receivedPaymentNotification = await Prisma.notificationUser.findMany({
+    where:{
+      recipent_id:receipent_id
+    }
+  })
+  if(!receivedPaymentNotification)
+  {
+    throw new ApiError(400,"you do not have any received payment notification");
+  }
+
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        notification:receivedPaymentNotification
+      },
+      "Notification fetched successfully"
+    )
+  )
+
+})
+
+export { createUser, loginUser, logoutUser, totalAgent,getUserByWalletId,generateWalletId, notificationToUser,getAllUser,getUserById,getWalletId,userActivity,getNotification };
 
 
