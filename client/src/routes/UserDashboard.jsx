@@ -544,7 +544,7 @@ const UserDashboard = () => {
 
       {showDeposit && (
         <div className="h-full w-full bg-gray-900/80  fixed top-0 left-0 z-50 flex justify-center items-center">
-          <div className="bg-white rounded-lg p-4 shadow-lg h-5/12 w-4/12">
+          <div className="bg-white rounded-lg p-4 shadow-lg h-4/12 w-3/12">
             <div className="flex justify-between items-start mb-2 h-1/12">
               <h1 className="text-lg mt-1 font-semibold ml-2">
                 Financial Based Gaming Lessons
@@ -570,12 +570,12 @@ const UserDashboard = () => {
               </button>
             </div>
             
-            <div className="flex h-10/12 justify-center items-center">
-              <div onClick={()=>goToMoneyMaze()} className="w-40 h-10 bg-gradient-to-tr from-blue-600 to-blue-950 rounded-xl text-white font-bold flex justify-center items-center mr-4 shadow-lg hover:shadow-black/40 cursor-pointer hover:from-blue-950 hover:to-blue-600 transition duration-700">
-                <button className="w-full h-full">Money Maze</button>
+            <div className="flex flex-wrap h-10/12 justify-center items-center content-center">
+              <div onClick={()=>goToMoneyMaze()} className="w-full flex justify-center">
+                <button className="w-40 h-10 bg-gradient-to-tr from-blue-600 to-blue-950 rounded-xl text-white font-bold flex justify-center items-center mb-4 shadow-lg hover:shadow-black/40 cursor-pointer hover:from-blue-950 hover:to-blue-600 transition duration-700">Money Maze</button>
               </div>
-              <div onClick={()=>FarmToFortune()} className="w-40 h-10 bg-gradient-to-tr from-green-600 to-green-900 rounded-xl text-white font-bold flex justify-center items-center shadow-lg hover:shadow-black/40 cursor-pointer hover:from-green-900 hover:to-green-600 transition duration-700">
-                  <button className="w-full h-full">Farm To Fortune</button>
+              <div onClick={()=>FarmToFortune()} className="w-full flex justify-center">
+                  <button className="w-40 h-10 bg-gradient-to-tr from-green-600 to-green-900 rounded-xl text-white font-bold flex justify-center items-center shadow-lg hover:shadow-black/40 cursor-pointer hover:from-green-900 hover:to-green-600 transition duration-700">Farm To Fortune</button>
               </div>
             </div>
           </div>

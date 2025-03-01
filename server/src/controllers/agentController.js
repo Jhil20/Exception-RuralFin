@@ -103,7 +103,7 @@ const createAgent = asyncHandler(async (req, res) => {
             throw new ApiError(400, "Agent phone number already  exists");
         }
          const hashedPassword = await bcrypt.hash(password, 10);
-
+        
         const newAgent = await Prisma.agent.create({
             data: {
                 full_name,

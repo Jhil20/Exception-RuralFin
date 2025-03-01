@@ -9,7 +9,7 @@ function App() {
   const location=useLocation();
   return (
     <>
-    {location.pathname!="/userDashboard" && location.pathname!="/agentDashboard" && <Header/>}
+    {location.pathname!="/userDashboard" && location.pathname!="/agentDashboard" && location.pathname!="/moneyMaze" && location.pathname!="/farmToFortune" && <Header/>}
       <Outlet/>
     </>
   )

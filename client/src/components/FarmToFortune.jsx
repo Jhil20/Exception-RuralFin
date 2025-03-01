@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const FarmToFortune = () => {
-    const navigate=useNavigate();
-    console.log("navigate",navigate)
-    const onExit = () => {
-        console.log("clicked")
-        navigate("/userDashboard");
-    }
+  const navigate = useNavigate();
+  console.log("navigate", navigate);
+  const onExit = () => {
+    console.log("clicked");
+    navigate("/userDashboard");
+  };
   const initialState = {
     money: 500,
     crops: 0,
@@ -115,88 +115,92 @@ const FarmToFortune = () => {
   };
 
   return (
-    <div className="flex flex-col items-center p-4 bg-white bg-opacity-90 rounded-lg shadow-lg max-w-[90vw] max-h-[90vh] overflow-auto">
-      <h1 className="text-xl font-bold mb-2">Farm to Fortune 🌾</h1>
+    <div className="w-full h-full flex justify-center bg-blue-600/80">
+      <div className="flex flex-col items-center p-4 px-10 bg-white shadow-xl shadow-black/70 bg-opacity-90 w-10/12 h-[100vh]">
+        <h1 className="text-3xl font-extrabold mb-4 mt-4">Farm to Fortune 🌾</h1>
 
-      <div
-        className={`mb-4 p-2 rounded text-center w-full ${
-          gameWon ? "bg-green-200 font-bold" : "bg-gray-300"
-        }`}
-      >
-        {message}
-      </div>
-
-      <div className="grid grid-cols-2 gap-2 mb-4 bg-gray-100 p-4 rounded-lg w-full">
-        <div className="p-2 font-bold">💰 Money: ₹{state.money}</div>
-        <div className="p-2 font-bold">🌱 Seeds: {state.seeds}</div>
-        <div className="p-2 font-bold">🌾 Crops: {state.crops}</div>
         <div
-          className={`p-2 font-bold ${state.loan > 0 ? "text-red-600" : ""}`}
+          className={`mb-4 p-2 rounded text-center w-1/2 ${
+            gameWon ? "bg-green-200 font-bold" : "bg-gray-200 font-semibold shadow-md shadow-black/20"
+          }`}
         >
-          🏦 Loan: ₹{state.loan}
+          {message}
         </div>
-      </div>
 
-      <div className="grid grid-cols-2 gap-2 w-full">
-        {actions.map((action) => (
-          <button
-            key={action.name}
-            onClick={() => handleAction(action)}
-            className={`p-2 bg-blue-500 text-white rounded cursor-pointer transition-opacity ${
-              (action.cost && state.money < action.cost) ||
-              (action.earn && state.crops <= 0) ||
-              (action.name === "Plant Seeds 🌿" && state.seeds <= 0) ||
-              (action.repay && (state.money < action.repay || state.loan <= 0))
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-blue-600"
-            }`}
-            disabled={
-              (action.cost && state.money < action.cost) ||
-              (action.earn && state.crops <= 0) ||
-              (action.name === "Plant Seeds 🌿" && state.seeds <= 0) ||
-              (action.repay && (state.money < action.repay || state.loan <= 0))
-            }
+        <div className="grid grid-cols-2 gap-2 mb-4 bg-gray-200 shadow-md shadow-black/30 p-4 rounded-lg w-full">
+          <div className="p-2 font-bold">💰 Money: ₹{state.money}</div>
+          <div className="p-2 font-bold">🌱 Seeds: {state.seeds}</div>
+          <div className="p-2 font-bold">🌾 Crops: {state.crops}</div>
+          <div
+            className={`p-2 font-bold ${state.loan > 0 ? "text-red-600" : ""}`}
           >
-            {action.name}
-            {action.cost ? ` (-₹${action.cost})` : ""}
-            {action.earn ? ` (+₹${action.earn})` : ""}
-            {action.loan ? ` (+₹${action.loan})` : ""}
-            {action.repay ? ` (-₹${action.repay})` : ""}
-          </button>
-        ))}
-      </div>
+            🏦 Loan: ₹{state.loan}
+          </div>
+        </div>
 
-      <div className="flex gap-2 mt-4">
-        {gameWon && (
+        <div className="grid grid-cols-2 gap-3 w-full">
+          {actions.map((action) => (
+            <button
+              key={action.name}
+              onClick={() => handleAction(action)}
+              className={`p-2 bg-blue-500 shadow-md shadow-black/30 transition duration-500 text-white rounded cursor-pointer ${
+                (action.cost && state.money < action.cost) ||
+                (action.earn && state.crops <= 0) ||
+                (action.name === "Plant Seeds 🌿" && state.seeds <= 0) ||
+                (action.repay &&
+                  (state.money < action.repay || state.loan <= 0))
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-blue-600"
+              }`}
+              disabled={
+                (action.cost && state.money < action.cost) ||
+                (action.earn && state.crops <= 0) ||
+                (action.name === "Plant Seeds 🌿" && state.seeds <= 0) ||
+                (action.repay &&
+                  (state.money < action.repay || state.loan <= 0))
+              }
+            >
+              {action.name}
+              {action.cost ? ` (-₹${action.cost})` : ""}
+              {action.earn ? ` (+₹${action.earn})` : ""}
+              {action.loan ? ` (+₹${action.loan})` : ""}
+              {action.repay ? ` (-₹${action.repay})` : ""}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex gap-2 mt-4">
+          {gameWon && (
+            <button
+              onClick={resetGame}
+              className="px-4 py-2 bg-green-500 text-white rounded cursor-pointer hover:bg-green-600"
+            >
+              Play Again
+            </button>
+          )}
+
           <button
-            onClick={resetGame}
-            className="px-4 py-2 bg-green-500 text-white rounded cursor-pointer hover:bg-green-600"
+            onClick={() => onExit()}
+            className="px-4 py-2 transition duration-500 shadow-md shadow-black/30 bg-red-500 text-white rounded cursor-pointer hover:bg-red-600"
           >
-            Play Again
+            Exit Game
           </button>
-        )}
+        </div>
 
-        <button
-          onClick={()=>onExit()}
-          className="px-4 py-2 bg-red-500 text-white rounded cursor-pointer hover:bg-red-600"
-        >
-          Exit Game
-        </button>
-      </div>
-
-      <div className="mt-4 text-sm text-center">
-        <p>Grow your farm and earn ₹2000 while being debt-free to win!</p>
-        <p>
-          <strong>Game Guide:</strong>
-        </p>
-        <p>1. Buy seeds with money 🌱</p>
-        <p>2. Plant seeds to grow crops 🌿</p>
-        <p>3. Sell crops for profit 🌾</p>
-        <p>
-          4. Take loans if needed, but remember to pay them back with interest
-          🏦
-        </p>
-        <p>5. Reach ₹2000 with no debt to win! 🏆</p>
+        <div className="mt-4 text-sm text-center">
+          <p className="text-xl font-bold mb-4">Grow your farm and earn ₹2000 while being debt-free to win!</p>
+          <p>
+            <strong className="text-lg">Game Guide:</strong>
+          </p>
+          <p className="text-[18px]">1. Buy seeds with money 🌱</p>
+          <p className="text-[18px]">2. Plant seeds to grow crops 🌿</p>
+          <p className="text-[18px]">3. Sell crops for profit 🌾</p>
+          <p className="text-[18px]">
+            4. Take loans if needed, but remember to pay them back with interest
+            🏦
+          </p>
+          <p className="text-[18px]">5. Reach ₹2000 with no debt to win! 🏆</p>
+        </div>
       </div>
     </div>
   );
