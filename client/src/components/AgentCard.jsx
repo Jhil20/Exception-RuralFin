@@ -5,8 +5,12 @@ const AgentCard = (props) => {
   // console.log("props data in agent card", props?.data);
   return (
     <div
-      onClick={() => handleClick(true)}
-      className="flex items-center hover:shadow-black/40 justify-between border border-gray-200 hover:bg-gray-200 cursor-pointer tranisition-all duration-500 shadow-lg rounded-lg p-3"
+      onClick={() => {
+        console.log("props data of agent",props.data)
+        props.setShowAgentInfo(props.data);
+        handleClick(true);
+      }}
+      className="flex items-center h-[84px] hover:shadow-black/40 justify-between border border-gray-200 hover:bg-gray-200 cursor-pointer tranisition-all duration-500 shadow-lg rounded-lg p-3"
     >
       <div className="flex items-center">
         <div className="mr-3">

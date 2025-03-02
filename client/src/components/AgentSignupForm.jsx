@@ -13,11 +13,15 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import CityAutocomplete from "./CityAutoComplete";
 import { useNavigate } from "react-router-dom";
+import Razorpay from "razorpay";
 
 const AgentSignupForm = (props) => {
   const steps = ["Personal Information", "Address Information"];
   const [activeStep, setActiveStep] = useState(0);
   const [profileData, setProfileData] = useState({});
+  const [deposit, setDeposit] = useState("");
+
+  const [key, setKey] = useState("");
   const handleNext = (values) => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     console.log("values", values);
@@ -28,19 +32,74 @@ const AgentSignupForm = (props) => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
+  // const razorPay = async function (e) {
+  //   // e.preventDefault();
+
+  //   console.log("in razorpay");
+
+  //   var keyData = await axios.get("http://localhost:5000/agent/getKey");
+  //   console.log("key data", keyData?.data?.data?.key);
+  //   setKey(keyData?.data?.data?.key);
+  //   const keyId = "rzp_test_n0i00Hb7WHJbfd";
+
+  //   // Call backend API to create an order
+  //   const response = await fetch("http://localhost:5000/agent/create-order", {
+  //     method: "POST",
+  //     security_deposit: deposit,
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({
+  //       amount: deposit,
+  //       currency: "INR",
+  //     }),
+  //   });
+  //   console.log("create order no ", response);
+
+  //   const order = await response.json();
+  //   console.log("order", order);
+  //   // Razorpay payment options
+  //   const options = {
+  //     key: "rzp_test_n0i00Hb7WHJbfd",
+  //     amount: order.amount,
+  //     currency: order.currency,
+  //     name: "Merchant Name",
+  //     description: "Test Transaction",
+  //     order_id: order.id,
+  //     handler: function (response) {
+  //       alert(
+  //         `Payment successful! Payment ID: ${response.razorpay_payment_id}`
+  //       );
+  //     },
+  //     prefill: {
+  //       name: "Your Name",
+  //       email: "email@example.com",
+  //       contact: "9999999999",
+  //     },
+  //     theme: {
+  //       color: "#3399cc",
+  //     },
+  //   };
+
+  //   const rzp1 = new Razorpay(options);
+  //   console.log("rzp1", rzp1);
+  //   rzp1.open();
+  // };
+
   const handleAgentSignupSubmit = async (values) => {
     console.log("in agent sigunp", values);
+
     try {
       const formData = { ...profileData, ...values };
       console.log("formData", formData);
+      setDeposit(formData.security_deposit);
       const response = await axios.post(
         "http://localhost:5000/agent/register",
         formData
-      ); /// backend not working for create agent
+      );
       console.log("response", response);
       if (response?.data?.data == "Agent registered successfully") {
-        setShowLogin(true);
+        props.setShowLogin(true);
       }
+      // razorPay();
     } catch (error) {
       console.log(error);
     }
@@ -273,6 +332,7 @@ const AgentSignupForm = (props) => {
               city: "",
               pincode: "",
               state: "",
+              agent_pin: "",
             }}
             validationSchema={agentSignupValidationSchema2}
             onSubmit={handleAgentSignupSubmit}

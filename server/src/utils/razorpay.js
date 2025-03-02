@@ -1,9 +1,9 @@
-// import razorpy from 'razorpay'
+import razorpay from 'razorpay'
 
-// const instance = new razorpy({
-//     key_id: process.env.RAZORPAY_ID,
-//     key_secret:process.env.RAZORPAY_SECRET,
-// });
+const instance = new razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret:process.env.RAZORPAY_KEY_SECRET,
+});
 
-// export default instance;
-  
+export default instance;
+    

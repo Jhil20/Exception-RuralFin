@@ -45,6 +45,7 @@ const UserDashboard = () => {
   const [recentTransactionReceiver, setRecentTransactionReceiver] = useState(
     {}
   );
+  const [showAgentInfo, setShowAgentInfo] = useState(false);
   const [refreshData, setRefreshData] = useState(false);
   const isSignedIn = useSelector((state) => state.signin.isSignedIn);
 
@@ -86,11 +87,12 @@ const UserDashboard = () => {
       );
       // console.log("result of all transactions", result);
       setAllTransactions(result?.data?.data?.Transaction);
+      console.log("tokenData aaaaaaaaaaaaaaaaaaaa", tokenData);
       const result2 = await axios.get(
         `http://localhost:5000/users/userActivity/`,
         tokenData.user_id
       );
-      // console.log("result of all transactions 2", result2);
+      console.log("result of all transactions 2", result2);
       setTodaysTransactions(result2?.data?.data?.Transaction);
     } catch (error) {
       console.log(error);
@@ -127,7 +129,7 @@ const UserDashboard = () => {
   const getAgents = async () => {
     try {
       const result = await axios.get("http://localhost:5000/users/getagent/");
-      console.log("result of all agents", result);
+      // console.log("result of all agents", result);
       setAllAgents(result?.data?.data?.agent);
       setFilteredAgents(result?.data?.data?.agent);
     } catch (error) {
@@ -146,7 +148,7 @@ const UserDashboard = () => {
     if (showRecentTransactionInfo) {
       getTransactionInfo();
     }
-  }, [showRecentTransactionInfo]);
+  }, [showRecentTransactionInfo,recentTransactionInfo]);
 
   const getTransactionInfo = async () => {
     console.log("showRecentTransactionInfo", recentTransactionInfo);
@@ -157,8 +159,8 @@ const UserDashboard = () => {
       `http://localhost:5000/users/${recentTransactionInfo.recipient_id}`
     );
     console.log("transaction info", recentTransactionInfo);
-    console.log("sender data", senderData);
-    console.log("receiver data", receiverData);
+    console.log("sender data", senderData?.data?.data?.user);
+    console.log("receiver data", receiverData?.data?.data?.user);
     setRecentTransactionSender(senderData?.data?.data?.user);
     setRecentTransactionReceiver(receiverData?.data?.data?.user);
     const senderWallet = await axios.get(
@@ -171,6 +173,7 @@ const UserDashboard = () => {
     console.log("receiver wallet", receiverWallet);
     const senderWid = senderWallet?.data?.data?.wallet_id;
     const receiverWid = receiverWallet?.data?.data?.wallet_id;
+    // console.log("sender data for transaction",new { ...recentTransactionSender, senderWid });
     setRecentTransactionSender({ ...recentTransactionSender, senderWid });
     setRecentTransactionReceiver({ ...recentTransactionReceiver, receiverWid });
   };
@@ -339,17 +342,16 @@ const UserDashboard = () => {
               </h2>
               <div className="mt-3 space-y-2 text-gray-600">
                 <p>
-                  <span className="font-semibold">Agent Name:</span> Atrey & K
+                  <span className="font-semibold">Agent Name:</span> {showAgentInfo.full_name}
                 </p>
                 <p>
-                  <span className="font-semibold">Rating:</span> 4.8 ⭐
+                  <span className="font-semibold">Rating:</span> {(Math.random() * 2 + 3).toFixed(1)} ⭐
                 </p>
                 <p>
-                  <span className="font-semibold">Address:</span> Kaka ni Pav
-                  Bhaji
+                  <span className="font-semibold">Address:</span> {showAgentInfo.city}
                 </p>
                 <p>
-                  <span className="font-semibold">Agent Budget:</span> ₹100,000
+                  <span className="font-semibold">Phone number:</span> {showAgentInfo.phone_num}
                 </p>
               </div>
             </div>
@@ -954,10 +956,12 @@ const UserDashboard = () => {
                 <h2 className="text-lg font-semibold mb-4">Select an Agent</h2>
                 <div className="space-y-3 grid grid-cols-2 gap-4 gap-y-2">
                   {/* Agent 1 */}
-                  {allAgents.map((agent) => (
+                  {allAgents.map((agent,index) => (
                     <AgentCard
+                      key={index}
                       onClick={setShowAgentTranscationOptions}
                       data={agent}
+                      setShowAgentInfo={setShowAgentInfo}
                     />
                   ))}
                 </div>

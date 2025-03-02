@@ -110,4 +110,7 @@ export const agentSignupValidationSchema2 = Yup.object().shape({
   city: Yup.string().trim().required("City is required"),
   state: Yup.string().trim().required("State is required"),
   pincode: Yup.string().required("Pincode is required"),
+  agent_pin: Yup.string()
+    .matches(/^\d{4}$/, "PIN must be exactly 4 digits") // Ensures exactly 4 digits
+    .required("PIN is required"),
 });

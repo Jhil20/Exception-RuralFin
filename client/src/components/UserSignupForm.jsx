@@ -317,7 +317,7 @@ const UserSignupForm = (props) => {
                     className="text-red-500 text-sm"
                   />
                 </div>
-                <CityAutocomplete />
+                <CityAutocomplete showAgent={props.showAgent} />
 
                 {props.error && (
                   <h1 className="text-md text-red-500 font-bold">

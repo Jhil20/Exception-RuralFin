@@ -13,6 +13,7 @@ const CityAutocomplete = (props) => {
     setValidCity(false); // Reset selection
 
     if (value.length > 1) {
+      console.log("hello")
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?city=${value}&format=json&addressdetails=1`
       );
@@ -133,14 +134,14 @@ const CityAutocomplete = (props) => {
           className="text-red-500 text-sm"
         />
       </div>
-      {!props.showAgent && (
+      {/* {!props.showAgent && ( */}
         <div className="flex-auto mr-3">
           <label className="block text-gray-700 mb-1 ml-1">
             Transaction Pin*
           </label>
           <Field
             type="text"
-            name="user_pin"
+            name={props?.showAgent?"agent_pin":"user_pin"}
             className="w-full p-2 border hover:ring-[1px] .no-spinner ring-gray-700 transition-all duration-500 border-gray-300 rounded-md"
             onInput={(e) => {
               if (e.target.value.length > 4) {
@@ -149,12 +150,12 @@ const CityAutocomplete = (props) => {
             }}
           />
           <ErrorMessage
-            name="user_pin"
+            name={props?.showAgent?"agent_pin":"user_pin"}
             component="p"
             className="text-red-500 text-sm"
           />
         </div>
-      )}
+      {/* )} */}
     </div>
   );
 };

@@ -3,10 +3,12 @@ import React from "react";
 const RecentTransactionCard = (props) => {
   const setShowRecentTransactionInfo = props.setShowRecentTransactionInfo;
   const setRecentTransactionInfo = props.setRecentTransactionInfo;
+
   // console.log("RecentTransactionCard", props.data);
   return (
     <div
       onClick={() => {
+        console.log("transaction info clicked ndjjscjkbjcdbabajknjkfcsanjcasjncssckajk")
         setShowRecentTransactionInfo(true);
         setRecentTransactionInfo(props?.data);
       }}

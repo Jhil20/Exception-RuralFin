@@ -17,6 +17,7 @@ const AgentDashboard = () => {
   const token=Cookies.get("jwt-token");
   const decoded=jwtDecode(token);
   console.log("decoded",decoded);
+//   const [show]
   const getAgentData = async () => {
     try{
         const agent=await axios.get(`http://localhost:5000/agent/${decoded.agent_id}`);
@@ -28,6 +29,10 @@ const AgentDashboard = () => {
         console.log("error",error);
     }
   };
+
+  const handleFeedback=()=>{
+
+  }
 
 
   const handleLogout = () => {
@@ -148,7 +153,7 @@ const AgentDashboard = () => {
           <h2 className="mt-1"> See Profile Information</h2>
         </div>
         <div className="flex gap-4">
-          <button className="flex cursor-pointer shadow-lg hover:shadow-black/30 transition duration-700 items-center gap-2 border border-gray-300 rounded-full px-4 py-2">
+          <button onClick={()=>handleFeedback()} className="flex cursor-pointer shadow-lg hover:shadow-black/30 transition duration-700 items-center gap-2 border border-gray-300 rounded-full px-4 py-2">
             <span className="text-2xl">?</span>
             <span className="font-medium">Support</span>
           </button>

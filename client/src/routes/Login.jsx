@@ -77,7 +77,7 @@ const Login = () => {
   if (showLogin) {
     return (
       <div className="flex justify-center items-center h-[90.7vh] bg-gray-300">
-          <div className="bg-white min-h-9/12 w-3/12 h-fit  p-6 rounded-lg hover:shadow-2xl transition-all duration-500 hover:ring-[906px] overflow-clip z-1 relative ring-gray-400 shadow-lg ">
+          <div className="bg-white min-h-8/12 w-3/12 h-fit  p-6 rounded-lg hover:shadow-2xl transition-all duration-500 hover:ring-[906px] overflow-clip z-1 relative ring-gray-400 shadow-lg ">
             <h2 className="text-2xl font-bold text-center text-gray-700 mb-4">
               Login to your RuralFin account
             </h2>
