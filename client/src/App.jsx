@@ -3,13 +3,11 @@ import {
   Outlet,
   useLocation,
 } from "react-router-dom";
-import Header from './components/Header';
+import Body from './routes/Body';
 
 function App() {
-  const location=useLocation();
   return (
     <>
-    {location.pathname!="/userDashboard" && location.pathname!="/agentDashboard" && location.pathname!="/moneyMaze" && location.pathname!="/farmToFortune" && <Header/>}
       <Outlet/>
     </>
   )
