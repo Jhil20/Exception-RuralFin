@@ -5,6 +5,7 @@ import App from "./App";
 import Loading from "./components/Loading";
 import Body from "./routes/Body";
 import HomePage from "./routes/HomePage";
+import LandingPage from "./routes/LandingPage";
 const appRouter = createBrowserRouter([
   {
     path: "/",
@@ -16,7 +17,7 @@ const appRouter = createBrowserRouter([
       },
       {
         path: "/home",
-        element: <HomePage />,
+        element: <LandingPage />,
       },
     ],
   },
