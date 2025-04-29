@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
-import { ArrowRight } from 'lucide-react';
+import React, { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
   const sectionRef = useRef(null);
@@ -24,7 +25,7 @@ const Hero = () => {
       opacity: 0,
       y: 50,
       duration: 1,
-      ease: 'power3.out'
+      ease: "power3.out",
     })
       .from(
         paragraph,
@@ -32,9 +33,9 @@ const Hero = () => {
           opacity: 0,
           y: 30,
           duration: 1,
-          ease: 'power3.out'
+          ease: "power3.out",
         },
-        '-=0.6'
+        "-=0.6"
       )
       .from(
         cta,
@@ -42,9 +43,9 @@ const Hero = () => {
           opacity: 0,
           y: 30,
           duration: 0.8,
-          ease: 'power3.out'
+          ease: "power3.out",
         },
-        '-=0.6'
+        "-=0.6"
       )
       .from(
         image,
@@ -52,9 +53,9 @@ const Hero = () => {
           opacity: 0,
           x: 50,
           duration: 1,
-          ease: 'power3.out'
+          ease: "power3.out",
         },
-        '-=0.8'
+        "-=0.8"
       );
   }, []);
 
@@ -71,21 +72,28 @@ const Hero = () => {
               ref={headingRef}
               className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-gray-900 mb-6"
             >
-              Financial <span className="text-black">Inclusion</span> For Everyone
+              Financial <span className="text-black">Inclusion</span> For
+              Everyone
             </h1>
             <p
               ref={paragraphRef}
               className="text-lg md:text-xl text-gray-700 mb-8 leading-relaxed"
             >
-              Empowering underbanked communities with secure, transparent financial tools. Bridge cash and digital transactions, gain financial control, and build a better future.
+              Empowering underbanked communities with secure, transparent
+              financial tools. Bridge cash and digital transactions, gain
+              financial control, and build a better future.
             </p>
             <div ref={ctaRef} className="flex flex-col sm:flex-row gap-4">
-              <button className="bg-black text-white px-8 py-4 rounded-full font-medium hover:bg-gray-800 transition-all flex items-center justify-center">
+              <Link to={"/signup"}>
+              <button className="bg-black cursor-pointer text-white px-8 py-4 rounded-full font-medium hover:shadow-gray-600 hover:shadow-lg duration-300 transition-all flex items-center justify-center">
                 Get Started <ArrowRight size={20} className="ml-2" />
               </button>
-              <button className="border-2 border-gray-300 text-gray-800 px-8 py-4 rounded-full font-medium hover:border-gray-400 transition-all">
+              </Link>
+              <a href="#features">
+              <button  className="border-2 cursor-pointer  border-gray-300 text-gray-800 px-8 py-4 rounded-full font-medium hover:shadow-gray-600 shadow-lg duration-300 hover:border-gray-400 transition-all">
                 Learn More
               </button>
+              </a>
             </div>
           </div>
           <div ref={imageRef} className="w-full md:w-1/2 relative">
@@ -96,9 +104,7 @@ const Hero = () => {
                     <p className="text-sm text-gray-500">Current Balance</p>
                     <p className="text-2xl font-bold">₹12,580.50</p>
                   </div>
-                  <div className="bg-black text-white h-10 w-10 rounded-full flex items-center justify-center">
-                    <ArrowRight size={18} />
-                  </div>
+                  
                 </div>
 
                 <div className="space-y-4 mb-6">
@@ -106,7 +112,9 @@ const Hero = () => {
                     <div className="flex justify-between items-center">
                       <div>
                         <p className="font-medium">Grocery Store</p>
-                        <p className="text-sm text-gray-500">Yesterday, 8:30 PM</p>
+                        <p className="text-sm text-gray-500">
+                          Yesterday, 8:30 PM
+                        </p>
                       </div>
                       <p className="font-medium text-red-500">-₹450.00</p>
                     </div>
@@ -131,7 +139,7 @@ const Hero = () => {
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className="bg-black h-2 rounded-full"
-                      style={{ width: '70%' }}
+                      style={{ width: "70%" }}
                     ></div>
                   </div>
                 </div>

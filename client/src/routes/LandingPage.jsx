@@ -8,15 +8,15 @@ import FinancialLiteracy from "../components/FinancialLiteracy";
 import Stats from "../components/Stats";
 import { useGSAP } from "../hooks/useGSAP";
 import Footer1 from "../components/Footer1";
-import Header1 from "../components/Header1";
+import Header from "../components/Header";
 
 const LandingPage = () => {
   // Initialize GSAP and ScrollTrigger
   useGSAP();
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
-      <Header1 />
+    <div className="min-h-screen w-[98.9vw] bg-white text-gray-900">
+      <Header />
         <Hero />
         <Stats />
         <Features />

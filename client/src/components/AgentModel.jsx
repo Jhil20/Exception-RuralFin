@@ -84,7 +84,7 @@ const AgentModel = () => {
       id="how-it-works"
     >
       <div className="container mx-auto">
-        <div className="text-center mb-16">
+        <div className="text-center mb-6">
           <h2
             ref={titleRef}
             className="text-3xl md:text-4xl font-bold mb-4"
@@ -100,8 +100,8 @@ const AgentModel = () => {
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row items-center gap-12">
-          <div className="w-full lg:w-1/2 order-2 lg:order-1">
+        <div className="flex flex-col justify-end lg:flex-row items-center gap-12">
+          <div className="w-full h-full lg:w-1/2 order-2 lg:order-1 ">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {steps.map((step, index) => (
                 <div
