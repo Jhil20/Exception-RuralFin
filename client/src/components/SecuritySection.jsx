@@ -81,7 +81,7 @@ const SecuritySection = () => {
   ];
 
   return (
-    <section ref={sectionRef} className="py-20 px-6 md:px-12 bg-white" id="security">
+    <section ref={sectionRef} className="py-20 px-6 md:px-12 bg-white" id="security-section">
       <div className="container mx-auto">
         <div className="text-center mb-16">
           <h2 ref={titleRef} className="text-3xl md:text-4xl font-bold mb-4">

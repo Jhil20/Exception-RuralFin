@@ -90,7 +90,7 @@ const Hero = () => {
               </button>
               </Link>
               <a href="#features">
-              <button  className="border-2 cursor-pointer  border-gray-300 text-gray-800 px-8 py-4 rounded-full font-medium hover:shadow-gray-600 shadow-lg duration-300 hover:border-gray-400 transition-all">
+              <button  className="border-2 cursor-pointer  border-gray-300 text-gray-800 px-8 py-4 rounded-full font-medium hover:shadow-gray-500 shadow-lg duration-300 hover:border-gray-400 transition-all">
                 Learn More
               </button>
               </a>

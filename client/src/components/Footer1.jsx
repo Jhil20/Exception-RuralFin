@@ -28,15 +28,22 @@ const Footer1 = () => {
       title: 'Features',
       links: ['Mobile Transfers', 'Budget Tracking', 'Agent Network', 'Financial Literacy']
     },
-    {
-      title: 'Resources',
-      links: ['Help Center', 'Security', 'Blog', 'Testimonials']
-    },
+    // {
+    //   title: 'Resources',
+    //   links: ['Help Center', 'Security', 'Blog', 'Testimonials']
+    // },
     {
       title: 'Legal',
       links: ['Privacy Policy', 'Terms of Service', 'Compliance', 'Licenses']
     }
   ];
+
+  const hrefMapping = {
+    "Mobile Transfers":"features",
+    "Budget Tracking":"financial-tools",
+    "Agent Network":"how-it-works",
+    "Financial Literacy":"financial-literacy",
+  }
 
   return (
     <footer ref={footerRef} className="bg-gray-900 text-white py-16 px-6 md:px-12">
@@ -73,7 +80,7 @@ const Footer1 = () => {
               <ul className="space-y-3">
                 {column.links.map((link, linkIndex) => (
                   <li key={linkIndex}>
-                    <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    <a href={`#${hrefMapping[link]}`} className="text-gray-400 hover:text-white transition-colors">
                       {link}
                     </a>
                   </li>

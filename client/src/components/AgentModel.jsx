@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Users, ShieldCheck, Wallet, RefreshCw } from 'lucide-react';
+import { Users, ShieldCheck, Wallet, RefreshCw, TrendingUp } from 'lucide-react';
 
 const AgentModel = () => {
   const sectionRef = useRef(null);
@@ -71,9 +71,9 @@ const AgentModel = () => {
       description: 'Agents help users deposit, withdraw, and transfer money seamlessly.'
     },
     {
-      icon: <RefreshCw size={24} />,
-      title: '6-Month Bond Period',
-      description: 'Agents maintain the bond for 6 months, after which it\'s returned if no violations occur.'
+      icon: <TrendingUp size={24} />,
+      title: 'Earnings-Based Model',
+      description: 'Agents earn a percentage from each user transaction—similar to freelancing. Higher deposits unlock more earning potential.'
     }
   ];
 
@@ -151,14 +151,14 @@ const AgentModel = () => {
                   <div className="space-y-3">
                     <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                       <div>
-                        <p className="font-medium">User Deposit</p>
+                        <p className="font-medium">User1 Deposit</p>
                         <p className="text-xs text-gray-500">Today, 2:30 PM</p>
                       </div>
                       <p className="font-medium text-green-500">+₹2,000.00</p>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                       <div>
-                        <p className="font-medium">User Withdrawal</p>
+                        <p className="font-medium">User2 Withdrawal</p>
                         <p className="text-xs text-gray-500">Today, 11:15 AM</p>
                       </div>
                       <p className="font-medium text-red-500">-₹500.00</p>
