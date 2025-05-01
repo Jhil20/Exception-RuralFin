@@ -3,12 +3,12 @@ import { initializeApp } from "firebase/app";
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_BUCKET",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID",
+  apiKey: "AIzaSyDNvZw_sf1qk3vBg0dC4zoV6THtwgZW48c",
+  authDomain: "ruralfin-2d4f0.firebaseapp.com",
+  projectId: "ruralfin-2d4f0",
+  storageBucket: "ruralfin-2d4f0.firebasestorage.app",
+  messagingSenderId: "447881313890",
+  appId: "1:447881313890:web:ba4d03a9e2b55d9a949b3b",
 };
 
 const app = initializeApp(firebaseConfig);
