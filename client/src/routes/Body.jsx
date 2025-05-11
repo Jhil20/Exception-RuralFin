@@ -19,26 +19,26 @@ import {
   upcomingPayments,
 } from "../data/mockdata";
 const Body = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // Simulate loading time
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+  // useEffect(() => {
+  //   // Simulate loading time
+  //   const timer = setTimeout(() => {
+  //     setIsLoading(false);
+  //   }, 2000);
 
-    return () => clearTimeout(timer);
-  }, []);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
+  // if (isLoading) {
+  //   return <LoadingScreen />;
+  // }
 
   return (
     <div className="bg-gray-50 min-h-screen">
       <Header />
 
-      <main className="container mx-auto px-4 sm:px-6 pt-24 pb-12">
+      <main className="container mx-auto px-4 sm:px-6 pt-10 pb-12">
         <section className="mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
             Hello, Sarah

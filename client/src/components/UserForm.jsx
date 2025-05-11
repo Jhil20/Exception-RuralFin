@@ -1,360 +1,385 @@
-import React, { useState } from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { ArrowRight, User, Phone, Mail, Calendar, MapPin, Lock } from 'lucide-react';
-import { userValidationSchema } from '../yupValidators/validationSchema';
+import React from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import { ArrowRight, User, Phone, Calendar, MapPin, Lock } from "lucide-react";
+import {
+  userValidationSchemaStep1,
+  userValidationSchemaStep2,
+} from "../yupValidators/validationSchema";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const UserForm = ({ onSubmit, resetRole }) => {
+const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
+  const initialValuesStep2 = {
+    aadharNumber: "",
+    password: "",
+    confirmPassword: "",
+  };
+  const navigate=useNavigate();
+
+  const [userData, setUserData] = useState(null);
+  const initialValuesStep1 = {
+    firstName: "",
+    lastName: "",
+    phone: "",
+    age: "",
+    dob: "",
+    gender: "",
+    address: "",
+  };
+
+  const handleSubmitStep1 = (values) => {
+    setStep(2);
+    setUserData(values);
+    setUserFormStep2(true);
+  };
+
   const [step, setStep] = useState(1);
-  const totalSteps = 3;
 
-  const initialValues = {
-    firstName: '',
-    lastName: '',
-    phone: '',
-    email: '',
-    age: '',
-    aadharNumber: '',
-    dob: '',
-    gender: '',
-    password: '',
-    confirmPassword: '',
-    address: '',
-  };
 
-  const nextStep = () => setStep(step + 1);
-  const prevStep = () => setStep(step - 1);
-
-  const renderProgressBar = () => (
-    <div className="w-full mb-8">
-      <div className="flex justify-between mb-2">
-        {[...Array(totalSteps)].map((_, index) => (
-          <div
-            key={index}
-            className={`w-8 h-8 rounded-full flex items-center justify-center ${
-              step > index + 1
-                ? 'bg-blue-600 text-white'
-                : step === index + 1
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-600'
-            }`}
-          >
-            {index + 1}
-          </div>
-        ))}
-      </div>
-      <div className="h-2 bg-gray-200 rounded-full">
-        <div
-          className="h-full bg-blue-600 rounded-full transition-all duration-300"
-          style={{ width: `${((step - 1) / (totalSteps - 1)) * 100}%` }}
-        ></div>
-      </div>
-    </div>
-  );
-
-  const renderStepTitle = () => {
-    switch (step) {
-      case 1:
-        return 'Personal Information';
-      case 2:
-        return 'Contact Details';
-      case 3:
-        return 'Security Details';
-      default:
-        return '';
+  const handleSubmitStep2 = (values) => {
+    const allValues={
+        ...userData,
+        ...values,
     }
-  };
+    console.log("Final Values:", allValues);
+    setUserFormStep2(false);
+    setUserData(null);
+    setStep(1);
+    navigate("/dashboard");
+  }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="flex items-center mb-8">
-        <button 
-          onClick={resetRole}
-          className="text-sm text-gray-600 hover:text-black flex items-center mr-4"
-        >
-          <ArrowRight className="h-4 w-4 mr-1 transform rotate-180" />
-          Back
-        </button>
-        <h2 className="text-2xl font-bold text-gray-900">Create User Account</h2>
-      </div>
-
-      {renderProgressBar()}
-
-      <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-        <h3 className="text-xl font-semibold mb-6">{renderStepTitle()}</h3>
-
+    <div className="space-y-6">
+      {step == 1 && (
         <Formik
-          initialValues={initialValues}
-          validationSchema={userValidationSchema}
-          onSubmit={onSubmit}
+          initialValues={initialValuesStep1}
+          //   validationSchema={userValidationSchemaStep1}
+          onSubmit={handleSubmitStep1}
         >
-          {({ isSubmitting, values, isValid, dirty }) => (
-            <Form className="space-y-6">
-              {step === 1 && (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-                        First Name
-                      </label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <User className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <Field
-                          type="text"
-                          id="firstName"
-                          name="firstName"
-                          className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                          placeholder="First Name"
-                        />
-                      </div>
-                      <ErrorMessage name="firstName" component="div" className="text-red-500 text-sm" />
+          {({ isSubmitting, values }) => (
+            <Form className="space-y-5">
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <label
+                    htmlFor="firstName"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    First Name
+                  </label>
+                  <div className="relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <User className="h-5 w-5 text-gray-600" />
                     </div>
-
-                    <div className="space-y-2">
-                      <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                        Last Name
-                      </label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <User className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <Field
-                          type="text"
-                          id="lastName"
-                          name="lastName"
-                          className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                          placeholder="Last Name"
-                        />
-                      </div>
-                      <ErrorMessage name="lastName" component="div" className="text-red-500 text-sm" />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
-                      Gender
-                    </label>
-                    <div className="flex space-x-4">
-                      <label className="inline-flex items-center">
-                        <Field 
-                          type="radio" 
-                          name="gender" 
-                          value="male" 
-                          className="form-radio h-5 w-5 text-blue-600" 
-                        />
-                        <span className="ml-2 text-gray-700">Male</span>
-                      </label>
-                      <label className="inline-flex items-center">
-                        <Field 
-                          type="radio" 
-                          name="gender" 
-                          value="female" 
-                          className="form-radio h-5 w-5 text-blue-600" 
-                        />
-                        <span className="ml-2 text-gray-700">Female</span>
-                      </label>
-                      <label className="inline-flex items-center">
-                        <Field 
-                          type="radio" 
-                          name="gender" 
-                          value="other" 
-                          className="form-radio h-5 w-5 text-blue-600" 
-                        />
-                        <span className="ml-2 text-gray-700">Other</span>
-                      </label>
-                    </div>
-                    <ErrorMessage name="gender" component="div" className="text-red-500 text-sm" />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label htmlFor="age" className="block text-sm font-medium text-gray-700">
-                        Age
-                      </label>
-                      <Field
-                        type="number"
-                        id="age"
-                        name="age"
-                        className="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                        placeholder="Your age"
-                      />
-                      <ErrorMessage name="age" component="div" className="text-red-500 text-sm" />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label htmlFor="dob" className="block text-sm font-medium text-gray-700">
-                        Date of Birth
-                      </label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Calendar className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <Field
-                          type="date"
-                          id="dob"
-                          name="dob"
-                          className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                        />
-                      </div>
-                      <ErrorMessage name="dob" component="div" className="text-red-500 text-sm" />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {step === 2 && (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                        Phone Number
-                      </label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Phone className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <Field
-                          type="tel"
-                          id="phone"
-                          name="phone"
-                          className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                          placeholder="10-digit phone number"
-                        />
-                      </div>
-                      <ErrorMessage name="phone" component="div" className="text-red-500 text-sm" />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                        Email
-                      </label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Mail className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <Field
-                          type="email"
-                          id="email"
-                          name="email"
-                          className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                          placeholder="Email address"
-                        />
-                      </div>
-                      <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="aadharNumber" className="block text-sm font-medium text-gray-700">
-                      Aadhar Number
-                    </label>
                     <Field
                       type="text"
-                      id="aadharNumber"
-                      name="aadharNumber"
-                      className="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                      placeholder="12-digit Aadhar number"
+                      id="firstName"
+                      name="firstName"
+                      className="block w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                      placeholder="First Name"
                     />
-                    <ErrorMessage name="aadharNumber" component="div" className="text-red-500 text-sm" />
                   </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-                      Address
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <MapPin className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <Field
-                        as="textarea"
-                        id="address"
-                        name="address"
-                        rows={3}
-                        className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                        placeholder="Your full address"
-                      />
-                    </div>
-                    <ErrorMessage name="address" component="div" className="text-red-500 text-sm" />
-                  </div>
+                  <ErrorMessage
+                    name="firstName"
+                    component="div"
+                    className="text-sm text-red-600 mt-1"
+                  />
                 </div>
-              )}
 
-              {step === 3 && (
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                      Password
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Lock className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <Field
-                        type="password"
-                        id="password"
-                        name="password"
-                        className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                        placeholder="Create a strong password"
-                      />
+                <div className="space-y-2">
+                  <label
+                    htmlFor="lastName"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Last Name
+                  </label>
+                  <div className="relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <User className="h-5 w-5 text-gray-600" />
                     </div>
-                    <ErrorMessage name="password" component="div" className="text-red-500 text-sm" />
+                    <Field
+                      type="text"
+                      id="lastName"
+                      name="lastName"
+                      className="block w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                      placeholder="Last Name"
+                    />
                   </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                      Confirm Password
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Lock className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <Field
-                        type="password"
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                        placeholder="Confirm your password"
-                      />
-                    </div>
-                    <ErrorMessage name="confirmPassword" component="div" className="text-red-500 text-sm" />
-                  </div>
+                  <ErrorMessage
+                    name="lastName"
+                    component="div"
+                    className="text-sm text-red-600 mt-1"
+                  />
                 </div>
-              )}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="phone"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Phone Number
+                  </label>
+                  <div className="relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Phone className="h-5 w-5 text-gray-600" />
+                    </div>
+                    <Field
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      className="block w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                      placeholder="10-digit phone number"
+                    />
+                  </div>
+                  <ErrorMessage
+                    name="phone"
+                    component="div"
+                    className="text-sm text-red-600 mt-1"
+                  />
+                </div>
+              </div>
 
-              <div className="flex justify-between mt-8">
-                {step > 1 && (
-                  <button
-                    type="button"
-                    onClick={prevStep}
-                    className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200"
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <label
+                    htmlFor="age"
+                    className="block text-sm font-medium text-gray-700"
                   >
-                    Previous
-                  </button>
-                )}
-                {step < totalSteps ? (
-                  <button
-                    type="button"
-                    onClick={nextStep}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 ml-auto"
+                    Age
+                  </label>
+                  <Field
+                    type="number"
+                    id="age"
+                    name="age"
+                    className="block w-full px-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                    placeholder="Your age"
+                  />
+                  <ErrorMessage
+                    name="age"
+                    component="div"
+                    className="text-sm text-red-600 mt-1"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label
+                    htmlFor="dob"
+                    className="block text-sm font-medium text-gray-700"
                   >
-                    Next
-                  </button>
-                ) : (
-                  <button
-                    type="submit"
-                    disabled={isSubmitting || !isValid || !dirty}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed ml-auto"
+                    Date of Birth
+                  </label>
+                  <div className="relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Calendar className="h-5 w-5 text-gray-600" />
+                    </div>
+                    <Field
+                      type="date"
+                      id="dob"
+                      name="dob"
+                      className="block w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                    />
+                  </div>
+                  <ErrorMessage
+                    name="dob"
+                    component="div"
+                    className="text-sm text-red-600 mt-1"
+                  />
+                </div>
+                <div className="space-y-2 ml-2 pt-4">
+                  <label
+                    htmlFor="gender"
+                    className="block text-sm font-medium text-gray-700"
                   >
-                    {isSubmitting ? 'Creating Account...' : 'Create Account'}
-                  </button>
-                )}
+                    Gender
+                  </label>
+                  <div className="flex space-x-4">
+                    <label className="inline-flex items-center">
+                      <Field
+                        type="radio"
+                        name="gender"
+                        value="male"
+                        className="form-radio h-5 w-5 text-black border-gray-300 focus:ring-black"
+                      />
+                      <span className="ml-2 text-gray-700">Male</span>
+                    </label>
+                    <label className="inline-flex items-center">
+                      <Field
+                        type="radio"
+                        name="gender"
+                        value="female"
+                        className="form-radio h-5 w-5 text-black border-gray-300 focus:ring-black"
+                      />
+                      <span className="ml-2 text-gray-700">Female</span>
+                    </label>
+                    <label className="inline-flex items-center">
+                      <Field
+                        type="radio"
+                        name="gender"
+                        value="other"
+                        className="form-radio h-5 w-5 text-black border-gray-300 focus:ring-black"
+                      />
+                      <span className="ml-2 text-gray-700">Other</span>
+                    </label>
+                  </div>
+                  <ErrorMessage
+                    name="gender"
+                    component="div"
+                    className="text-sm text-red-600 mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-1 gap-4">
+                <div className="space-y-2">
+                  <label
+                    htmlFor="address"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Address
+                  </label>
+                  <div className="relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <MapPin className="h-5 w-5 text-gray-600" />
+                    </div>
+                    <Field
+                      type="text"
+                      id="address"
+                      name="address"
+                      className="block w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                      placeholder="Address"
+                    />
+                  </div>
+                  <ErrorMessage
+                    name="address"
+                    component="div"
+                    className="text-sm text-red-600 mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <button
+                  onClick={resetRole}
+                  className="mt-4 flex justify-center items-center w-52 px-4 py-3 shadow-lg hover:shadow-black/50 bg-gray-400 text-white font-semibold rounded-lg transition-all duration-300 cursor-pointer hover:bg-gray-600 disabled:bg-gray-600"
+                >
+                  Back
+                </button>
+
+                <button
+                  type="submit"
+                  className="mt-4 w-52 px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-black/50 hover:bg-blue-800 transition-all duration-300 cursor-pointer  disabled:bg-gray-400"
+                  disabled={isSubmitting}
+                >
+                  Next
+                </button>
               </div>
             </Form>
           )}
         </Formik>
-      </div>
+      )}
+
+      {step == 2 && (
+        <Formik
+          initialValues={initialValuesStep2}
+        //   validationSchema={userValidationSchemaStep2}
+          onSubmit={handleSubmitStep2}
+        >
+          {({ isSubmitting, values }) => (
+            <Form className="space-y-5">
+              <div className="grid md:grid-cols-1 gap-4">
+                <div className="space-y-2">
+                  <label
+                    htmlFor="aadharNumber"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Aadhar Number
+                  </label>
+                  <Field
+                    type="text"
+                    id="aadharNumber"
+                    name="aadharNumber"
+                    className="block w-full px-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                    placeholder="12-digit Aadhar number"
+                  />
+                  <ErrorMessage
+                    name="aadharNumber"
+                    component="div"
+                    className="text-sm text-red-600 mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Password
+                  </label>
+                  <div className="relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Lock className="h-5 w-5 text-gray-600" />
+                    </div>
+                    <Field
+                      type="password"
+                      id="password"
+                      name="password"
+                      className="block w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                      placeholder="Create a strong password"
+                    />
+                  </div>
+                  <ErrorMessage
+                    name="password"
+                    component="div"
+                    className="text-sm text-red-600 mt-1"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    htmlFor="confirmPassword"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Confirm Password
+                  </label>
+                  <div className="relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Lock className="h-5 w-5 text-gray-600" />
+                    </div>
+                    <Field
+                      type="password"
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      className="block w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                      placeholder="Confirm your password"
+                    />
+                  </div>
+                  <ErrorMessage
+                    name="confirmPassword"
+                    component="div"
+                    className="text-sm text-red-600 mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <button
+                type="submit"
+                className="mt-4 flex justify-center items-center w-52 px-4 py-3 shadow-lg hover:shadow-black/50 bg-gray-400 text-white font-semibold rounded-lg transition-all duration-300 cursor-pointer hover:bg-gray-600 disabled:bg-gray-600"
+                disabled={isSubmitting}
+              >
+                Back
+              </button>
+                <button
+                  type="submit"
+                  className="mt-4 w-52 px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-black/50 hover:bg-blue-800 transition-all duration-300 cursor-pointer  disabled:bg-gray-400"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting..." : "Submit"}
+                </button>
+              </div>
+            </Form>
+          )}
+        </Formik>
+      )}
     </div>
   );
 };

@@ -36,7 +36,7 @@ const QuickActions = () => {
   ];
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm">
+    <div className="bg-white h-full rounded-2xl p-6 shadow-sm">
       <h3 className="text-lg font-semibold text-gray-900 mb-6">Quick Actions</h3>
       
       <div className="grid grid-cols-5 gap-3">

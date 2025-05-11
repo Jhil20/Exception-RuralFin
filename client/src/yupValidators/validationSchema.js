@@ -1,7 +1,6 @@
 import * as Yup from "yup";
 
-
-export const userValidationSchema = Yup.object({
+export const userValidationSchemaStep1 = Yup.object({
   firstName: Yup.string()
     .min(2, "Too short")
     .max(50, "Too long")
@@ -17,13 +16,19 @@ export const userValidationSchema = Yup.object({
     .min(18, "You must be at least 18 years old")
     .max(100, "Age must be less than 100")
     .required("Age is required"),
-  aadharNumber: Yup.string()
-    .matches(/^[0-9]{12}$/, "Aadhar number must be 12 digits")
-    .required("Aadhar number is required"),
   dob: Yup.date().required("Date of birth is required"),
   gender: Yup.string()
     .oneOf(["male", "female", "other"], "Please select a valid gender")
     .required("Gender is required"),
+  address: Yup.string()
+    .min(10, "Please enter a valid address")
+    .required("Address is required"),
+});
+
+export const userValidationSchemaStep2 = Yup.object({
+  aadharNumber: Yup.string()
+    .matches(/^[0-9]{12}$/, "Aadhar number must be 12 digits")
+    .required("Aadhar number is required"),
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")
     .matches(
@@ -34,9 +39,6 @@ export const userValidationSchema = Yup.object({
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password")], "Passwords must match")
     .required("Confirm password is required"),
-  address: Yup.string()
-    .min(10, "Please enter a valid address")
-    .required("Address is required"),
 });
 
 // Agent-specific validation schema
