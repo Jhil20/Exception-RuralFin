@@ -1,16 +1,13 @@
-import React from 'react'
-import {
-  Outlet,
-  useLocation,
-} from "react-router-dom";
-import Body from './routes/Body';
+import React from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import UserDashboard from "./routes/UserDashboard";
 
 function App() {
   return (
     <>
-      <Outlet/>
+      <Outlet />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

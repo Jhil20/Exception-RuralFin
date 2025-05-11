@@ -14,7 +14,7 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
     password: "",
     confirmPassword: "",
   };
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
   const [userData, setUserData] = useState(null);
   const initialValuesStep1 = {
@@ -35,25 +35,24 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
 
   const [step, setStep] = useState(1);
 
-
   const handleSubmitStep2 = (values) => {
-    const allValues={
-        ...userData,
-        ...values,
-    }
+    const allValues = {
+      ...userData,
+      ...values,
+    };
     console.log("Final Values:", allValues);
     setUserFormStep2(false);
     setUserData(null);
     setStep(1);
     navigate("/dashboard");
-  }
+  };
 
   return (
     <div className="space-y-6">
       {step == 1 && (
         <Formik
           initialValues={initialValuesStep1}
-          //   validationSchema={userValidationSchemaStep1}
+            validationSchema={userValidationSchemaStep1}
           onSubmit={handleSubmitStep1}
         >
           {({ isSubmitting, values }) => (
@@ -278,7 +277,7 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
       {step == 2 && (
         <Formik
           initialValues={initialValuesStep2}
-        //   validationSchema={userValidationSchemaStep2}
+            validationSchema={userValidationSchemaStep2}
           onSubmit={handleSubmitStep2}
         >
           {({ isSubmitting, values }) => (
@@ -362,18 +361,19 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
 
               <div className="flex justify-between items-center">
                 <button
-                type="submit"
-                className="mt-4 flex justify-center items-center w-52 px-4 py-3 shadow-lg hover:shadow-black/50 bg-gray-400 text-white font-semibold rounded-lg transition-all duration-300 cursor-pointer hover:bg-gray-600 disabled:bg-gray-600"
-                disabled={isSubmitting}
-              >
-                Back
-              </button>
+                  className="mt-4 flex justify-center items-center w-52 px-4 py-3 shadow-lg hover:shadow-black/50 bg-gray-400 text-white font-semibold rounded-lg transition-all duration-300 cursor-pointer hover:bg-gray-600 disabled:bg-gray-600"
+                  onClick={() => {setStep(1)
+                    setUserFormStep2(false);
+                  }}
+                >
+                  Back
+                </button>
                 <button
                   type="submit"
                   className="mt-4 w-52 px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-black/50 hover:bg-blue-800 transition-all duration-300 cursor-pointer  disabled:bg-gray-400"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Submitting..." : "Submit"}
+                  Create User Account
                 </button>
               </div>
             </Form>

@@ -3,13 +3,12 @@ import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App";
 import Loading from "./components/Loading";
-import Body from "./routes/Body";
+import UserDashboard from "./routes/UserDashboard";
 import HomePage from "./routes/HomePage";
 import LandingPage from "./routes/LandingPage";
 import Login from "./routes/Login";
 import OtpVerification from "./routes/OtpVerification";
 import Register from "./routes/Register";
-// import UserDashboard from "./routes/UserDashboard";
 const appRouter = createBrowserRouter([
   {
     path: "/",
@@ -37,12 +36,11 @@ const appRouter = createBrowserRouter([
       },
       {
         path: "/dashboard",
-        element: <Body />,
+        element: <UserDashboard />,
       },
     ],
   },
 ]);
-
 
 createRoot(document.getElementById("root")).render(
   <RouterProvider router={appRouter}>

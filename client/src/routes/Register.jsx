@@ -95,7 +95,7 @@ const Register = () => {
           </div>
 
           <div
-            className={`bg-white shadow-xl rounded-2xl p-8 w-full border-gray-300 border-[1px] transition-all duration-300 shadow-black/20 ${
+            className={`bg-white shadow-xl rounded-2xl p-8 w-full border-gray-300 border-[1px]  transition-all duration-300 shadow-black/20 ${
               isSubmitted ? "py-16" : ""
             }`}
           >
