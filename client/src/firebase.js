@@ -1,17 +1,17 @@
 // firebase.js
 import { initializeApp } from "firebase/app";
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDNvZw_sf1qk3vBg0dC4zoV6THtwgZW48c",
-  authDomain: "ruralfin-2d4f0.firebaseapp.com",
-  projectId: "ruralfin-2d4f0",
-  storageBucket: "ruralfin-2d4f0.firebasestorage.app",
-  messagingSenderId: "447881313890",
-  appId: "1:447881313890:web:ba4d03a9e2b55d9a949b3b",
+  apiKey: "AIzaSyAIYk3ryIXQYZmYJcdBuSkuE3Eo8cIJkSc",
+  authDomain: "fintech123-71edc.firebaseapp.com",
+  projectId: "fintech123-71edc",
+  storageBucket: "fintech123-71edc.firebasestorage.app",
+  messagingSenderId: "618705162099",
+  appId: "1:618705162099:web:857b2832bcb6be61fb7f06",
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+const auth = getAuth(app); // ✅ Initialize auth here
 
-export { auth, RecaptchaVerifier, signInWithPhoneNumber };
+export { app ,auth};

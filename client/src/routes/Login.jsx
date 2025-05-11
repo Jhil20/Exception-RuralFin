@@ -4,7 +4,8 @@ import { ArrowRight, Phone } from "lucide-react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Header from "../components/Header";
-import { auth, RecaptchaVerifier, signInWithPhoneNumber } from "../firebase";
+import { auth } from "../firebase";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -20,15 +21,15 @@ const Login = () => {
     phoneNumber: "",
   };
 
-  // Setup reCAPTCHA
-  const setupRecaptcha = () => {
+  // ✅ Setup reCAPTCHA once on component mount
+  useEffect(() => {
     if (!window.recaptchaVerifier) {
       window.recaptchaVerifier = new RecaptchaVerifier(
         "recaptcha-container",
         {
-          size: "invisible",
+          size: "normal",
           callback: (response) => {
-            // reCAPTCHA solved
+            console.log("reCAPTCHA solved:", response);
           },
           "expired-callback": () => {
             console.warn("reCAPTCHA expired. Please try again.");
@@ -36,24 +37,39 @@ const Login = () => {
         },
         auth
       );
+
+      window.recaptchaVerifier.render().then((widgetId) => {
+        window.recaptchaWidgetId = widgetId;
+      });
     }
-  };
+  }, []);
 
   const handleSubmit = async (values, { setSubmitting }) => {
     setFirebaseError("");
-    setupRecaptcha();
-
     const appVerifier = window.recaptchaVerifier;
-    const fullPhone = `+91${values.phoneNumber}`;
 
+    if (!appVerifier) {
+      setFirebaseError("reCAPTCHA not initialized. Please refresh the page.");
+      setSubmitting(false);
+      return;
+    }
+
+    const fullPhone = `+91${values.phoneNumber}`;
+    console.log("Full Phone Number:", fullPhone);
+    
     try {
-      const confirmationResult = await signInWithPhoneNumber(auth, fullPhone, appVerifier);
+      const confirmationResult = await signInWithPhoneNumber(
+        auth,
+        fullPhone,
+        appVerifier
+      );
+      console.log("SMS sent successfully:", confirmationResult);
       window.confirmationResult = confirmationResult;
       navigate("/verifyotp", { state: { phoneNumber: fullPhone } });
     } catch (error) {
       console.error("SMS not sent:", error);
       setFirebaseError(error.message);
-      window.recaptchaVerifier.clear();
+      if (window.recaptchaVerifier) window.recaptchaVerifier.clear();
     }
 
     setSubmitting(false);
@@ -74,7 +90,11 @@ const Login = () => {
             </p>
           </div>
 
-          <div className="bg-white shadow-2xl rounded-2xl p-8 border border-gray-100 transition-all duration-300 hover:shadow-xl">
+          <div className="recaptcha-wrapper mb-4">
+            <div id="recaptcha-container"></div>
+          </div>
+
+          <div className="bg-white shadow-xl rounded-2xl p-8 border border-gray-100 transition-all duration-300 hover:shadow-2xl hover:shadow-black/40">
             <Formik
               initialValues={initialValues}
               validationSchema={validationSchema}
@@ -83,7 +103,10 @@ const Login = () => {
               {({ values, handleChange, handleBlur, isSubmitting }) => (
                 <Form className="space-y-6">
                   <div className="space-y-2">
-                    <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
+                    <label
+                      htmlFor="phoneNumber"
+                      className="block text-sm font-medium text-gray-700"
+                    >
                       Phone Number
                     </label>
                     <div className="relative rounded-md shadow-sm">
@@ -103,8 +126,16 @@ const Login = () => {
                         maxLength={10}
                       />
                     </div>
-                    <ErrorMessage name="phoneNumber" component="div" className="text-sm text-red-600 mt-1" />
-                    {firebaseError && <div className="text-sm text-red-600 mt-1">{firebaseError}</div>}
+                    <ErrorMessage
+                      name="phoneNumber"
+                      component="div"
+                      className="text-sm text-red-600 mt-1"
+                    />
+                    {firebaseError && (
+                      <div className="text-sm text-red-600 mt-1">
+                        {firebaseError}
+                      </div>
+                    )}
                   </div>
 
                   <div className="pt-0">
@@ -117,8 +148,6 @@ const Login = () => {
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </button>
                   </div>
-
-                  <div id="recaptcha-container"></div>
                 </Form>
               )}
             </Formik>
@@ -126,7 +155,10 @@ const Login = () => {
             <div className="mt-8 text-center">
               <p className="text-sm text-gray-600">
                 Don't have an account?{" "}
-                <a href="/register" className="font-medium text-gray-900 hover:text-black transition-colors border-b border-gray-900">
+                <a
+                  href="/register"
+                  className="font-medium text-gray-900 hover:text-black transition-colors border-b border-gray-900"
+                >
                   Register Now
                 </a>
               </p>
@@ -136,11 +168,17 @@ const Login = () => {
           <div className="text-center mt-8">
             <p className="text-xs text-gray-500">
               By signing in, you agree to our{" "}
-              <a href="/terms" className="text-gray-700 hover:text-black transition-colors">
+              <a
+                href="/terms"
+                className="text-gray-700 hover:text-black transition-colors"
+              >
                 Terms of Service
               </a>{" "}
               and{" "}
-              <a href="/privacy" className="text-gray-700 hover:text-black transition-colors">
+              <a
+                href="/privacy"
+                className="text-gray-700 hover:text-black transition-colors"
+              >
                 Privacy Policy
               </a>
             </p>
