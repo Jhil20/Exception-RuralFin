@@ -7,13 +7,13 @@ const Header = () => {
   const location = useLocation();
   // console.log(location)
   return (
-    <header className="bg-white border-b border-gray-200 fixed w-full top-0 z-50 shadow-sm">
+    <header className="bg-white border-b h-[9.1vh] border-gray-200 sticky w-full top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
             <span className="text-2xl font-bold text-black">
-              Flux<span className="text-gray-500">Wallet</span>
+              Rural<span className="text-gray-500">Fin</span>
             </span>
           </div>
 

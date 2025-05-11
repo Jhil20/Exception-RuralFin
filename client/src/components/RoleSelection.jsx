@@ -6,7 +6,7 @@ const RoleSelection = ({ setRole }) => {
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Your Role</h2>
-        <p className="text-gray-600">Select the type of account you want to create</p>
+        <p className="text-gray-600 px-20">Select how you want to participate in our financial ecosystem. Each role comes with unique features and responsibilities.</p>
       </div>
       
       <div className="grid md:grid-cols-2 gap-4">
@@ -18,8 +18,8 @@ const RoleSelection = ({ setRole }) => {
             <User className="h-8 w-8 text-blue-600" />
           </div>
           <h3 className="text-xl font-semibold text-gray-900 mb-2">User</h3>
-          <p className="text-gray-600 text-center text-sm">
-            Create an account to access financial services and manage your eWallet
+          <p className="text-gray-600 text-center mt-2 text-sm">
+            Create an account to Access secure digital payments, manage your finances, and enjoy seamless transactions. Perfect for individuals looking for modern financial solutions.
           </p>
         </button>
         
@@ -31,9 +31,8 @@ const RoleSelection = ({ setRole }) => {
             <Building className="h-8 w-8 text-green-600" />
           </div>
           <h3 className="text-xl font-semibold text-gray-900 mb-2">Agent</h3>
-          <p className="text-gray-600 text-center text-sm">
-            Create an account to earm money and provide financial services to users
-          </p>
+          <p className="text-gray-600 text-center mt-2 text-sm">
+   Create an account to become a financial service provider in your community. Help others access digital financial services while earning commission on transactions.          </p>
         </button>
       </div>
     </div>

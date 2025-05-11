@@ -72,21 +72,21 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col">
+    <div className="min-h-[100vh] h-[100vh]  bg-gradient-to-b from-gray-50 to-gray-200 flex flex-col">
       <Header />
 
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
-        <div className="w-full max-w-3xl">
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-1">
+        <div className={`w-full ${!role?"max-w-3xl":"max-w-9/12"}`}>
           <div className="text-center mb-8">
             <h1 className="text-4xl font-extrabold text-gray-900 mb-2">
-              Register To Become a User or an Agent
+              {!role?"Register To Become a User or an Agent":(role=="user"?"Create Your eWallet":"Create Your Agent Account")}
             </h1>
             <p className="text-gray-600 text-lg">
               Join RuralFin Finance to access financial services and manage your eWallet easily.
             </p>
           </div>
 
-          <div className={`bg-white shadow-xl rounded-2xl p-8  border-gray-300 border-[1px] transition-all duration-300 shadow-black/20 ${isSubmitted ? 'py-16' : ''}`}>
+          <div className={`bg-white shadow-xl rounded-2xl p-8 w-full border-gray-300 border-[1px] transition-all duration-300 shadow-black/20 ${isSubmitted ? 'py-16' : ''}`}>
             {renderContent()}
           </div>
 
