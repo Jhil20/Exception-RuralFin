@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ArrowRight, Phone } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, PersonStanding, Phone, Presentation } from "lucide-react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Header from "../components/Header";
@@ -10,41 +10,36 @@ import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 const Login = () => {
   const navigate = useNavigate();
   const [firebaseError, setFirebaseError] = useState("");
+  const [isSignup, setIsSignup] = useState(false);
 
-  const validationSchema = Yup.object({
-    phoneNumber: Yup.string()
-      .required("Phone number is required")
-      .matches(/^\d{10}$/, "Please enter a valid 10-digit phone number"),
-  });
+
 
   const initialValues = {
     phoneNumber: "",
+    role: "",
   };
 
   // ✅ Setup reCAPTCHA once on component mount
   useEffect(() => {
     if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(
-        "recaptcha-container",
-        {
-          size: "normal",
-          callback: (response) => {
-            console.log("reCAPTCHA solved:", response);
-          },
-          "expired-callback": () => {
-            console.warn("reCAPTCHA expired. Please try again.");
-          },
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, "submit-btn", {
+        size: "invisible",
+        callback: (response) => {
+          console.log("reCAPTCHA solved:", response);
         },
-        auth
-      );
-
-      window.recaptchaVerifier.render().then((widgetId) => {
-        window.recaptchaWidgetId = widgetId;
+        "expired-callback": () => {
+          console.warn("reCAPTCHA expired. Please try again.");
+        },
       });
+
+      // window.recaptchaVerifier.render().then((widgetId) => {
+      //   window.recaptchaWidgetId = widgetId;
+      // });
     }
   }, []);
 
   const handleSubmit = async (values, { setSubmitting }) => {
+    
     setFirebaseError("");
     const appVerifier = window.recaptchaVerifier;
 
@@ -56,13 +51,28 @@ const Login = () => {
 
     const fullPhone = `+91${values.phoneNumber}`;
     console.log("Full Phone Number:", fullPhone);
-    
+
     try {
       const confirmationResult = await signInWithPhoneNumber(
         auth,
         fullPhone,
         appVerifier
       );
+
+      console.log("Confirmation Result:", confirmationResult);
+
+      // await signInWithPhoneNumber(auth, fullPhone, appVerifier)
+      //   .then((confirmationResult) => {
+      //     // SMS sent. Prompt user to type the code from the message, then sign the
+      //     // user in with confirmationResult.confirm(code).
+      //     window.confirmationResult = confirmationResult;
+      //     // ...
+      //   })
+      //   .catch((error) => {
+      //     // Error; SMS not sent
+      //     // ...
+      //   });
+
       console.log("SMS sent successfully:", confirmationResult);
       window.confirmationResult = confirmationResult;
       navigate("/verifyotp", { state: { phoneNumber: fullPhone } });
@@ -97,40 +107,72 @@ const Login = () => {
           <div className="bg-white shadow-xl rounded-2xl p-8 border border-gray-100 transition-all duration-300 hover:shadow-2xl hover:shadow-black/40">
             <Formik
               initialValues={initialValues}
-              validationSchema={validationSchema}
+              // validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >
               {({ values, handleChange, handleBlur, isSubmitting }) => (
                 <Form className="space-y-6">
                   <div className="space-y-2">
-                    <label
-                      htmlFor="phoneNumber"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Phone Number
-                    </label>
-                    <div className="relative rounded-md shadow-sm">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Phone className="h-5 w-5 text-gray-400" />
+                    <div>
+                      <label
+                        htmlFor="phoneNumber"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Phone Number
+                      </label>
+                      <div className="relative rounded-md shadow-sm">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Phone className="h-5 w-5 text-gray-600" />
+                        </div>
+                        <Field
+                          type="tel"
+                          id="phoneNumber"
+                          name="phoneNumber"
+                          className="block mt-2 w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                          placeholder="Enter your 10-digit phone number"
+                          value={values.phoneNumber}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          required
+                          maxLength={10}
+                          pattern="[0-9]{10}"
+                          title="Please enter a valid 10-digit phone number"
+                        />
                       </div>
-                      <Field
-                        type="tel"
-                        id="phoneNumber"
-                        name="phoneNumber"
-                        className="block w-full pl-10 pr-3 py-3 border-gray-300 bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
-                        placeholder="Enter your 10-digit phone number"
-                        value={values.phoneNumber}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        required
-                        maxLength={10}
-                      />
+                      
                     </div>
-                    <ErrorMessage
-                      name="phoneNumber"
-                      component="div"
-                      className="text-sm text-red-600 mt-1"
-                    />
+                    <div className="h-full mt-3">
+                      <label
+                        htmlFor="role"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Role
+                      </label>
+                      <div className="relative rounded-md shadow-sm">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <PersonStanding className="h-5 w-5 text-gray-600" />
+                        </div>
+                        <Field
+                          as="select"
+                          id="role"
+                          name="role"
+                          className={`block mt-2 w-full pl-10 pr-10 py-3 text-gray-600  border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white `}
+                          value={values.role}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          required
+                        >
+                          <option value="" disabled>
+                            Select Role
+                          </option>
+                          <option value="user">User</option>
+                          <option value="agent">Agent</option>
+                          <option value="admin">Admin</option>
+                        </Field>
+                      </div>
+                      
+                    </div>
+
                     {firebaseError && (
                       <div className="text-sm text-red-600 mt-1">
                         {firebaseError}
@@ -141,6 +183,7 @@ const Login = () => {
                   <div className="pt-0">
                     <button
                       type="submit"
+                      id="submit-btn"
                       disabled={isSubmitting}
                       className="w-full cursor-pointer flex justify-center items-center px-4 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-black hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all duration-200"
                     >
@@ -155,12 +198,12 @@ const Login = () => {
             <div className="mt-8 text-center">
               <p className="text-sm text-gray-600">
                 Don't have an account?{" "}
-                <a
-                  href="/register"
-                  className="font-medium text-gray-900 hover:text-black transition-colors border-b border-gray-900"
+                <Link
+                  to={"/register"}
+                  className="font-medium cursor-pointer text-gray-900 no-underline  hover:text-black transition-colors border-b border-gray-900"
                 >
                   Register Now
-                </a>
+                </Link>
               </p>
             </div>
           </div>

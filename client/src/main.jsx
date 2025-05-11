@@ -8,6 +8,8 @@ import HomePage from "./routes/HomePage";
 import LandingPage from "./routes/LandingPage";
 import Login from "./routes/Login";
 import OtpVerification from "./routes/OtpVerification";
+import Register from "./routes/Register";
+// import UserDashboard from "./routes/UserDashboard";
 const appRouter = createBrowserRouter([
   {
     path: "/",
@@ -22,12 +24,20 @@ const appRouter = createBrowserRouter([
         element: <LandingPage />,
       },
       {
-        path: "/signup",
+        path: "/login",
         element: <Login />,
+      },
+      {
+        path: "/register",
+        element: <Register />,
       },
       {
         path: "/verifyotp",
         element: <OtpVerification />,
+      },
+      {
+        path: "/dashboard",
+        element: <Body />,
       },
     ],
   },
