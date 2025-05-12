@@ -9,6 +9,8 @@ import LandingPage from "./routes/LandingPage";
 import Login from "./routes/Login";
 import OtpVerification from "./routes/OtpVerification";
 import Register from "./routes/Register";
+import { Provider } from "react-redux";
+import store from "./redux/store/store";
 const appRouter = createBrowserRouter([
   {
     path: "/",
@@ -43,7 +45,9 @@ const appRouter = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")).render(
-  <RouterProvider router={appRouter}>
-    <App />
-  </RouterProvider>
+  <Provider store={store}>
+    <RouterProvider router={appRouter}>
+      <App />
+    </RouterProvider>
+  </Provider>
 );

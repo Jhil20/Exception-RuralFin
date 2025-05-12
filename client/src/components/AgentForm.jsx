@@ -14,6 +14,7 @@ import {
 import {
   agentValidationSchemaStep1,
   agentValidationSchemaStep2,
+  userValidationSchemaStep1,
 } from "../yupValidators/validationSchema";
 const AgentForm = ({ onSubmit, resetRole }) => {
   const initialValuesStep2 = {
@@ -48,7 +49,7 @@ const AgentForm = ({ onSubmit, resetRole }) => {
       {step == 1 && (
         <Formik
           initialValues={initialValuesStep1}
-          validationSchema={userValidationSchemaStep1}
+          // validationSchema={userValidationSchemaStep1}
           onSubmit={handleSubmitStep1}
         >
           {({ isSubmitting, values }) => (

@@ -1,13 +1,6 @@
 import React, { useEffect } from "react";
 import { Wallet } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-const Loading = () => {
-    const navigate=useNavigate();
-    useEffect(()=>{
-        setTimeout(()=>{
-            navigate("/home")
-        },2000);
-    },[])
+const Loader = () => {
   return (
     <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
       <div className="text-center">
@@ -36,4 +29,4 @@ const Loading = () => {
   );
 };
 
-export default Loading;
+export default Loader;

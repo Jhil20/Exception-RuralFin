@@ -26,7 +26,7 @@ export const userValidationSchemaStep1 = Yup.object({
 });
 
 export const userValidationSchemaStep2 = Yup.object({
-  aadharNumber: Yup.string()
+  aadhar: Yup.string()
     .matches(/^[0-9]{12}$/, "Aadhar number must be 12 digits")
     .required("Aadhar number is required"),
   password: Yup.string()

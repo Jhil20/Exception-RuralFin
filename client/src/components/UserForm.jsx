@@ -7,6 +7,10 @@ import {
 } from "../yupValidators/validationSchema";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
+import { BACKEND_URL } from "../utils/constants";
 
 const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
   const initialValuesStep2 = {
@@ -15,16 +19,16 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
     confirmPassword: "",
   };
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const [userData, setUserData] = useState(null);
   const initialValuesStep1 = {
-    firstName: "",
-    lastName: "",
-    phone: "",
-    age: "",
-    dob: "",
-    gender: "",
-    address: "",
+    firstName: userData?.firstName || "",
+    lastName:  userData?.lastName || "",
+    phone: userData?.phone || "",
+    age: userData?.age || "",
+    dob: userData?.dob || "",
+    gender: userData?.gender || "",
+    address: userData?.address || "",
   };
 
   const handleSubmitStep1 = (values) => {
@@ -35,16 +39,27 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
 
   const [step, setStep] = useState(1);
 
-  const handleSubmitStep2 = (values) => {
-    const allValues = {
-      ...userData,
-      ...values,
-    };
-    console.log("Final Values:", allValues);
-    setUserFormStep2(false);
-    setUserData(null);
-    setStep(1);
-    navigate("/dashboard");
+  const handleSubmitStep2 = async (values) => {
+    console.log("Submitting form with values:", values);
+    dispatch(showLoader());
+    try{
+
+      const allValues = {
+        ...userData,
+        ...values,
+      };
+      const result = await axios.post(`${BACKEND_URL}/api/user/register`,allValues);
+      console.log("User created successfully:", result);
+      console.log("Final Values:", allValues);
+      navigate("/dashboard");
+    }catch (error) {
+      console.error("Error submitting form:", error);
+    }finally {
+      dispatch(hideLoader());
+      setUserFormStep2(false);
+      setUserData(null);
+      setStep(1);
+    }
   };
 
   return (
@@ -52,7 +67,7 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
       {step == 1 && (
         <Formik
           initialValues={initialValuesStep1}
-            validationSchema={userValidationSchemaStep1}
+          validationSchema={userValidationSchemaStep1}
           onSubmit={handleSubmitStep1}
         >
           {({ isSubmitting, values }) => (
@@ -277,7 +292,7 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
       {step == 2 && (
         <Formik
           initialValues={initialValuesStep2}
-            validationSchema={userValidationSchemaStep2}
+          // validationSchema={userValidationSchemaStep2}
           onSubmit={handleSubmitStep2}
         >
           {({ isSubmitting, values }) => (
@@ -285,20 +300,20 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
               <div className="grid md:grid-cols-1 gap-4">
                 <div className="space-y-2">
                   <label
-                    htmlFor="aadharNumber"
+                    htmlFor="aadhar"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Aadhar Number
                   </label>
                   <Field
                     type="text"
-                    id="aadharNumber"
-                    name="aadharNumber"
+                    id="aadhar"
+                    name="aadhar"
                     className="block w-full px-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
                     placeholder="12-digit Aadhar number"
                   />
                   <ErrorMessage
-                    name="aadharNumber"
+                    name="aadhar"
                     component="div"
                     className="text-sm text-red-600 mt-1"
                   />
@@ -362,8 +377,9 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
               <div className="flex justify-between items-center">
                 <button
                   className="mt-4 flex justify-center items-center w-52 px-4 py-3 shadow-lg hover:shadow-black/50 bg-gray-400 text-white font-semibold rounded-lg transition-all duration-300 cursor-pointer hover:bg-gray-600 disabled:bg-gray-600"
-                  onClick={() => {setStep(1)
-                    setUserFormStep2(false);
+                  onClick={() => {
+                    setStep(1);
+                    setUserFormStep2(false); //tochange the user form size
                   }}
                 >
                   Back
