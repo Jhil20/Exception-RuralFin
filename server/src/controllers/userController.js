@@ -25,6 +25,21 @@ const getUserById = async (req, res) => {
   }
 };
 
+const getUserByPhone = async (req, res) => {
+  try {
+    const {phoneNumber,role} = req.body;
+    const user = await User.findOne({ phone: phoneNumber, role: role });
+    if (user) {
+      return res.status(200).json({ message: "User found",success: true });
+    }else{
+      return res.status(200).json({ message: "User not found",success: false });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user", error });
+  }
+}
+
+
 // Create a new user
 const createUser = async (req, res) => {
   try {
@@ -134,4 +149,5 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
+  getUserByPhone,
 };

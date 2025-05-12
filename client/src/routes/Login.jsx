@@ -23,7 +23,7 @@ const Login = () => {
   // ✅ Setup reCAPTCHA once on component mount
   useEffect(() => {
     if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, "submit-btn", {
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, "", {
         size: "invisible",
         callback: (response) => {
           console.log("reCAPTCHA solved:", response);
@@ -61,22 +61,25 @@ const Login = () => {
         // console.log("Response from server:", response);
 
       if (!response?.data?.success) {
-        toast.error("User not found with same phone number");
+        toast.error("User not found with given phone number");
         setSubmitting(false);
       } 
       else {
         console.log("in else")
-        const confirmationResult = await signInWithPhoneNumber(
-          auth,
-          fullPhone,
-          appVerifier
-        );
-
-        console.log("Confirmation Result:", confirmationResult);
-
-        console.log("SMS sent successfully:", confirmationResult);
-        window.confirmationResult = confirmationResult;
-        navigate("/verifyotp", { state: { phoneNumber: fullPhone } });
+        // appVerifier.verify().then(async ()=>{
+          console.log("reCAPTCHA verified");
+          const confirmationResult = await signInWithPhoneNumber(
+            auth,
+            fullPhone,
+            appVerifier
+          );
+          
+          console.log("Confirmation Result:", confirmationResult);
+          
+          console.log("SMS sent successfully:", confirmationResult);
+          window.confirmationResult = confirmationResult;
+        // })
+        // navigate("/verifyotp", { state: { phoneNumber: fullPhone } });
       }
     } catch (error) {
       console.error("SMS not sent:", error);
