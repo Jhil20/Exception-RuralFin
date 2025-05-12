@@ -1,14 +1,20 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowRight, Lock } from "lucide-react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Header from "../components/Header";
+import { toast, ToastContainer } from "react-toastify";
 
 const OtpVerification = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const phoneNumber = location.state?.phoneNumber;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    toast.success("OTP sent successfully to " + phoneNumber);
+  }, [phoneNumber]);
 
   const validationSchema = Yup.object({
     otpNumber: Yup.string()
@@ -20,24 +26,58 @@ const OtpVerification = () => {
     otpNumber: "",
   };
 
-  const handleSubmit = (values) => {
-    // Simulate successful OTP verification
-    console.log("Verifying OTP for:", phoneNumber);
-    navigate("/dashboard"); // or wherever the app routes after login
+  const handleSubmit = async (values) => {
+    setIsSubmitting(true);
+
+    if (!window.confirmationResult) {
+      toast.error("OTP session expired. Please try again.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const { otpNumber } = values;
+      const confirmationResult = window.confirmationResult;
+      
+      // Verify OTP
+      const result = await confirmationResult.confirm(otpNumber);
+      const user = result.user;
+      
+      console.log("User verified successfully:", user);
+
+      toast.success("OTP verified successfully!");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      toast.error("Invalid OTP. Please try again.");
+    }
+
+    setIsSubmitting(false);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col">
       <Header />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        style={{ marginTop: "70px" }}
+      />
 
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Enter OTP
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Enter OTP</h1>
             <p className="text-gray-600 text-base">
-              We've sent a 6-digit OTP to <span className="font-semibold">{phoneNumber}</span>
+              We've sent a 6-digit OTP to{" "}
+              <span className="font-semibold">{phoneNumber}</span>
             </p>
           </div>
 
@@ -47,7 +87,7 @@ const OtpVerification = () => {
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >
-              {({ values, handleChange, handleBlur, isSubmitting }) => (
+              {({ values, handleChange, handleBlur }) => (
                 <Form className="space-y-6">
                   <div className="space-y-2">
                     <label
@@ -97,7 +137,12 @@ const OtpVerification = () => {
             <div className="mt-8 text-center">
               <p className="text-sm text-gray-600">
                 Didn't receive the code?{" "}
-                <button className="text-black font-semibold cursor-pointer">Resend OTP</button>
+                <button
+                  className="text-black font-semibold cursor-pointer"
+                  onClick={() => navigate("/login")}
+                >
+                  Resend OTP
+                </button>
               </p>
             </div>
           </div>

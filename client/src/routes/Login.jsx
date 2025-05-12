@@ -6,13 +6,14 @@ import * as Yup from "yup";
 import Header from "../components/Header";
 import { auth } from "../firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import axios from "axios";
+import { BACKEND_URL } from "../utils/constants";
+import { ToastContainer, toast } from "react-toastify";
 
 const Login = () => {
   const navigate = useNavigate();
   const [firebaseError, setFirebaseError] = useState("");
   const [isSignup, setIsSignup] = useState(false);
-
-
 
   const initialValues = {
     phoneNumber: "",
@@ -32,50 +33,51 @@ const Login = () => {
         },
       });
 
-      // window.recaptchaVerifier.render().then((widgetId) => {
-      //   window.recaptchaWidgetId = widgetId;
-      // });
+      window.recaptchaVerifier.render().then((widgetId) => {
+        window.recaptchaWidgetId = widgetId;
+      });
     }
   }, []);
 
   const handleSubmit = async (values, { setSubmitting }) => {
-    
     setFirebaseError("");
     const appVerifier = window.recaptchaVerifier;
-
     if (!appVerifier) {
-      setFirebaseError("reCAPTCHA not initialized. Please refresh the page.");
+      toast.error("reCAPTCHA not initialized. Please refresh the page.");
       setSubmitting(false);
       return;
     }
 
+    // console.log("btn clicked");
+
     const fullPhone = `+91${values.phoneNumber}`;
     console.log("Full Phone Number:", fullPhone);
-
+    
     try {
-      const confirmationResult = await signInWithPhoneNumber(
-        auth,
-        fullPhone,
-        appVerifier
+      const response = await axios.post(
+        `${BACKEND_URL}/api/user/getUserByPhone`,
+        values
       );
+        // console.log("Response from server:", response);
 
-      console.log("Confirmation Result:", confirmationResult);
+      if (!response?.data?.success) {
+        toast.error("User not found with same phone number");
+        setSubmitting(false);
+      } 
+      else {
+        console.log("in else")
+        const confirmationResult = await signInWithPhoneNumber(
+          auth,
+          fullPhone,
+          appVerifier
+        );
 
-      // await signInWithPhoneNumber(auth, fullPhone, appVerifier)
-      //   .then((confirmationResult) => {
-      //     // SMS sent. Prompt user to type the code from the message, then sign the
-      //     // user in with confirmationResult.confirm(code).
-      //     window.confirmationResult = confirmationResult;
-      //     // ...
-      //   })
-      //   .catch((error) => {
-      //     // Error; SMS not sent
-      //     // ...
-      //   });
+        console.log("Confirmation Result:", confirmationResult);
 
-      console.log("SMS sent successfully:", confirmationResult);
-      window.confirmationResult = confirmationResult;
-      navigate("/verifyotp", { state: { phoneNumber: fullPhone } });
+        console.log("SMS sent successfully:", confirmationResult);
+        window.confirmationResult = confirmationResult;
+        navigate("/verifyotp", { state: { phoneNumber: fullPhone } });
+      }
     } catch (error) {
       console.error("SMS not sent:", error);
       setFirebaseError(error.message);
@@ -88,6 +90,18 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col">
       <Header />
+      <ToastContainer
+      className={"mt-16"}
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
 
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
         <div className="w-full max-w-md">
@@ -107,7 +121,7 @@ const Login = () => {
           <div className="bg-white shadow-xl rounded-2xl p-8 border border-gray-100 transition-all duration-300 hover:shadow-2xl hover:shadow-black/40">
             <Formik
               initialValues={initialValues}
-              // validationSchema={validationSchema}
+              // validationSchema={loginValidationSchema}
               onSubmit={handleSubmit}
             >
               {({ values, handleChange, handleBlur, isSubmitting }) => (
@@ -139,7 +153,6 @@ const Login = () => {
                           title="Please enter a valid 10-digit phone number"
                         />
                       </div>
-                      
                     </div>
                     <div className="h-full mt-3">
                       <label
@@ -170,14 +183,13 @@ const Login = () => {
                           <option value="admin">Admin</option>
                         </Field>
                       </div>
-                      
                     </div>
 
-                    {firebaseError && (
+                    {/* {firebaseError && (
                       <div className="text-sm text-red-600 mt-1">
                         {firebaseError}
                       </div>
-                    )}
+                    )} */}
                   </div>
 
                   <div className="pt-0">
@@ -188,7 +200,7 @@ const Login = () => {
                       className="w-full cursor-pointer flex justify-center items-center px-4 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-black hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all duration-200"
                     >
                       {isSubmitting ? "Sending OTP..." : "Continue"}
-                      <ArrowRight className="ml-2 h-5 w-5" />
+                      {/* <ArrowRight className="ml-2 h-5 w-5" /> */}
                     </button>
                   </div>
                 </Form>

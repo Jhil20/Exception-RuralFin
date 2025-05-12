@@ -94,3 +94,5 @@ export const agentValidationSchemaStep2 = Yup.object({
     .required("IFSC code is required"),
   bankName: Yup.string().required("Bank name is required"),
 });
+
+
