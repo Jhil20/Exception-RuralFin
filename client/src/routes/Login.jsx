@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, PersonStanding, Phone, Presentation } from "lucide-react";
+import {
+  ArrowRight,
+  PersonStanding,
+  Phone,
+  Lock,
+  Presentation,
+} from "lucide-react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Header from "../components/Header";
@@ -9,29 +15,47 @@ import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import { ToastContainer, toast } from "react-toastify";
-
+import { useDispatch } from "react-redux";
+import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
 const Login = () => {
-  const navigate = useNavigate();
   const [firebaseError, setFirebaseError] = useState("");
   const [isSignup, setIsSignup] = useState(false);
-
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [phoneState, setPhoneState] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRendered, setIsRendered] = useState(false);
+  const dispatch = useDispatch();
   const initialValues = {
     phoneNumber: "",
     role: "",
   };
 
+  const validationSchemaOTP = Yup.object({
+    otpNumber: Yup.string()
+      .required("OTP is required")
+      .matches(/^\d{6}$/, "Please enter a valid 6-digit OTP"),
+  });
+
+  const initialValuesOTP = {
+    otpNumber: "",
+  };
+
   // ✅ Setup reCAPTCHA once on component mount
   useEffect(() => {
     if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, "", {
-        size: "invisible",
-        callback: (response) => {
-          console.log("reCAPTCHA solved:", response);
-        },
-        "expired-callback": () => {
-          console.warn("reCAPTCHA expired. Please try again.");
-        },
-      });
+      window.recaptchaVerifier = new RecaptchaVerifier(
+        auth,
+        "recaptcha-container",
+        {
+          size: "invisible",
+          callback: (response) => {
+            console.log("reCAPTCHA solved:", response);
+          },
+          "expired-callback": () => {
+            console.warn("reCAPTCHA expired. Please try again.");
+          },
+        }
+      );
 
       window.recaptchaVerifier.render().then((widgetId) => {
         window.recaptchaWidgetId = widgetId;
@@ -52,49 +76,250 @@ const Login = () => {
 
     const fullPhone = `+91${values.phoneNumber}`;
     console.log("Full Phone Number:", fullPhone);
-    
+    setPhoneState(fullPhone);
     try {
       const response = await axios.post(
         `${BACKEND_URL}/api/user/getUserByPhone`,
         values
       );
-        // console.log("Response from server:", response);
+      // console.log("Response from server:", response);
 
       if (!response?.data?.success) {
-        toast.error("User not found with given phone number");
+        toast.error("User not found with given phone number & role");
         setSubmitting(false);
-      } 
-      else {
-        console.log("in else")
+      } else {
+        console.log("in else");
         // appVerifier.verify().then(async ()=>{
-          console.log("reCAPTCHA verified");
-          const confirmationResult = await signInWithPhoneNumber(
-            auth,
-            fullPhone,
-            appVerifier
-          );
-          
-          console.log("Confirmation Result:", confirmationResult);
-          
-          console.log("SMS sent successfully:", confirmationResult);
-          window.confirmationResult = confirmationResult;
+        console.log("reCAPTCHA verified");
+        const confirmationResult = await signInWithPhoneNumber(
+          auth,
+          fullPhone,
+          appVerifier
+        );
+
+        console.log("Confirmation Result:", confirmationResult);
+
+        console.log("SMS sent successfully:", confirmationResult);
+        window.confirmationResult = confirmationResult;
         // })
+        setIsOtpSent(true);
         // navigate("/verifyotp", { state: { phoneNumber: fullPhone } });
       }
     } catch (error) {
       console.error("SMS not sent:", error);
       setFirebaseError(error.message);
+      toast.error("Error sending OTP. Please refresh the page.");
       if (window.recaptchaVerifier) window.recaptchaVerifier.clear();
     }
 
     setSubmitting(false);
   };
 
+  //otp verification
+
+  const handleOTPResend = async () => {
+    try {
+      if (!isRendered) {
+        if (window.recaptchaVerifier) {
+          console.log("Clearing previous reCAPTCHA instance...");
+          await window.recaptchaVerifier.clear();
+        }
+
+        const recaptchaContainer = document.getElementById(
+          "recaptcha-container-otp"
+        );
+        if (recaptchaContainer) {
+          recaptchaContainer.innerHTML = "";
+        }
+
+        window.recaptchaVerifier = new RecaptchaVerifier(
+          auth,
+          "recaptcha-container-otp",
+          {
+            size: "invisible",
+            callback: (response) => {
+              console.log("reCAPTCHA solved:", response);
+            },
+            "expired-callback": () => {
+              console.warn("reCAPTCHA expired. Please try again.");
+            },
+          }
+        );
+
+        const appVerifier = window.recaptchaVerifier;
+
+        // Render the new instance
+        await appVerifier.render();
+        setIsRendered(true);
+      }
+      const appVerifier = window.recaptchaVerifier;
+      const confirmationResult = await signInWithPhoneNumber(
+        auth,
+        phoneState,
+        appVerifier
+      );
+      toast.success("Resending OTP...");
+
+      console.log("Confirmation Result:", confirmationResult);
+
+      console.log("SMS sent successfully:", confirmationResult);
+      window.confirmationResult = confirmationResult;
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      toast.error("Error sending OTP. Please try again.");
+    }
+  };
+
+  const handleSubmitOTP = async (values) => {
+    setIsSubmitting(true);
+
+    if (!window.confirmationResult) {
+      toast.error("OTP session expired. You will be redirected to login page.");
+      setTimeout(() => {
+        navigate("/login");
+      }, 3000);
+      return;
+    }
+
+    try {
+      const { otpNumber } = values;
+      const confirmationResult = window.confirmationResult;
+
+      // Verify OTP
+      const result = await confirmationResult.confirm(otpNumber);
+      const user = result.user;
+
+      console.log("User verified successfully:", user);
+
+      toast.success("OTP verified successfully!");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      toast.error("Invalid OTP. Please try again.");
+    }
+
+    setIsSubmitting(false);
+  };
+
+  if (isOtpSent) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col">
+        <Header isOtpSent={isOtpSent} setIsOtpSent={setIsOtpSent}/>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          style={{ marginTop: "70px" }}
+        />
+
+        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+          <div className="w-full max-w-md">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Enter OTP
+              </h1>
+              <p className="text-gray-600 text-base">
+                We've sent a 6-digit OTP to{" "}
+                <span className="font-semibold">{phoneState}</span>
+              </p>
+            </div>
+
+            <div className="bg-white shadow-2xl rounded-2xl p-8 border border-gray-100 transition-all duration-300 hover:shadow-xl">
+              <Formik
+                initialValues={initialValuesOTP}
+                validationSchema={validationSchemaOTP}
+                onSubmit={handleSubmitOTP}
+              >
+                {({
+                  values,
+                  handleChange,
+                  handleBlur,
+                  setFieldValue,
+                  setErrors,
+                  setTouched,
+                }) => (
+                  <Form className="space-y-6">
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="otpNumber"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        OTP
+                      </label>
+                      <div className="relative rounded-md shadow-sm">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Lock className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <Field
+                          type="tel"
+                          id="otpNumber"
+                          name="otpNumber"
+                          className="block w-full pl-10 pr-3 py-3 border-gray-300 bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                          placeholder="Enter 6-digit OTP"
+                          value={values.otpNumber}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          // required
+                          // maxLength={6}
+                        />
+                      </div>
+                      <ErrorMessage
+                        name="otpNumber"
+                        component="div"
+                        className="text-sm text-red-600 mt-1"
+                      />
+                    </div>
+
+                    <div className="pt-0">
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full cursor-pointer flex justify-center items-center px-4 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-black hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all duration-200"
+                      >
+                        {isSubmitting ? "Verifying..." : "Verify OTP"}
+                        <ArrowRight className="ml-2 h-5 w-5" />
+                      </button>
+                    </div>
+                    <div className="mt-8 flex justify-center items-center text-center">
+                      <p className="text-sm mr-1 text-gray-600">
+                        Didn't receive the code?{" "}
+                      </p>
+                      <div
+                        className="text-black font-semibold cursor-pointer"
+                        onClick={() => {
+                          setFieldValue("otpNumber", "");
+                          setErrors(null);
+                          setTouched(false);
+                          handleOTPResend();
+                        }}
+                      >
+                        Resend OTP
+                      </div>
+                    </div>
+                  </Form>
+                )}
+              </Formik>
+            </div>
+            <div className="recaptcha-wrapper mb-4">
+              <div id="recaptcha-container-otp"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col">
       <Header />
       <ToastContainer
-      className={"mt-16"}
+        className={"mt-16"}
         position="top-right"
         autoClose={3000}
         hideProgressBar={false}

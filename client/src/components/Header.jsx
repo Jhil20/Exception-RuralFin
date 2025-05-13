@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Bell, Menu, Search, User, X } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-const Header = () => {
+const Header = ({isOtpSent,setIsOtpSent}) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   // console.log(location)
@@ -91,7 +91,9 @@ const Header = () => {
           )}
 
           {/* Right Side Icons */}
-          <Link to={"/login"} className="hidden md:flex items-center space-x-4">
+          <Link onClick={()=>{
+            window.location.reload();
+          }} to={"/login"} className="hidden md:flex items-center space-x-4">
             <button className="flex cursor-pointer  hover:ring-2 hover:ring-gray-900 items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
               <User size={18} />
               <span className="text-sm font-medium text-gray-800">Account</span>
