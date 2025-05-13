@@ -92,7 +92,7 @@ const Header = ({isOtpSent,setIsOtpSent}) => {
 
           {/* Right Side Icons */}
           <Link onClick={()=>{
-            window.location.reload();
+            // window.location.reload();
           }} to={"/login"} className="hidden md:flex items-center space-x-4">
             <button className="flex cursor-pointer  hover:ring-2 hover:ring-gray-900 items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
               <User size={18} />
