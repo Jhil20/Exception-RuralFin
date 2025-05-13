@@ -1,5 +1,5 @@
 const User = require("../models/userModel");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt"); 
 const jwt = require("jsonwebtoken");
 
 // Get all users
@@ -28,9 +28,17 @@ const getUserById = async (req, res) => {
 const getUserByPhone = async (req, res) => {
   try {
     const {phoneNumber,role} = req.body;
+    console.log("phoneNumber",phoneNumber);
+    console.log("role",role);
     const user = await User.findOne({ phone: phoneNumber, role: role });
+    console.log("user found",user);
     if (user) {
-      return res.status(200).json({ message: "User found",success: true });
+      const token=jwt.sign(
+        { id: user._id, phone: user.phone },
+        "harshp4114",
+        { expiresIn: "1h" }
+      );
+      return res.status(200).json({ message: "User found",success: true,token: token });
     }else{
       return res.status(200).json({ message: "User not found",success: false });
     }
@@ -80,7 +88,7 @@ const createUser = async (req, res) => {
 
     const user = User.create({
       firstName: req.body.firstName,
-      lastName: req.body.lastName,
+      lastName: req.body.lastName,  
       age: req.body.age,
       dob: req.body.dob,
       gender: req.body.gender,

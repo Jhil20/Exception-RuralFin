@@ -18,6 +18,11 @@ import { BACKEND_URL } from "../utils/constants";
 import { ToastContainer, toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
+// import Cookie from "js-cookie";
+import {jwtDecode} from "jwt-decode";
+import Cookies from "js-cookie";
+import { SignedIn } from "../redux/slices/isSignInSlice";
+
 const Login = () => {
   const [firebaseError, setFirebaseError] = useState("");
   const [isSignup, setIsSignup] = useState(false);
@@ -30,7 +35,7 @@ const Login = () => {
     phoneNumber: "",
     role: "",
   };
-
+  const navigate=useNavigate();
   const validationSchemaOTP = Yup.object({
     otpNumber: Yup.string()
       .required("OTP is required")
@@ -90,6 +95,9 @@ const Login = () => {
         setSubmitting(false);
       } else {
         console.log("in else");
+        const token = response?.data?.token;
+        Cookies.set("token", token, { expires: 1 });
+        // const decodedToken = jwt(token);
         // appVerifier.verify().then(async ()=>{
         console.log("reCAPTCHA verified");
         const confirmationResult = await signInWithPhoneNumber(
@@ -177,6 +185,8 @@ const Login = () => {
     if (!window.confirmationResult) {
       toast.error("OTP session expired. You will be redirected to login page.");
       setTimeout(() => {
+        Cookies.remove("token");
+        setIsOtpSent(false);
         navigate("/login");
       }, 3000);
       return;
@@ -193,7 +203,10 @@ const Login = () => {
       console.log("User verified successfully:", user);
 
       toast.success("OTP verified successfully!");
-      navigate("/dashboard");
+      setTimeout(() => {
+        dispatch(SignedIn());
+        navigate("/dashboard");
+      },2000);
     } catch (error) {
       console.error("Error verifying OTP:", error);
       toast.error("Invalid OTP. Please try again.");
@@ -262,6 +275,9 @@ const Login = () => {
                           );
                           if (recaptchaContainer) {
                             recaptchaContainer.innerHTML = "";
+                          }
+                          if (Cookies.get("token")) {
+                            Cookies.remove("token");
                           }
                         }}
                         className="mb-5 flex hover:text-gray-600 transition-all duration-300 items-center cursor-pointer"

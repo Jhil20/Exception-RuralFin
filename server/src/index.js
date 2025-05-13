@@ -3,6 +3,7 @@ const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const connectMongo = require('./config')
 const userRoutes = require('./routes/userRoutes')
+const agentRoutes = require('./routes/agentRoutes')
 const app = express()
 
 app.use(cors({
@@ -17,6 +18,7 @@ app.use(express.urlencoded({extended:true}))
 app.use(cors())
 
 app.use("/api/user",userRoutes)
+app.use("/api/agent",agentRoutes)
 
 app.listen(5000 ,() =>{
     try {

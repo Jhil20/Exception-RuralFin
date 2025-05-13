@@ -11,6 +11,7 @@ import OtpVerification from "./routes/OtpVerification";
 import Register from "./routes/Register";
 import { Provider } from "react-redux";
 import store from "./redux/store/store";
+import RazorPay from "./routes/RazorPay";
 
 
 const appRouter = createBrowserRouter([
@@ -41,6 +42,10 @@ const appRouter = createBrowserRouter([
       {
         path: "/dashboard",
         element: <UserDashboard />,
+      },
+      {
+        path: "/razorpay",
+        element: <RazorPay />,
       },
     ],
   },

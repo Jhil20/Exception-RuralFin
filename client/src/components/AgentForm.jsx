@@ -16,9 +16,15 @@ import {
   agentValidationSchemaStep2,
   userValidationSchemaStep1,
 } from "../yupValidators/validationSchema";
+import { useDispatch } from "react-redux";
+import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
+import axios from "axios";
+import { BACKEND_URL } from "../utils/constants";
+import { useNavigate } from "react-router-dom";
+
 const AgentForm = ({ onSubmit, resetRole }) => {
   const initialValuesStep2 = {
-    aadharNumber: "",
+    aadhar: "",
     password: "",
     confirmPassword: "",
     securityDeposit: "",
@@ -35,14 +41,30 @@ const AgentForm = ({ onSubmit, resetRole }) => {
     gender: "",
     address: "",
   };
-
+  const dispatch=useDispatch();
+  const navigate=useNavigate();
   const [step, setStep] = useState(1);
-  const [userData, setUserData] = useState(null);
+  const [agentData, setAgentData] = useState(null);
   const handleSubmitStep1 = (values) => {
     setStep(2);
-    setUserData(values);
+    setAgentData(values);
     setUserFormStep2(true);
   };
+
+  const handleSubmit = async (values) => {
+    const data={...values,...agentData};
+    console.log(data,"data");
+    dispatch(showLoader());
+    try{
+      navigate("/razorpay");
+
+    }catch(error){
+      console.log("error in creating agent",error);
+    }finally{
+      dispatch(hideLoader());
+    }
+  }
+
 
   return (
     <div className="space-y-6">
@@ -275,7 +297,7 @@ const AgentForm = ({ onSubmit, resetRole }) => {
         <Formik
           initialValues={initialValuesStep2}
           validationSchema={agentValidationSchemaStep2}
-          onSubmit={onSubmit}
+          onSubmit={handleSubmit}
         >
           {({ isSubmitting, values }) => (
             <Form className="space-y-5">
@@ -283,20 +305,20 @@ const AgentForm = ({ onSubmit, resetRole }) => {
                 <div className="grid md:grid-cols-2 gap-4 mt-0">
                   <div className="space-y-2">
                     <label
-                      htmlFor="aadharNumber"
+                      htmlFor="aadhar"
                       className="block text-sm font-medium text-gray-700"
                     >
                       Aadhar Number
                     </label>
                     <Field
                       type="text"
-                      id="aadharNumber"
-                      name="aadharNumber"
+                      id="aadhar"
+                      name="aadhar"
                       className="block w-full px-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 shadow-sm focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none text-gray-900"
                       placeholder="12-digit Aadhar number"
                     />
                     <ErrorMessage
-                      name="aadharNumber"
+                      name="aadhar"
                       component="div"
                       className="text-sm text-red-600 mt-1"
                     />

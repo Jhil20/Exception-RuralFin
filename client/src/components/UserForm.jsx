@@ -11,10 +11,11 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
 import { BACKEND_URL } from "../utils/constants";
+import { SignedIn } from "../redux/slices/isSignInSlice";
 
 const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
   const initialValuesStep2 = {
-    aadharNumber: "",
+    aadhar: "",
     password: "",
     confirmPassword: "",
   };
@@ -51,6 +52,7 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
       const result = await axios.post(`${BACKEND_URL}/api/user/register`,allValues);
       console.log("User created successfully:", result);
       console.log("Final Values:", allValues);
+      dispatch(SignedIn());
       navigate("/dashboard");
     }catch (error) {
       console.error("Error submitting form:", error);

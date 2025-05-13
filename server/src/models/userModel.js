@@ -21,6 +21,12 @@ const userSchema = new Schema(
       enum: ["stable", "overBudget", "underBudget"],
       default: "stable",
     },
+    role:{
+      type: String,
+      enum: ["user"],
+      default: "user",
+      required: true,
+    },
     lastTransactionDate: { type: Date },
     isActive: { type: Boolean, default: true },
   },

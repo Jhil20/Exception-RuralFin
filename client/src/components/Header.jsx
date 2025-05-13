@@ -21,7 +21,7 @@ const Header = () => {
           </div>
 
           {/* Desktop Navigation */}
-          {(location.pathname == "/home" || location.pathname=="/login") ? (
+          {(location.pathname == "/home" || location.pathname=="/login" || location.pathname=="/register") ? (
             <>
               <nav className="hidden md:flex space-x-8">
                 <Link
