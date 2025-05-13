@@ -8,10 +8,16 @@ import ScrollToTop from "./components/ScrollToTop";
 function App() {
   const isLoading = useSelector((state) => state.loading.isLoading);
 
-  return <>{isLoading ? <Loader /> :<>
-  <ScrollToTop />
-  <Outlet />
-  </> }</>;
+  // return <>{isLoading ? <Loader /> :<>
+  // <ScrollToTop />
+  // <Outlet />
+  // </> }</>;
+  return(
+    <>
+      <ScrollToTop />
+      <Outlet />
+    </>
+  );
 }
 
 export default App;

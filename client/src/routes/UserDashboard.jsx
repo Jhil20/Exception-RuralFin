@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import LoadingScreen from "../components/Loading";
@@ -18,6 +18,16 @@ import {
   cards,
   upcomingPayments,
 } from "../data/mockdata";
+import useAuth from "../utils/useAuth";
+import { jwtDecode } from "jwt-decode";
+import Cookies from "js-cookie";
+import { useDispatch } from "react-redux";
+import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
+import axios from "axios";
+import { BACKEND_URL } from "../utils/constants";
+import { Loader } from "lucide-react";
+import capitalize from "../utils/capitalize";
+
 const UserDashboard = () => {
   // const [isLoading, setIsLoading] = useState(true);
 
@@ -33,15 +43,46 @@ const UserDashboard = () => {
   // if (isLoading) {
   //   return <LoadingScreen />;
   // }
+  useAuth();
 
-  return (
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const dispatch = useDispatch();
+  const [userData, setUserData] = useState(null);
+  const token = Cookies.get("token");
+  const decoded = useMemo(() => {
+    if (token) return jwtDecode(token);
+    return null;
+  }, [token]);
+
+  const getUserData = async () => {
+    dispatch(showLoader());
+    try {
+      console.log("hiiii");
+      const response = await axios.get(`${BACKEND_URL}/api/user/${decoded.id}`);
+      console.log("response", response);
+      setUserData(response?.data?.data);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      dispatch(hideLoader());
+    }
+  };
+
+  useEffect(() => {
+    console.log("decoded", decoded);
+    getUserData();
+  }, []);
+
+  return isLoading ? (
+    <Loader />
+  ) : (
     <div className="bg-gray-50 min-h-screen">
       <Header />
 
       <main className="container mx-auto px-4 sm:px-6 pt-10 pb-12">
         <section className="mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-            Hello, Sarah
+            Hello, {capitalize(userData?.firstName)} {capitalize(userData?.lastName)}
           </h1>
           <p className="text-gray-600">
             Welcome back to your financial dashboard

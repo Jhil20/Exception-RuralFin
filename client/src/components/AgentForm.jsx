@@ -10,13 +10,14 @@ import {
   ScanLineIcon,
   Building2,
   ReceiptIndianRupee,
+  Loader,
 } from "lucide-react";
 import {
   agentValidationSchemaStep1,
   agentValidationSchemaStep2,
   userValidationSchemaStep1,
 } from "../yupValidators/validationSchema";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
@@ -41,8 +42,9 @@ const AgentForm = ({ onSubmit, resetRole }) => {
     gender: "",
     address: "",
   };
-  const dispatch=useDispatch();
-  const navigate=useNavigate();
+  const dispatch = useDispatch();
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [agentData, setAgentData] = useState(null);
   const handleSubmitStep1 = (values) => {
@@ -52,21 +54,21 @@ const AgentForm = ({ onSubmit, resetRole }) => {
   };
 
   const handleSubmit = async (values) => {
-    const data={...values,...agentData};
-    console.log(data,"data");
+    const data = { ...values, ...agentData };
+    console.log(data, "data");
     dispatch(showLoader());
-    try{
+    try {
       navigate("/razorpay");
-
-    }catch(error){
-      console.log("error in creating agent",error);
-    }finally{
+    } catch (error) {
+      console.log("error in creating agent", error);
+    } finally {
       dispatch(hideLoader());
     }
-  }
+  };
 
-
-  return (
+  return isLoading ? (
+    <Loader />
+  ) : (
     <div className="space-y-6">
       {step == 1 && (
         <Formik

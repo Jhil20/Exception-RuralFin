@@ -1,6 +1,6 @@
 import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import { ArrowRight, User, Phone, Calendar, MapPin, Lock } from "lucide-react";
+import { ArrowRight, User, Phone, Calendar, MapPin, Lock, Loader } from "lucide-react";
 import {
   userValidationSchemaStep1,
   userValidationSchemaStep2,
@@ -8,7 +8,7 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
 import { BACKEND_URL } from "../utils/constants";
 import { SignedIn } from "../redux/slices/isSignInSlice";
@@ -19,6 +19,7 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
     password: "",
     confirmPassword: "",
   };
+  const isLoading = useSelector((state) => state.loading.isLoading);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [userData, setUserData] = useState(null);
@@ -64,7 +65,9 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
     }
   };
 
-  return (
+  return isLoading?(
+    <Loader/>
+  ):(
     <div className="space-y-6">
       {step == 1 && (
         <Formik
