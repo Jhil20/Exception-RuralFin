@@ -11,6 +11,8 @@ import OtpVerification from "./routes/OtpVerification";
 import Register from "./routes/Register";
 import { Provider } from "react-redux";
 import store from "./redux/store/store";
+
+
 const appRouter = createBrowserRouter([
   {
     path: "/",

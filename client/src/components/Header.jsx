@@ -2,55 +2,58 @@ import React, { useState } from "react";
 import { Bell, Menu, Search, User, X } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-const Header = ({isOtpSent,setIsOtpSent}) => {
+const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate=useNavigate();
   // console.log(location)
   return (
     <header className="bg-white border-b h-[9.1vh] border-gray-200 sticky w-full top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex-shrink-0 flex items-center">
+          <div onClick={()=>{
+            navigate("/");
+          }} className="flex-shrink-0 flex cursor-pointer items-center">
             <span className="text-2xl font-bold text-black">
               Rural<span className="text-gray-500">Fin</span>
             </span>
           </div>
 
           {/* Desktop Navigation */}
-          {location.pathname == "/home" ? (
+          {(location.pathname == "/home" || location.pathname=="/login") ? (
             <>
               <nav className="hidden md:flex space-x-8">
-                <a
-                  href="#features"
+                <Link
+                  to={"/home#features"}
                   className="text-gray-900 hover:text-gray-600 px-3 py-2 text-sm font-medium transition-colors duration-200"
                 >
                   Features
-                </a>
-                <a
-                  href="#how-it-works"
+                </Link>
+                <Link
+                  to={"/home#how-it-works"}
                   className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
                 >
                   Agent Model
-                </a>
-                <a
-                  href="#security-section"
+                </Link>
+                <Link
+                  to={"/home#security-section"}
                   className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
                 >
                   Security
-                </a>
-                <a
-                  href="#financial-tools"
+                </Link>
+                <Link
+                  to={"/home#financial-tools"}
                   className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
                 >
                   Budget Tracking
-                </a>
-                <a
-                  href="#financial-literacy"
+                </Link>
+                <Link
+                  to={"/home#financial-literacy"}
                   className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
                 >
                   Financial Literacy
-                </a>
+                </Link>
               </nav>
             </>
           ) : (

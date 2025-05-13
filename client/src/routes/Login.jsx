@@ -6,6 +6,7 @@ import {
   Phone,
   Lock,
   Presentation,
+  ArrowLeftIcon,
 } from "lucide-react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -204,7 +205,7 @@ const Login = () => {
   if (isOtpSent) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col">
-        <Header isOtpSent={isOtpSent} setIsOtpSent={setIsOtpSent}/>
+        {/* <Header /> */}
         <ToastContainer
           position="top-right"
           autoClose={3000}
@@ -246,6 +247,28 @@ const Login = () => {
                 }) => (
                   <Form className="space-y-6">
                     <div className="space-y-2">
+                      <div
+                        onClick={async () => {
+                          setIsOtpSent(false);
+                          if (window.recaptchaVerifier) {
+                            console.log(
+                              "Clearing previous reCAPTCHA instance..."
+                            );
+                            await window.recaptchaVerifier.clear();
+                          }
+
+                          const recaptchaContainer = document.getElementById(
+                            "recaptcha-container-otp"
+                          );
+                          if (recaptchaContainer) {
+                            recaptchaContainer.innerHTML = "";
+                          }
+                        }}
+                        className="mb-5 flex hover:text-gray-600 transition-all duration-300 items-center cursor-pointer"
+                      >
+                        <ArrowLeftIcon size={18} />
+                        <p className="font-semibold ml-1 text-lg">Back</p>
+                      </div>
                       <label
                         htmlFor="otpNumber"
                         className="block text-sm font-medium text-gray-700"
