@@ -13,22 +13,15 @@ const userSchema = new Schema(
     phone: { type: String, required: true },
     aadhar: { type: String, required: true },
     password: { type: String, required: true },
-    balance: { type: Number, default: 0 },
-    budget: { type: Number, default: 0 },
     budgetAlerts: { type: Boolean, default: false },
-    financialStatus: {
-      type: String,
-      enum: ["stable", "overBudget", "underBudget"],
-      default: "stable",
-    },
-    role:{
+    role: {
       type: String,
       enum: ["user"],
       default: "user",
       required: true,
     },
-    lastTransactionDate: { type: Date },
     isActive: { type: Boolean, default: true },
+    finance: { type: Schema.Types.ObjectId, ref: "Finance", required: true },
   },
   { timestamps: true }
 );

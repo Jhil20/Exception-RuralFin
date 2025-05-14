@@ -156,3 +156,9 @@ export const userProfile = {
       type: 'subscription',
     }
   ];
+
+  export const agentsData = [
+  { id: 1, name: "Rahul K", rating: 4.8, location: "North Delhi" },
+  { id: 2, name: "Priya S", rating: 4.9, location: "South Delhi" },
+  { id: 3, name: "Amit P", rating: 4.7, location: "East Delhi" },
+];

@@ -5,10 +5,10 @@ const signInSlice = createSlice({
   initialState: { isSignedIn: false },
   reducers: {
     SignedIn: (state) => {
-      state.isLoading = true;
+      state.isSignedIn = true;
     },
     NotSignedIn: (state) => {
-      state.isLoading = false;
+      state.isSignedIn = false;
     },
   },
 });

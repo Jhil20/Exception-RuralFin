@@ -8,7 +8,6 @@ import BalanceCard from "../components/BalanceCard";
 import RecentTransactions from "../components/RecentTransactions";
 import ExpenseAnalytics from "../components/ExpenseAnalytics";
 import QuickActions from "../components/QuickActions";
-import CardSection from "../components/CardSection";
 import UpcomingPayments from "../components/UpcomingsPaymentProps";
 
 import {
@@ -16,6 +15,7 @@ import {
   recentTransactions,
   expenseAnalytics,
   cards,
+  agentsData,
   upcomingPayments,
 } from "../data/mockdata";
 import useAuth from "../utils/useAuth";
@@ -27,6 +27,7 @@ import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import { Loader } from "lucide-react";
 import capitalize from "../utils/capitalize";
+import AgentList from "../components/AgentList";
 
 const UserDashboard = () => {
   // const [isLoading, setIsLoading] = useState(true);
@@ -119,7 +120,7 @@ const UserDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <CardSection cards={cards} />
+          <AgentList agents={agentsData} />
           <UpcomingPayments payments={upcomingPayments} />
         </div>
       </main>

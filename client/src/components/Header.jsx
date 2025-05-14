@@ -1,27 +1,86 @@
 import React, { useState } from "react";
 import { Bell, Menu, Search, User, X } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { NotSignedIn, SignedIn } from "../redux/slices/isSignInSlice";
+import Cookies from "js-cookie";
+import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const navigate=useNavigate();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const isSignedIn = useSelector((state) => state.signin.isSignedIn);
   // console.log(location)
+
+  const handleLogout = () => {
+    dispatch(showLoader());
+    if (Cookies.get("token")) {
+      Cookies.remove("token");
+    }
+    dispatch(NotSignedIn());
+    navigate("/home");
+    dispatch(hideLoader());
+  };
+
   return (
     <header className="bg-white border-b h-[9.1vh] border-gray-200 sticky w-full top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div onClick={()=>{
-            navigate("/");
-          }} className="flex-shrink-0 flex cursor-pointer items-center">
+          <div
+            onClick={() => {
+              navigate("/");
+            }}
+            className="flex-shrink-0 flex cursor-pointer items-center"
+          >
             <span className="text-2xl font-bold text-black">
               Rural<span className="text-gray-500">Fin</span>
             </span>
           </div>
 
           {/* Desktop Navigation */}
-          {(location.pathname == "/home" || location.pathname=="/login" || location.pathname=="/register") ? (
+
+          {isSignedIn ? (
+            <>
+              <nav className="hidden md:flex space-x-8">
+                <Link
+                  to={"/home#features"}
+                  className="text-gray-900 hover:text-gray-600 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                >
+                  Features
+                </Link>
+                <Link
+                  to={"/home#how-it-works"}
+                  className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                >
+                  Agent Model
+                </Link>
+                <Link
+                  to={"/home#security-section"}
+                  className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                >
+                  Security
+                </Link>
+                <Link
+                  to={"/home#financial-tools"}
+                  className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                >
+                  Budget Tracking
+                </Link>
+                <Link
+                  to={"/home#financial-literacy"}
+                  className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                >
+                  Financial Literacy
+                </Link>
+              </nav>
+            </>
+          ) : location.pathname == "/home" ||
+            location.pathname == "/login" ||
+            location.pathname == "/register" ? (
             <>
               <nav className="hidden md:flex space-x-8">
                 <Link
@@ -94,14 +153,37 @@ const Header = () => {
           )}
 
           {/* Right Side Icons */}
-          <Link onClick={()=>{
-            // window.location.reload();
-          }} to={"/login"} className="hidden md:flex items-center space-x-4">
-            <button className="flex cursor-pointer  hover:ring-2 hover:ring-gray-900 items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
-              <User size={18} />
-              <span className="text-sm font-medium text-gray-800">Account</span>
+          {isSignedIn ? (
+            <button
+              onClick={() => {
+                handleLogout();
+              }}
+              to={"/login"}
+              className="hidden md:flex items-center space-x-4"
+            >
+              <div className="flex cursor-pointer  hover:ring-2 hover:ring-gray-900 items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
+                <User size={18} />
+                <span className="text-sm font-medium text-gray-800">
+                  Logout
+                </span>
+              </div>
             </button>
-          </Link>
+          ) : (
+            <Link
+              onClick={() => {
+                // window.location.reload();
+              }}
+              to={"/login"}
+              className="hidden md:flex items-center space-x-4"
+            >
+              <button className="flex cursor-pointer  hover:ring-2 hover:ring-gray-900 items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
+                <User size={18} />
+                <span className="text-sm font-medium text-gray-800">
+                  Account
+                </span>
+              </button>
+            </Link>
+          )}
 
           {/* Mobile Menu Button */}
           <div className="md:hidden">
