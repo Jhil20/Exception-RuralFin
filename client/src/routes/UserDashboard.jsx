@@ -25,9 +25,10 @@ import { useDispatch } from "react-redux";
 import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
-import { Loader } from "lucide-react";
 import capitalize from "../utils/capitalize";
 import AgentList from "../components/AgentList";
+import Loader from "../components/Loader";
+import SendMoney from "../components/SendMoney";
 
 const UserDashboard = () => {
   // const [isLoading, setIsLoading] = useState(true);
@@ -49,6 +50,8 @@ const UserDashboard = () => {
   const isLoading = useSelector((state) => state.loading.isLoading);
   const dispatch = useDispatch();
   const [userData, setUserData] = useState(null);
+  const [userFinance, setUserFinance] = useState(null);
+  const [showSend, setShowSend] = useState(false);
   const token = Cookies.get("token");
   const decoded = useMemo(() => {
     if (token) return jwtDecode(token);
@@ -62,6 +65,12 @@ const UserDashboard = () => {
       const response = await axios.get(`${BACKEND_URL}/api/user/${decoded.id}`);
       console.log("response", response);
       setUserData(response?.data?.data);
+      console.log("FIDDDD", response?.data?.data?.finance);
+      const response2 = await axios.get(
+        `${BACKEND_URL}/api/finance/${response?.data?.data?.finance}`
+      );
+      console.log("response fr", response2?.data?.finance);
+      setUserFinance(response2?.data?.finance);
     } catch (err) {
       console.log(err);
     } finally {
@@ -78,12 +87,16 @@ const UserDashboard = () => {
     <Loader />
   ) : (
     <div className="bg-gray-50 min-h-screen">
-      <Header />
-
+      {showSend && (
+        <div className="bg-black/40 flex justify-center items-center fixed top-0 z-50 w-full h-full">
+          <SendMoney showSend={{showSend,setShowSend}}/>
+        </div>
+       )}
       <main className="container mx-auto px-4 sm:px-6 pt-10 pb-12">
         <section className="mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-            Hello, {capitalize(userData?.firstName)} {capitalize(userData?.lastName)}
+            Hello, {capitalize(userData?.firstName)}{" "}
+            {capitalize(userData?.lastName)}
           </h1>
           <p className="text-gray-600">
             Welcome back to your financial dashboard
@@ -93,9 +106,10 @@ const UserDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-1">
             <BalanceCard
-              balance={accountBalance.balance}
+              balance={userFinance?.balance}
               currency={accountBalance.currency}
               lastUpdated={accountBalance.lastUpdated}
+              showSend={{ showSend, setShowSend }}
             />
           </div>
 

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const financeSchema = new Schema({
-  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  userId: { type: Schema.Types.ObjectId, ref: 'User'},
   balance: { type: Number, default: 0 },
   financialStatus: {
     type: String,
@@ -10,7 +10,7 @@ const financeSchema = new Schema({
     default: 'stable',
   },
   transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
-  lastTransactionDate: { type: Date },
+  lastTransactionDate: { type: Date ,default:null},
   budgetAlerts: { type: Boolean, default: false },
   isBudgetPlanningEnabled: { type: Boolean, default: false },
   income: { type: Number, default: 0 },

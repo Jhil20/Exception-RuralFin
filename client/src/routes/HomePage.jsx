@@ -7,7 +7,6 @@ const HomePage = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
   return (
     <div className="min-h-screen bg-white text-black flex flex-col">
-        <Header/>
 
   
     <div className="min-h-screen bg-white text-gray-900 font-sans">

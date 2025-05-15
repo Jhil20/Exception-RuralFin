@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import { ArrowRight, User, Phone, Calendar, MapPin, Lock, Loader } from "lucide-react";
+import { ArrowRight, User, Phone, Calendar, MapPin, Lock } from "lucide-react";
 import {
   userValidationSchemaStep1,
   userValidationSchemaStep2,
@@ -12,12 +12,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
 import { BACKEND_URL } from "../utils/constants";
 import { SignedIn } from "../redux/slices/isSignInSlice";
+import Loader from "./Loader";
+import { toast, ToastContainer } from "react-toastify";
+import Cookies from "js-cookie";
 
 const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
   const initialValuesStep2 = {
     aadhar: "",
     password: "",
     confirmPassword: "",
+    transactionPin: "",
+    confirmTransactionPin: "",
   };
   const isLoading = useSelector((state) => state.loading.isLoading);
   const navigate = useNavigate();
@@ -25,7 +30,7 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
   const [userData, setUserData] = useState(null);
   const initialValuesStep1 = {
     firstName: userData?.firstName || "",
-    lastName:  userData?.lastName || "",
+    lastName: userData?.lastName || "",
     phone: userData?.phone || "",
     age: userData?.age || "",
     dob: userData?.dob || "",
@@ -44,30 +49,67 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
   const handleSubmitStep2 = async (values) => {
     console.log("Submitting form with values:", values);
     dispatch(showLoader());
-    try{
-
+    try {
       const allValues = {
         ...userData,
         ...values,
       };
-      const result = await axios.post(`${BACKEND_URL}/api/user/register`,allValues);
+      const result = await axios.post(
+        `${BACKEND_URL}/api/user/register`,
+        allValues
+      );
       console.log("User created successfully:", result);
       console.log("Final Values:", allValues);
-      dispatch(SignedIn());
-      navigate("/dashboard");
-    }catch (error) {
-      console.error("Error submitting form:", error);
-    }finally {
-      dispatch(hideLoader());
+      toast.success("User created successfully");
+      const token = result?.data?.token;
+      Cookies.set("token", token, { expires: 1 });
+      setTimeout(() => {
+        dispatch(SignedIn());
+        navigate("/dashboard");
+      }, 2000);
       setUserFormStep2(false);
       setUserData(null);
       setStep(1);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      if (
+        error?.response?.data?.message ==
+        "Error assinging RuralFin ID. User creation rolled back."
+      ) {
+        toast.error("Heavy Traffic. Please try again later");
+      } else if (
+        error?.response?.data?.message ==
+        "User with this phone number already exists"
+      ) {
+        toast.error("User with this phone number already exists");
+      } else if (
+        error?.response?.data?.message ==
+          "Error creating finance record. User creation rolled back." ||
+        error?.response?.data?.message == "Error creating user"
+      ) {
+        toast.error("Error occured. Please try again later");
+      }
+    } finally {
+      dispatch(hideLoader());
     }
   };
 
-  return isLoading?(
-    <Loader/>
-  ):(
+  return isLoading ? (
+    <Loader />
+  ) : (
+    <>
+    <ToastContainer
+      position="top-right"
+      autoClose={3000}
+      hideProgressBar={false}
+      newestOnTop={true}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme="light"
+    />
     <div className="space-y-6">
       {step == 1 && (
         <Formik
@@ -297,7 +339,7 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
       {step == 2 && (
         <Formik
           initialValues={initialValuesStep2}
-          // validationSchema={userValidationSchemaStep2}
+          validationSchema={userValidationSchemaStep2}
           onSubmit={handleSubmitStep2}
         >
           {({ isSubmitting, values }) => (
@@ -319,6 +361,48 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
                   />
                   <ErrorMessage
                     name="aadhar"
+                    component="div"
+                    className="text-sm text-red-600 mt-1"
+                  />
+                </div>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label
+                    htmlFor="transactionPin"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Transaction PIN
+                  </label>
+                  <Field
+                    type="password"
+                    id="transactionPin"
+                    name="transactionPin"
+                    className="block w-full px-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                    placeholder="4-digit Transaction PIN"
+                  />
+                  <ErrorMessage
+                    name="transactionPin"
+                    component="div"
+                    className="text-sm text-red-600 mt-1"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label
+                    htmlFor="confirmTransactionPin"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Confirm Transaction PIN
+                  </label>
+                  <Field
+                    type="password"
+                    id="confirmTransactionPin"
+                    name="confirmTransactionPin"
+                    className="block w-full px-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                    placeholder="12-digit Transaction PIN"
+                  />
+                  <ErrorMessage
+                    name="confirmTransactionPin"
                     component="div"
                     className="text-sm text-red-600 mt-1"
                   />
@@ -402,6 +486,8 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
         </Formik>
       )}
     </div>
+    </>
+
   );
 };
 

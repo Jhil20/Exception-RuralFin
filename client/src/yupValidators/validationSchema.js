@@ -39,6 +39,13 @@ export const userValidationSchemaStep2 = Yup.object({
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password")], "Passwords must match")
     .required("Confirm password is required"),
+    transactionPin: Yup.string()
+    .matches(/^[0-9]{4}$/, "Transaction PIN must be 4 digits")
+    .required("Transaction PIN is required"),
+    confirmTransactionPin: Yup.string()
+    .oneOf([Yup.ref("transactionPin")], "Transaction PINs must match")
+    .required("Confirm transaction PIN is required"),
+
 });
 
 // Agent-specific validation schema

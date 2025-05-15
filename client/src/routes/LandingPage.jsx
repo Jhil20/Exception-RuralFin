@@ -16,7 +16,6 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen w-[98.9vw] bg-white text-gray-900">
-      <Header />
         <Hero />
         <Stats />
         <Features />

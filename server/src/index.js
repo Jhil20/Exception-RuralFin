@@ -5,7 +5,7 @@ const connectMongo = require('./config')
 const userRoutes = require('./routes/userRoutes')
 const agentRoutes = require('./routes/agentRoutes')
 const app = express()
-
+const financeRoutes = require('./routes/financeRoutes')
 app.use(cors({
     credentials:true
 }))
@@ -19,6 +19,7 @@ app.use(cors())
 
 app.use("/api/user",userRoutes)
 app.use("/api/agent",agentRoutes)
+app.use("/api/finance",financeRoutes);
 
 app.listen(5000 ,() =>{
     try {

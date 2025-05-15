@@ -4,6 +4,7 @@ import UserDashboard from "./routes/UserDashboard";
 import { useSelector } from "react-redux";
 import Loader from "./components/Loader";
 import ScrollToTop from "./components/ScrollToTop";
+import Header from "./components/Header";
 
 function App() {
   const isLoading = useSelector((state) => state.loading.isLoading);
@@ -12,8 +13,9 @@ function App() {
   // <ScrollToTop />
   // <Outlet />
   // </> }</>;
-  return(
+  return (
     <>
+      <Header />
       <ScrollToTop />
       <Outlet />
     </>

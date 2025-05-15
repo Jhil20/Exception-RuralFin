@@ -10,7 +10,6 @@ import {
   ScanLineIcon,
   Building2,
   ReceiptIndianRupee,
-  Loader,
 } from "lucide-react";
 import {
   agentValidationSchemaStep1,
@@ -22,6 +21,7 @@ import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
+import Loader from "./Loader";
 
 const AgentForm = ({ onSubmit, resetRole }) => {
   const initialValuesStep2 = {

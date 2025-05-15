@@ -76,7 +76,6 @@ const Register = () => {
 
   return (
     <div className="min-h-[100vh] h-[100vh]  bg-gradient-to-b from-gray-50 to-gray-200 flex flex-col">
-      <Header />
 
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-1">
         <div className={`w-full ${!role ? "max-w-3xl" : userFormStep2 ? "max-w-2xl" : "max-w-9/12"} `}>

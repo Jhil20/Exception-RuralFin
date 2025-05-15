@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { ArrowUpRight, CreditCard, DollarSign, Eye, EyeOff } from 'lucide-react';
 
-const BalanceCard = ({ balance, currency, lastUpdated }) => {
+const BalanceCard = ({showSend, balance, currency, lastUpdated }) => {
   const [showBalance, setShowBalance] = useState(true);
-  
+  const setShowSend=showSend.setShowSend;
   const toggleBalanceVisibility = () => {
     setShowBalance(!showBalance);
   };
@@ -16,12 +16,12 @@ const BalanceCard = ({ balance, currency, lastUpdated }) => {
 
   return (
     <div className="bg-black text-white rounded-2xl p-6 shadow-lg transform transition-all duration-300 hover:scale-[1.02]">
+      
       <div className="flex justify-between items-start mb-6">
         <div>
           <h3 className="text-gray-400 text-sm font-medium">Total Balance</h3>
           <div className="flex items-center mt-1">
             <div className="flex items-center">
-              <DollarSign size={20} className="mr-1 text-gray-300" />
               <p className="text-2xl md:text-3xl font-bold">
                 {showBalance ? formattedBalance : '••••••'}
               </p>
@@ -40,14 +40,10 @@ const BalanceCard = ({ balance, currency, lastUpdated }) => {
         </div>
       </div>
       
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <button className="bg-gray-800 hover:bg-gray-700 transition-colors duration-200 rounded-xl py-3 px-4 flex items-center justify-center">
+      <div className="grid grid-cols-1 gap-4 mb-4">
+        <button onClick={()=>setShowSend(true)} className="bg-gray-800 cursor-pointer hover:bg-gray-700 transition-colors duration-200 rounded-xl py-3 px-4 flex items-center justify-center">
           <span className="mr-2">Send</span>
           <ArrowUpRight size={16} />
-        </button>
-        <button className="bg-gray-800 hover:bg-gray-700 transition-colors duration-200 rounded-xl py-3 px-4 flex items-center justify-center">
-          <span className="mr-2">Receive</span>
-          <ArrowUpRight size={16} className="transform rotate-180" />
         </button>
       </div>
       
