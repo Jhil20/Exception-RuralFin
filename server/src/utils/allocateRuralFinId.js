@@ -20,7 +20,7 @@ async function generateUniqueUpiId(firstName, lastName, phoneNumber) {
     }
   }
 
-  return ruralFinId;
+  return ruralFinId.toUpperCase();
 }
 
 async function allocateRuralFinId(userId) {

@@ -13,6 +13,8 @@ import store from "./redux/store/store";
 import RazorPay from "./routes/RazorPay";
 
 
+//start by fixing the getFavourites function as it is not displayinga nything 
+
 const appRouter = createBrowserRouter([
   {
     path: "/",

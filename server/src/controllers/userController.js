@@ -60,6 +60,66 @@ const getUserByPhone = async (req, res) => {
   }
 };
 
+const checkValidRuralFinId = async (req, res) => {
+  try{
+    const id=req.params.id;
+    console.log("id",id);
+    const user=await User.findOne({ruralFinId:id});
+    console.log("user",user);
+    if(!user){
+      return res.status(404).json({message:"User not found",success:false,found:false});
+    }
+    return res.status(200).json({message:"User found",success:true,found:true});
+  }catch(error){
+    res.status(500).json({ message: "Error fetching user", error });
+  }
+}
+
+const addFavouriteToUserById = async (req, res) => {
+  try {
+    const { userId, ruralFinId } = req.body;
+    console.log("userId", userId);
+    console.log("ruralFinId", ruralFinId);
+
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required", success: false });
+    }
+
+    const user = await User.findById(userId);
+    console.log("user", user);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found", success: false });
+    }
+
+    const favouriteUser = await User.findOne({ ruralFinId: ruralFinId });
+    if (!favouriteUser) {
+      return res.status(404).json({ message: "User not found", success: false });
+    }
+
+    const userFavourites = user.favourites || [];
+    console.log("userFavourites", userFavourites);
+
+    const isAlreadyFavourite = userFavourites.some((id) => id.equals(favouriteUser._id));
+
+    if (isAlreadyFavourite) {
+      return res.status(400).json({ message: "User already in favourites", success: false });
+    }
+
+      user.favourites.push(favouriteUser._id);
+    const updatedUser = await user.save();
+
+    console.log("updatedUser", updatedUser);
+
+    return res.status(200).json({ message: "User updated successfully", success: true, updatedUser });
+
+  } catch (error) {
+    console.error("Error adding favourite:", error);
+    return res.status(500).json({ message: "Error adding favourite", error });
+  }
+};
+
+
 // Create a new user
 const createUser = async (req, res) => {
   try {
@@ -205,4 +265,6 @@ module.exports = {
   updateUser,
   deleteUser,
   getUserByPhone,
+  checkValidRuralFinId,
+  addFavouriteToUserById
 };

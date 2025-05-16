@@ -39,13 +39,12 @@ export const userValidationSchemaStep2 = Yup.object({
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password")], "Passwords must match")
     .required("Confirm password is required"),
-    transactionPin: Yup.string()
+  transactionPin: Yup.string()
     .matches(/^[0-9]{4}$/, "Transaction PIN must be 4 digits")
     .required("Transaction PIN is required"),
-    confirmTransactionPin: Yup.string()
+  confirmTransactionPin: Yup.string()
     .oneOf([Yup.ref("transactionPin")], "Transaction PINs must match")
     .required("Confirm transaction PIN is required"),
-
 });
 
 // Agent-specific validation schema
@@ -74,8 +73,6 @@ export const agentValidationSchemaStep1 = Yup.object({
     .required("Address is required"),
 });
 
-
-
 export const agentValidationSchemaStep2 = Yup.object({
   aadharNumber: Yup.string()
     .matches(/^[0-9]{12}$/, "Aadhar number must be 12 digits")
@@ -100,6 +97,20 @@ export const agentValidationSchemaStep2 = Yup.object({
     .matches(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Please enter a valid IFSC code")
     .required("IFSC code is required"),
   bankName: Yup.string().required("Bank name is required"),
+});
+
+export const SendMoneySchema = Yup.object().shape({
+  ruralfinId: Yup.string()
+    .matches(
+      /^[a-zA-Z0-9]+@RURALFIN$/i,
+      "RuralFin ID must contain only letters, numbers, and end with '@RURALFIN'"
+    )
+    .required("RuralFin ID is required"),
+  amount: Yup.number()
+    .typeError("Amount must be a number")
+    .positive("Amount must be positive")
+    .required("Amount is required"),
+  password: Yup.string().required("Password is required"),
 });
 
 
