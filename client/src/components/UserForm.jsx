@@ -60,9 +60,12 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
       );
       console.log("User created successfully:", result);
       console.log("Final Values:", allValues);
-      toast.success("User created successfully");
-      const token = result?.data?.token;
-      Cookies.set("token", token, { expires: 1 });
+      if(result?.data?.success){
+
+        toast.success("User created successfully");
+        const token = result?.data?.token;
+        Cookies.set("token", token, { expires: 1 });
+      }
       setTimeout(() => {
         dispatch(SignedIn());
         navigate("/dashboard");
@@ -399,7 +402,7 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
                     id="confirmTransactionPin"
                     name="confirmTransactionPin"
                     className="block w-full px-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
-                    placeholder="12-digit Transaction PIN"
+                    placeholder="4-digit Transaction PIN"
                   />
                   <ErrorMessage
                     name="confirmTransactionPin"

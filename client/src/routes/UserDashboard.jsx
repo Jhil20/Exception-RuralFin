@@ -89,7 +89,7 @@ const UserDashboard = () => {
     <div className="bg-gray-50 min-h-screen">
       {showSend && (
         <div className="bg-black/40 flex justify-center items-center fixed top-0 z-50 w-full h-full">
-          <SendMoney showSend={{showSend,setShowSend}} user={userData}/>
+          <SendMoney showSend={{showSend,setShowSend}} user={userData} finance={userFinance}/>
         </div>
        )}
       <main className="container mx-auto px-4 sm:px-6 pt-10 pb-12">

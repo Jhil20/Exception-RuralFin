@@ -30,6 +30,6 @@ const userToAgentTransactionSchema = new Schema(
 );
 
 module.exports = mongoose.model(
-  "UseToAgentTransaction",
+  "UserToAgentTransaction",
   userToAgentTransactionSchema
 );

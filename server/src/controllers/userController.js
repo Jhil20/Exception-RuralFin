@@ -154,7 +154,7 @@ const createUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-
+    const hashedPin = await bcrypt.hash(req.body.transactionPin, 10);
     const user = await User.create({
       firstName: req.body.firstName,
       lastName: req.body.lastName,
@@ -166,7 +166,7 @@ const createUser = async (req, res) => {
       aadhar: req.body.aadhar,
       password: hashedPassword,
       lastTransactionDate: null,
-      transactionPin:req.body.transactionPin,
+      transactionPin:hashedPin,
     });
 
     try {
@@ -183,6 +183,7 @@ const createUser = async (req, res) => {
         } catch (retryErr) {
           console.error("Retry allocation still failed:", retryErr);
           await User.findByIdAndDelete(user._id);
+          await Finance.deleteOne({ userId: user._id });
           return res.status(400).json({
             success: false,
             message: "Error assinging RuralFin ID. User creation rolled back.",

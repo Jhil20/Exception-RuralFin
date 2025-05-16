@@ -4,6 +4,7 @@ const cors = require('cors')
 const connectMongo = require('./config')
 const userRoutes = require('./routes/userRoutes')
 const agentRoutes = require('./routes/agentRoutes')
+const userToUserTransactionRoutes = require('./routes/userToUserTransactionRoutes')
 const app = express()
 const financeRoutes = require('./routes/financeRoutes')
 app.use(cors({
@@ -20,6 +21,7 @@ app.use(cors())
 app.use("/api/user",userRoutes)
 app.use("/api/agent",agentRoutes)
 app.use("/api/finance",financeRoutes);
+app.use("/api/userToUserTransaction",userToUserTransactionRoutes)
 
 app.listen(5000 ,() =>{
     try {

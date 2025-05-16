@@ -110,7 +110,13 @@ export const SendMoneySchema = Yup.object().shape({
     .typeError("Amount must be a number")
     .positive("Amount must be positive")
     .required("Amount is required"),
-  password: Yup.string().required("Password is required"),
+  password: Yup.string()
+    .matches(/^[0-9]{4}$/, "Password must be 4 digits")
+    .required("Password is required"),
+  remarks: Yup.string()
+    .oneOf(
+      ["Housing", "Food & Dining", "Entertainment", "Transport", "Others"],
+      "Invalid remark"
+    )
+    .required("Remark is required"),
 });
-
-

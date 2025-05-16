@@ -9,7 +9,6 @@ const financeSchema = new Schema({
     enum: ['stable', 'overBudget', 'underBudget'],
     default: 'stable',
   },
-  transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
   lastTransactionDate: { type: Date ,default:null},
   budgetAlerts: { type: Boolean, default: false },
   isBudgetPlanningEnabled: { type: Boolean, default: false },

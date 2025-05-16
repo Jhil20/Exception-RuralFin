@@ -4,9 +4,9 @@ const User = require("../models/userModel");
 
 async function generateUniqueUpiId(firstName, lastName, phoneNumber) {
     
+  let counter = 1;
+  const baseUpiId = `${firstName}${lastName}${counter}@RURALFIN`.toUpperCase();
     let ruralFinId = baseUpiId;
-    let counter = 1;
-    const baseUpiId = `${firstName}${lastName}${counter}}@RURALFIN`.toUpperCase();
   let isUnique = false;
 
   while (!isUnique) {

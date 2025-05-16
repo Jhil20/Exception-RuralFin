@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Search,
   Send,
@@ -14,8 +14,9 @@ import { SendMoneySchema } from "../yupValidators/validationSchema";
 import axios from "axios";
 import debounce from "lodash.debounce";
 import { toast, ToastContainer } from "react-toastify";
+import capitalize from "../utils/capitalize";
 
-export const SendMoney = ({ showSend, user }) => {
+export const SendMoney = ({ showSend, user, finance }) => {
   const [step, setStep] = useState("form");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
@@ -28,7 +29,8 @@ export const SendMoney = ({ showSend, user }) => {
   const [ruralFinId, setRuralFinId] = useState("");
   const [isValidId, setIsValidId] = useState(null);
   const [disableFav, setDisableFav] = useState(true);
-  const [addFavourites, setAddFavourites] = useState(true);
+  const [addFavourites, setAddFavourites] = useState(false);
+  const formikRef = useRef();
   const setShowSend = showSend.setShowSend;
 
   const users = [
@@ -71,14 +73,32 @@ export const SendMoney = ({ showSend, user }) => {
     debouncedCheckRuralFinId(value); // debounce validation
   };
 
-  const sendMoneyInitialValues = { ruralfinId: "", amount: "", password: "" };
+  const sendMoneyInitialValues = { ruralfinId: "", amount: "", password: "" ,remarks:""};
   const addFavouritesInitialValues = { ruralFinId: "" };
 
   const handleUserSelect = (user) => {
     setSelectedUser(user);
   };
 
-  const handleSubmit = () => {
+  const handleSendMoneySubmit = async (values) => {
+    const { ruralfinId, amount, password,remarks } = values;
+    if (finance?.balance < amount) {
+      toast.error("Insufficient balance");
+      return;
+    }
+    try{
+
+      const response=await axios.post(`${BACKEND_URL}/api/userToUserTransaction/`, {senderId:user._id,receiverRuralId:ruralfinId,amount,remarks,password})
+      console.log("response", response);
+    }catch(err){
+      if(err?.response?.data?.message=="Transaction PIN is incorrect"){
+        toast.error("Transaction PIN is incorrect");
+        return;
+      }
+      console.log("Error in transaction", err);
+      toast.error("Transaction failed");
+      return;
+    }
     setStep("otp");
   };
 
@@ -94,7 +114,7 @@ export const SendMoney = ({ showSend, user }) => {
   };
 
   const getFavourites = async () => {
-    console.log("called")
+    console.log("called");
     const fav = user?.favourites || [];
     const result = await Promise.all(
       fav.map(async (f) => {
@@ -108,13 +128,20 @@ export const SendMoney = ({ showSend, user }) => {
 
   const handleAddFavourite = async () => {
     if (!ruralfinValue) return;
+    if (user?.ruralFinId === ruralfinValue) {
+      toast.error("You cannot add yourself to favourites");
+      setRuralFinValue("");
+      setIsValidId(null);
+      setDisableFav(true);
+      return;
+    }
     try {
       const response = await axios.post(
         `${BACKEND_URL}/api/user/addToFavourites`,
         { userId: user._id, ruralFinId: ruralfinValue }
       );
       console.log("response", response);
-      if(response?.data?.success){
+      if (response?.data?.success) {
         toast.success("User added to favourites");
         setAddFavourites(false);
         setRuralFinValue("");
@@ -299,22 +326,38 @@ export const SendMoney = ({ showSend, user }) => {
           ) : (
             favourites.map((user) => (
               <div
-                key={user?.id}
-                onClick={() => handleUserSelect(user)}
+                key={user?.data?.id}
+                onClick={() => {
+                  handleUserSelect(user);
+                  setRuralFinId(user?.data?.ruralFinId);
+                  formikRef.current?.setFieldValue(
+                    "ruralfinId",
+                    user?.data?.ruralFinId
+                  );
+                  // setFieldValue("ruralFinId", user?.data?.ruralFinId);
+                }}
                 className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                  selectedUser?.id === user?.id
+                  selectedUser?.data?.id === user?.data?.id
                     ? "bg-gray-100"
                     : "hover:bg-gray-50"
                 }`}
               >
+                {console.log("user selected", selectedUser, user?.data?.id)}
                 <div className="bg-gray-200 h-10 w-10 rounded-full flex items-center justify-center">
                   <span className="text-sm font-medium text-gray-600">
-                    {user?.avatar}
+                    {user?.data?.firstName[0].toUpperCase() +
+                      user?.data?.lastName[0].toUpperCase()}
                   </span>
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">{user?.name}</p>
-                  <p className="text-sm text-gray-500">{user?.ruralfinId}</p>
+                  <p className="font-medium text-gray-900">
+                    {capitalize(user?.data?.firstName) +
+                      " " +
+                      capitalize(user?.data?.lastName)}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {user?.data?.ruralFinId}
+                  </p>
                 </div>
               </div>
             ))
@@ -323,7 +366,8 @@ export const SendMoney = ({ showSend, user }) => {
         <Formik
           initialValues={sendMoneyInitialValues}
           validationSchema={SendMoneySchema}
-          onSubmit={handleSubmit}
+          onSubmit={handleSendMoneySubmit}
+          innerRef={formikRef}
         >
           {({ isSubmitting, isValid, dirty }) => (
             <Form className="space-y-4">
@@ -333,8 +377,8 @@ export const SendMoney = ({ showSend, user }) => {
                 </label>
                 <Field
                   type="text"
-                  value={ruralFinId}
-                  onChange={(e) => setRuralFinId(e.target.value.toUpperCase())}
+                  // value={ruralFinId}
+                  // onChange={(e) => setRuralFinId(e.target.value.toUpperCase())}
                   name="ruralfinId"
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg  focus:ring-black focus:border-transparent"
                   placeholder="Enter RuralFin ID"
@@ -346,37 +390,64 @@ export const SendMoney = ({ showSend, user }) => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Amount
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                    $
-                  </span>
-                  <Field
-                    type="number"
+              <div className="grid-cols-2 grid gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Amount
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                      $
+                    </span>
+                    <Field
+                      type="number"
+                      name="amount"
+                      className="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg  focus:ring-black focus:border-transparent"
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <ErrorMessage
                     name="amount"
-                    className="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg  focus:ring-black focus:border-transparent"
-                    placeholder="0.00"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
                   />
                 </div>
-                <ErrorMessage
-                  name="amount"
-                  component="div"
-                  className="text-red-500 text-sm mt-1"
-                />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Remarks
+                  </label>
+                  <div className="relative">
+                    <Field
+                      as="select"
+                      name="remarks"
+                      className="w-full pl-3 cursor-pointer pr-4 py-2 border border-gray-200 rounded-lg  focus:ring-black focus:border-transparent"
+                    >
+                      <option disabled value="" label="Please select a remark" />
+                      <option value="Housing" label="Housing" />
+                      <option value="Food & Dining" label="Food & Dining" />
+                      <option value="Entertainment" label="Entertainment" />
+                      <option value="Transport" label="Transport" />
+                      <option value="Others" label="Others" />
+                    </Field>
+                  </div>
+                  <ErrorMessage
+                    name="remarks"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
+                  Transaction PIN
                 </label>
                 <Field
                   type="password"
                   name="password"
+                  maxLength={4}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg  focus:ring-black focus:border-transparent"
-                  placeholder="Enter your password"
+                  placeholder="Enter your Transaction PIN"
                 />
                 <ErrorMessage
                   name="password"
@@ -387,8 +458,8 @@ export const SendMoney = ({ showSend, user }) => {
 
               <button
                 type="submit"
-                disabled={isSubmitting || !(isValid && dirty)}
-                className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center space-x-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                // disabled={isSubmitting || (isValid && !dirty)}
+                className="w-full cursor-pointer bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center space-x-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
                 <Send className="h-5 w-5" />
                 <span>Send Money</span>
