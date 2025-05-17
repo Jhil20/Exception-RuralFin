@@ -42,7 +42,43 @@ const createUserToUserTransaction = async (req, res) => {
     }
 }
 
+const updateStatus = async (req, res) => {
+    try{
+        const {transactionId, status} = req.body;
+        const transaction = await UserToUserTransaction.findById(transactionId);
+        if(!transaction){
+            return res.status(400).json({message: "Transaction not found", success: false});
+        }
+        transaction.status = status;
+        await transaction.save();
+        console.log("Transaction updated", transaction);
+        return res.status(200).json({message: "Transaction updated", success: true, transaction});
+
+    }catch(err){
+        console.log(err);
+        res.status(500).json({message: "Error updating transaction", error: err, success: false});
+    }
+}
+
+
+const deleteUserToUserTransaction = async (req, res) => {
+    try{
+        const transactionId = req.params.id;
+        const transaction = await UserToUserTransaction.findByIdAndDelete(transactionId);
+        if(!transaction){
+            return res.status(400).json({message: "Transaction not found", success: false});
+        }
+        console.log("Transaction deleted", transaction);
+        return res.status(200).json({message: "Transaction deleted", success: true});
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({message: "Error deleting transaction", error: err, success: false});
+    }
+}
 
 module.exports = {
 createUserToUserTransaction,
+updateStatus,
+deleteUserToUserTransaction,
 }
