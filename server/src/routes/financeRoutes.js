@@ -1,9 +1,10 @@
 const express = require('express');
-const { getFinanceById } = require('../controllers/financeController');
+const { getFinanceById, transferFunds } = require('../controllers/financeController');
 const router = express.Router();
 
 
 router.get("/:id",getFinanceById);
+router.post("/transfer",transferFunds);
 
 
 module.exports = router;

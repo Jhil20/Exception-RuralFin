@@ -18,7 +18,7 @@ import capitalize from "../utils/capitalize";
 import { auth } from "../firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
-export const SendMoney = ({ showSend, user, finance }) => {
+export const SendMoney = ({ showSend, user, finance, toastControl }) => {
   const [step, setStep] = useState("form");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
@@ -34,9 +34,12 @@ export const SendMoney = ({ showSend, user, finance }) => {
   const [disableFav, setDisableFav] = useState(true);
   const [addFavourites, setAddFavourites] = useState(false);
   const [transactionCreated, setTransactionCreated] = useState(null);
+  const [resetCaptcha, setResetCaptcha] = useState(false);
   const formikRef = useRef();
   const setShowSend = showSend.setShowSend;
-
+  const setTransactionSuccess = toastControl.setTransactionSuccess;
+  const setOtpVerified = toastControl.setOtpVerified;
+  const showSendVar = showSend.showSend;
   const users = [
     { id: "1", name: "John Doe", ruralfinId: "RF001", avatar: "JD" },
     { id: "2", name: "Jane Smith", ruralfinId: "RF002", avatar: "JS" },
@@ -50,7 +53,13 @@ export const SendMoney = ({ showSend, user, finance }) => {
 
   // ✅ Setup reCAPTCHA once on component mount
   useEffect(() => {
-    if (!window.recaptchaVerifier) {
+    if (showSendVar) {
+      if (window.recaptchaVerifier) {
+        // Reset the reCAPTCHA if it already exists
+        window.recaptchaVerifier.clear();
+        window.recaptchaVerifier = null;
+      }
+
       window.recaptchaVerifier = new RecaptchaVerifier(
         auth,
         "recaptcha-container",
@@ -69,7 +78,7 @@ export const SendMoney = ({ showSend, user, finance }) => {
         window.recaptchaWidgetId = widgetId;
       });
     }
-  }, []);
+  }, [showSendVar, resetCaptcha]);
 
   const debouncedCheckRuralFinId = debounce(async (id) => {
     if (id.endsWith("@RURALFIN")) {
@@ -164,6 +173,7 @@ export const SendMoney = ({ showSend, user, finance }) => {
       // const decodedToken = jwt(token);
       // appVerifier.verify().then(async ()=>{
       console.log("reCAPTCHA verified");
+
       const confirmationResult = await signInWithPhoneNumber(
         auth,
         fullPhone,
@@ -178,7 +188,15 @@ export const SendMoney = ({ showSend, user, finance }) => {
     } catch (err) {
       if (err?.response?.data?.message == "Transaction PIN is incorrect") {
         toast.error("Transaction PIN is incorrect");
+        setSubmitting(false);
         return;
+      }
+      // console.log("checking delete", transactionCreated._id);
+      if (transactionCreated?._id) {
+        const response = await axios.delete(
+          `${BACKEND_URL}/api/userToUserTransaction/${transactionCreated?._id}`
+        );
+        console.log("response of transactiopn update", response);
       }
       console.log("Error in transaction", err);
       toast.error("Transaction failed");
@@ -189,65 +207,75 @@ export const SendMoney = ({ showSend, user, finance }) => {
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
 
-
-
     if (!window.confirmationResult) {
-          toast.error("OTP session expired.");
-          setTimeout(() => {
-            window.location.reload();
-          }, 3000);
-          return;
-        }
-    
-        try {
-          const otpNumber = e.target.otp.value;
+      toast.error("OTP session expired.");
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+      return;
+    }
 
-          const confirmationResult = window.confirmationResult;
-    
-          // Verify OTP
-          const result = await confirmationResult.confirm(otpNumber);
-          const user = result.user;
-    
-          console.log("User verified successfully:", user);
-    
-          toast.success("OTP verified successfully!");
-          const response=await axios.post(`${BACKEND_URL}/api/userToUserTransaction/updateStatus`,{
-            transactionId:transactionCreated?._id,
-            status:"completed",
-          })
+    try {
+      const otpNumber = e.target.otp.value;
 
-          console.log("response of transactiopn update", response);
-          toast.success("Transaction completed successfully");
-          setStep("form");
-          setSelectedUser(null);
-          setAmount("");
-          setPassword("");
-          setOtp("");
-          setRuralFinValue("");
-          setRuralFinId("");
-          setTransactionCreated(null);
-          setIsValidId(null);
-          setShowSend(false);
-        } catch (error) {
-          console.error("Error verifying OTP:", error);
+      const confirmationResult = window.confirmationResult;
 
-          toast.error("Error occured. Transaction failed");
+      // Verify OTP
+      const result = await confirmationResult.confirm(otpNumber);
+      const userVerified = result.user;
 
-          const response=await axios.delete(`${BACKEND_URL}/api/userToUserTransaction/${transactionCreated?._id}`)
-          console.log("response of transactiopn update", response);
-          setStep("form");
-          setSelectedUser(null);
-          setAmount("");
-          setPassword("");
-          setOtp("");
-          setRuralFinValue("");
-          setRuralFinId("");
-          setTransactionCreated(null);
-          setIsValidId(null);
+      console.log("User verified successfully:", userVerified);
 
-        }
+      // toast.success("OTP verified successfully!");
+      setOtpVerified(true);
+      // const response = await axios.post(
+      //   `${BACKEND_URL}/api/userToUserTransaction/updateStatus`,
+      //   {
+      //     transactionId: transactionCreated?._id,
+      //     status: "completed",
+      //   }
+      // );
 
+      console.log("before sending data to backend",user._id,transactionCreated?.receiverId,transactionCreated?.amount,transactionCreated?._id);
 
+      const response = await axios.post(`${BACKEND_URL}/api/finance/transfer`, {
+        senderId: user._id,
+        receiverId: transactionCreated?.receiverId,
+        amount: transactionCreated?.amount,
+        transactionId: transactionCreated?._id,
+      });
+
+      console.log("response of transaction complete", response);
+      setTransactionSuccess(true);
+      setStep("form");
+      setSelectedUser(null);
+      setAmount("");
+      setPassword("");
+      setOtp("");
+      setRuralFinValue("");
+      setRuralFinId("");
+      setTransactionCreated(null);
+      setIsValidId(null);
+      setShowSend(false);
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+
+      toast.error("Error occured. Transaction failed");
+
+      const response = await axios.delete(
+        `${BACKEND_URL}/api/userToUserTransaction/${transactionCreated?._id}`
+      );
+      console.log("response of transactiopn update", response);
+      setStep("form");
+      setSelectedUser(null);
+      setAmount("");
+      setPassword("");
+      setOtp("");
+      setRuralFinValue("");
+      setRuralFinId("");
+      setTransactionCreated(null);
+      setIsValidId(null);
+    }
 
     console.log("Transfer completed");
     // setStep("form");
@@ -311,6 +339,28 @@ export const SendMoney = ({ showSend, user, finance }) => {
     }
   };
 
+  const handleBackForm = async () => {
+    try {
+      const response = await axios.delete(
+        `${BACKEND_URL}/api/userToUserTransaction/${transactionCreated?._id}`
+      );
+      console.log("response of transactiopn update", response);
+      setStep("form");
+      setSelectedUser(null);
+      setAmount("");
+      setPassword("");
+      setOtp("");
+      setRuralFinValue("");
+      setRuralFinId("");
+      setTransactionCreated(null);
+      setResetCaptcha(!resetCaptcha);
+      setIsValidId(null);
+      setShowSend(false);
+    } catch (err) {
+      console.log("error in back", err);
+    }
+  };
+
   return (
     <div className="w-full h-full flex justify-center items-center">
       <div className="recaptcha-wrapper mb-4">
@@ -332,10 +382,10 @@ export const SendMoney = ({ showSend, user, finance }) => {
               Verify Transfer
             </h2>
             <button
-              onClick={() => setStep("form")}
+              onClick={() => handleBackForm()}
               className=" cursor-pointer text-md transition-all duration-300 text-gray-500 hover:text-gray-900"
             >
-              Back to form
+              <X className="text-gray-800 p-1 h-9 w-9 transition-all duration-500 hover:bg-gray-200 rounded-lg cursor-pointer" />
             </button>
           </div>
           <form onSubmit={handleVerifyOtp} className="space-y-6">
@@ -355,7 +405,7 @@ export const SendMoney = ({ showSend, user, finance }) => {
                 Enter OTP sent to your phone
               </label>
               <input
-              name="otp"
+                name="otp"
                 type="text"
                 maxLength={6}
                 value={otp}
@@ -388,7 +438,14 @@ export const SendMoney = ({ showSend, user, finance }) => {
 
           <div className="flex items-center justify-between mb-6">
             <X
-              onClick={() => setShowSend(false)}
+              onClick={() => {
+                if (window.recaptchaVerifier) {
+                  // Reset the reCAPTCHA if it already exists
+                  window.recaptchaVerifier.clear();
+                  window.recaptchaVerifier = null;
+                }
+                setShowSend(false);
+              }}
               className="text-gray-800 p-1 h-9 w-9 transition-all duration-500 hover:bg-gray-200 rounded-lg cursor-pointer"
             />
             <h2 className="text-xl font-semibold text-gray-900">Send Money</h2>
@@ -474,9 +531,7 @@ export const SendMoney = ({ showSend, user, finance }) => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by name or RuralFin ID"
                 className={`w-full pl-10 pr-4 py-2 border ${
-                  favourites.length === 0
-                    ? "cursor-not-allowed"
-                    : "cursor-alias"
+                  favourites.length === 0 ? "cursor-not-allowed" : "cursor-text"
                 } border-gray-200 rounded-lg focus:ring-black focus:border-transparent`}
               />
             </div>
@@ -490,7 +545,7 @@ export const SendMoney = ({ showSend, user, finance }) => {
               ) : (
                 favourites.map((user) => (
                   <div
-                    key={user?.data?.id}
+                    key={user?.data?._id}
                     onClick={() => {
                       handleUserSelect(user);
                       setRuralFinId(user?.data?.ruralFinId);

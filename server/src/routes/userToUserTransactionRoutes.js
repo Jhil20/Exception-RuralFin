@@ -1,5 +1,6 @@
 const express=require('express');
 const { createUserToUserTransaction, updateStatus, deleteUserToUserTransaction } = require('../controllers/userToUserTransactionController');
+
 const router=express.Router();
 
 router.post("/",createUserToUserTransaction);

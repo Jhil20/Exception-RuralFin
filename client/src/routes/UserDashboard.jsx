@@ -29,6 +29,7 @@ import capitalize from "../utils/capitalize";
 import AgentList from "../components/AgentList";
 import Loader from "../components/Loader";
 import SendMoney from "../components/SendMoney";
+import { toast } from "react-toastify";
 
 const UserDashboard = () => {
   // const [isLoading, setIsLoading] = useState(true);
@@ -52,24 +53,40 @@ const UserDashboard = () => {
   const [userData, setUserData] = useState(null);
   const [userFinance, setUserFinance] = useState(null);
   const [showSend, setShowSend] = useState(false);
+  const [otpverified, setOtpVerified] = useState(false);
+  const [transactionSuccess, setTransactionSuccess] = useState(false);
   const token = Cookies.get("token");
   const decoded = useMemo(() => {
     if (token) return jwtDecode(token);
     return null;
   }, [token]);
 
+  useEffect(()=>{
+    if(transactionSuccess){
+      setTransactionSuccess(false);
+      toast.success("Transaction successful");
+      getUserData();
+    }
+  },[transactionSuccess])
+  useEffect(()=>{
+    if(otpverified){
+      setOtpVerified(false);
+      toast.success("OTP verified");
+    }
+  },[otpverified])
+
   const getUserData = async () => {
     dispatch(showLoader());
     try {
-      console.log("hiiii");
+      // console.log("hiiii");
       const response = await axios.get(`${BACKEND_URL}/api/user/${decoded.id}`);
-      console.log("response", response);
+      // console.log("response", response);
       setUserData(response?.data?.data);
-      console.log("FIDDDD", response?.data?.data?.finance);
+      // console.log("FIDDDD", response?.data?.data?.finance);
       const response2 = await axios.get(
         `${BACKEND_URL}/api/finance/${response?.data?.data?.finance}`
       );
-      console.log("response fr", response2?.data?.finance);
+      // console.log("response fr", response2?.data?.finance);
       setUserFinance(response2?.data?.finance);
     } catch (err) {
       console.log(err);
@@ -79,7 +96,7 @@ const UserDashboard = () => {
   };
 
   useEffect(() => {
-    console.log("decoded", decoded);
+    // console.log("decoded", decoded);
     getUserData();
   }, []);
 
@@ -89,7 +106,7 @@ const UserDashboard = () => {
     <div className="bg-gray-50 min-h-screen">
       {showSend && (
         <div className="bg-black/40 flex justify-center items-center fixed top-0 z-50 w-full h-full">
-          <SendMoney showSend={{showSend,setShowSend}} user={userData} finance={userFinance}/>
+          <SendMoney showSend={{showSend,setShowSend}} toastControl={{setTransactionSuccess,setOtpVerified}} user={userData} finance={userFinance}/>
         </div>
        )}
       <main className="container mx-auto px-4 sm:px-6 pt-10 pb-12">
