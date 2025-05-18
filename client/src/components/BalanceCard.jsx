@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowUpRight, CreditCard, DollarSign, Eye, EyeOff } from 'lucide-react';
 
-const BalanceCard = ({showSend, balance, currency, lastUpdated }) => {
+const BalanceCard = ({showSend, balance, lastUpdated }) => {
   const [showBalance, setShowBalance] = useState(true);
   const setShowSend=showSend.setShowSend;
   const toggleBalanceVisibility = () => {
@@ -10,7 +10,7 @@ const BalanceCard = ({showSend, balance, currency, lastUpdated }) => {
   
   const formattedBalance = new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency,
+    currency:"INR",
     maximumFractionDigits: 2,
   }).format(balance);
 
@@ -28,7 +28,7 @@ const BalanceCard = ({showSend, balance, currency, lastUpdated }) => {
             </div>
             <button 
               onClick={toggleBalanceVisibility}
-              className="ml-2 text-gray-400 hover:text-white transition-colors duration-200"
+              className="ml-2 text-gray-400 hover:text-white cursor-pointer transition-colors duration-200"
             >
               {showBalance ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>

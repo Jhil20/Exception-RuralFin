@@ -35,9 +35,9 @@ const createUserToUserTransaction = async (req, res) => {
         if(!transaction){
             return res.status(400).json({message: "Transaction not created",success: false});
         }
-        console.log("first the transaction is created",transaction)
+        // console.log("first the transaction is created",transaction)
         // console.log("Transaction created", transaction);
-        return res.status(200).json({message: "Transaction created", success: true, transaction});
+        return res.status(200).json({message: "Transaction created", success: true, transaction,receiver});
     }catch(err){
         console.log(err);
         res.status(500).json({message: "Error creating transaction", error: err});
@@ -62,6 +62,29 @@ const updateStatus = async (req, res) => {
     }
 }
 
+const getTransactionsByUserId = async (req, res) => {
+    try{
+        const userId= req.params.id;
+        const creditTransactions = await UserToUserTransaction.find({receiverId: userId}).populate("senderId");
+
+        if(!creditTransactions){
+            return res.status(400).json({message: "No credit transactions found", success: false});
+        }
+        const debitTransactions =await UserToUserTransaction.find({senderId: userId}).populate("receiverId");
+
+        if(!debitTransactions){
+            return res.status(400).json({message: "No debit transactions found", success: false});
+        }
+
+        const transactions = [...creditTransactions, ...debitTransactions];
+        transactions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        console.log("Transactions fetched", transactions);
+        return res.status(200).json({message: "Transactions fetched", success: true, transactions});
+
+    }catch(err){
+        res.status(500).json({message: "Error fetching transactions", error: err, success: false});
+    }
+}
 
 const deleteUserToUserTransaction = async (req, res) => {
     try{
@@ -82,5 +105,6 @@ const deleteUserToUserTransaction = async (req, res) => {
 module.exports = {
 createUserToUserTransaction,
 updateStatus,
+getTransactionsByUserId,
 deleteUserToUserTransaction,
 }

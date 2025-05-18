@@ -14,7 +14,7 @@ const userToUserTransactionSchema = new Schema(
     },
     transactionDate: { type: Date, default: Date.now },
     remarks: { type: String ,
-        enum: ["Housing", "Food & Dining", "Entertainment","Transport", "Others"],
+        enum: ["Housing", "Food & Dining","Healthcare","Education","Utilities", "Entertainment","Transport", "Others"],
         default: "Others",
     },
   },

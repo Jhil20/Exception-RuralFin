@@ -115,7 +115,7 @@ export const SendMoneySchema = Yup.object().shape({
     .required("Password is required"),
   remarks: Yup.string()
     .oneOf(
-      ["Housing", "Food & Dining", "Entertainment", "Transport", "Others"],
+      ["Housing", "Food & Dining", "Entertainment", "Transport","Healthcare","Utilities","Education", "Others"],
       "Invalid remark"
     )
     .required("Remark is required"),

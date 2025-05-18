@@ -26,6 +26,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [favourites, setFavourites] = useState([]);
+  const [receiverUser, setReceiverUser] = useState(null);
   const [ruralfinValue, setRuralFinValue] = useState("");
   const [otpAmount, setOtpAmount] = useState("");
   // const [ruralfinValue, setFavRuralFinId] = useState("");
@@ -140,6 +141,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       );
       console.log("response", response);
       setTransactionCreated(response?.data?.transaction);
+      setReceiverUser(response?.data?.receiver);
       setOtpAmount(amount);
 
       //sending otp
@@ -392,10 +394,14 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
             <div className="bg-gray-50 p-4 rounded-lg">
               <p className="text-sm text-gray-600">
                 Sending to:{" "}
-                {selectedUser
-                  ? selectedUser?.data?.firstName +
+                {console.log("receiverUser", receiverUser)}
+                {receiverUser
+                  ? receiverUser?.firstName +
                     " " +
-                    selectedUser?.data?.lastName
+                    receiverUser?.lastName +
+                    " ( "+
+                    receiverUser?.ruralFinId +
+                    " )"
                   : "Unknown"}
               </p>
               <p className="text-lg font-semibold">${otpAmount}</p>
@@ -649,7 +655,10 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
                           <option value="Housing" label="Housing" />
                           <option value="Food & Dining" label="Food & Dining" />
                           <option value="Entertainment" label="Entertainment" />
+                          <option value="Healthcare" label="Healthcare" />
                           <option value="Transport" label="Transport" />
+                          <option value="Education" label="Education" />
+                          <option value="Utilities" label="Utilities" />
                           <option value="Others" label="Others" />
                         </Field>
                       </div>

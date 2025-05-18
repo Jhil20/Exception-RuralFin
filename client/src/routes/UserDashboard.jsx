@@ -29,7 +29,8 @@ import capitalize from "../utils/capitalize";
 import AgentList from "../components/AgentList";
 import Loader from "../components/Loader";
 import SendMoney from "../components/SendMoney";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import ViewAll from "../components/ViewAll";
 
 const UserDashboard = () => {
   // const [isLoading, setIsLoading] = useState(true);
@@ -53,6 +54,8 @@ const UserDashboard = () => {
   const [userData, setUserData] = useState(null);
   const [userFinance, setUserFinance] = useState(null);
   const [showSend, setShowSend] = useState(false);
+  const [viewAll, setViewAll] = useState(false);
+  const [transactionData, setTransactionData] = useState([]);
   const [otpverified, setOtpVerified] = useState(false);
   const [transactionSuccess, setTransactionSuccess] = useState(false);
   const token = Cookies.get("token");
@@ -61,19 +64,31 @@ const UserDashboard = () => {
     return null;
   }, [token]);
 
-  useEffect(()=>{
-    if(transactionSuccess){
+  useEffect(() => {
+    if (transactionSuccess) {
       setTransactionSuccess(false);
       toast.success("Transaction successful");
       getUserData();
     }
-  },[transactionSuccess])
-  useEffect(()=>{
-    if(otpverified){
+  }, [transactionSuccess]);
+  useEffect(() => {
+    if (otpverified) {
       setOtpVerified(false);
       toast.success("OTP verified");
     }
-  },[otpverified])
+  }, [otpverified]);
+
+  const getTransactions = async () => {
+      try {
+        const result = await axios.get(
+          `${BACKEND_URL}/api/userToUserTransaction/getTransactions/${decoded.id}`
+        );
+        console.log("result", result);
+        setTransactionData(result?.data?.transactions);
+      } catch (err) {
+        console.log("error in fetching transactions", err);
+      }
+    };
 
   const getUserData = async () => {
     dispatch(showLoader());
@@ -100,15 +115,41 @@ const UserDashboard = () => {
     getUserData();
   }, []);
 
+  useEffect(()=>{
+    getTransactions();
+  },[transactionSuccess])
+
   return isLoading ? (
     <Loader />
   ) : (
     <div className="bg-gray-50 min-h-screen">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick={true}
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable={false}
+        pauseOnHover={false}
+      />
       {showSend && (
         <div className="bg-black/40 flex justify-center items-center fixed top-0 z-50 w-full h-full">
-          <SendMoney showSend={{showSend,setShowSend}} toastControl={{setTransactionSuccess,setOtpVerified}} user={userData} finance={userFinance}/>
+          <SendMoney
+            showSend={{ showSend, setShowSend }}
+            toastControl={{ setTransactionSuccess, setOtpVerified }}
+            user={userData}
+            finance={userFinance}
+          />
         </div>
-       )}
+      )}
+
+      {viewAll && (
+        <div className="bg-black/40 flex justify-center items-center fixed top-0 z-50 w-full h-full">
+          <ViewAll setViewAll={setViewAll} transactionData={transactionData} decoded={decoded}/>
+        </div>
+      )}
       <main className="container mx-auto px-4 sm:px-6 pt-10 pb-12">
         <section className="mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
@@ -124,7 +165,6 @@ const UserDashboard = () => {
           <div className="lg:col-span-1">
             <BalanceCard
               balance={userFinance?.balance}
-              currency={accountBalance.currency}
               lastUpdated={accountBalance.lastUpdated}
               showSend={{ showSend, setShowSend }}
             />
@@ -137,7 +177,12 @@ const UserDashboard = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-2">
-            <RecentTransactions transactions={recentTransactions} />
+            <RecentTransactions
+              transactionData={transactionData}
+              // transactionFlag={transactionSuccess}
+              decoded={decoded}
+              setViewAll={setViewAll}
+            />
           </div>
 
           <div className="lg:col-span-1">
