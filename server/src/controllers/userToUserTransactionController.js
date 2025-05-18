@@ -13,7 +13,7 @@ const createUserToUserTransaction = async (req, res) => {
             _id: senderId
         })
 
-        console.log("user", user);
+        // console.log("user", user);
         const userPassword = user.transactionPin;
         const isMatch = await bcrypt.compare(password, userPassword);
         if(!isMatch){
@@ -31,10 +31,12 @@ const createUserToUserTransaction = async (req, res) => {
             amount,
             remarks
         });
+
         if(!transaction){
             return res.status(400).json({message: "Transaction not created",success: false});
         }
-        console.log("Transaction created", transaction);
+        console.log("first the transaction is created",transaction)
+        // console.log("Transaction created", transaction);
         return res.status(200).json({message: "Transaction created", success: true, transaction});
     }catch(err){
         console.log(err);

@@ -30,7 +30,7 @@ const transferFunds = async (req, res) => {
   try {
     const { senderId, receiverId, amount, transactionId } = req.body;
 
-    if (!senderId || !receiverId || !amount) {
+    if (!senderId || !receiverId || !amount || !transactionId) {
       return res.status(400).json({ message: "Invalid request", success: false });
     }
 
@@ -51,8 +51,15 @@ const transferFunds = async (req, res) => {
       return res.status(400).json({ message: "Transaction is not pending", success: false });
     }
 
+    const senderFinance = await Finance.findOne({ userId: senderId }).session(session);
+    const receiverFinance = await Finance.findOne({ userId: receiverId }).session(session);
+
+    if (!senderFinance || !receiverFinance) {
+      return res.status(404).json({ message: "Finance record not found", success: false });
+    }
+
     // Check sufficient balance
-    if (sender.balance < amount) {
+    if (senderFinance.balance < amount) {
       return res.status(400).json({ message: "Insufficient balance", success: false });
     }
 
@@ -60,14 +67,14 @@ const transferFunds = async (req, res) => {
     let isCreditSuccessful = false;
 
     try {
-      // Debit sender
-      sender.balance -= amount;
-      await sender.save({ session });
+      // Debit senderFinance
+      senderFinance.balance -= amount;
+      await senderFinance.save({ session });
       isDebitSuccessful = true;
 
-      // Credit receiver
-      receiver.balance += amount;
-      await receiver.save({ session });
+      // Credit receiverFinance
+      receiverFinance.balance += amount;
+      await receiverFinance.save({ session });
       isCreditSuccessful = true;
 
       // Mark transaction as completed
@@ -84,15 +91,15 @@ const transferFunds = async (req, res) => {
 
       // Rollback Debit
       if (isDebitSuccessful) {
-        sender.balance += amount;
-        await sender.save({ session });
+        senderFinance.balance += amount;
+        await senderFinance.save({ session });
         console.log("Debit rolled back");
       }
 
       // Rollback Credit
       if (isCreditSuccessful) {
-        receiver.balance -= amount;
-        await receiver.save({ session });
+        receiverFinance.balance -= amount;
+        await receiverFinance.save({ session });
         console.log("Credit rolled back");
       }
 
