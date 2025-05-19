@@ -63,6 +63,7 @@ const BudgetPlanningForm = ({ setBudgetPlanningForm ,setBudgetPlanningEnabled}) 
       setBudgetStep2Error(true);
       return;
     }
+    console.log("step1Data aea",step1Data)
 
     if (
       values.CBHousing +
@@ -84,6 +85,7 @@ const BudgetPlanningForm = ({ setBudgetPlanningForm ,setBudgetPlanningEnabled}) 
           values.CBUtilities +
           values.CBEntertainment +
           values.CBTransport);
+          console.log("valeus of cbother",values.CBOthers)
     }
     setBudgetStep2Error(false);
     const token = Cookies.get("token");

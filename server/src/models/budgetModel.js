@@ -5,6 +5,8 @@ const { Schema } = mongoose;
 const budgetSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    month: { type: Number, required: true }, 
+    year: { type: Number, required: true },
     income: { type: Number, required: true },
     budget: { type: Number, default: 0 },
     savingsGoal: { type: Number, default: 0 },
@@ -32,5 +34,7 @@ const budgetSchema = new Schema(
   },
   { timestamps: true }
 );
+
+budgetSchema.index({ userId: 1, month: 1, year: 1 }, { unique: true });
 
 module.exports = mongoose.model("Budget", budgetSchema);

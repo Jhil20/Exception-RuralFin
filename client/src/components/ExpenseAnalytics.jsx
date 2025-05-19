@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo } from "react";
-import { PieChart, TrendingUp } from "lucide-react";
+import { PieChart, Settings, Settings2, TrendingUp } from "lucide-react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import { useState } from "react";
 
-const ExpenseAnalytics = ({ categories, comparedToLastMonth }) => {
+const ExpenseAnalytics = ({ categories,setIsReportOpen, comparedToLastMonth,setBudgetPlanningForm ,setShowDetailedExpense}) => {
   const [totalSpent, setTotalSpent] = useState(0);
   const [budgetData, setBudgetData] = useState({});
   const [categoryBudgets, setCategoryBudgets] = useState([]);
@@ -30,10 +30,6 @@ const ExpenseAnalytics = ({ categories, comparedToLastMonth }) => {
       const response = await axios.get(
         `${BACKEND_URL}/api/userToUserTransaction/transactionsTotal/${decoded.id}`
       );
-      // console.log(
-      //   "response result of total spent in expense analytics",
-      //   response
-      // );
       setTotalSpent(response?.data?.totalSpent);
     } catch (err) {
       console.log("error in fetching total spent", err);
@@ -60,12 +56,17 @@ const ExpenseAnalytics = ({ categories, comparedToLastMonth }) => {
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">
-          Expense Analytics
-        </h3>
-        <div className="bg-gray-100 p-2 rounded-full">
-          <PieChart size={18} className="text-gray-700" />
+      <div className="flex justify-between items-center mb-3">
+        <div className="flex items-center bg-gray-900 p-2 px-2 pl-4 rounded-4xl">
+          <h3 className="text-lg font-semibold mr-2 text-white">
+            Expense Analytics
+          </h3>
+          <div className="bg-gray-200 p-1 rounded-full">
+            <PieChart size={20} className="text-gray-700" />
+          </div>
+        </div>
+        <div onClick={()=>setBudgetPlanningForm(true)} className="bg-gray-200 p-2 hover:ring-2 transition-all duration-300 cursor-pointer rounded-full">
+          <Settings size={22} className="text-gray-700" />
         </div>
       </div>
 
@@ -108,8 +109,8 @@ const ExpenseAnalytics = ({ categories, comparedToLastMonth }) => {
                 {new Intl.NumberFormat("en-US", {
                   style: "currency",
                   currency: "INR",
-                }).format(budgetData?.categorySpending[category])}
-                {" "} /{" "}
+                }).format(budgetData?.categorySpending[category])}{" "}
+                /{" "}
                 {new Intl.NumberFormat("en-US", {
                   style: "currency",
                   currency: "INR",
@@ -144,7 +145,7 @@ const ExpenseAnalytics = ({ categories, comparedToLastMonth }) => {
         ))}
       </div>
 
-      <button className="w-full mt-6 text-center py-2 text-sm font-medium text-gray-600 hover:text-black transition-colors duration-200">
+      <button onClick={()=>{setShowDetailedExpense(true);setIsReportOpen(true)}} className="w-full  cursor-pointer mt-6 text-center py-2 text-sm font-medium text-gray-600 hover:text-black transition-colors duration-200">
         View Detailed Report
       </button>
     </div>

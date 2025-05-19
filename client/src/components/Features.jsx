@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Smartphone, DollarSign, Shield, BarChart3 } from 'lucide-react';
+import { Smartphone,  Shield, BarChart3, IndianRupee } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,7 +12,7 @@ const features = [
     description: 'Send and receive money using just a FinId, no need for complex account details.'
   },
   {
-    icon: <DollarSign size={28} />,
+    icon: <IndianRupee size={28} />,
     title: 'Cash to Digital Bridge',
     description: 'Easily convert physical cash to digital money through our trusted agent network.'
   },

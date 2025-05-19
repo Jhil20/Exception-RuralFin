@@ -46,10 +46,41 @@ const createBudget = async (req, res) => {
     // Check if budget already exists for the user
     const existingBudget = await Budget.findOne({ userId });
     if (existingBudget) {
-      return res.status(400).json({
-        message: "Budget already exists for this user",
-        success: false,
+
+      // If a budget already exists, you can choose to update it or return an error
+      // Uncomment the following lines to update the existing budget instead of returning an error
+      const updatedBudget = await Budget.findByIdAndUpdate(
+        existingBudget._id,
+        {
+          income,
+          budget,
+          savingsGoal,
+          alertsEnabled,
+          categoryBudgets: {
+            Housing: CBHousing,
+            Food: CBFood,
+            Healthcare: CBHealthcare,
+            Education: CBEducation,
+            Utilities: CBUtilities,
+            Entertainment: CBEntertainment,
+            Transport: CBTransport,
+            Others: CBOthers,
+          },
+        },
+        { new: true }
+      );
+      if (!updatedBudget) {
+        return res
+          .status(400)
+          .json({ message: "Failed to update budget", success: false });
+      }
+      
+      return res.status(200).json({
+        updatedBudget,
+        message: "Budget updated successfully",
+        success: true,
       });
+
     }
 
     const newBudget = Budget.create({

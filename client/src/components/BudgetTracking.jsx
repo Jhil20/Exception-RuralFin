@@ -163,7 +163,7 @@ const BudgetTracking = () => {
                         <p className="text-xs">₹1,100 / ₹1,000</p>
                       </div>
                       <div className="w-full bg-gray-100 rounded-full h-2">
-                        <div className="bg-red-500 h-2 rounded-full" style={{ width: '110%' }}></div>
+                        <div className="bg-red-500 h-2 rounded-full" style={{ width: '100%' }}></div>
                       </div>
                     </div>
 

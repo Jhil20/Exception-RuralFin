@@ -1,20 +1,14 @@
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import React, { useState, useEffect, useMemo } from "react";
-import Header from "../components/Header";
+import { useState, useEffect, useMemo } from "react";
 import Footer from "../components/Footer";
-import LoadingScreen from "../components/Loading";
 import BalanceCard from "../components/BalanceCard";
 import RecentTransactions from "../components/RecentTransactions";
 import ExpenseAnalytics from "../components/ExpenseAnalytics";
 import QuickActions from "../components/QuickActions";
 import UpcomingPayments from "../components/UpcomingsPaymentProps";
-
 import {
   accountBalance,
-  recentTransactions,
   expenseAnalytics,
-  cards,
   agentsData,
   upcomingPayments,
 } from "../data/mockdata";
@@ -32,6 +26,7 @@ import SendMoney from "../components/SendMoney";
 import { toast, ToastContainer } from "react-toastify";
 import ViewAll from "../components/ViewAll";
 import BudgetPlanningForm from "../components/BudgetPlanningForm";
+import DetailedExpenseReport from "../components/DetailedExpenseReport";
 
 const UserDashboard = () => {
   // const [isLoading, setIsLoading] = useState(true);
@@ -61,6 +56,33 @@ const UserDashboard = () => {
   const [transactionSuccess, setTransactionSuccess] = useState(false);
   const [budgetPlanningForm, setBudgetPlanningForm] = useState(false);
   const [budgetPlanningEnabled, setBudgetPlanningEnabled] = useState(false);
+  const [showDetailedExpense, setShowDetailedExpense] = useState(false);
+
+  //added to support new components
+  const [isReportOpen, setIsReportOpen] = useState(false);
+  const budgetData = {
+    totalBudget: 50000,
+    totalSpent: 35600,
+    categoryBudgets: {
+      Food: 15000,
+      Shopping: 10000,
+      Entertainment: 8000,
+      Transportation: 5000,
+      Utilities: 7000,
+      Healthcare: 5000,
+    },
+    categorySpending: {
+      Food: 12500,
+      Shopping: 9800,
+      Entertainment: 7300,
+      Transportation: 2800,
+      Utilities: 6500,
+      Healthcare: 3700,
+    },
+  };
+
+  const categoryBudgets = Object.keys(budgetData.categoryBudgets);
+
   const token = Cookies.get("token");
   const decoded = useMemo(() => {
     if (token) return jwtDecode(token);
@@ -161,10 +183,20 @@ const UserDashboard = () => {
       {budgetPlanningForm && (
         <div className="bg-black/40 flex justify-center items-center fixed top-0 z-50 w-full h-full">
           <BudgetPlanningForm
-          setBudgetPlanningForm={setBudgetPlanningForm}
-          setBudgetPlanningEnabled={setBudgetPlanningEnabled}
+            setBudgetPlanningForm={setBudgetPlanningForm}
+            setBudgetPlanningEnabled={setBudgetPlanningEnabled}
           />
         </div>
+      )}
+
+      {showDetailedExpense && (
+          <DetailedExpenseReport
+            isOpen={isReportOpen}
+            onClose={() => setIsReportOpen(false)}
+            budgetData={budgetData}
+            categoryBudgets={categoryBudgets}
+            totalSpent={budgetData.totalSpent}
+          />
       )}
 
       <main className="container mx-auto px-4 sm:px-6 pt-10 pb-12">
@@ -204,22 +236,29 @@ const UserDashboard = () => {
           </div>
 
           <div className="lg:col-span-1">
-            {(userFinance?.isBudgetPlanningEnabled || budgetPlanningEnabled) ? (
+            {userFinance?.isBudgetPlanningEnabled || budgetPlanningEnabled ? (
               <ExpenseAnalytics
                 categories={expenseAnalytics.categories}
                 comparedToLastMonth={expenseAnalytics.comparedToLastMonth}
+                setBudgetPlanningForm={setBudgetPlanningForm}
+                setShowDetailedExpense={setShowDetailedExpense}
+                setIsReportOpen={setIsReportOpen}
               />
             ) : (
               <div className="bg-white rounded-2xl flex flex-wrap justify-center content-center items-center h-full p-6 shadow-sm">
                 <div className="w-full">
                   <h1 className="text-xl px-16 text-center font-semibold text-gray-800">
-                    Budget Planning is not enabled for your account. Enable it 
+                    Budget Planning is not enabled for your account. Enable it
                     to get insights on your spending habits.
-
                   </h1>
                 </div>
                 <div className="w-full flex justify-center mt-4">
-                  <button onClick={()=>setBudgetPlanningForm(true)} className="w-60 h-14 bg-black text-white text-lg rounded-xl font-semibold shadow-lg shadow-gray-400 hover:shadow-gray-700 hover:bg-gray-800 transition-all duration-300 cursor-pointer">Enable Budget Planning</button>
+                  <button
+                    onClick={() => setBudgetPlanningForm(true)}
+                    className="w-60 h-14 bg-black text-white text-lg rounded-xl font-semibold shadow-lg shadow-gray-400 hover:shadow-gray-700 hover:bg-gray-800 transition-all duration-300 cursor-pointer"
+                  >
+                    Enable Budget Planning
+                  </button>
                 </div>
               </div>
             )}
