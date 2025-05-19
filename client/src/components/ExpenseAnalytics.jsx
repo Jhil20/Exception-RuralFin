@@ -3,14 +3,14 @@ import { PieChart, TrendingUp } from 'lucide-react';
 
 const ExpenseAnalytics = ({ 
   totalSpent, 
-  currency, 
   categories,
   comparedToLastMonth
 }) => {
   const formattedTotal = new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency,
+    currency:"INR",
   }).format(totalSpent);
+
   
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm">
@@ -42,7 +42,7 @@ const ExpenseAnalytics = ({
               <span className="text-sm font-medium text-gray-900">
                 {new Intl.NumberFormat('en-US', {
                   style: 'currency',
-                  currency,
+                  currency:"INR",
                 }).format(category.amount)}
               </span>
             </div>

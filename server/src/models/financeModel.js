@@ -9,14 +9,11 @@ const financeSchema = new Schema({
     enum: ['stable', 'overBudget', 'underBudget'],
     default: 'stable',
   },
-  lastTransactionDate: { type: Date ,default:null},
+  // lastTransactionDate: { type: Date ,default:null},
   budgetAlerts: { type: Boolean, default: false },
+  budgetAlertsNotifications: [{ type: String, default: null }],
   isBudgetPlanningEnabled: { type: Boolean, default: false },
-  income: { type: Number, default: 0 },
-  budget: { type: Number, default: 0 },
-  spendingLimit: { type: Number, default: 0 },
-  currentSpending: { type: Number, default: 0 },
-  savingsGoal: { type: Number, default: 0 },
+  budget: { type: Schema.Types.ObjectId, ref:'Budget',default: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Finance', financeSchema);

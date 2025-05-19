@@ -31,6 +31,7 @@ import Loader from "../components/Loader";
 import SendMoney from "../components/SendMoney";
 import { toast, ToastContainer } from "react-toastify";
 import ViewAll from "../components/ViewAll";
+import BudgetPlanningForm from "../components/BudgetPlanningForm";
 
 const UserDashboard = () => {
   // const [isLoading, setIsLoading] = useState(true);
@@ -58,6 +59,8 @@ const UserDashboard = () => {
   const [transactionData, setTransactionData] = useState([]);
   const [otpverified, setOtpVerified] = useState(false);
   const [transactionSuccess, setTransactionSuccess] = useState(false);
+  const [budgetPlanningForm, setBudgetPlanningForm] = useState(false);
+  const [budgetPlanningEnabled, setBudgetPlanningEnabled] = useState(false);
   const token = Cookies.get("token");
   const decoded = useMemo(() => {
     if (token) return jwtDecode(token);
@@ -79,16 +82,16 @@ const UserDashboard = () => {
   }, [otpverified]);
 
   const getTransactions = async () => {
-      try {
-        const result = await axios.get(
-          `${BACKEND_URL}/api/userToUserTransaction/getTransactions/${decoded.id}`
-        );
-        console.log("result", result);
-        setTransactionData(result?.data?.transactions);
-      } catch (err) {
-        console.log("error in fetching transactions", err);
-      }
-    };
+    try {
+      const result = await axios.get(
+        `${BACKEND_URL}/api/userToUserTransaction/getTransactions/${decoded.id}`
+      );
+      console.log("result", result);
+      setTransactionData(result?.data?.transactions);
+    } catch (err) {
+      console.log("error in fetching transactions", err);
+    }
+  };
 
   const getUserData = async () => {
     dispatch(showLoader());
@@ -115,9 +118,9 @@ const UserDashboard = () => {
     getUserData();
   }, []);
 
-  useEffect(()=>{
+  useEffect(() => {
     getTransactions();
-  },[transactionSuccess])
+  }, [transactionSuccess]);
 
   return isLoading ? (
     <Loader />
@@ -147,9 +150,23 @@ const UserDashboard = () => {
 
       {viewAll && (
         <div className="bg-black/40 flex justify-center items-center fixed top-0 z-50 w-full h-full">
-          <ViewAll setViewAll={setViewAll} transactionData={transactionData} decoded={decoded}/>
+          <ViewAll
+            setViewAll={setViewAll}
+            transactionData={transactionData}
+            decoded={decoded}
+          />
         </div>
       )}
+
+      {budgetPlanningForm && (
+        <div className="bg-black/40 flex justify-center items-center fixed top-0 z-50 w-full h-full">
+          <BudgetPlanningForm
+          setBudgetPlanningForm={setBudgetPlanningForm}
+          setBudgetPlanningEnabled={setBudgetPlanningEnabled}
+          />
+        </div>
+      )}
+
       <main className="container mx-auto px-4 sm:px-6 pt-10 pb-12">
         <section className="mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
@@ -179,19 +196,32 @@ const UserDashboard = () => {
           <div className="lg:col-span-2">
             <RecentTransactions
               transactionData={transactionData}
-              // transactionFlag={transactionSuccess}
               decoded={decoded}
               setViewAll={setViewAll}
             />
           </div>
 
           <div className="lg:col-span-1">
-            <ExpenseAnalytics
-              totalSpent={expenseAnalytics.totalSpent}
-              currency={expenseAnalytics.currency}
-              categories={expenseAnalytics.categories}
-              comparedToLastMonth={expenseAnalytics.comparedToLastMonth}
-            />
+            {(userFinance?.isBudgetPlanningEnabled || budgetPlanningEnabled) ? (
+              <ExpenseAnalytics
+                totalSpent={expenseAnalytics.totalSpent}
+                categories={expenseAnalytics.categories}
+                comparedToLastMonth={expenseAnalytics.comparedToLastMonth}
+              />
+            ) : (
+              <div className="bg-white rounded-2xl flex flex-wrap justify-center content-center items-center h-full p-6 shadow-sm">
+                <div className="w-full">
+                  <h1 className="text-xl px-16 text-center font-semibold text-gray-800">
+                    Budget Planning is not enabled for your account. Enable it 
+                    to get insights on your spending habits.
+
+                  </h1>
+                </div>
+                <div className="w-full flex justify-center mt-4">
+                  <button onClick={()=>setBudgetPlanningForm(true)} className="w-60 h-14 bg-black text-white text-lg rounded-xl font-semibold shadow-lg shadow-gray-400 hover:shadow-gray-700 hover:bg-gray-800 transition-all duration-300 cursor-pointer">Enable Budget Planning</button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

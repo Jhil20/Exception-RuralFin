@@ -115,8 +115,81 @@ export const SendMoneySchema = Yup.object().shape({
     .required("Password is required"),
   remarks: Yup.string()
     .oneOf(
-      ["Housing", "Food & Dining", "Entertainment", "Transport","Healthcare","Utilities","Education", "Others"],
+      [
+        "Housing",
+        "Food & Dining",
+        "Entertainment",
+        "Transport",
+        "Healthcare",
+        "Utilities",
+        "Education",
+        "Others",
+      ],
       "Invalid remark"
     )
     .required("Remark is required"),
 });
+
+export const budgetPlanningValidationSchemaStep1 = Yup.object().shape({
+  budget: Yup.number()
+    .typeError("Budget must be a number")
+    .min(0, "Budget cannot be negative")
+    .required("Budget is required"),
+
+  income: Yup.number()
+    .typeError("Income must be a number")
+    .min(0, "Income cannot be negative")
+    .required("Income is required"),
+
+  savingsGoal: Yup.number()
+    .typeError("Savings goal must be a number")
+    .min(0, "Savings goal cannot be negative")
+    .required("Savings goal is required"),
+
+  alertsEnabled: Yup.string().required(
+    "Please select if alerts should be enabled"
+  ),
+});
+
+export const budgetPlanningValidationSchemaStep2 = Yup.object().shape({
+  CBHousing: Yup.number()
+    .typeError('Housing must be a number')
+    .min(0, 'Housing cannot be negative')
+    .required('Housing is required'),
+
+  CBFood: Yup.number()
+    .typeError('Food must be a number')
+    .min(0, 'Food cannot be negative')
+    .required('Food is required'),
+
+  CBHealthcare: Yup.number()
+    .typeError('Healthcare must be a number')
+    .min(0, 'Healthcare cannot be negative')
+    .required('Healthcare is required'),
+
+  CBEducation: Yup.number()
+    .typeError('Education must be a number')
+    .min(0, 'Education cannot be negative')
+    .required('Education is required'),
+
+  CBUtilities: Yup.number()
+    .typeError('Utilities must be a number')
+    .min(0, 'Utilities cannot be negative')
+    .required('Utilities is required'),
+
+  CBEntertainment: Yup.number()
+    .typeError('Entertainment must be a number')
+    .min(0, 'Entertainment cannot be negative')
+    .required('Entertainment is required'),
+
+  CBTransport: Yup.number()
+    .typeError('Transport must be a number')
+    .min(0, 'Transport cannot be negative')
+    .required('Transport is required'),
+
+  CBOthers: Yup.number()
+    .typeError('Others must be a number')
+    .min(0, 'Others cannot be negative')
+    .required('Others is required'),
+});
+
