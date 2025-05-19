@@ -198,13 +198,14 @@ const UserDashboard = () => {
               transactionData={transactionData}
               decoded={decoded}
               setViewAll={setViewAll}
+              budgetPlanningEnabled={budgetPlanningEnabled}
+              userFinance={userFinance}
             />
           </div>
 
           <div className="lg:col-span-1">
             {(userFinance?.isBudgetPlanningEnabled || budgetPlanningEnabled) ? (
               <ExpenseAnalytics
-                totalSpent={expenseAnalytics.totalSpent}
                 categories={expenseAnalytics.categories}
                 comparedToLastMonth={expenseAnalytics.comparedToLastMonth}
               />

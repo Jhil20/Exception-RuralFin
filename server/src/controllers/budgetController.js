@@ -98,6 +98,27 @@ const createBudget = async (req, res) => {
   }
 };
 
+const getBudgetByUserId= async (req, res) => {
+  try {
+    const  userId  = req.params.id;
+
+    // Validate required fields
+    if (!userId) {
+      return res.status(400).json({ message: "userId is required" , success: false });
+    }
+
+    const budget = await Budget.findOne({ userId });
+    if (!budget) {
+      return res.status(404).json({ message: "Budget not found" , success: false });
+    }
+
+    res.status(200).json({ budget , message: "Budget fetched successfully", success: true });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createBudget,
+  getBudgetByUserId,
 };
