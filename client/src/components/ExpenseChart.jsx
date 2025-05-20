@@ -82,7 +82,7 @@ const ExpenseChart = ({ budgetData, categoryBudgets }) => {
                     ></div>
                   </div>
                   <p className="text-xs text-gray-500 rotate-270 truncate w-10 text-center">
-                    {category.substring(0, 4)}
+                    {category}
                   </p>
                   <p className="text-xs font-semibold mt-1">
                     {spentPercentage > 10 ? `${spentPercentage.toFixed(0)}%` : ''}

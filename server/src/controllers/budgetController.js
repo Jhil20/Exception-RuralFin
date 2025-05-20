@@ -1,6 +1,6 @@
 const Budget = require("../models/budgetModel");
 const Finance = require("../models/financeModel");
-
+const UserToUserTransaction = require("../models/userToUserTransactionModel");
 const createBudget = async (req, res) => {
   try {
     const {
@@ -46,7 +46,6 @@ const createBudget = async (req, res) => {
     // Check if budget already exists for the user
     const existingBudget = await Budget.findOne({ userId });
     if (existingBudget) {
-
       // If a budget already exists, you can choose to update it or return an error
       // Uncomment the following lines to update the existing budget instead of returning an error
       const updatedBudget = await Budget.findByIdAndUpdate(
@@ -74,19 +73,56 @@ const createBudget = async (req, res) => {
           .status(400)
           .json({ message: "Failed to update budget", success: false });
       }
-      
+
       return res.status(200).json({
         updatedBudget,
         message: "Budget updated successfully",
         success: true,
       });
-
     }
+    const date = new Date();
+    const currentMonth = date.getMonth() + 1;
+    const currentYear = date.getFullYear();
+
+    const AllDebitTransactions = await UserToUserTransaction.find({
+      senderId: userId,
+      status: "completed",
+      transactionDate: {
+        $gte: new Date(currentYear, currentMonth - 1, 1),
+        $lt: new Date(currentYear, currentMonth, 1),
+      },
+    });
+
+    const categorySpending = {
+      Housing: 0,
+      Food: 0,
+      Healthcare: 0,
+      Education: 0,
+      Utilities: 0,
+      Entertainment: 0,
+      Transport: 0,
+      Others: 0,
+    };
+
+    // console.log("AllDebitTransactions", AllDebitTransactions);
+    AllDebitTransactions.forEach(async (transaction) => {
+      const { amount, remarks } = transaction;
+      const category = remarks;
+      if (category == "Food & Dining") {
+        categorySpending.Food += amount;
+      } else {
+        categorySpending[category] += amount;
+      }
+    });
+
+    // console.log("categorySpending", categorySpending);
 
     const newBudget = Budget.create({
       userId,
       income,
       budget,
+      month: currentMonth,
+      year: currentYear,
       savingsGoal,
       alertsEnabled,
       categoryBudgets: {
@@ -99,12 +135,15 @@ const createBudget = async (req, res) => {
         Transport: CBTransport,
         Others: CBOthers,
       },
+      categorySpending,
     });
     if (!newBudget) {
       return res
         .status(400)
         .json({ message: "Failed to create budget", success: false });
     }
+
+    // console.log("newBudget", newBudget);
 
     const finance = await Finance.updateOne(
       { userId },
@@ -114,9 +153,10 @@ const createBudget = async (req, res) => {
 
     if (!finance) {
       await Budget.deleteOne({ _id: newBudget._id });
-      return res
-        .status(400)
-        .json({ message: "Failed to update finance and Rollback Budget", success: false });
+      return res.status(400).json({
+        message: "Failed to update finance and Rollback Budget",
+        success: false,
+      });
     }
 
     res.status(201).json({
@@ -129,27 +169,69 @@ const createBudget = async (req, res) => {
   }
 };
 
-const getBudgetByUserId= async (req, res) => {
+const getBudgetByUserId = async (req, res) => {
   try {
-    const  userId  = req.params.id;
+    const userId = req.params.id;
 
     // Validate required fields
     if (!userId) {
-      return res.status(400).json({ message: "userId is required" , success: false });
+      return res
+        .status(400)
+        .json({ message: "userId is required", success: false });
     }
 
     const budget = await Budget.findOne({ userId });
     if (!budget) {
-      return res.status(404).json({ message: "Budget not found" , success: false });
+      return res
+        .status(404)
+        .json({ message: "Budget not found", success: false });
     }
 
-    res.status(200).json({ budget , message: "Budget fetched successfully", success: true });
+    res
+      .status(200)
+      .json({ budget, message: "Budget fetched successfully", success: true });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
+const getAllBudgetsOfThisYearByUserId = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Validate required fields
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ message: "userId is required", success: false });
+    }
+
+    const date = new Date();
+    const currentYear = date.getFullYear();
+
+    const budgets = await Budget.find({
+      userId,
+      year: currentYear,
+    });
+
+    if (!budgets || budgets.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "Budgets not found", success: false });
+    }
+
+    res.status(200).json({
+      budgets,
+      message: "Budgets fetched successfully",
+      success: true,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
 module.exports = {
   createBudget,
   getBudgetByUserId,
+  getAllBudgetsOfThisYearByUserId,
 };

@@ -6,7 +6,7 @@ import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import { useState } from "react";
 
-const ExpenseAnalytics = ({ categories,setIsReportOpen, comparedToLastMonth,setBudgetPlanningForm ,setShowDetailedExpense}) => {
+const ExpenseAnalytics = ({ setIsReportOpen, setBudgetPlanningForm ,setShowDetailedExpense}) => {
   const [totalSpent, setTotalSpent] = useState(0);
   const [budgetData, setBudgetData] = useState({});
   const [categoryBudgets, setCategoryBudgets] = useState([]);
