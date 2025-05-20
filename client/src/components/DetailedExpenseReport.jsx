@@ -174,7 +174,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
         <div className="flex border-b border-gray-100">
           <button
             onClick={() => setActiveTab("overview")}
-            className={`px-6 py-4 font-medium text-sm transition-colors duration-200 ${
+            className={`px-6 py-4 font-medium  text-sm transition-colors duration-200 ${
               activeTab === "overview"
                 ? "text-black border-b-2 border-black"
                 : "text-gray-500 hover:text-gray-700"
@@ -210,7 +210,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
             <div className="space-y-8">
               {/* Summary cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-gray-50 rounded-xl p-5">
+                <div className="bg-gray-50 rounded-xl shadow-gray-300 hover:shadow-gray-400 transition-all duration-300 shadow-md hover:shadow-lg p-5">
                   <div className="flex items-center justify-between mb-0">
                     <span className="text-sm font-medium text-gray-500">
                       Total Spent
@@ -227,7 +227,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
                   </div>
                 </div>
 
-                <div className="bg-gray-50 rounded-xl p-5">
+                <div className="bg-gray-50 shadow-gray-300 hover:shadow-gray-400 transition-all duration-300 shadow-md hover:shadow-lg rounded-xl p-5">
                   <div className="flex items-center justify-between mb-0">
                     <span className="text-sm font-medium text-gray-500">
                       Budget Utilized
@@ -244,7 +244,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
                   </div>
                 </div>
 
-                <div className="bg-gray-50 rounded-xl p-5">
+                <div className="bg-gray-50 shadow-gray-300 hover:shadow-gray-400 transition-all duration-300 shadow-md hover:shadow-lg rounded-xl p-5">
                   <div className="flex justify-between items-center mb-3">
                     <span className="text-sm font-medium text-gray-500">
                       Time Period
@@ -280,7 +280,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
               />
 
               {/* Monthly Comparison */}
-              <MonthlyComparison />
+              <MonthlyComparison allYearBudgets={allYearBudgets} />
             </div>
           )}
 
@@ -361,18 +361,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
           )}
         </div>
 
-        {/* Footer */}
-        {/* <div className="border-t border-gray-100 p-4 flex justify-end">
-          <button
-            onClick={onClose}
-            className="px-6 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors duration-200"
-          >
-            Close
-          </button>
-          <button className="px-6 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-900 transition-colors duration-200 ml-2">
-            Download Report
-          </button>
-        </div> */}
+       
       </div>
     </div>
   );
