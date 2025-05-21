@@ -1,57 +1,68 @@
-import React, { useEffect, useState } from 'react';
-import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { ArrowUpRight, ArrowDownRight, BarChart2 } from "lucide-react";
+import axios from "axios";
+import { BACKEND_URL } from "../utils/constants";
 
-const MonthlyComparison = ({allYearBudgets}) => {
+const MonthlyComparison = ({ allYearBudgets, totalSpent, decoded }) => {
   // Sample data for illustration
+  console.log("all year budgets", allYearBudgets);
   const [thisMonthStateData, setThisMonthStateData] = useState({});
   const [lastMonthStateData, setLastMonthStateData] = useState({});
-  const monthlyData = [
-    {
-      month: 'This Month',
-      amount: 45600,
-      change: 12,
-      categories: [
-        { name: 'Food', amount: 12500, change: 5 },
-        { name: 'Shopping', amount: 9800, change: 18 },
-        { name: 'Entertainment', amount: 7300, change: -8 },
-        { name: 'Utilities', amount: 6500, change: 0 },
-      ],
-    },
-    {
-      month: 'Last Month',
-      amount: 40700,
-      change: -3,
-      categories: [
-        { name: 'Food', amount: 11900, change: -5 },
-        { name: 'Shopping', amount: 8300, change: -10 },
-        { name: 'Entertainment', amount: 7900, change: 15 },
-        { name: 'Utilities', amount: 6500, change: 2 },
-      ],
-    },
+  const [lastMonthTotalSpent, setLastMonthTotalSpent] = useState(0);
+  const categoryBudgets = [
+    "Housing",
+    "Food",
+    "Healthcare",
+    "Education",
+    "Utilities",
+    "Entertainment",
+    "Transport",
+    "Others",
   ];
 
-  useEffect(()=>{
-    const thisMonthData=allYearBudgets?.find((budget)=>(budget?.month==new Date().getMonth()+1 && budget?.year==new Date().getFullYear()));
-  const prevMonth=thisMonthData?.month-1==0?12:thisMonthData?.month-1;
-  const prevYear=thisMonthData?.month-1==0?thisMonthData?.year-1:thisMonthData?.year;
-  const lastMonthData=allYearBudgets?.find((budget)=>(budget?.month==prevMonth && budget?.year==prevYear));
-  console.log("this month data",thisMonthData);
-  console.log("last month data",lastMonthData);
-  setThisMonthStateData(thisMonthData);
-  setLastMonthStateData(lastMonthData);
-  },[])
+  useEffect(() => {
+    getTotalspent();
+    const thisMonthData = allYearBudgets?.find(
+      (budget) =>
+        budget?.month == new Date().getMonth() + 1 &&
+        budget?.year == new Date().getFullYear()
+    );
+    console.log("this month data", thisMonthData, allYearBudgets);
+    const prevMonth =
+      thisMonthData?.month - 1 == 0 ? 12 : thisMonthData?.month - 1;
+    const prevYear =
+      thisMonthData?.month - 1 == 0
+        ? thisMonthData?.year - 1
+        : thisMonthData?.year;
+    const lastMonthData = allYearBudgets?.find(
+      (budget) => budget?.month == prevMonth && budget?.year == prevYear
+    );
+    console.log("this month data", thisMonthData);
+    console.log("last month data", lastMonthData);
+    setThisMonthStateData(thisMonthData);
+    setLastMonthStateData(lastMonthData);
+    // const keys = Object.keys(thisMonthData?.categoryBudgets);
+    // setCategoryBudgets(keys);
+  }, [allYearBudgets]);
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
       maximumFractionDigits: 0,
     }).format(amount);
   };
 
-  const getCategoryColor = (index) => {
-    const colors = ['#4F46E5', '#10B981', '#F59E0B', '#EF4444', '#6366F1'];
-    return colors[index % colors.length];
+  const getTotalspent = async () => {
+    try {
+      const response1 = await axios.get(
+        `${BACKEND_URL}/api/userToUserTransaction/lastMonthTransactionsTotal/${decoded.id}`
+      );
+      console.log("last month total spent", response1.data.totalSpent);
+      setLastMonthTotalSpent(response1.data.totalSpent);
+    } catch (err) {
+      console.log("error fetching total spent", err);
+    }
   };
 
   return (
@@ -59,70 +70,52 @@ const MonthlyComparison = ({allYearBudgets}) => {
       <h3 className="text-lg font-semibold">Monthly Comparison</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {monthlyData.map((data, index) => (
-          <div key={index} className="bg-gray-50 shadow-gray-300 hover:shadow-gray-400 transition-all duration-300 shadow-md hover:shadow-lg rounded-xl p-5">
-            <div className="flex justify-between items-center mb-4">
-              <h4 className="text-base font-medium">{data.month}</h4>
-              <div
-                className={`flex items-center ${
-                  data.change >= 0 ? 'text-green-600' : 'text-red-600'
-                }`}
-              >
-                {data.change >= 0 ? (
-                  <ArrowUpRight size={16} className="mr-1" />
-                ) : (
-                  <ArrowDownRight size={16} className="mr-1" />
-                )}
-                <span className="text-sm font-medium">{data.change}%</span>
-              </div>
+        {lastMonthStateData ? (
+          <div className="bg-gray-50 shadow-gray-300 hover:shadow-gray-400 transition-all duration-300 shadow-md hover:shadow-lg rounded-xl p-5">
+            <div className="flex justify-between items-center mb-1">
+              <h4 className="text-xl font-medium">Last Month</h4>
             </div>
 
-            <p className="text-2xl font-bold mb-4">{formatCurrency(data.amount)}</p>
+            <p className="text-2xl font-bold mb-4">
+              {formatCurrency(lastMonthTotalSpent)}
+            </p>
 
             <div className="space-y-4">
-              {data.categories.map((category, catIndex) => {
-                const percent = data.amount > 0 ? (category.amount / data.amount) * 100 : 0;
-
-                const barColor =
-                  category.change > 0
-                    ? 'bg-green-500'
-                    : category.change < 0
-                    ? 'bg-red-500'
-                    : 'bg-gray-400';
+              {categoryBudgets?.map((category) => {
+                const percent =
+                  (lastMonthStateData?.categorySpending?.[category] /
+                    lastMonthStateData?.categoryBudgets?.[category]) *
+                    100 >
+                  100
+                    ? 100
+                    : (lastMonthStateData?.categorySpending?.[category] /
+                        lastMonthStateData?.categoryBudgets?.[category]) *
+                      100;
 
                 return (
-                  <div key={catIndex}>
+                  <div>
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-medium">{category.name}</span>
+                      <span className="text-sm font-medium">
+                        {category == "Food" ? "Food & Dining" : category}
+                      </span>
                       <div className="flex items-center">
                         <span className="text-sm font-medium mr-2">
-                          {formatCurrency(category.amount)}
+                          {formatCurrency(
+                            lastMonthStateData?.categorySpending?.[category]
+                          )}{" "}
+                          /{" "}
+                          {formatCurrency(
+                            lastMonthStateData?.categoryBudgets?.[category]
+                          )}
                         </span>
-                        <div
-                          className={`flex items-center text-xs ${
-                            category.change > 0
-                              ? 'text-green-600'
-                              : category.change < 0
-                              ? 'text-red-600'
-                              : 'text-gray-500'
-                          }`}
-                        >
-                          {category.change > 0 ? (
-                            <ArrowUpRight size={12} />
-                          ) : category.change < 0 ? (
-                            <ArrowDownRight size={12} />
-                          ) : null}
-                          <span>{category.change !== 0 ? `${category.change}%` : '—'}</span>
-                        </div>
                       </div>
                     </div>
-
-                    <div className="w-full bg-gray-200 rounded-full h-1.5">
+                    <div className="w-full bg-gray-300 rounded-full h-1.5">
                       <div
-                        className={`h-1.5 rounded-full transition-all duration-500`}
+                        className="h-1.5 rounded-full transition-all duration-500"
                         style={{
                           width: `${percent}%`,
-                          backgroundColor: getCategoryColor(catIndex),
+                          backgroundColor: "black",
                         }}
                       ></div>
                     </div>
@@ -131,78 +124,107 @@ const MonthlyComparison = ({allYearBudgets}) => {
               })}
             </div>
           </div>
-        ))}
+        ) : (
+          <div className="bg-white rounded-2xl flex flex-wrap p-8 pt-0 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100">
+            <div className="flex items-center justify-between ">
+              <h4 className="text-xl mr-50 font-semibold text-gray-900">
+                Last Month
+              </h4>
+              <div className="bg-gray-100 p-2 rounded-lg">
+                <BarChart2 className="h-5 w-5 text-gray-600" />
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center justify-center py-8 px-4 bg-gray-50 ring ring-gray-200 rounded-xl">
+              <div className="bg-gray-100 p-4 rounded-full mb-4">
+                <BarChart2 className="h-8 w-8 text-gray-900" />
+              </div>
+
+              <div className="text-center space-y-2">
+                <p className="text-xl font-semibold text-gray-800">
+                  No Data Available
+                </p>
+                <p className="text-sm text-gray-500 max-w-xs">
+                  We couldn't find any transaction records for the previous
+                  month.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="bg-gray-50 shadow-gray-300 hover:shadow-gray-400 transition-all duration-300 shadow-md hover:shadow-lg rounded-xl p-5">
-            <div className="flex justify-between items-center mb-4">
-              <h4 className="text-base font-medium">{lastMonthStateData?.month}</h4>
-              <div
-                className={`flex items-center ${
-                  data.change >= 0 ? 'text-green-600' : 'text-red-600'
-                }`}
-              >
-                {data.change >= 0 ? (
-                  <ArrowUpRight size={16} className="mr-1" />
-                ) : (
-                  <ArrowDownRight size={16} className="mr-1" />
-                )}
-                <span className="text-sm font-medium">{data.change}%</span>
-              </div>
-            </div>
+          <div className="flex justify-between items-center mb-1">
+            <h4 className="text-xl font-medium">This Month</h4>
+          </div>
 
-            <p className="text-2xl font-bold mb-4">{formatCurrency(data.amount)}</p>
+          <p className="text-2xl font-bold mb-4">
+            {formatCurrency(totalSpent)}
+          </p>
 
-            <div className="space-y-4">
-              {data.categories.map((category, catIndex) => {
-                const percent = data.amount > 0 ? (category.amount / data.amount) * 100 : 0;
-
-                const barColor =
-                  category.change > 0
-                    ? 'bg-green-500'
-                    : category.change < 0
-                    ? 'bg-red-500'
-                    : 'bg-gray-400';
-
-                return (
-                  <div key={catIndex}>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-medium">{category.name}</span>
-                      <div className="flex items-center">
-                        <span className="text-sm font-medium mr-2">
-                          {formatCurrency(category.amount)}
-                        </span>
-                        <div
-                          className={`flex items-center text-xs ${
-                            category.change > 0
-                              ? 'text-green-600'
-                              : category.change < 0
-                              ? 'text-red-600'
-                              : 'text-gray-500'
-                          }`}
-                        >
-                          {category.change > 0 ? (
-                            <ArrowUpRight size={12} />
-                          ) : category.change < 0 ? (
+          <div className="space-y-4">
+            {categoryBudgets?.map((category) => {
+              const percent =
+                (thisMonthStateData?.categorySpending?.[category] /
+                  thisMonthStateData?.categoryBudgets?.[category]) *
+                  100 >
+                100
+                  ? 100
+                  : (thisMonthStateData?.categorySpending?.[category] /
+                      thisMonthStateData?.categoryBudgets?.[category]) *
+                    100;
+              const lastMonthSpent =
+                lastMonthStateData?.categorySpending?.[category] || 0;
+              const spendingDifference =
+                ((thisMonthStateData?.categorySpending?.[category] -
+                  lastMonthSpent) /
+                  lastMonthSpent) *
+                100;
+              return (
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm font-medium">
+                      {category == "Food" ? "Food & Dining" : category}
+                    </span>
+                    <div className="flex items-center">
+                      <span className="text-sm font-medium mr-3">
+                        {formatCurrency(
+                          thisMonthStateData?.categorySpending?.[category]
+                        )}{" "}
+                        /{" "}
+                        {formatCurrency(
+                          thisMonthStateData?.categoryBudgets?.[category]
+                        )}
+                      </span>
+                      {lastMonthStateData?.categorySpending?.[category] &&
+                        (spendingDifference < 0 ? (
+                          <div className="flex items-center text-xs text-red-600">
                             <ArrowDownRight size={12} />
-                          ) : null}
-                          <span>{category.change !== 0 ? `${category.change}%` : '—'}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="w-full bg-gray-200 rounded-full h-1.5">
-                      <div
-                        className={`h-1.5 rounded-full transition-all duration-500`}
-                        style={{
-                          width: `${percent}%`,
-                          backgroundColor: getCategoryColor(catIndex),
-                        }}
-                      ></div>
+                            <span>
+                              {Math.round(Math.abs(spendingDifference))}%
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center text-xs text-green-600">
+                            <ArrowUpRight size={12} />
+                            <span>
+                              {Math.round(Math.abs(spendingDifference))}%
+                            </span>
+                          </div>
+                        ))}
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="w-full bg-gray-300 rounded-full h-1.5">
+                    <div
+                      className="h-1.5 rounded-full transition-all duration-500"
+                      style={{ width: `${percent}%`, backgroundColor: "black" }}
+                    ></div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
+        </div>
       </div>
     </div>
   );

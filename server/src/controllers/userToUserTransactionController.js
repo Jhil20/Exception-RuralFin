@@ -120,10 +120,11 @@ const getTransactionsByUserId = async (req, res) => {
 const getTotalTransactionsThisMonthByUserId = async (req, res) => {
   try {
     const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    const month=req.body.selectedMonth;
+    console.log("month",req.body)
+    const startOfMonth = new Date(now.getFullYear(), month-1, 1);
+    const startOfNextMonth = new Date(now.getFullYear(), month, 1);
     const userId = req.params.id;
-
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ error: "Invalid user ID" });
     }
@@ -160,6 +161,47 @@ const getTotalTransactionsThisMonthByUserId = async (req, res) => {
   }
 };
 
+const getTotalTransactionsLastMonthByUserId = async (req, res) => {
+    try{
+      const date = new Date();
+      const thisMonth= date.getMonth() + 1;
+      const thisYear = date.getFullYear();
+      const lastMonth = thisMonth - 1 == 0 ? 12 : thisMonth - 1;
+      const lastYear = thisMonth - 1 == 0 ? thisYear - 1 : thisYear;
+      const startOfLastMonth = new Date(lastYear, lastMonth - 1, 1);
+      const startOfThisMonth = new Date(thisYear, thisMonth - 1, 1);
+      const userId = req.params.id;
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+      const result = await UserToUserTransaction.aggregate([
+        {
+          $match: {
+            senderId: new mongoose.Types.ObjectId(userId), // make sure this is ObjectId
+            status: "completed",
+            transactionDate: { $gte: startOfLastMonth, $lt: startOfThisMonth },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalSpent: { $sum: "$amount" },
+          },
+        },
+      ]);
+      const totalSpent = result.length > 0 ? result[0].totalSpent : 0;
+      return res.status(200).json({ totalSpent: totalSpent , success: true });
+    }catch(err){
+      console.log("error fetching last month transactions",err)
+      res.status(500).json({
+        message: "Error fetching transactions total",
+        error: err,
+        success: false,
+      });
+    }
+
+}
+
 const deleteUserToUserTransaction = async (req, res) => {
   try {
     const transactionId = req.params.id;
@@ -191,4 +233,5 @@ module.exports = {
   getTransactionsByUserId,
   deleteUserToUserTransaction,
   getTotalTransactionsThisMonthByUserId,
+  getTotalTransactionsLastMonthByUserId,
 };

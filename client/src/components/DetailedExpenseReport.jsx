@@ -18,7 +18,7 @@ import { jwtDecode } from "jwt-decode";
 
 const DetailedExpenseReport = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState("overview");
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth()+1);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [budgetData, setBudgetData] = useState({});
   const [categoryBudgets, setCategoryBudgets] = useState([]);
@@ -39,6 +39,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
     } else {
       setIsModalVisible(false);
     }
+    setSelectedMonth(new Date().getMonth() + 1);
   }, [isOpen]);
 
   const getBudget = async () => {
@@ -61,8 +62,8 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
 
   const getTotalSpent = async () => {
     try {
-      const response = await axios.get(
-        `${BACKEND_URL}/api/userToUserTransaction/transactionsTotal/${decoded.id}`
+      const response = await axios.post(
+        `${BACKEND_URL}/api/userToUserTransaction/transactionsTotal/${decoded.id}`,{selectedMonth:selectedMonth}
       );
       setTotalSpent(response?.data?.totalSpent);
     } catch (err) {
@@ -72,9 +73,12 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     getBudget();
-    getTotalSpent();
     getAllbudgetsOfThisYear();
   }, []);
+
+  useEffect(() => {
+    getTotalSpent();
+  }, [budgetData]);
 
   const getAllbudgetsOfThisYear = async () => {
     try {
@@ -90,11 +94,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
+ 
 
   const months = [
     "January",
@@ -144,7 +144,6 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
     <div
       className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center overflow-y-auto transition-opacity duration-300"
       style={{ opacity: isOpen ? 1 : 0 }}
-      onClick={handleOverlayClick}
     >
       <div
         className={`bg-white rounded-2xl w-full pb-8 max-w-4xl max-h-[90vh] overflow-hidden flex flex-col transition-all duration-300 transform ${
@@ -174,7 +173,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
         <div className="flex border-b border-gray-100">
           <button
             onClick={() => setActiveTab("overview")}
-            className={`px-6 py-4 font-medium  text-sm transition-colors duration-200 ${
+            className={`px-6 py-4 font-medium cursor-pointer text-sm transition-colors duration-200 ${
               activeTab === "overview"
                 ? "text-black border-b-2 border-black"
                 : "text-gray-500 hover:text-gray-700"
@@ -184,7 +183,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
           </button>
           <button
             onClick={() => setActiveTab("categories")}
-            className={`px-6 py-4 font-medium text-sm transition-colors duration-200 ${
+            className={`px-6 py-4 font-medium text-sm cursor-pointer transition-colors duration-200 ${
               activeTab === "categories"
                 ? "text-black border-b-2 border-black"
                 : "text-gray-500 hover:text-gray-700"
@@ -194,7 +193,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
           </button>
           <button
             onClick={() => setActiveTab("trends")}
-            className={`px-6 py-4 font-medium text-sm transition-colors duration-200 ${
+            className={`px-6 py-4 font-medium text-sm cursor-pointer transition-colors duration-200 ${
               activeTab === "trends"
                 ? "text-black border-b-2 border-black"
                 : "text-gray-500 hover:text-gray-700"
@@ -257,16 +256,19 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
                     value={selectedMonth}
                     onChange={(e) => {
                       setSelectedMonth(parseInt(e.target.value));
-                      const budgetNew=allYearBudgets.find(
-                        (budget) =>
-                          budget?.month === parseInt(e.target.value)
+                      const budgetNew = allYearBudgets.find(
+                        (budget) => budget?.month === parseInt(e.target.value)
                       );
                       setBudgetData(budgetNew);
                     }}
                     className="block w-full bg-white border cursor-pointer border-gray-200 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-200 mt-1"
                   >
                     {allYearBudgets.map((budget) => (
-                      <option className="cursor-pointer" key={budget?._id} value={budget?.month}>
+                      <option
+                        className="cursor-pointer"
+                        key={budget?._id}
+                        value={budget?.month}
+                      >
                         {monthsMapping[budget?.month]}
                       </option>
                     ))}
@@ -280,7 +282,11 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
               />
 
               {/* Monthly Comparison */}
-              <MonthlyComparison allYearBudgets={allYearBudgets} />
+              <MonthlyComparison
+                allYearBudgets={allYearBudgets}
+                totalSpent={totalSpent}
+                decoded={decoded}
+              />
             </div>
           )}
 
@@ -288,6 +294,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
             <ExpenseCategoryDetails
               budgetData={budgetData}
               categoryBudgets={categoryBudgets}
+              selectedMonth={selectedMonth}
             />
           )}
 
@@ -360,8 +367,6 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
             </div>
           )}
         </div>
-
-       
       </div>
     </div>
   );

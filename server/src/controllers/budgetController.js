@@ -179,8 +179,11 @@ const getBudgetByUserId = async (req, res) => {
         .status(400)
         .json({ message: "userId is required", success: false });
     }
+    const date= new Date();
+    const month= date.getMonth() + 1;
+    const year= date.getFullYear();
 
-    const budget = await Budget.findOne({ userId });
+    const budget = await Budget.findOne({ userId,month,year });
     if (!budget) {
       return res
         .status(404)
@@ -213,6 +216,9 @@ const getAllBudgetsOfThisYearByUserId = async (req, res) => {
       userId,
       year: currentYear,
     });
+
+
+    console.log("budgets", budgets);
 
     if (!budgets || budgets.length === 0) {
       return res

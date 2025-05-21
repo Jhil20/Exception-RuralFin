@@ -27,9 +27,11 @@ const ExpenseAnalytics = ({ setIsReportOpen, setBudgetPlanningForm ,setShowDetai
 
   const getTotalSpent = async () => {
     try {
-      const response = await axios.get(
-        `${BACKEND_URL}/api/userToUserTransaction/transactionsTotal/${decoded.id}`
+      const selectedMonth = new Date().getMonth() + 1;
+      const response = await axios.post(
+        `${BACKEND_URL}/api/userToUserTransaction/transactionsTotal/${decoded.id}`,{selectedMonth:selectedMonth}
       );
+      console.log("response result of total spent fetch in expense analytics", response);
       setTotalSpent(response?.data?.totalSpent);
     } catch (err) {
       console.log("error in fetching total spent", err);
