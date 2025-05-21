@@ -191,7 +191,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
           >
             Categories
           </button>
-          <button
+          {/* <button
             onClick={() => setActiveTab("trends")}
             className={`px-6 py-4 font-medium text-sm cursor-pointer transition-colors duration-200 ${
               activeTab === "trends"
@@ -200,7 +200,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
             }`}
           >
             Trends
-          </button>
+          </button> */}
         </div>
 
         {/* Content area */}
@@ -286,6 +286,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
                 allYearBudgets={allYearBudgets}
                 totalSpent={totalSpent}
                 decoded={decoded}
+                selectedMonth={selectedMonth}
               />
             </div>
           )}
@@ -299,7 +300,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
             />
           )}
 
-          {activeTab === "trends" && (
+          {/* {activeTab === "trends" && (
             <div className="space-y-6">
               <h3 className="text-lg font-semibold">Spending Trends</h3>
               <div className="bg-gray-50 rounded-xl p-6">
@@ -366,7 +367,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </div>

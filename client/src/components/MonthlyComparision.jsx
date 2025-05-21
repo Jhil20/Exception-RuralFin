@@ -3,7 +3,7 @@ import { ArrowUpRight, ArrowDownRight, BarChart2 } from "lucide-react";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 
-const MonthlyComparison = ({ allYearBudgets, totalSpent, decoded }) => {
+const MonthlyComparison = ({ allYearBudgets, totalSpent, decoded,selectedMonth }) => {
   // Sample data for illustration
   console.log("all year budgets", allYearBudgets);
   const [thisMonthStateData, setThisMonthStateData] = useState({});
@@ -24,7 +24,7 @@ const MonthlyComparison = ({ allYearBudgets, totalSpent, decoded }) => {
     getTotalspent();
     const thisMonthData = allYearBudgets?.find(
       (budget) =>
-        budget?.month == new Date().getMonth() + 1 &&
+        budget?.month == selectedMonth &&
         budget?.year == new Date().getFullYear()
     );
     console.log("this month data", thisMonthData, allYearBudgets);
@@ -43,7 +43,7 @@ const MonthlyComparison = ({ allYearBudgets, totalSpent, decoded }) => {
     setLastMonthStateData(lastMonthData);
     // const keys = Object.keys(thisMonthData?.categoryBudgets);
     // setCategoryBudgets(keys);
-  }, [allYearBudgets]);
+  }, [allYearBudgets,selectedMonth]);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("en-IN", {

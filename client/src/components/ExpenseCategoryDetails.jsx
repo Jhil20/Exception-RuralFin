@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { ArrowRight, Wallet, X } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Wallet, X } from "lucide-react";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
+import capitalize from "../utils/capitalize";
+import TransactionIcon from "../utils/TransactionIcon";
 
 const ExpenseCategoryDetails = ({
   budgetData,
@@ -17,9 +19,11 @@ const ExpenseCategoryDetails = ({
   };
   const [detailsTransactions, setDetailsTransactions] = useState([]);
   const [showViewDetails, setShowViewDetails] = useState(false);
+  const [whichCategory, setWhichCategory] = useState("");
 
   const handleViewDetails = async (category) => {
     setShowViewDetails(true);
+    setWhichCategory(category);
     const values = {
       userId: decoded.id,
       selectedMonth: selectedMonth,
@@ -39,46 +43,99 @@ const ExpenseCategoryDetails = ({
       {showViewDetails && (
         <div className="fixed h-full inset-0 bg-black/60 flex items-center justify-center z-40">
           <div className="w-11/12 h-9/12 bg-white shadow-lg rounded-lg p-5 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
-            <div className="flex justify-between h-1/12 items-center mb-0">
-              <h2 className="text-xl font-semibold">Transaction Details</h2>
+            <div className="flex justify-between h-1/12 items-center mb-4">
+              <h2 className="text-xl font-semibold">
+                {whichCategory} Transactions Details
+              </h2>
               <X
-                size={30}
+                size={38}
                 onClick={() => setShowViewDetails(false)}
-                className="text-gray-700 cursor-pointer rounded-lg transition-all duration-300 hover:bg-gray-200 p-1 hover:text-gray-900"
+                className="text-gray-700 cursor-pointer rounded-lg transition-all duration-300 hover:bg-gray-200 p-2 hover:text-gray-900"
               >
                 Close
               </X>
             </div>
-            <div className="h-11/12 overflow-y-auto">
-              {detailsTransactions.map((transaction) => {
-                return (
+            <div className="h-11/12 overflow-y-auto px-4 py-2 bg-white text-black rounded-xl shadow-inner">
+              {detailsTransactions.length === 0 ? (
+                <div className="text-center h-full flex justify-center items-center pb-10 text-gray-400 text-sm">
+                  <h1 className="text-2xl text-gray-500 font-semibold">No transactions found.</h1>
+                </div>
+              ) : (
+                detailsTransactions.map((transaction) => (
                   <div
-                    key={transaction._id}
-                    className="flex justify-between items-center border-b border-gray-200 py-2"
+                    key={transaction?._id}
+                    className="flex items-center justify-between py-3 border-b-[1px] border-gray-400 last:border-0"
                   >
-                    <div className="flex items-center">
-                      <div className="flex flex-col">
-                        <h3 className="text-lg font-semibold">
-                          {transaction.remarks}
-                        </h3>
-                        <p className="text-sm text-gray-500">
+                    <div className="flex items-center space-x-3">
+                      <TransactionIcon type={transaction?.remarks} />
+
+                      <div>
+                        {transaction?.senderId == decoded.id ? (
+                          <>
+                            <p className="font-medium text-gray-900">
+                              {capitalize(transaction?.receiverId?.firstName) +
+                                " " +
+                                capitalize(transaction?.receiverId?.lastName)}
+                              <span className="text-sm text-gray-500">
+                                {" "}
+                                - {transaction?.receiverId?.ruralFinId}
+                              </span>
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="font-medium text-gray-900">
+                              {capitalize(transaction?.senderId?.firstName) +
+                                " " +
+                                capitalize(transaction?.senderId?.lastName)}
+                              <span className="text-sm text-gray-500">
+                                {" "}
+                                - {transaction?.receiverId?.ruralFinId}
+                              </span>
+                            </p>
+                          </>
+                        )}
+                        <p className="text-xs text-gray-500">
                           {new Date(
-                            transaction.transactionDate
-                          ).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className="ml-4">
-                        <h4 className="text-lg font-bold">
-                          {formatCurrency(transaction.amount)}
-                        </h4>
-                        <p className="text-sm text-gray-500">
-                          {transaction.status}
+                            transaction?.transactionDate
+                          ).toLocaleString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit",
+                            hour12: true,
+                          })}
                         </p>
                       </div>
                     </div>
+
+                    <div className="flex items-center">
+                      <span
+                        className={`text-sm font-semibold ${
+                          transaction?.senderId != decoded.id
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                      >
+                        {transaction?.type === "incoming" ? "+ " : "- "}
+                        {new Intl.NumberFormat("en-US", {
+                          style: "currency",
+                          currency: "INR",
+                        }).format(transaction?.amount)}
+                      </span>
+
+                      <div className="ml-2">
+                        {transaction?.senderId != decoded.id ? (
+                          <ArrowDownLeft size={16} className="text-green-600" />
+                        ) : (
+                          <ArrowUpRight size={16} className="text-red-600" />
+                        )}
+                      </div>
+                    </div>
                   </div>
-                );
-              })}
+                ))
+              )}
             </div>
           </div>
         </div>
