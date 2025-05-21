@@ -8,7 +8,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="text-xl font-bold text-black mb-4">
-              Flux<span className="text-gray-500">Wallet</span>
+              Rural<span className="text-gray-500">Fin</span>
             </div>
             <p className="text-gray-600 mb-4 text-sm">
               The modern way to manage your finances. Simple, secure, and designed for you.
@@ -49,20 +49,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 uppercase mb-4">Download Our App</h3>
-            <p className="text-gray-600 text-sm mb-3">
-              Get our mobile app and manage your finances on the go.
-            </p>
-            <div className="space-y-2">
-              <button className="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-lg text-sm w-full transition-colors duration-200">
-                App Store
-              </button>
-              <button className="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-lg text-sm w-full transition-colors duration-200">
-                Google Play
-              </button>
-            </div>
-          </div>
+          
         </div>
 
         <div className="border-t border-gray-200 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center">

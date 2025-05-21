@@ -11,9 +11,9 @@ const RecentTransactions = ({
   budgetPlanningEnabled,
 }) => {
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm">
+    <div className="bg-white rounded-2xl p-6 shadow-md shadow-gray-300">
       <div className="flex justify-between items-center mb-3">
-        <h3 className="text-lg font-semibold text-gray-900">
+        <h3 className="text-xl font-semibold text-gray-900">
           Recent Transactions
         </h3>
         <button

@@ -15,7 +15,7 @@ const BalanceCard = ({showSend, balance, lastUpdated }) => {
   }).format(balance);
 
   return (
-    <div className="bg-black text-white rounded-2xl p-6 shadow-lg transform transition-all duration-300 hover:scale-[1.02]">
+    <div className="bg-black h-full text-white rounded-2xl p-6 shadow-lg transform transition-all duration-300 hover:scale-[1.02]">
       
       <div className="flex justify-between items-start mb-6">
         <div>
@@ -40,7 +40,7 @@ const BalanceCard = ({showSend, balance, lastUpdated }) => {
         </div>
       </div>
       
-      <div className="grid grid-cols-1 gap-4 mb-4">
+      <div className="grid grid-cols-1 gap-4 mt-13 mb-4">
         <button onClick={()=>setShowSend(true)} className="bg-gray-800 cursor-pointer hover:bg-gray-700 transition-colors duration-200 rounded-xl py-3 px-4 flex items-center justify-center">
           <span className="mr-2">Send</span>
           <ArrowUpRight size={16} />
@@ -48,7 +48,14 @@ const BalanceCard = ({showSend, balance, lastUpdated }) => {
       </div>
       
       <div className="text-xs text-gray-400">
-        Last updated: {lastUpdated}
+        Last updated: {lastUpdated ? new Date(lastUpdated).toLocaleString('en-IN', {
+          year: 'numeric',
+          month: 'long',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true,
+        }) : "N/A"}
       </div>
     </div>
   );

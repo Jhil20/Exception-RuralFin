@@ -210,17 +210,17 @@ const UserDashboard = () => {
           </p>
         </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 h-[15rem] lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-1">
             <BalanceCard
               balance={userFinance?.balance}
-              lastUpdated={accountBalance.lastUpdated}
+              lastUpdated={userFinance?.updatedAt}
               showSend={{ showSend, setShowSend }}
             />
           </div>
 
           <div className="lg:col-span-2">
-            <QuickActions />
+            <AgentList agents={agentsData} />
           </div>
         </div>
 
@@ -266,8 +266,8 @@ const UserDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <AgentList agents={agentsData} />
-          <UpcomingPayments payments={upcomingPayments} />
+          
+          {/* <UpcomingPayments payments={upcomingPayments} /> */}
         </div>
       </main>
 

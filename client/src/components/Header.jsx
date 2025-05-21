@@ -42,114 +42,81 @@ const Header = () => {
           </div>
 
           {/* Desktop Navigation */}
-
-          {isSignedIn ? (
-            <>
-              <nav className="hidden md:flex space-x-8">
-                <Link
-                  to={"/home#features"}
-                  className="text-gray-900 hover:text-gray-600 px-3 py-2 text-sm font-medium transition-colors duration-200"
-                >
-                  Features
-                </Link>
-                <Link
-                  to={"/home#how-it-works"}
-                  className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
-                >
-                  Agent Model
-                </Link>
-                <Link
-                  to={"/home#security-section"}
-                  className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
-                >
-                  Security
-                </Link>
-                <Link
-                  to={"/home#financial-tools"}
-                  className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
-                >
-                  Budget Tracking
-                </Link>
-                <Link
-                  to={"/home#financial-literacy"}
-                  className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
-                >
-                  Financial Literacy
-                </Link>
-              </nav>
-            </>
-          ) : location.pathname == "/home" ||
-            location.pathname == "/login" ||
-            location.pathname == "/register" ? (
-            <>
-              <nav className="hidden md:flex space-x-8">
-                <Link
-                  to={"/home#features"}
-                  className="text-gray-900 hover:text-gray-600 px-3 py-2 text-sm font-medium transition-colors duration-200"
-                >
-                  Features
-                </Link>
-                <Link
-                  to={"/home#how-it-works"}
-                  className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
-                >
-                  Agent Model
-                </Link>
-                <Link
-                  to={"/home#security-section"}
-                  className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
-                >
-                  Security
-                </Link>
-                <Link
-                  to={"/home#financial-tools"}
-                  className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
-                >
-                  Budget Tracking
-                </Link>
-                <Link
-                  to={"/home#financial-literacy"}
-                  className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
-                >
-                  Financial Literacy
-                </Link>
-              </nav>
-            </>
+          {location.pathname === "/dashboard" ? (
+            <div></div>
           ) : (
-            <>
-              <nav className="hidden md:flex space-x-8">
-                <a
-                  href="#dashboard"
-                  className="text-gray-900 hover:text-gray-600 px-3 py-2 text-sm font-medium transition-colors duration-200"
-                >
-                  Dashboard
-                </a>
-                <a
-                  href="#transactions"
-                  className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
-                >
-                  Transactions
-                </a>
-                <a
-                  href="#cards"
-                  className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
-                >
-                  Cards
-                </a>
-                <a
-                  href="#payments"
-                  className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
-                >
-                  Payments
-                </a>
-                <a
-                  href="#settings"
-                  className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
-                >
-                  Settings
-                </a>
-              </nav>
-            </>
+            <nav className="hidden md:flex space-x-8">
+              {isSignedIn ||
+              location.pathname === "/home" ||
+              location.pathname === "/login" ||
+              location.pathname === "/register" ? (
+                <>
+                  <Link
+                    to="/home#features"
+                    className="text-gray-900 hover:text-gray-600 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                  >
+                    Features
+                  </Link>
+                  <Link
+                    to="/home#how-it-works"
+                    className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                  >
+                    Agent Model
+                  </Link>
+                  <Link
+                    to="/home#security-section"
+                    className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                  >
+                    Security
+                  </Link>
+                  <Link
+                    to="/home#financial-tools"
+                    className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                  >
+                    Budget Tracking
+                  </Link>
+                  <Link
+                    to="/home#financial-literacy"
+                    className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                  >
+                    Financial Literacy
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <a
+                    href="#dashboard"
+                    className="text-gray-900 hover:text-gray-600 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                  >
+                    Dashboard
+                  </a>
+                  <a
+                    href="#transactions"
+                    className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                  >
+                    Transactions
+                  </a>
+                  <a
+                    href="#cards"
+                    className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                  >
+                    Cards
+                  </a>
+                  <a
+                    href="#payments"
+                    className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                  >
+                    Payments
+                  </a>
+                  <a
+                    href="#settings"
+                    className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                  >
+                    Settings
+                  </a>
+                </>
+              )}
+            </nav>
           )}
 
           {/* Right Side Icons */}
