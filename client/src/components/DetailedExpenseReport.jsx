@@ -295,6 +295,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
               budgetData={budgetData}
               categoryBudgets={categoryBudgets}
               selectedMonth={selectedMonth}
+              decoded={decoded}
             />
           )}
 

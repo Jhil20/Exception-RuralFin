@@ -1,10 +1,13 @@
 import React, { useState } from "react";
-import { ArrowRight, Wallet } from "lucide-react";
+import { ArrowRight, Wallet, X } from "lucide-react";
+import axios from "axios";
+import { BACKEND_URL } from "../utils/constants";
 
 const ExpenseCategoryDetails = ({
   budgetData,
   categoryBudgets,
   selectedMonth,
+  decoded,
 }) => {
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("en-IN", {
@@ -12,13 +15,74 @@ const ExpenseCategoryDetails = ({
       currency: "INR",
     }).format(amount);
   };
-
+  const [detailsTransactions, setDetailsTransactions] = useState([]);
   const [showViewDetails, setShowViewDetails] = useState(false);
 
-  const handleViewDetails = async () => {};
+  const handleViewDetails = async (category) => {
+    setShowViewDetails(true);
+    const values = {
+      userId: decoded.id,
+      selectedMonth: selectedMonth,
+      category: category,
+      selectedYear: new Date().getFullYear(),
+    };
+    const response = await axios.post(
+      `${BACKEND_URL}/api/userToUserTransaction/transactionsByCategory`,
+      values
+    );
+    console.log("response 22222222222222222", response);
+    setDetailsTransactions(response?.data?.transactions);
+  };
 
   return (
     <div className="space-y-8">
+      {showViewDetails && (
+        <div className="fixed h-full inset-0 bg-black/60 flex items-center justify-center z-40">
+          <div className="w-11/12 h-9/12 bg-white shadow-lg rounded-lg p-5 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+            <div className="flex justify-between h-1/12 items-center mb-0">
+              <h2 className="text-xl font-semibold">Transaction Details</h2>
+              <X
+                size={30}
+                onClick={() => setShowViewDetails(false)}
+                className="text-gray-700 cursor-pointer rounded-lg transition-all duration-300 hover:bg-gray-200 p-1 hover:text-gray-900"
+              >
+                Close
+              </X>
+            </div>
+            <div className="h-11/12 overflow-y-auto">
+              {detailsTransactions.map((transaction) => {
+                return (
+                  <div
+                    key={transaction._id}
+                    className="flex justify-between items-center border-b border-gray-200 py-2"
+                  >
+                    <div className="flex items-center">
+                      <div className="flex flex-col">
+                        <h3 className="text-lg font-semibold">
+                          {transaction.remarks}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          {new Date(
+                            transaction.transactionDate
+                          ).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="ml-4">
+                        <h4 className="text-lg font-bold">
+                          {formatCurrency(transaction.amount)}
+                        </h4>
+                        <p className="text-sm text-gray-500">
+                          {transaction.status}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
       <h3 className="text-lg font-semibold">Budget Categories</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -85,7 +149,7 @@ const ExpenseCategoryDetails = ({
               </div>
 
               <button
-                onClick={() => handleViewDetails()}
+                onClick={() => handleViewDetails(category)}
                 className="w-full px-5 cursor-pointer py-3 bg-gray-200 text-sm font-medium text-gray-600 hover:text-black flex items-center justify-center transition-colors duration-200"
               >
                 <span>View Details</span>

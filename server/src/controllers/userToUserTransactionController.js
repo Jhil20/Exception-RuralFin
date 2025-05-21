@@ -120,9 +120,9 @@ const getTransactionsByUserId = async (req, res) => {
 const getTotalTransactionsThisMonthByUserId = async (req, res) => {
   try {
     const now = new Date();
-    const month=req.body.selectedMonth;
-    console.log("month",req.body)
-    const startOfMonth = new Date(now.getFullYear(), month-1, 1);
+    const month = req.body.selectedMonth;
+    console.log("month", req.body);
+    const startOfMonth = new Date(now.getFullYear(), month - 1, 1);
     const startOfNextMonth = new Date(now.getFullYear(), month, 1);
     const userId = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -151,7 +151,7 @@ const getTotalTransactionsThisMonthByUserId = async (req, res) => {
 
     const totalSpent = result.length > 0 ? result[0].totalSpent : 0;
 
-    return res.status(200).json({ totalSpent: totalSpent , success: true });
+    return res.status(200).json({ totalSpent: totalSpent, success: true });
   } catch (err) {
     res.status(500).json({
       message: "Error fetching transactions total",
@@ -162,45 +162,84 @@ const getTotalTransactionsThisMonthByUserId = async (req, res) => {
 };
 
 const getTotalTransactionsLastMonthByUserId = async (req, res) => {
-    try{
-      const date = new Date();
-      const thisMonth= date.getMonth() + 1;
-      const thisYear = date.getFullYear();
-      const lastMonth = thisMonth - 1 == 0 ? 12 : thisMonth - 1;
-      const lastYear = thisMonth - 1 == 0 ? thisYear - 1 : thisYear;
-      const startOfLastMonth = new Date(lastYear, lastMonth - 1, 1);
-      const startOfThisMonth = new Date(thisYear, thisMonth - 1, 1);
-      const userId = req.params.id;
-      if (!mongoose.Types.ObjectId.isValid(userId)) {
-        return res.status(400).json({ error: "Invalid user ID" });
-      }
-      const result = await UserToUserTransaction.aggregate([
-        {
-          $match: {
-            senderId: new mongoose.Types.ObjectId(userId), // make sure this is ObjectId
-            status: "completed",
-            transactionDate: { $gte: startOfLastMonth, $lt: startOfThisMonth },
-          },
-        },
-        {
-          $group: {
-            _id: null,
-            totalSpent: { $sum: "$amount" },
-          },
-        },
-      ]);
-      const totalSpent = result.length > 0 ? result[0].totalSpent : 0;
-      return res.status(200).json({ totalSpent: totalSpent , success: true });
-    }catch(err){
-      console.log("error fetching last month transactions",err)
-      res.status(500).json({
-        message: "Error fetching transactions total",
-        error: err,
-        success: false,
-      });
+  try {
+    const date = new Date();
+    const thisMonth = date.getMonth() + 1;
+    const thisYear = date.getFullYear();
+    const lastMonth = thisMonth - 1 == 0 ? 12 : thisMonth - 1;
+    const lastYear = thisMonth - 1 == 0 ? thisYear - 1 : thisYear;
+    const startOfLastMonth = new Date(lastYear, lastMonth - 1, 1);
+    const startOfThisMonth = new Date(thisYear, thisMonth - 1, 1);
+    const userId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: "Invalid user ID" });
     }
+    const result = await UserToUserTransaction.aggregate([
+      {
+        $match: {
+          senderId: new mongoose.Types.ObjectId(userId), // make sure this is ObjectId
+          status: "completed",
+          transactionDate: { $gte: startOfLastMonth, $lt: startOfThisMonth },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalSpent: { $sum: "$amount" },
+        },
+      },
+    ]);
+    const totalSpent = result.length > 0 ? result[0].totalSpent : 0;
+    return res.status(200).json({ totalSpent: totalSpent, success: true });
+  } catch (err) {
+    console.log("error fetching last month transactions", err);
+    res.status(500).json({
+      message: "Error fetching transactions total",
+      error: err,
+      success: false,
+    });
+  }
+};
 
-}
+const getAllTransactionsByCategory = async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const category = req.body.category;
+    const selectedMonth = req.body.selectedMonth-1;
+    const selectedYear = req.body.selectedYear;
+    const startOfMonth = new Date(selectedYear, selectedMonth, 1); 
+const startOfNextMonth = new Date(selectedYear, selectedMonth + 1, 1); 
+    // console.log("startOfMonth", startOfMonth, "startOfNextMonth", startOfNextMonth,selectedMonth);
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
+    const transactions = await UserToUserTransaction.find({
+      senderId: userId,
+      status: "completed",
+      transactionDate: { $gte: startOfMonth, $lt: startOfNextMonth },
+      remarks: category,
+    }).populate("receiverId");
+    // console.log("transactions", transactions);
+    
+    if (!transactions) {
+      return res
+        .status(400)
+        .json({ message: "No transactions found", success: false });
+    }
+    transactions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    // console.log("Transactions fetched", transactions);
+    return res
+      .status(200)
+      .json({ message: "Transactions fetched", success: true, transactions });
+  } catch (err) {
+    console.log("error fetching transactions by category", err);
+    res.status(500).json({
+      message: "Error fetching transactions by category",
+      error: err,
+      success: false,
+    });
+  }
+};
 
 const deleteUserToUserTransaction = async (req, res) => {
   try {
@@ -234,4 +273,5 @@ module.exports = {
   deleteUserToUserTransaction,
   getTotalTransactionsThisMonthByUserId,
   getTotalTransactionsLastMonthByUserId,
+  getAllTransactionsByCategory,
 };
