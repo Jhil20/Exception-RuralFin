@@ -89,7 +89,7 @@ const createAgent = async (req, res) => {
       accountNumber,
       ifscCode,
       bankName,
-      securityDeposit,
+      securityDeposit:5000,
       email,
       password: hashedPassword,
       phone,
