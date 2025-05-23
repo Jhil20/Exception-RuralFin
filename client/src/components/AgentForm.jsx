@@ -23,7 +23,7 @@ import { BACKEND_URL } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
 import Loader from "./Loader";
 
-const AgentForm = ({ onSubmit, resetRole }) => {
+const AgentForm = ({  resetRole }) => {
   const initialValuesStep2 = {
     aadhar: "",
     password: "",
