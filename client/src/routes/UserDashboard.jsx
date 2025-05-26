@@ -4,14 +4,7 @@ import Footer from "../components/Footer";
 import BalanceCard from "../components/BalanceCard";
 import RecentTransactions from "../components/RecentTransactions";
 import ExpenseAnalytics from "../components/ExpenseAnalytics";
-import QuickActions from "../components/QuickActions";
-import UpcomingPayments from "../components/UpcomingsPaymentProps";
-import {
-  accountBalance,
-  expenseAnalytics,
-  agentsData,
-  upcomingPayments,
-} from "../data/mockdata";
+import { expenseAnalytics } from "../data/mockdata";
 import useAuth from "../utils/useAuth";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
@@ -27,6 +20,7 @@ import { toast, ToastContainer } from "react-toastify";
 import ViewAll from "../components/ViewAll";
 import BudgetPlanningForm from "../components/BudgetPlanningForm";
 import DetailedExpenseReport from "../components/DetailedExpenseReport";
+import AgentDetails from "../components/AgentDetails";
 
 const UserDashboard = () => {
   // const [isLoading, setIsLoading] = useState(true);
@@ -57,6 +51,7 @@ const UserDashboard = () => {
   const [budgetPlanningForm, setBudgetPlanningForm] = useState(false);
   const [budgetPlanningEnabled, setBudgetPlanningEnabled] = useState(false);
   const [showDetailedExpense, setShowDetailedExpense] = useState(false);
+  const [showAgentDetails, setShowAgentDetails] = useState(false);
 
   //added to support new components
   const [isReportOpen, setIsReportOpen] = useState(false);
@@ -188,15 +183,20 @@ const UserDashboard = () => {
           />
         </div>
       )}
+      {showAgentDetails && (
+        <div className="bg-black/40 flex justify-center items-center fixed top-0 z-50 w-full h-full">
+          <AgentDetails setShowAgentDetails={setShowAgentDetails} showAgentDetails={showAgentDetails} />
+        </div>
+      )}
 
       {showDetailedExpense && (
-          <DetailedExpenseReport
-            isOpen={isReportOpen}
-            onClose={() => setIsReportOpen(false)}
-            budgetData={budgetData}
-            categoryBudgets={categoryBudgets}
-            totalSpent={budgetData.totalSpent}
-          />
+        <DetailedExpenseReport
+          isOpen={isReportOpen}
+          onClose={() => setIsReportOpen(false)}
+          budgetData={budgetData}
+          categoryBudgets={categoryBudgets}
+          totalSpent={budgetData.totalSpent}
+        />
       )}
 
       <main className="container mx-auto px-4 sm:px-6 pt-10 pb-12">
@@ -220,7 +220,7 @@ const UserDashboard = () => {
           </div>
 
           <div className="lg:col-span-2">
-            <AgentList agents={agentsData} />
+            <AgentList setShowAgentDetails={setShowAgentDetails} />
           </div>
         </div>
 
@@ -266,7 +266,6 @@ const UserDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
           {/* <UpcomingPayments payments={upcomingPayments} /> */}
         </div>
       </main>

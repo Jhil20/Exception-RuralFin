@@ -7,7 +7,8 @@ const jwt = require("jsonwebtoken");
 const getAllAgents = async (req, res) => {
   try {
     const agents = await Agent.find();
-    res.json(agents);
+    res.json({ agents, message: "agents fetched successfully" ,success:true});
+    
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -17,8 +18,11 @@ const getAllAgents = async (req, res) => {
 const getAgentById = async (req, res) => {
   try {
     const agent = await Agent.findById(req.params.id);
-    if (!agent) return res.status(404).json({ message: "Agent not found", success: false });
-    res.json({agent,message: "Agent found", success: true});
+    if (!agent)
+      return res
+        .status(404)
+        .json({ message: "Agent not found", success: false });
+    res.json({ agent, message: "Agent found", success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -72,7 +76,9 @@ const createAgent = async (req, res) => {
     // Check if agent already exists
     const existingAgent = await Agent.findOne({ phone });
     if (existingAgent) {
-      return res.status(400).json({ error: "Profile with this phone already exists" });
+      return res
+        .status(400)
+        .json({ error: "Profile with this phone already exists" });
     }
 
     // Hash password
@@ -89,7 +95,7 @@ const createAgent = async (req, res) => {
       accountNumber,
       ifscCode,
       bankName,
-      securityDeposit:securityDeposit,
+      securityDeposit: securityDeposit,
       password: hashedPassword,
       phone,
       address,
@@ -109,17 +115,16 @@ const createAgent = async (req, res) => {
         agent,
         token,
       });
-    }else{
-        res.status(400).json({
-            success: false,
-            message: "Failed to create agent",
-        });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "Failed to create agent",
+      });
     }
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 };
-
 
 const getAgentByPhone = async (req, res) => {
   try {
@@ -147,7 +152,6 @@ const getAgentByPhone = async (req, res) => {
     res.status(500).json({ message: "Error fetching Agent", error });
   }
 };
-
 
 // Update agent
 const updateAgent = async (req, res) => {
