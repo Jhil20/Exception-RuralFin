@@ -247,6 +247,15 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
         transactionId: transactionCreated?._id,
       });
 
+      if(response?.data?.success ==true && response?.data?.message == "Transaction completed successfully"){
+        const response2 = await axios.put(`${BACKEND_URL}/api/budget/updateBudgetSpending`,{
+          userId:user._id,
+          amount : transactionCreated?.amount,
+          category: transactionCreated?.remarks,
+        });
+        console.log("response of budget update", response2);
+      }
+
       console.log("response of transaction complete", response);
       setTransactionSuccess(true);
       setStep("form");

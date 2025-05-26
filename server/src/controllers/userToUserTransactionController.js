@@ -121,7 +121,7 @@ const getTotalTransactionsThisMonthByUserId = async (req, res) => {
   try {
     const now = new Date();
     const month = req.body.selectedMonth;
-    console.log("month", req.body);
+    // console.log("month", req.body);
     const startOfMonth = new Date(now.getFullYear(), month - 1, 1);
     const startOfNextMonth = new Date(now.getFullYear(), month, 1);
     const userId = req.params.id;
@@ -205,10 +205,10 @@ const getAllTransactionsByCategory = async (req, res) => {
   try {
     const userId = req.body.userId;
     const category = req.body.category;
-    const selectedMonth = req.body.selectedMonth-1;
+    const selectedMonth = req.body.selectedMonth - 1;
     const selectedYear = req.body.selectedYear;
-    const startOfMonth = new Date(selectedYear, selectedMonth, 1); 
-const startOfNextMonth = new Date(selectedYear, selectedMonth + 1, 1); 
+    const startOfMonth = new Date(selectedYear, selectedMonth, 1);
+    const startOfNextMonth = new Date(selectedYear, selectedMonth + 1, 1);
     // console.log("startOfMonth", startOfMonth, "startOfNextMonth", startOfNextMonth,selectedMonth);
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ error: "Invalid user ID" });
@@ -220,7 +220,7 @@ const startOfNextMonth = new Date(selectedYear, selectedMonth + 1, 1);
       remarks: category,
     }).populate("receiverId");
     // console.log("transactions", transactions);
-    
+
     if (!transactions) {
       return res
         .status(400)

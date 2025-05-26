@@ -119,7 +119,7 @@ const AgentDashboard = () => {
   };
 
   return (
-    <div className="min-h-[90.7vh] bg-gray-50">
+    <div className="min-h-[89.3vh] bg-gray-50">
       {/* Header */}
       <header className="bg-white text-black shadow-md mx-4 mx rounded-md mt-3">
         <div className="container mx-auto p-4">
@@ -182,14 +182,13 @@ const AgentDashboard = () => {
               </p>
             </div>
             <div className="text-center w-56 mr-10">
-              <p className="text-gray-300 text-md ">
-               Total Commission Earned
-              </p>
+              <p className="text-gray-300 text-md ">Total Commission Earned</p>
               <p className="text-lg font-semibold text-white">
                 ₹
-                {transactionsDone
-                  
-                  ?.reduce((acc, tr) => acc + (tr.commission || 0), 0)}
+                {transactionsDone?.reduce(
+                  (acc, tr) => acc + (tr.commission || 0),
+                  0
+                )}
               </p>
             </div>
           </div>
@@ -280,29 +279,32 @@ const AgentDashboard = () => {
             <h2 className="text-lg font-semibold">Pending Requests</h2>
           </div>
           <div className="divide-y divide-gray-200">
-            {transactions.map((transaction) => (
-              <div key={transaction.id} className="px-8 py-4">
+            {transactionsDone.map((transaction) => (
+              <div key={transaction?._id} className="px-8 py-4">
                 <div className="flex justify-between items-center">
                   <div className="space-y-1">
                     <div className="flex items-center">
-                      <p className="font-medium">Request #{transaction.id}</p>
+                      <p className="font-medium">
+                        Request #{transaction?._id?.toLocaleString()}
+                      </p>
                       <span
                         className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${
-                          transaction.type === "deposit"
+                          transaction?.conversionType === "eRupeesToCash"
                             ? "bg-green-100 text-green-800"
                             : "bg-blue-100 text-blue-800"
                         }`}
                       >
-                        {transaction.type.charAt(0).toUpperCase() +
-                          transaction.type.slice(1)}
+                        {transaction?.conversionType === "eRupeesToCash"
+                          ? "Deposit"
+                          : "Withdrawal"}
                       </span>
                     </div>
                     <p className="text-gray-600">
-                      Amount: ₹{transaction.amount.toLocaleString()}
+                      Amount: ₹{transaction?.amount.toLocaleString()}
                     </p>
-                    <p className="text-gray-600">User: {transaction.user}</p>
+                    <p className="text-gray-600">User: {transaction?.userId?.firstName + " "+transaction?.userId?.lastName}</p>
                     <p className="text-gray-500 text-sm">
-                      {formatDate(transaction.timestamp)}
+                      {formatDate(transaction?.transactionDate)}
                     </p>
                   </div>
                   <div className="flex space-x-2">
@@ -319,7 +321,7 @@ const AgentDashboard = () => {
               </div>
             ))}
           </div>
-          {transactions.length === 0 && (
+          {transactionsDone.length === 0 && (
             <div className="p-8 text-center text-gray-500">
               No pending transactions
             </div>

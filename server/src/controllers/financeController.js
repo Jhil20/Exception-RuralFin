@@ -29,6 +29,11 @@ const transferFunds = async (req, res) => {
 
   try {
     const { senderId, receiverId, amount, transactionId } = req.body;
+    console.log("Transfer Funds Request:", req.body);
+    console.log("senderId:", senderId);
+    console.log("receiverId:", receiverId);
+    console.log("amount:", amount);
+    console.log("transactionId:", transactionId);
 
     if (!senderId || !receiverId || !amount || !transactionId) {
       return res.status(400).json({ message: "Invalid request", success: false });
@@ -36,13 +41,13 @@ const transferFunds = async (req, res) => {
 
     const sender = await User.findById(senderId).session(session);
     const receiver = await User.findById(receiverId).session(session);
-
+    console.log("sender and receiver found")
     if (!sender || !receiver) {
       return res.status(404).json({ message: "User or Receiver not found", success: false });
     }
 
     const transaction = await UserToUserTransaction.findById(transactionId).session(session);
-
+    console.log("transaction found")
     if (!transaction) {
       return res.status(404).json({ message: "Transaction not found", success: false });
     }
@@ -50,7 +55,7 @@ const transferFunds = async (req, res) => {
     if (transaction.status !== "pending") {
       return res.status(400).json({ message: "Transaction is not pending", success: false });
     }
-
+    console.log("Transaction is pending")
     const senderFinance = await Finance.findOne({ userId: senderId }).session(session);
     const receiverFinance = await Finance.findOne({ userId: receiverId }).session(session);
 
@@ -62,7 +67,7 @@ const transferFunds = async (req, res) => {
     if (senderFinance.balance < amount) {
       return res.status(400).json({ message: "Insufficient balance", success: false });
     }
-
+    console.log("Sufficient balance found",senderFinance,receiverFinance)
     let isDebitSuccessful = false;
     let isCreditSuccessful = false;
 
@@ -71,19 +76,19 @@ const transferFunds = async (req, res) => {
       senderFinance.balance -= amount;
       await senderFinance.save({ session });
       isDebitSuccessful = true;
-
+      console.log("Debit successful");
       // Credit receiverFinance
       receiverFinance.balance += amount;
       await receiverFinance.save({ session });
       isCreditSuccessful = true;
-
+      console.log("Credit successful");
       // Mark transaction as completed
       transaction.status = "completed";
       await transaction.save({ session });
-
+      console.log("Transaction marked as completed");
       await session.commitTransaction();
       session.endSession();
-
+      console.log("Transaction committed successfully");
       return res.status(200).json({ success: true, message: "Transaction completed successfully" });
 
     } catch (innerError) {

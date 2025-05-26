@@ -3,7 +3,7 @@ const AgentToUserTransaction = require('../models/agentToUserTransactionModel');
 const getAllTransactionsByAgentId = async (req, res) => {
     try {
         const { id } = req.params;
-        const transactions = await AgentToUserTransaction.find({ id });
+        const transactions = await AgentToUserTransaction.find({ id }).populate('userId');
         if (!transactions) {
         return res.status(404).json({ message: "No transactions found", success: false });
         }

@@ -10,14 +10,14 @@ const userToAgentTransactionSchema = new Schema(
     commission: { type: Number, default: 0 },
     status: {
       type: String,
-      enum: ["pending", "completed", "failed"],
+      enum: ["pending", "completed", "failed", "rejected"],
       default: "pending",
     },
     transactionDate: { type: Date, default: Date.now },
     // remarks: { type: String },
     method: {
       type: String,
-      enum: ["cash", "bankTransfer", "mobileWallet"],
+      enum: ["cash", "eRupees"],
       default: "cash",
     },
     conversionType: {

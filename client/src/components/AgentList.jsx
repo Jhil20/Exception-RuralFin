@@ -2,6 +2,11 @@ import React from "react";
 import { User, Star, ChevronRight } from "lucide-react";
 
 const AgentList = ({ agents }) => {
+
+
+  
+
+
   return (
     <div className="bg-gray-50  h-full rounded-2xl p-8 shadow-md shadow-gray-300">
       <h3 className="text-xl font-semibold text-black mb-6">Select an Agent</h3>

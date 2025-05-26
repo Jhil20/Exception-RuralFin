@@ -198,6 +198,45 @@ const getBudgetByUserId = async (req, res) => {
   }
 };
 
+const updateBudgetSpending = async (req, res) => {
+  try{
+    const { userId, category, amount } = req.body;
+    console.log("updateBudgetSpending", req.body);
+
+    // Validate required fields
+    if (!userId || !category || !amount) {
+      return res
+        .status(400)
+        .json({ message: "userId, category and amount are required", success: false });
+    }
+
+    const date = new Date();
+    const currentMonth = date.getMonth() + 1;
+    const currentYear = date.getFullYear();
+
+    const budget = await Budget.findOne({ userId, month: currentMonth, year: currentYear });
+    if (!budget) {
+      return res
+        .status(404)
+        .json({ message: "Budget not found for this user", success: false });
+    }
+
+    // Update the category spending
+    budget.categorySpending[category] += amount;
+    
+    // Save the updated budget
+    await budget.save();
+
+    res.status(200).json({
+      budget,
+      message: "Budget spending updated successfully",
+      success: true,
+    });
+  }catch(error){
+    res.status(500).json({ message: error.message });
+  }
+}
+
 const getAllBudgetsOfThisYearByUserId = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -240,4 +279,5 @@ module.exports = {
   createBudget,
   getBudgetByUserId,
   getAllBudgetsOfThisYearByUserId,
+  updateBudgetSpending,
 };
