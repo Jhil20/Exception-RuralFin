@@ -1,7 +1,13 @@
-import React, { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Users, ShieldCheck, Wallet, RefreshCw, TrendingUp } from 'lucide-react';
+import React, { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import {
+  Users,
+  ShieldCheck,
+  Wallet,
+  RefreshCw,
+  TrendingUp,
+} from "lucide-react";
 
 const AgentModel = () => {
   const sectionRef = useRef(null);
@@ -22,8 +28,8 @@ const AgentModel = () => {
       duration: 0.8,
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: 'top 70%',
-      }
+        start: "top 70%",
+      },
     });
 
     stepRefs.current.forEach((step, index) => {
@@ -33,11 +39,11 @@ const AgentModel = () => {
         opacity: 0,
         x: index % 2 === 0 ? -30 : 30,
         duration: 0.8,
-        delay: 0.2 + (index * 0.1),
+        delay: 0.2 + index * 0.1,
         scrollTrigger: {
           trigger: step,
-          start: 'top 85%',
-        }
+          start: "top 85%",
+        },
       });
     });
 
@@ -48,8 +54,8 @@ const AgentModel = () => {
         duration: 1,
         scrollTrigger: {
           trigger: imageRef.current,
-          start: 'top 80%',
-        }
+          start: "top 80%",
+        },
       });
     }
   }, []);
@@ -57,24 +63,28 @@ const AgentModel = () => {
   const steps = [
     {
       icon: <Users size={24} />,
-      title: 'Agent Recruitment',
-      description: 'Trusted individuals from local communities become our financial agents.'
+      title: "Agent Recruitment",
+      description:
+        "Trusted individuals from local communities become our financial agents.",
     },
     {
       icon: <ShieldCheck size={24} />,
-      title: 'Security Deposit',
-      description: 'Agents deposit ₹5,000-₹10,000 as security, ensuring transaction liquidity.'
+      title: "Security Deposit",
+      description:
+        "Agents deposit ₹5,000-₹10,000 as security, ensuring transaction liquidity.",
     },
     {
       icon: <Wallet size={24} />,
-      title: 'Transaction Facilitation',
-      description: 'Agents help users deposit, withdraw, and transfer money seamlessly.'
+      title: "Transaction Facilitation",
+      description:
+        "Agents help users deposit, withdraw, and transfer money seamlessly.",
     },
     {
       icon: <TrendingUp size={24} />,
-      title: 'Earnings-Based Model',
-      description: 'Agents earn a percentage from each user transaction—similar to freelancing. Higher deposits unlock more earning potential.'
-    }
+      title: "Earnings-Based Model",
+      description:
+        "Agents earn a percentage from each user transaction—similar to freelancing. Higher deposits unlock more earning potential.",
+    },
   ];
 
   return (
@@ -85,18 +95,16 @@ const AgentModel = () => {
     >
       <div className="container mx-auto">
         <div className="text-center mb-6">
-          <h2
-            ref={titleRef}
-            className="text-3xl md:text-4xl font-bold mb-4"
-          >
+          <h2 ref={titleRef} className="text-3xl md:text-4xl font-bold mb-4">
             How Our Agent Model Works
           </h2>
           <p
             ref={descriptionRef}
             className="text-lg text-gray-700 max-w-3xl mx-auto"
           >
-            Our innovative agent network bridges the gap between cash and digital economies, 
-            ensuring transactions are secure, reliable and accessible to everyone.
+            Our innovative agent network bridges the gap between cash and
+            digital economies, ensuring transactions are secure, reliable and
+            accessible to everyone.
           </p>
         </div>
 
@@ -106,7 +114,7 @@ const AgentModel = () => {
               {steps.map((step, index) => (
                 <div
                   key={index}
-                  ref={el => stepRefs.current[index] = el}
+                  ref={(el) => (stepRefs.current[index] = el)}
                   className="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
                 >
                   <div className="bg-gray-100 h-12 w-12 rounded-lg flex items-center justify-center mb-4 text-black">
@@ -119,10 +127,7 @@ const AgentModel = () => {
             </div>
           </div>
 
-          <div
-            ref={imageRef}
-            className="w-full lg:w-1/2 order-1 lg:order-2"
-          >
+          <div ref={imageRef} className="w-full lg:w-1/2 order-1 lg:order-2">
             <div className="bg-gradient-to-br from-gray-200 to-gray-300 p-6 rounded-2xl shadow-lg">
               <div className="bg-white rounded-xl p-6">
                 <div className="flex items-center mb-6">
@@ -130,8 +135,10 @@ const AgentModel = () => {
                     <Users size={24} className="text-black" />
                   </div>
                   <div>
-                    <h4 className="font-bold">Agent Dashboard</h4>
-                    <p className="text-sm text-gray-500">Secure transactions & management</p>
+                    <h4 className="font-bold">Agent AgentDashboard</h4>
+                    <p className="text-sm text-gray-500">
+                      Secure transactions & management
+                    </p>
                   </div>
                 </div>
 
@@ -143,11 +150,15 @@ const AgentModel = () => {
                   <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
                     <div className="bg-black h-2 rounded-full w-full"></div>
                   </div>
-                  <p className="text-xs text-gray-500">Bond Period: 4 months remaining</p>
+                  <p className="text-xs text-gray-500">
+                    Bond Period: 4 months remaining
+                  </p>
                 </div>
 
                 <div className="mb-4">
-                  <p className="text-sm font-medium text-gray-700 mb-2">Recent Transactions</p>
+                  <p className="text-sm font-medium text-gray-700 mb-2">
+                    Recent Transactions
+                  </p>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                       <div>

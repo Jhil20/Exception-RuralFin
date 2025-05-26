@@ -74,7 +74,7 @@ export const agentValidationSchemaStep1 = Yup.object({
 });
 
 export const agentValidationSchemaStep2 = Yup.object({
-  aadharNumber: Yup.string()
+  aadhar: Yup.string()
     .matches(/^[0-9]{12}$/, "Aadhar number must be 12 digits")
     .required("Aadhar number is required"),
   password: Yup.string()
@@ -88,7 +88,7 @@ export const agentValidationSchemaStep2 = Yup.object({
     .oneOf([Yup.ref("password")], "Passwords must match")
     .required("Confirm password is required"),
   securityDeposit: Yup.number()
-    .min(1000, "Security deposit must be at least ₹1000")
+    .min(10000, "Security deposit must be at least ₹10000")
     .required("Security deposit is required"),
   accountNumber: Yup.string()
     .matches(/^[0-9]{9,18}$/, "Please enter a valid account number")

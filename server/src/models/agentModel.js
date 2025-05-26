@@ -7,9 +7,9 @@ const agentSchema = new Schema(
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     phone: { type: String, required: true },
-    age : { type: Number, required: true },
+    age: { type: Number, required: true },
     dob: { type: Date, required: true },
-    gender: { type: String, enum: ["Male", "Female", "Other"], required: true },
+    gender: { type: String, enum: ["male", "female", "other"], required: true },
     address: { type: String, required: true },
     aadhar: { type: String, required: true },
     accountNumber: { type: String, required: true },
@@ -20,6 +20,12 @@ const agentSchema = new Schema(
     commissionEarned: { type: Number, default: 0 },
     transactionCount: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true },
+    role: {
+      type: String,
+      enum: ["agent"],
+      default: "agent",
+      required: true,
+    },
   },
   { timestamps: true }
 );

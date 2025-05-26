@@ -42,7 +42,8 @@ const Header = () => {
           </div>
 
           {/* Desktop Navigation */}
-          {(location.pathname === "/dashboard" || location.pathname === "/agentDashboard") ? (
+          {location.pathname === "/dashboard" ||
+          location.pathname === "/agentDashboard" ? (
             <div></div>
           ) : (
             <nav className="hidden md:flex space-x-8">
@@ -88,7 +89,7 @@ const Header = () => {
                     href="#dashboard"
                     className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
                   >
-                    Dashboard
+                    AgentDashboard
                   </a>
                   <a
                     href="#transactions"
@@ -173,7 +174,7 @@ const Header = () => {
               href="#dashboard"
               className="block text-gray-900 px-3 py-2 text-base font-medium rounded-md hover:bg-gray-100 transition-colors duration-200"
             >
-              Dashboard
+              AgentDashboard
             </a>
             <a
               href="#transactions"

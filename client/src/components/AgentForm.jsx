@@ -58,7 +58,9 @@ const AgentForm = ({  resetRole }) => {
     console.log(data, "data");
     dispatch(showLoader());
     try {
-      navigate("/razorpay");
+      navigate("/razorpay",{
+        state:{data:data}
+      });
     } catch (error) {
       console.log("error in creating agent", error);
     } finally {
@@ -420,7 +422,7 @@ const AgentForm = ({  resetRole }) => {
                       <ReceiptIndianRupee className="h-5 w-5 text-gray-600" />
                     </div>
                     <Field
-                      type="password"
+                      type="number"
                       id="securityDeposit"
                       name="securityDeposit"
                       className="block w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"

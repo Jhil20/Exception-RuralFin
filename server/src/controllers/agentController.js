@@ -17,8 +17,8 @@ const getAllAgents = async (req, res) => {
 const getAgentById = async (req, res) => {
   try {
     const agent = await Agent.findById(req.params.id);
-    if (!agent) return res.status(404).json({ message: "Agent not found" });
-    res.json(agent);
+    if (!agent) return res.status(404).json({ message: "Agent not found", success: false });
+    res.json({agent,message: "Agent found", success: true});
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -58,7 +58,7 @@ const createAgent = async (req, res) => {
       "bankName",
       "securityDeposit",
     ];
-    // console.log(req.body);
+    console.log(req.body);
     // Check if all required fields are present
     for (const field of requiredFields) {
       if (!req.body[field]) {
@@ -72,7 +72,7 @@ const createAgent = async (req, res) => {
     // Check if agent already exists
     const existingAgent = await Agent.findOne({ phone });
     if (existingAgent) {
-      return res.status(400).json({ error: "Agent already exists" });
+      return res.status(400).json({ error: "Profile with this phone already exists" });
     }
 
     // Hash password
@@ -89,8 +89,7 @@ const createAgent = async (req, res) => {
       accountNumber,
       ifscCode,
       bankName,
-      securityDeposit:5000,
-      email,
+      securityDeposit:securityDeposit,
       password: hashedPassword,
       phone,
       address,
@@ -120,6 +119,35 @@ const createAgent = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+
+const getAgentByPhone = async (req, res) => {
+  try {
+    // console.log("getAgentByPhone called");
+    const { phoneNumber, role } = req.body;
+    // console.log("phoneNumber", phoneNumber);
+    // console.log("role", role);
+    const agent = await Agent.findOne({ phone: phoneNumber, role: role });
+    // console.log("agent found", agent);
+    if (agent) {
+      const token = jwt.sign(
+        { id: agent._id, phone: agent.phone },
+        "harshp4114",
+        { expiresIn: "1h" }
+      );
+      return res
+        .status(200)
+        .json({ message: "Agent found", success: true, token: token });
+    } else {
+      return res
+        .status(200)
+        .json({ message: "Agent not found", success: false });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching Agent", error });
+  }
+};
+
 
 // Update agent
 const updateAgent = async (req, res) => {
@@ -151,4 +179,5 @@ module.exports = {
   createAgent,
   updateAgent,
   deleteAgent,
+  getAgentByPhone,
 };

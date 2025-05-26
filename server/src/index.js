@@ -8,6 +8,7 @@ const userToUserTransactionRoutes = require("./routes/userToUserTransactionRoute
 const budgetRoutes = require("./routes/budgetRoutes");
 const app = express();
 const financeRoutes = require("./routes/financeRoutes");
+const agentToUserTransactionRoutes = require("./routes/agentToUserTransactionRoutes");
 app.use(
   cors({
     credentials: true,
@@ -26,6 +27,7 @@ app.use("/api/agent", agentRoutes);
 app.use("/api/finance", financeRoutes);
 app.use("/api/userToUserTransaction", userToUserTransactionRoutes);
 app.use("/api/budget", budgetRoutes);
+app.use('/api/agentToUserTransaction',agentToUserTransactionRoutes)
 
 app.listen(5000, () => {
   try {

@@ -22,6 +22,7 @@ import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
 import {jwtDecode} from "jwt-decode";
 import Cookies from "js-cookie";
 import { SignedIn } from "../redux/slices/isSignInSlice";
+import capitalize from "../utils/capitalize";
 
 const Login = () => {
   const [firebaseError, setFirebaseError] = useState("");
@@ -30,6 +31,7 @@ const Login = () => {
   const [phoneState, setPhoneState] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRendered, setIsRendered] = useState(false);
+  const [whatRole, setWhatRole] = useState("");
   const dispatch = useDispatch();
   const initialValues = {
     phoneNumber: "",
@@ -84,8 +86,11 @@ const Login = () => {
     console.log("Full Phone Number:", fullPhone);
     setPhoneState(fullPhone);
     try {
+      const whichRole = values.role;
+      setWhatRole(whichRole);
+      
       const response = await axios.post(
-        `${BACKEND_URL}/api/user/getUserByPhone`,
+        `${BACKEND_URL}/api/${whichRole}/get${capitalize(whichRole)}ByPhone`,
         values
       );
       // console.log("Response from server:", response);
@@ -205,7 +210,14 @@ const Login = () => {
       toast.success("OTP verified successfully!");
       setTimeout(() => {
         dispatch(SignedIn());
-        navigate("/dashboard");
+        if(whatRole==="user"){
+
+          navigate("/dashboard");
+        }else if(whatRole==="agent"){
+          navigate("/agentDashboard");
+        }else{
+          navigate("/adminDashboard");
+        }
       },2000);
     } catch (error) {
       console.error("Error verifying OTP:", error);
