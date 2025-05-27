@@ -4,7 +4,11 @@ import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import capitalize from "../utils/capitalize";
 
-const AgentList = ({ setShowAgentDetails, setSelectedAgent }) => {
+const AgentList = ({
+  setShowAgentDetails,
+  setSelectedAgent,
+  setShowAgentsViewMore,
+}) => {
   const [allAgents, setAllAgents] = useState([]);
   useEffect(() => {
     getAgents();
@@ -60,7 +64,10 @@ const AgentList = ({ setShowAgentDetails, setSelectedAgent }) => {
           </div>
         ))}
         {/* View More Box */}
-        <div className="bg-black  p-5 rounded-lg shadow-md hover:shadow-lg shadow-black/40 transition-all duration-300 transform hover:scale-105 cursor-pointer flex items-center justify-center">
+        <div
+          onClick={() => setShowAgentsViewMore(true)}
+          className="bg-black  p-5 rounded-lg shadow-md hover:shadow-lg shadow-black/40 transition-all duration-300 transform hover:scale-105 cursor-pointer flex items-center justify-center"
+        >
           <span className="text-white text-lg font-semibold mr-">
             View More
           </span>

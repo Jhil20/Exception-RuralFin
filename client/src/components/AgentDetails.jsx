@@ -1,6 +1,5 @@
 import { IndianRupee, X } from "lucide-react";
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   User,
   Phone,
@@ -8,42 +7,25 @@ import {
   MapPin,
   Building,
   CreditCard,
-  DollarSign,
   ArrowDownCircle,
   ArrowUpCircle,
   Check,
-  AlertCircle,
   Activity,
-  ChevronUp,
+  History,
+  Clock,
+  Filter,
+  RefreshCw,
 } from "lucide-react";
 import capitalize from "../utils/capitalize";
 import findAge from "../utils/findAge";
 import calculateAgentCommission from "../utils/calculateAgentComission";
+
 const AgentDetails = ({
   showAgentDetails,
   setShowAgentDetails,
   selectedAgent,
   setSelectedAgent,
 }) => {
-  const mockAgentData = {
-    firstName: "John",
-    lastName: "Doe",
-    phone: "+91 9876543210",
-    age: 32,
-    dob: new Date("1991-05-15"),
-    gender: "male",
-    address: "123 Main Street, Bangalore, Karnataka, 560001",
-    aadhar: "1234-5678-9012",
-    accountNumber: "12345678901234",
-    ifscCode: "ABCD0001234",
-    bankName: "State Bank of India",
-    securityDeposit: 5000,
-    commissionEarned: 12500,
-    transactionCount: 48,
-    isActive: true,
-    role: "agent",
-  };
-
   const monthsMapping = {
     1: "January",
     2: "February",
@@ -63,12 +45,77 @@ const AgentDetails = ({
   const [transactionType, setTransactionType] = useState("deposit");
   const [amount, setAmount] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [transactionFilter, setTransactionFilter] = useState("all");
+
+  // Mock transaction data
+  const mockTransactions = [
+    {
+      id: "TRX123456",
+      type: "deposit",
+      amount: 5000,
+      status: "completed",
+      date: new Date(2025, 4, 10, 14, 30),
+      userName: "Raj Kumar",
+      userId: "USR789012",
+      commissionAmount: 100,
+    },
+    {
+      id: "TRX123457",
+      type: "withdrawal",
+      amount: 2000,
+      status: "completed",
+      date: new Date(2025, 4, 9, 10, 15),
+      userName: "Priya Sharma",
+      userId: "USR789013",
+      commissionAmount: 40,
+    },
+    {
+      id: "TRX123458",
+      type: "deposit",
+      amount: 10000,
+      status: "pending",
+      date: new Date(2025, 4, 11, 9, 45),
+      userName: "Vikram Singh",
+      userId: "USR789014",
+      commissionAmount: 250,
+    },
+    {
+      id: "TRX123459",
+      type: "withdrawal",
+      amount: 7500,
+      status: "pending",
+      date: new Date(2025, 4, 11, 16, 20),
+      userName: "Ananya Patel",
+      userId: "USR789015",
+      commissionAmount: 150,
+    },
+    {
+      id: "TRX123460",
+      type: "deposit",
+      amount: 3000,
+      status: "cancelled",
+      date: new Date(2025, 4, 8, 11, 10),
+      userName: "Mohan Das",
+      userId: "USR789016",
+      commissionAmount: 45,
+    },
+  ];
 
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
+    });
+  };
+
+  const formatDateTime = (date) => {
+    return new Date(date).toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -96,6 +143,15 @@ const AgentDetails = ({
     setShowConfirmation(false);
   };
 
+  const getFilteredTransactions = () => {
+    if (transactionFilter === "all") {
+      return mockTransactions;
+    }
+    return mockTransactions.filter(tx => tx.status === transactionFilter);
+  };
+
+  const filteredTransactions = getFilteredTransactions();
+
   if (!showAgentDetails) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -114,11 +170,11 @@ const AgentDetails = ({
       {/* Header */}
       <div className="flex justify-between items-center h-22 mt-2 px-6 pb-2 border-b border-gray-100">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Agent Details</h2>
+          <h2 className="text-2xl font-semibold mb-2 mt-2  text-gray-900">Agent Details</h2>
           <p className="text-gray-500 mt-1">
             {capitalize(selectedAgent?.firstName)}{" "}
             {capitalize(selectedAgent?.lastName)} | ID:{" "}
-            {selectedAgent?._id.toLocaleString()}
+            {selectedAgent?._id}
           </p>
         </div>
         <button
@@ -126,7 +182,7 @@ const AgentDetails = ({
             setSelectedAgent(null);
             setShowAgentDetails(false);
           }}
-          className="p-2 rounded-full cursor-pointer hover:bg-gray-100 transition-colors duration-200 group"
+          className="p-2 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors duration-200 group"
           aria-label="Close"
         >
           <X
@@ -137,7 +193,7 @@ const AgentDetails = ({
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b h-14  border-gray-100">
+      <div className="flex border-b h-14 border-gray-100">
         <button
           onClick={() => setActiveTab("info")}
           className={`px-8 py-4 cursor-pointer border-r border-r-gray-100 font-medium transition-colors duration-200 ${
@@ -150,7 +206,7 @@ const AgentDetails = ({
         </button>
         <button
           onClick={() => setActiveTab("transactions")}
-          className={`px-8 py-4 cursor-pointer font-medium transition-colors duration-200 ${
+          className={`px-8 py-4 cursor-pointer border-r border-r-gray-100 font-medium transition-colors duration-200 ${
             activeTab === "transactions"
               ? "text-black bg-gray-50 border-b-2 border-black"
               : "text-gray-500 hover:text-gray-900"
@@ -158,10 +214,20 @@ const AgentDetails = ({
         >
           Transactions
         </button>
+        <button
+          onClick={() => setActiveTab("history")}
+          className={`px-8 py-4 cursor-pointer font-medium transition-colors duration-200 ${
+            activeTab === "history"
+              ? "text-black bg-gray-50 border-b-2 border-black"
+              : "text-gray-500 hover:text-gray-900"
+          }`}
+        >
+          Transaction History
+        </button>
       </div>
 
       {/* Content */}
-      <div className="h-9/12 overflow-auto border-b border-gray-100  p-6">
+      <div className="h-9/12 overflow-auto border-b border-gray-100 p-6">
         {activeTab === "info" ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
@@ -192,7 +258,7 @@ const AgentDetails = ({
                             Phone Number
                           </span>
                         </label>
-                        <p className="text-black  font-medium">
+                        <p className="text-black font-medium">
                           {selectedAgent?.phone}
                         </p>
                       </div>
@@ -387,7 +453,7 @@ const AgentDetails = ({
               </div>
             </div>
           </div>
-        ) : (
+        ) : activeTab === "transactions" ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
               <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
@@ -442,7 +508,7 @@ const AgentDetails = ({
                           id="amount"
                           value={amount}
                           onChange={handleAmountChange}
-                          className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg   focus:border-black transition-all duration-200"
+                          className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:border-black transition-all duration-200"
                           placeholder="0.00"
                           required
                         />
@@ -454,7 +520,7 @@ const AgentDetails = ({
 
                     <div className="mb-6">
                       <label
-                        htmlFor="amount"
+                        htmlFor="commission"
                         className="block text-sm font-medium text-gray-700 mb-2"
                       >
                         Agent Commision Amount (₹)
@@ -465,11 +531,10 @@ const AgentDetails = ({
                         </div>
                         <input
                           type="text"
-                          name="amount"
-                          id="amount"
+                          name="commission"
+                          id="commission"
                           value={calculateAgentCommission(amount)}
-                          onChange={handleAmountChange}
-                          className="block w-full text-gray-500 pl-10 pr-12 py-3 border border-gray-300 rounded-lg   focus:border-black transition-all duration-200"
+                          className="block w-full text-gray-500 pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:border-black transition-all duration-200"
                           placeholder="0.00"
                           required
                           disabled
@@ -491,7 +556,7 @@ const AgentDetails = ({
                         id="notes"
                         name="notes"
                         rows={3}
-                        className="block w-full py-3 px-4 border border-gray-300 rounded-lg  focus:border-black transition-all duration-200"
+                        className="block w-full py-3 px-4 border border-gray-300 rounded-lg focus:border-black transition-all duration-200"
                         placeholder="Add any additional information..."
                       />
                     </div>
@@ -543,7 +608,7 @@ const AgentDetails = ({
                     </div>
 
                     <div className="bg-gray-50 p-4 border-gray-200 border rounded-lg">
-                      <h4 className="font-medium text-gray-900  mb-2">
+                      <h4 className="font-medium text-gray-900 mb-2">
                         Agent Commission Strategy
                       </h4>
                       <ul className="text-sm text-gray-600 space-y-2">
@@ -559,52 +624,216 @@ const AgentDetails = ({
               </div>
             </div>
           </div>
+        ) : (
+          // Transaction History Tab
+          <div className="grid grid-cols-1 gap-6">
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+              <div className="p-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4 md:mb-0 flex items-center">
+                    <History size={18} className="mr-2" />
+                    Transaction History
+                  </h3>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => setTransactionFilter("all")}
+                      className={`px-3 py-1.5 text-sm rounded-md transition-colors duration-200 flex items-center ${
+                        transactionFilter === "all"
+                          ? "bg-gray-900 text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      <Filter size={14} className="mr-1.5" />
+                      All
+                    </button>
+                    <button
+                      onClick={() => setTransactionFilter("pending")}
+                      className={`px-3 py-1.5 text-sm rounded-md transition-colors duration-200 flex items-center ${
+                        transactionFilter === "pending"
+                          ? "bg-gray-900 text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      <Clock size={14} className="mr-1.5" />
+                      Pending
+                    </button>
+                    <button
+                      onClick={() => setTransactionFilter("completed")}
+                      className={`px-3 py-1.5 text-sm rounded-md transition-colors duration-200 flex items-center ${
+                        transactionFilter === "completed"
+                          ? "bg-gray-900 text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      <Check size={14} className="mr-1.5" />
+                      Completed
+                    </button>
+                  </div>
+                </div>
+
+                {filteredTransactions.length === 0 ? (
+                  <div className="text-center py-10">
+                    <RefreshCw size={40} className="mx-auto text-gray-300 mb-3" />
+                    <p className="text-gray-500">No transactions found</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {filteredTransactions.map((transaction) => (
+                      <div 
+                        key={transaction.id}
+                        className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200"
+                      >
+                        <div className="p-4 bg-white">
+                          <div className="flex flex-col md:flex-row justify-between">
+                            <div className="mb-2 md:mb-0">
+                              <div className="flex items-center mb-1">
+                                <span className="font-medium text-gray-900">
+                                  {transaction.type === "deposit" ? "Deposit" : "Withdrawal"}
+                                </span>
+                                <span className="ml-2 text-sm text-gray-500">#{transaction.id}</span>
+                                <span 
+                                  className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
+                                    transaction.status === "completed" 
+                                      ? "bg-green-100 text-green-800" 
+                                      : transaction.status === "pending"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : "bg-red-100 text-red-800"
+                                  }`}
+                                >
+                                  {transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
+                                </span>
+                              </div>
+                              <div className="text-sm text-gray-600 flex items-center">
+                                <span className="mr-4">
+                                  From: {transaction.userName}
+                                </span>
+                                <span className="text-xs text-gray-500">
+                                  {formatDateTime(transaction.date)}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex flex-col items-end">
+                              <span className="font-bold text-black">
+                                ₹{transaction.amount.toLocaleString("en-IN")}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                Commission: ₹{transaction.commissionAmount.toLocaleString("en-IN")}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {transaction.status === "pending" && (
+                          <div className="px-4 py-2 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
+                            <button className="px-3 py-1 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-100 transition-colors duration-200">
+                              Reject
+                            </button>
+                            <button className="px-3 py-1 text-sm bg-black text-white rounded-md hover:bg-gray-800 transition-colors duration-200">
+                              {transaction.type === "deposit" ? "Confirm Receipt" : "Complete Withdrawal"}
+                            </button>
+                          </div>
+                        )}
+
+                        {transaction.status === "completed" && (
+                          <div className="px-4 py-2 bg-gray-50 border-t border-gray-200 flex items-center text-sm text-gray-500">
+                            <Check size={14} className="mr-1.5 text-green-500" />
+                            {transaction.type === "deposit" 
+                              ? "Cash received and eRupees credited to user" 
+                              : "Cash given to user and eRupees deducted"}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+              <div className="p-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                  <Activity size={18} className="mr-2" />
+                  Transaction Process
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-gray-50 border-gray-200 border p-4 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-3">
+                      Withdrawal Flow (eRupees to Cash)
+                    </h4>
+                    <ol className="text-sm text-gray-600 space-y-3 list-decimal pl-5">
+                      <li className="pl-1">User sends withdrawal request</li>
+                      <li className="pl-1">Agent accepts request</li>
+                      <li className="pl-1">Agent gives real cash to user</li>
+                      <li className="pl-1">Agent clicks "Complete"</li>
+                      <li className="pl-1">System deducts erupees from user</li>
+                      <li className="pl-1 text-green-600 font-medium">Transaction marked completed, audit logged</li>
+                    </ol>
+                  </div>
+
+                  <div className="bg-gray-50 border-gray-200 border p-4 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-3">
+                      Deposit Flow (Cash to eRupees)
+                    </h4>
+                    <ol className="text-sm text-gray-600 space-y-3 list-decimal pl-5">
+                      <li className="pl-1">User sends deposit request to agent</li>
+                      <li className="pl-1">Agent accepts after verifying identity</li>
+                      <li className="pl-1">User gives real cash to agent physically</li>
+                      <li className="pl-1">Agent clicks "Complete" after receiving cash</li>
+                      <li className="pl-1">System credits eRupees to user's wallet</li>
+                      <li className="pl-1 text-green-600 font-medium">Transaction marked completed, audit logged</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </div>
+
+      {/* Transaction Confirmation Modal */}
+      {showConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl animate-fade-in">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Confirm Transaction</h3>
+            
+            <div className="bg-gray-50 rounded-lg p-4 mb-6">
+              <div className="flex justify-between mb-2">
+                <span className="text-gray-500">Transaction Type:</span>
+                <span className="font-medium capitalize">{transactionType}</span>
+              </div>
+              <div className="flex justify-between mb-2">
+                <span className="text-gray-500">Amount:</span>
+                <span className="font-medium">₹{parseFloat(amount || "0").toLocaleString('en-IN')}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Agent:</span>
+                <span className="font-medium">
+                  {capitalize(selectedAgent?.firstName)} {capitalize(selectedAgent?.lastName)}
+                </span>
+              </div>
+            </div>
+            
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowConfirmation(false)}
+                className="flex-1 py-2 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirm}
+                className="flex-1 py-2 px-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-200"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-{
-  /* Transaction Confirmation Modal */
-}
-{
-  /* {showConfirmation && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
-    <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl animate-fade-in">
-      <h3 className="text-xl font-bold text-gray-900 mb-4">Confirm Transaction</h3>
-      
-      <div className="bg-gray-50 rounded-lg p-4 mb-6">
-        <div className="flex justify-between mb-2">
-          <span className="text-gray-500">Transaction Type:</span>
-          <span className="font-medium capitalize">{transactionType}</span>
-        </div>
-        <div className="flex justify-between mb-2">
-          <span className="text-gray-500">Amount:</span>
-          <span className="font-medium">₹{parseFloat(amount).toLocaleString('en-IN')}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-gray-500">Agent:</span>
-          <span className="font-medium">{mockAgentData.firstName} {mockAgentData.lastName}</span>
-        </div>
-      </div>
-      
-      <div className="flex space-x-3">
-        <button
-          onClick={() => setShowConfirmation(false)}
-          className="flex-1 py-2 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleConfirm}
-          className="flex-1 py-2 px-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-200"
-        >
-          Confirm
-        </button>
-      </div>
-    </div>
-  </div>
-)} */
-}
 
 export default AgentDetails;

@@ -21,6 +21,7 @@ import ViewAll from "../components/ViewAll";
 import BudgetPlanningForm from "../components/BudgetPlanningForm";
 import DetailedExpenseReport from "../components/DetailedExpenseReport";
 import AgentDetails from "../components/AgentDetails";
+import AgentsViewMore from "../components/AgentsViewMore";
 
 const UserDashboard = () => {
   // const [isLoading, setIsLoading] = useState(true);
@@ -53,7 +54,7 @@ const UserDashboard = () => {
   const [showDetailedExpense, setShowDetailedExpense] = useState(false);
   const [showAgentDetails, setShowAgentDetails] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState(null);
-  //added to support new components
+  const [showAgentsViewMore, setShowAgentsViewMore] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
   const budgetData = {
     totalBudget: 50000,
@@ -184,8 +185,19 @@ const UserDashboard = () => {
         </div>
       )}
       {showAgentDetails && (
-        <div className="bg-black/40 flex justify-center items-center fixed top-0 z-50 w-full h-full">
-          <AgentDetails setShowAgentDetails={setShowAgentDetails} setSelectedAgent={setSelectedAgent} showAgentDetails={showAgentDetails} selectedAgent={selectedAgent}/>
+        <div className="bg-black/40 flex justify-center items-center fixed top-0 z-100 w-full h-full">
+          <AgentDetails
+            setShowAgentDetails={setShowAgentDetails}
+            setSelectedAgent={setSelectedAgent}
+            showAgentDetails={showAgentDetails}
+            selectedAgent={selectedAgent}
+          />
+        </div>
+      )}
+
+      {showAgentsViewMore && (
+        <div className="bg-black/40 flex justify-center items-center fixed top-0 z-51 w-full h-full">
+          <AgentsViewMore setShowAgentsViewMore={setShowAgentsViewMore} setShowAgentDetails={setShowAgentDetails} setSelectedAgent={setSelectedAgent}/>
         </div>
       )}
 
@@ -220,7 +232,11 @@ const UserDashboard = () => {
           </div>
 
           <div className="lg:col-span-2">
-            <AgentList setShowAgentDetails={setShowAgentDetails} setSelectedAgent={setSelectedAgent} />
+            <AgentList
+              setShowAgentDetails={setShowAgentDetails}
+              setSelectedAgent={setSelectedAgent}
+              setShowAgentsViewMore={setShowAgentsViewMore}
+            />
           </div>
         </div>
 
