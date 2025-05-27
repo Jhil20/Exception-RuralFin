@@ -19,6 +19,8 @@ import {
 import capitalize from "../utils/capitalize";
 import findAge from "../utils/findAge";
 import calculateAgentCommission from "../utils/calculateAgentComission";
+import { Field, Formik, Form, ErrorMessage } from "formik";
+import { AgentToUserSchema } from "../yupValidators/validationSchema";
 
 const AgentDetails = ({
   showAgentDetails,
@@ -132,9 +134,9 @@ const AgentDetails = ({
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setShowConfirmation(true);
+  const handleAgentToUserSubmit = (values) => {
+    console.log(values);
+    // setShowConfirmation(true);
   };
 
   const handleConfirm = () => {
@@ -147,7 +149,7 @@ const AgentDetails = ({
     if (transactionFilter === "all") {
       return mockTransactions;
     }
-    return mockTransactions.filter(tx => tx.status === transactionFilter);
+    return mockTransactions.filter((tx) => tx.status === transactionFilter);
   };
 
   const filteredTransactions = getFilteredTransactions();
@@ -170,11 +172,12 @@ const AgentDetails = ({
       {/* Header */}
       <div className="flex justify-between items-center h-22 mt-2 px-6 pb-2 border-b border-gray-100">
         <div>
-          <h2 className="text-2xl font-semibold mb-2 mt-2  text-gray-900">Agent Details</h2>
+          <h2 className="text-2xl font-semibold mb-2 mt-2  text-gray-900">
+            Agent Details
+          </h2>
           <p className="text-gray-500 mt-1">
             {capitalize(selectedAgent?.firstName)}{" "}
-            {capitalize(selectedAgent?.lastName)} | ID:{" "}
-            {selectedAgent?._id}
+            {capitalize(selectedAgent?.lastName)} | ID: {selectedAgent?._id}
           </p>
         </div>
         <button
@@ -454,9 +457,9 @@ const AgentDetails = ({
             </div>
           </div>
         ) : activeTab === "transactions" ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+          <div className="grid  grid-cols-3 gap-6 gap-y-12">
+            <div className="col-span-2  h-full">
+              <div className="bg-white rounded-xl border h-full border-gray-200 overflow-hidden shadow-sm">
                 <div className="p-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-6">
                     {transactionType === "deposit"
@@ -464,13 +467,13 @@ const AgentDetails = ({
                       : "Withdrawal (eRupees to Cash)"}
                   </h3>
 
-                  <div className="flex space-x-4 mb-6">
+                  <div className="flex flex-wrap space-y-6 mb-6">
                     <button
                       onClick={() => setTransactionType("deposit")}
-                      className={`flex-1 flex items-center cursor-pointer justify-center p-4 rounded-lg transition-all duration-200 ${
+                      className={` w-full flex items-center cursor-pointer justify-center p-4 rounded-lg transition-all duration-200 ${
                         transactionType === "deposit"
                           ? "bg-gray-900 text-white"
-                          : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                          : "bg-gray-200 text-gray-800 hover:bg-gray-300"
                       }`}
                     >
                       <ArrowDownCircle size={20} className="mr-2" />
@@ -479,10 +482,10 @@ const AgentDetails = ({
 
                     <button
                       onClick={() => setTransactionType("withdrawal")}
-                      className={`flex-1 flex items-center cursor-pointer justify-center p-4 rounded-lg transition-all duration-200 ${
+                      className={`w-full flex items-center cursor-pointer justify-center p-4 rounded-lg transition-all duration-200 ${
                         transactionType === "withdrawal"
                           ? "bg-gray-900 text-white"
-                          : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                          : "bg-gray-200 text-gray-800 hover:bg-gray-300"
                       }`}
                     >
                       <ArrowUpCircle size={20} className="mr-2" />
@@ -490,87 +493,108 @@ const AgentDetails = ({
                     </button>
                   </div>
 
-                  <form onSubmit={handleSubmit}>
-                    <div className="mb-6">
-                      <label
-                        htmlFor="amount"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        Amount (₹)
-                      </label>
-                      <div className="mt-1 relative rounded-md shadow-sm">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <IndianRupee size={18} className="text-gray-400" />
+                  <Formik
+                    initialValues={{ amount: "", notes: "" }}
+                    onSubmit={handleAgentToUserSubmit}
+                    validationSchema={AgentToUserSchema}
+                  >
+                    {({ values }) => (
+                      <Form>
+                        <div className="mb-6">
+                          <label
+                            htmlFor="amount"
+                            className="block text-sm font-medium text-gray-700 mb-2"
+                          >
+                            Amount (₹)
+                          </label>
+                          <div className="mt-1 relative rounded-md shadow-sm">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <IndianRupee
+                                size={18}
+                                className="text-gray-400"
+                              />
+                            </div>
+                            <Field
+                              type="number"
+                              name="amount"
+                              id="amount"
+                              className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:border-black transition-all duration-200"
+                              placeholder="0.00"
+                            />
+                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                              <span className="text-gray-500 sm:text-sm">
+                                INR
+                              </span>
+                            </div>
+                          </div>
+                          <ErrorMessage
+                            name="amount"
+                            component="div"
+                            className="text-red-500 text-sm mt-1"
+                          />
                         </div>
-                        <input
-                          type="text"
-                          name="amount"
-                          id="amount"
-                          value={amount}
-                          onChange={handleAmountChange}
-                          className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:border-black transition-all duration-200"
-                          placeholder="0.00"
-                          required
-                        />
-                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                          <span className="text-gray-500 sm:text-sm">INR</span>
-                        </div>
-                      </div>
-                    </div>
 
-                    <div className="mb-6">
-                      <label
-                        htmlFor="commission"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        Agent Commision Amount (₹)
-                      </label>
-                      <div className="mt-1 relative rounded-md shadow-sm">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <IndianRupee size={18} className="text-gray-400" />
+                        <div className="mb-6">
+                          <label
+                            htmlFor="commission"
+                            className="block text-sm font-medium text-gray-700 mb-2"
+                          >
+                            Agent Commission Amount (₹)
+                          </label>
+                          <div className="mt-1 relative rounded-md shadow-sm">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <IndianRupee
+                                size={18}
+                                className="text-gray-400"
+                              />
+                            </div>
+                            <input
+                              type="text"
+                              name="commission"
+                              id="commission"
+                              value={calculateAgentCommission(values.amount)}
+                              className="block w-full text-gray-500 pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:border-black transition-all duration-200"
+                              placeholder="0.00"
+                              disabled
+                            />
+                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                              <span className="text-gray-500 sm:text-sm">
+                                INR
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                        <input
-                          type="text"
-                          name="commission"
-                          id="commission"
-                          value={calculateAgentCommission(amount)}
-                          className="block w-full text-gray-500 pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:border-black transition-all duration-200"
-                          placeholder="0.00"
-                          required
-                          disabled
-                        />
-                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                          <span className="text-gray-500 sm:text-sm">INR</span>
+
+                        <div className="mb-6">
+                          <label
+                            htmlFor="notes"
+                            className="block text-sm font-medium text-gray-700 mb-2"
+                          >
+                            Notes (Optional)
+                          </label>
+                          <Field
+                            as="textarea"
+                            id="notes"
+                            name="notes"
+                            rows={3}
+                            className="block w-full py-3 px-4 border border-gray-300 rounded-lg focus:border-black transition-all duration-200"
+                            placeholder="Add any additional information..."
+                          />
                         </div>
-                      </div>
-                    </div>
 
-                    <div className="mb-6">
-                      <label
-                        htmlFor="notes"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        Notes (Optional)
-                      </label>
-                      <textarea
-                        id="notes"
-                        name="notes"
-                        rows={3}
-                        className="block w-full py-3 px-4 border border-gray-300 rounded-lg focus:border-black transition-all duration-200"
-                        placeholder="Add any additional information..."
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      className="w-full py-3 px-4 cursor-pointer bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-200 transform hover:translate-y-[-2px] flex items-center justify-center"
-                      disabled={!amount}
-                    >
-                      <CreditCard size={18} className="mr-2" />
-                      Process{" "}
-                      {transactionType === "deposit" ? "Deposit" : "Withdrawal"}
-                    </button>
-                  </form>
+                        <button
+                          type="submit"
+                          className="w-full py-3 mt-9 px-4 cursor-pointer bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-200 transform hover:translate-y-[-2px] flex items-center justify-center"
+                        >
+                          <CreditCard size={18} className="mr-2" />
+                          Process{" "}
+                          {transactionType === "deposit"
+                            ? "Deposit"
+                            : "Withdrawal"}
+                        </button>
+                      </Form>
+                    )}
+                  </Formik>
                 </div>
               </div>
             </div>
@@ -634,7 +658,7 @@ const AgentDetails = ({
                     <History size={18} className="mr-2" />
                     Transaction History
                   </h3>
-                  
+
                   <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() => setTransactionFilter("all")}
@@ -674,13 +698,16 @@ const AgentDetails = ({
 
                 {filteredTransactions.length === 0 ? (
                   <div className="text-center py-10">
-                    <RefreshCw size={40} className="mx-auto text-gray-300 mb-3" />
+                    <RefreshCw
+                      size={40}
+                      className="mx-auto text-gray-300 mb-3"
+                    />
                     <p className="text-gray-500">No transactions found</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {filteredTransactions.map((transaction) => (
-                      <div 
+                      <div
                         key={transaction.id}
                         className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200"
                       >
@@ -689,19 +716,24 @@ const AgentDetails = ({
                             <div className="mb-2 md:mb-0">
                               <div className="flex items-center mb-1">
                                 <span className="font-medium text-gray-900">
-                                  {transaction.type === "deposit" ? "Deposit" : "Withdrawal"}
+                                  {transaction.type === "deposit"
+                                    ? "Deposit"
+                                    : "Withdrawal"}
                                 </span>
-                                <span className="ml-2 text-sm text-gray-500">#{transaction.id}</span>
-                                <span 
+                                <span className="ml-2 text-sm text-gray-500">
+                                  #{transaction.id}
+                                </span>
+                                <span
                                   className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
-                                    transaction.status === "completed" 
-                                      ? "bg-green-100 text-green-800" 
+                                    transaction.status === "completed"
+                                      ? "bg-green-100 text-green-800"
                                       : transaction.status === "pending"
                                       ? "bg-yellow-100 text-yellow-800"
                                       : "bg-red-100 text-red-800"
                                   }`}
                                 >
-                                  {transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
+                                  {transaction.status.charAt(0).toUpperCase() +
+                                    transaction.status.slice(1)}
                                 </span>
                               </div>
                               <div className="text-sm text-gray-600 flex items-center">
@@ -718,28 +750,36 @@ const AgentDetails = ({
                                 ₹{transaction.amount.toLocaleString("en-IN")}
                               </span>
                               <span className="text-xs text-gray-500">
-                                Commission: ₹{transaction.commissionAmount.toLocaleString("en-IN")}
+                                Commission: ₹
+                                {transaction.commissionAmount.toLocaleString(
+                                  "en-IN"
+                                )}
                               </span>
                             </div>
                           </div>
                         </div>
-                        
+
                         {transaction.status === "pending" && (
                           <div className="px-4 py-2 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
                             <button className="px-3 py-1 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-100 transition-colors duration-200">
                               Reject
                             </button>
                             <button className="px-3 py-1 text-sm bg-black text-white rounded-md hover:bg-gray-800 transition-colors duration-200">
-                              {transaction.type === "deposit" ? "Confirm Receipt" : "Complete Withdrawal"}
+                              {transaction.type === "deposit"
+                                ? "Confirm Receipt"
+                                : "Complete Withdrawal"}
                             </button>
                           </div>
                         )}
 
                         {transaction.status === "completed" && (
                           <div className="px-4 py-2 bg-gray-50 border-t border-gray-200 flex items-center text-sm text-gray-500">
-                            <Check size={14} className="mr-1.5 text-green-500" />
-                            {transaction.type === "deposit" 
-                              ? "Cash received and eRupees credited to user" 
+                            <Check
+                              size={14}
+                              className="mr-1.5 text-green-500"
+                            />
+                            {transaction.type === "deposit"
+                              ? "Cash received and eRupees credited to user"
                               : "Cash given to user and eRupees deducted"}
                           </div>
                         )}
@@ -768,7 +808,9 @@ const AgentDetails = ({
                       <li className="pl-1">Agent gives real cash to user</li>
                       <li className="pl-1">Agent clicks "Complete"</li>
                       <li className="pl-1">System deducts erupees from user</li>
-                      <li className="pl-1 text-green-600 font-medium">Transaction marked completed, audit logged</li>
+                      <li className="pl-1 text-green-600 font-medium">
+                        Transaction marked completed, audit logged
+                      </li>
                     </ol>
                   </div>
 
@@ -777,12 +819,24 @@ const AgentDetails = ({
                       Deposit Flow (Cash to eRupees)
                     </h4>
                     <ol className="text-sm text-gray-600 space-y-3 list-decimal pl-5">
-                      <li className="pl-1">User sends deposit request to agent</li>
-                      <li className="pl-1">Agent accepts after verifying identity</li>
-                      <li className="pl-1">User gives real cash to agent physically</li>
-                      <li className="pl-1">Agent clicks "Complete" after receiving cash</li>
-                      <li className="pl-1">System credits eRupees to user's wallet</li>
-                      <li className="pl-1 text-green-600 font-medium">Transaction marked completed, audit logged</li>
+                      <li className="pl-1">
+                        User sends deposit request to agent
+                      </li>
+                      <li className="pl-1">
+                        Agent accepts after verifying identity
+                      </li>
+                      <li className="pl-1">
+                        User gives real cash to agent physically
+                      </li>
+                      <li className="pl-1">
+                        Agent clicks "Complete" after receiving cash
+                      </li>
+                      <li className="pl-1">
+                        System credits eRupees to user's wallet
+                      </li>
+                      <li className="pl-1 text-green-600 font-medium">
+                        Transaction marked completed, audit logged
+                      </li>
                     </ol>
                   </div>
                 </div>
@@ -796,25 +850,32 @@ const AgentDetails = ({
       {showConfirmation && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
           <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl animate-fade-in">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Confirm Transaction</h3>
-            
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              Confirm Transaction
+            </h3>
+
             <div className="bg-gray-50 rounded-lg p-4 mb-6">
               <div className="flex justify-between mb-2">
                 <span className="text-gray-500">Transaction Type:</span>
-                <span className="font-medium capitalize">{transactionType}</span>
+                <span className="font-medium capitalize">
+                  {transactionType}
+                </span>
               </div>
               <div className="flex justify-between mb-2">
                 <span className="text-gray-500">Amount:</span>
-                <span className="font-medium">₹{parseFloat(amount || "0").toLocaleString('en-IN')}</span>
+                <span className="font-medium">
+                  ₹{parseFloat(amount || "0").toLocaleString("en-IN")}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Agent:</span>
                 <span className="font-medium">
-                  {capitalize(selectedAgent?.firstName)} {capitalize(selectedAgent?.lastName)}
+                  {capitalize(selectedAgent?.firstName)}{" "}
+                  {capitalize(selectedAgent?.lastName)}
                 </span>
               </div>
             </div>
-            
+
             <div className="flex space-x-3">
               <button
                 onClick={() => setShowConfirmation(false)}

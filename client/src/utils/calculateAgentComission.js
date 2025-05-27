@@ -1,6 +1,6 @@
 function calculateAgentCommission(amount) {
   if (amount < 0) {
-    throw new Error("Invalid transaction amount");
+    return "Amount cannot be negative";
   }
 
   if (amount <= 499) return 5;

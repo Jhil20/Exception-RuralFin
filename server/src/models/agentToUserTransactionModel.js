@@ -19,6 +19,7 @@ const userToAgentTransactionSchema = new Schema(
       enum: ["cashToERupees", "eRupeesToCash"],
       required: true,
     },
+    notes: { type: String, default: "" },
   },
   { timestamps: true }
 );

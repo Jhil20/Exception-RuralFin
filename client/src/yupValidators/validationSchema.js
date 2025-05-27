@@ -193,3 +193,7 @@ export const budgetPlanningValidationSchemaStep2 = Yup.object().shape({
     .required('Others is required'),
 });
 
+export const AgentToUserSchema = Yup.object().shape({
+  amount: Yup.number().positive("Amount must be positive").required("Amount is required"),
+  notes: Yup.string(),
+});
