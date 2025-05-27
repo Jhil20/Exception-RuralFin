@@ -52,7 +52,7 @@ const UserDashboard = () => {
   const [budgetPlanningEnabled, setBudgetPlanningEnabled] = useState(false);
   const [showDetailedExpense, setShowDetailedExpense] = useState(false);
   const [showAgentDetails, setShowAgentDetails] = useState(false);
-
+  const [selectedAgent, setSelectedAgent] = useState(null);
   //added to support new components
   const [isReportOpen, setIsReportOpen] = useState(false);
   const budgetData = {
@@ -185,7 +185,7 @@ const UserDashboard = () => {
       )}
       {showAgentDetails && (
         <div className="bg-black/40 flex justify-center items-center fixed top-0 z-50 w-full h-full">
-          <AgentDetails setShowAgentDetails={setShowAgentDetails} showAgentDetails={showAgentDetails} />
+          <AgentDetails setShowAgentDetails={setShowAgentDetails} setSelectedAgent={setSelectedAgent} showAgentDetails={showAgentDetails} selectedAgent={selectedAgent}/>
         </div>
       )}
 
@@ -220,7 +220,7 @@ const UserDashboard = () => {
           </div>
 
           <div className="lg:col-span-2">
-            <AgentList setShowAgentDetails={setShowAgentDetails} />
+            <AgentList setShowAgentDetails={setShowAgentDetails} setSelectedAgent={setSelectedAgent} />
           </div>
         </div>
 

@@ -4,7 +4,7 @@ import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import capitalize from "../utils/capitalize";
 
-const AgentList = ({ setShowAgentDetails}) => {
+const AgentList = ({ setShowAgentDetails, setSelectedAgent }) => {
   const [allAgents, setAllAgents] = useState([]);
   useEffect(() => {
     getAgents();
@@ -20,8 +20,6 @@ const AgentList = ({ setShowAgentDetails}) => {
     }
   };
 
-  
-
   return (
     <div className="bg-gray-50  h-full rounded-2xl p-8 shadow-md shadow-gray-300">
       <h3 className="text-xl font-semibold text-black mb-6">Select an Agent</h3>
@@ -30,7 +28,10 @@ const AgentList = ({ setShowAgentDetails}) => {
         {allAgents.map((agent) => (
           <div
             key={agent?._id}
-            onClick={()=>setShowAgentDetails(true)}
+            onClick={() => {
+              setSelectedAgent(agent);
+              setShowAgentDetails(true);
+            }}
             className="bg-gray-100 ring-1 ring-gray-300  mx-0.5 cursor-pointer p-5 rounded-lg shadow-md hover:shadow-lg shadow-black/30 transition-all duration-300 transform hover:scale-105"
           >
             <div className="flex items-center">
@@ -44,7 +45,7 @@ const AgentList = ({ setShowAgentDetails}) => {
                     capitalize(agent?.lastName)}
                 </span>
                 <span className="text-gray-700 text-sm my-1 font-normal">
-                 Amount: ₹{agent?.securityDeposit}
+                  Amount: ₹{agent?.securityDeposit}
                 </span>
                 <div className="text-gray-700 text-sm  ">
                   Address : {agent?.address}

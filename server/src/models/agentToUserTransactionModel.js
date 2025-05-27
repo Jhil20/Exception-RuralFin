@@ -14,12 +14,6 @@ const userToAgentTransactionSchema = new Schema(
       default: "pending",
     },
     transactionDate: { type: Date, default: Date.now },
-    // remarks: { type: String },
-    method: {
-      type: String,
-      enum: ["cash", "eRupees"],
-      default: "cash",
-    },
     conversionType: {
       type: String,
       enum: ["cashToERupees", "eRupeesToCash"],
