@@ -8,7 +8,7 @@ const userToUserTransactionRoutes = require("./routes/userToUserTransactionRoute
 const budgetRoutes = require("./routes/budgetRoutes");
 const app = express();
 const financeRoutes = require("./routes/financeRoutes");
-const agentToUserTransactionRoutes = require("./routes/agentToUserTransactionRoutes");
+const agentToUserTransactionRoutes = require("./routes/userToAgentTransactionRoutes");
 app.use(
   cors({
     credentials: true,

@@ -2,6 +2,7 @@ const Finance = require("../models/financeModel");
 const mongoose = require("mongoose");
 const User = require("../models/userModel");
 const UserToUserTransaction = require("../models/userToUserTransactionModel");
+const userToAgentTransaction = require("../models/userToAgentTransactionModel");
 
 const getFinanceById = async (req, res) => {
   try {
@@ -36,38 +37,56 @@ const transferFunds = async (req, res) => {
     console.log("transactionId:", transactionId);
 
     if (!senderId || !receiverId || !amount || !transactionId) {
-      return res.status(400).json({ message: "Invalid request", success: false });
+      return res
+        .status(400)
+        .json({ message: "Invalid request", success: false });
     }
 
     const sender = await User.findById(senderId).session(session);
     const receiver = await User.findById(receiverId).session(session);
-    console.log("sender and receiver found")
+    console.log("sender and receiver found");
     if (!sender || !receiver) {
-      return res.status(404).json({ message: "User or Receiver not found", success: false });
+      return res
+        .status(404)
+        .json({ message: "User or Receiver not found", success: false });
     }
 
-    const transaction = await UserToUserTransaction.findById(transactionId).session(session);
-    console.log("transaction found")
+    const transaction = await UserToUserTransaction.findById(
+      transactionId
+    ).session(session);
+    console.log("transaction found");
     if (!transaction) {
-      return res.status(404).json({ message: "Transaction not found", success: false });
+      return res
+        .status(404)
+        .json({ message: "Transaction not found", success: false });
     }
 
     if (transaction.status !== "pending") {
-      return res.status(400).json({ message: "Transaction is not pending", success: false });
+      return res
+        .status(400)
+        .json({ message: "Transaction is not pending", success: false });
     }
-    console.log("Transaction is pending")
-    const senderFinance = await Finance.findOne({ userId: senderId }).session(session);
-    const receiverFinance = await Finance.findOne({ userId: receiverId }).session(session);
+    console.log("Transaction is pending");
+    const senderFinance = await Finance.findOne({ userId: senderId }).session(
+      session
+    );
+    const receiverFinance = await Finance.findOne({
+      userId: receiverId,
+    }).session(session);
 
     if (!senderFinance || !receiverFinance) {
-      return res.status(404).json({ message: "Finance record not found", success: false });
+      return res
+        .status(404)
+        .json({ message: "Finance record not found", success: false });
     }
 
     // Check sufficient balance
     if (senderFinance.balance < amount) {
-      return res.status(400).json({ message: "Insufficient balance", success: false });
+      return res
+        .status(400)
+        .json({ message: "Insufficient balance", success: false });
     }
-    console.log("Sufficient balance found",senderFinance,receiverFinance)
+    console.log("Sufficient balance found", senderFinance, receiverFinance);
     let isDebitSuccessful = false;
     let isCreditSuccessful = false;
 
@@ -89,8 +108,9 @@ const transferFunds = async (req, res) => {
       await session.commitTransaction();
       session.endSession();
       console.log("Transaction committed successfully");
-      return res.status(200).json({ success: true, message: "Transaction completed successfully" });
-
+      return res
+        .status(200)
+        .json({ success: true, message: "Transaction completed successfully" });
     } catch (innerError) {
       console.error("Inner transaction error:", innerError.message);
 
@@ -110,7 +130,6 @@ const transferFunds = async (req, res) => {
 
       throw innerError; // Propagate the error to the main catch block
     }
-
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -119,8 +138,61 @@ const transferFunds = async (req, res) => {
   }
 };
 
+const depositFunds = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { trId, userId, amount } = req.body;
+
+    if (!userId || !amount) {
+      return res
+        .status(400)
+        .json({ message: "Invalid request", success: false });
+    }
+
+    // const user = await User.findById(userId).session(session);
+    // if (!user) {
+    //   return res.status(404).json({ message: "User not found", success: false });
+    // }
+
+    const finance = await Finance.findOne({ userId }).session(session);
+    if (!finance) {
+      return res
+        .status(404)
+        .json({ message: "Finance record not found", success: false });
+    }
+
+    finance.balance += amount;
+    await finance.save({ session });
+
+    const transactionUpdate = await userToAgentTransaction.findByIdAndUpdate(
+      trId,
+      { status: "completed" },
+      { new: true, session }
+    ).session(session);
+    if (!transactionUpdate) {
+      return res
+        .status(404)
+        .json({ message: "Transaction not found", success: false });
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Funds deposited successfully" });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    console.error("Deposit failed:", error.message);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 module.exports = {
   getFinanceById,
   transferFunds,
+  depositFunds,
 };

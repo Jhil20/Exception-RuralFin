@@ -21,6 +21,11 @@ import findAge from "../utils/findAge";
 import calculateAgentCommission from "../utils/calculateAgentComission";
 import { Field, Formik, Form, ErrorMessage } from "formik";
 import { AgentToUserSchema } from "../yupValidators/validationSchema";
+import { useMemo } from "react";
+import Cookies from "js-cookie";
+import axios from "axios";
+import {jwtDecode} from "jwt-decode";
+import { BACKEND_URL } from "../utils/constants";
 
 const AgentDetails = ({
   showAgentDetails,
@@ -48,7 +53,11 @@ const AgentDetails = ({
   const [amount, setAmount] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [transactionFilter, setTransactionFilter] = useState("all");
-
+  const token=Cookies.get("token");
+  const decoded=useMemo(()=>{
+    if(!token) return null;
+    return jwtDecode(token);
+  },[token])
   // Mock transaction data
   const mockTransactions = [
     {
@@ -134,9 +143,22 @@ const AgentDetails = ({
     }
   };
 
-  const handleAgentToUserSubmit = (values) => {
-    console.log(values);
-    // setShowConfirmation(true);
+  const handleAgentToUserSubmit = async(values,{ resetForm }) => {
+    const data={
+      agentId: selectedAgent._id,
+      userId: decoded.id,
+      amount:parseFloat(values.amount),
+      commission:calculateAgentCommission(values.amount),
+      conversionType: transactionType=="deposit"?"cashToERupees":"eRupeesToCash",
+      notes: values.notes || "",
+    } 
+    try{
+      const response=await axios.post(`${BACKEND_URL}/api/agentToUserTransaction/`,data);
+      console.log("response of creating agent to user transactions",response.data);
+      resetForm();
+    }catch(error){
+      console.error("Error creating agent to user transaction:", error);
+    }
   };
 
   const handleConfirm = () => {
