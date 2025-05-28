@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const User = require("../models/userModel");
 const UserToUserTransaction = require("../models/userToUserTransactionModel");
 const userToAgentTransaction = require("../models/userToAgentTransactionModel");
+const Agent = require("../models/agentModel");
 
 const getFinanceById = async (req, res) => {
   try {
@@ -143,20 +144,16 @@ const depositFunds = async (req, res) => {
   session.startTransaction();
 
   try {
-    const { trId, userId, amount } = req.body;
-
+    const { trId, userId, amount, agentId, commission } = req.body;
+    console.log("Deposit Funds Request:", req.body);
     if (!userId || !amount) {
       return res
         .status(400)
         .json({ message: "Invalid request", success: false });
     }
 
-    // const user = await User.findById(userId).session(session);
-    // if (!user) {
-    //   return res.status(404).json({ message: "User not found", success: false });
-    // }
-
     const finance = await Finance.findOne({ userId }).session(session);
+    console.log("Finance record found:", finance);
     if (!finance) {
       return res
         .status(404)
@@ -165,16 +162,33 @@ const depositFunds = async (req, res) => {
 
     finance.balance += amount;
     await finance.save({ session });
-
-    const transactionUpdate = await userToAgentTransaction.findByIdAndUpdate(
-      trId,
-      { status: "completed" },
-      { new: true, session }
-    ).session(session);
+    console.log("Finance balance updated:", finance.balance);
+    const transactionUpdate = await userToAgentTransaction
+      .findByIdAndUpdate(trId, { status: "completed" }, { new: true, session })
+      .session(session);
+    console.log("Transaction update:", transactionUpdate);
     if (!transactionUpdate) {
       return res
         .status(404)
         .json({ message: "Transaction not found", success: false });
+    }
+
+    const agentUpdate = await Agent.findByIdAndUpdate(
+      agentId,
+      {
+        $inc: {
+          securityDeposit: commission-amount,
+          commissionEarned: commission,
+        },
+        
+      },
+      { new: true, session }
+    );
+    console.log("Agent update:", agentUpdate);
+    if (!agentUpdate) {
+      return res
+        .status(404)
+        .json({ message: "Agent not found", success: false });
     }
 
     await session.commitTransaction();

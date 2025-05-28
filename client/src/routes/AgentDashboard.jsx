@@ -141,9 +141,13 @@ const AgentDashboard = () => {
     try{
       const response = await axios.post(
         `${BACKEND_URL}/api/finance/depositFunds`,{
-          trId,
+          trId: transactionToComplete?._id,
           amount: transactionToComplete?.amount,
+          agentId:decoded.id,
+          userId: transactionToComplete?.userId?._id,
+          commission: transactionToComplete?.commission,
         })
+        console.log("Deposit transaction completed:", response.data);
     }catch(err) {
       console.error("Error completing deposit transaction request:", err);
     }
