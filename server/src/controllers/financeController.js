@@ -145,7 +145,7 @@ const depositFunds = async (req, res) => {
 
   try {
     const { trId, userId, amount, agentId, commission } = req.body;
-    console.log("Deposit Funds Request:", req.body);
+    // console.log("Deposit Funds Request:", req.body);
     if (!userId || !amount) {
       return res
         .status(400)
@@ -153,28 +153,20 @@ const depositFunds = async (req, res) => {
     }
 
     const finance = await Finance.findOne({ userId }).session(session);
-    console.log("Finance record found:", finance);
+    // console.log("Finance record found:", finance);
     if (!finance) {
       return res
         .status(404)
         .json({ message: "Finance record not found", success: false });
     }
 
-    finance.balance += amount;
+    finance.balance += (amount-commission);
     await finance.save({ session });
-    console.log("Finance balance updated:", finance.balance);
-    const transactionUpdate = await userToAgentTransaction
-      .findByIdAndUpdate(trId, { status: "completed" }, { new: true, session })
-      .session(session);
-    console.log("Transaction update:", transactionUpdate);
-    if (!transactionUpdate) {
-      return res
-        .status(404)
-        .json({ message: "Transaction not found", success: false });
-    }
+    // console.log("Finance balance updated:", finance.balance);
+    
 
     const agentUpdate = await Agent.findByIdAndUpdate(
-      agentId,
+      {_id:agentId},
       {
         $inc: {
           securityDeposit: commission-amount,
@@ -184,12 +176,23 @@ const depositFunds = async (req, res) => {
       },
       { new: true, session }
     );
-    console.log("Agent update:", agentUpdate);
+    // console.log("Agent update:", agentUpdate);
     if (!agentUpdate) {
       return res
         .status(404)
         .json({ message: "Agent not found", success: false });
     }
+
+    const transactionUpdate = await userToAgentTransaction
+      .findByIdAndUpdate({_id:trId}, { status: "completed",transactionDate:new Date() }, { new: true, session })
+      ;
+    // console.log("Transaction update:", transactionUpdate);
+    if (!transactionUpdate) {
+      return res
+        .status(404)
+        .json({ message: "Transaction not found", success: false });
+    }
+
 
     await session.commitTransaction();
     session.endSession();
@@ -205,8 +208,85 @@ const depositFunds = async (req, res) => {
   }
 };
 
+const withdrawFunds = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { userId, amount,agentId,trId,commission } = req.body;
+    console.log("Withdraw Funds Request:", req.body);
+    if (!userId || !amount) {
+      return res
+        .status(400)
+        .json({ message: "Invalid request", success: false });
+    }
+
+    const finance = await Finance.findOne({ userId }).session(session);
+    console.log("Finance record found:", finance);
+    if (!finance) {
+      return res
+        .status(404)
+        .json({ message: "Finance record not found", success: false });
+    }
+
+    if (finance.balance < amount) {
+      return res
+        .status(400)
+        .json({ message: "Insufficient balance", success: false });
+    }
+    const val=amount+commission;
+
+    finance.balance -= (val);
+    await finance.save({ session });
+    console.log("Finance balance updated:", finance.balance);
+
+    const agentUpdate = await Agent.findByIdAndUpdate(
+      agentId,
+      {
+        $inc: {
+          securityDeposit: amount+commission,
+          commissionEarned: commission,
+        },
+      },
+      { new: true, session }
+    )
+    console.log("Agent update:", agentUpdate);
+    if (!agentUpdate) {
+      return res
+        .status(404)
+        .json({ message: "Agent not found", success: false });
+    }
+    const transactionUpdate = await userToAgentTransaction.findOneAndUpdate(
+      {_id:trId},
+      { status: "completed",transactionDate:new Date() },
+      { new: true, session }
+    );
+    console.log("Transaction update:", transactionUpdate);
+
+    if (!transactionUpdate) {
+      return res
+        .status(404)
+        .json({ message: "Transaction not found", success: false });
+    }
+    
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Funds withdrawn successfully" });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    console.error("Withdrawal failed:", error.message);
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
 module.exports = {
   getFinanceById,
   transferFunds,
   depositFunds,
+  withdrawFunds,
 };

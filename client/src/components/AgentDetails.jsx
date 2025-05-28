@@ -1,5 +1,11 @@
-import { IndianRupee, X } from "lucide-react";
-import React, { useState } from "react";
+import {
+  Accessibility,
+  CheckCircle,
+  IndianRupee,
+  X,
+  XCircle,
+} from "lucide-react";
+import React, { useEffect, useState } from "react";
 import {
   User,
   Phone,
@@ -24,7 +30,7 @@ import { AgentToUserSchema } from "../yupValidators/validationSchema";
 import { useMemo } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { BACKEND_URL } from "../utils/constants";
 
 const AgentDetails = ({
@@ -53,11 +59,13 @@ const AgentDetails = ({
   const [amount, setAmount] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [transactionFilter, setTransactionFilter] = useState("all");
-  const token=Cookies.get("token");
-  const decoded=useMemo(()=>{
-    if(!token) return null;
+  const [allTransactions, setAllTransactions] = useState([]);
+  const [filteredTransactions, setFilteredTransactions] = useState([]);
+  const token = Cookies.get("token");
+  const decoded = useMemo(() => {
+    if (!token) return null;
     return jwtDecode(token);
-  },[token])
+  }, [token]);
   // Mock transaction data
   const mockTransactions = [
     {
@@ -143,21 +151,45 @@ const AgentDetails = ({
     }
   };
 
-  const handleAgentToUserSubmit = async(values,{ resetForm }) => {
-    const data={
+  const handleAgentToUserSubmit = async (values, { resetForm }) => {
+    const data = {
       agentId: selectedAgent._id,
       userId: decoded.id,
-      amount:parseFloat(values.amount),
-      commission:calculateAgentCommission(values.amount),
-      conversionType: transactionType=="deposit"?"cashToERupees":"eRupeesToCash",
+      amount: parseFloat(values.amount),
+      commission: calculateAgentCommission(values.amount),
+      conversionType:
+        transactionType == "deposit" ? "cashToERupees" : "eRupeesToCash",
       notes: values.notes || "",
-    } 
-    try{
-      const response=await axios.post(`${BACKEND_URL}/api/agentToUserTransaction/`,data);
-      console.log("response of creating agent to user transactions",response.data);
+    };
+    try {
+      const response = await axios.post(
+        `${BACKEND_URL}/api/agentToUserTransaction/`,
+        data
+      );
+      console.log(
+        "response of creating agent to user transactions",
+        response.data
+      );
       resetForm();
-    }catch(error){
+    } catch (error) {
       console.error("Error creating agent to user transaction:", error);
+    }
+  };
+
+  useEffect(() => {
+    getAllTransactions();
+  }, []);
+
+  const getAllTransactions = async () => {
+    try {
+      const response = await axios.get(
+        `${BACKEND_URL}/api/agentToUserTransaction/${selectedAgent._id}`
+      );
+      console.log("Fetched transactions:", response.data);
+      setAllTransactions(response?.data?.transactions);
+      setFilteredTransactions(response?.data?.transactions);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
     }
   };
 
@@ -167,14 +199,16 @@ const AgentDetails = ({
     setShowConfirmation(false);
   };
 
-  const getFilteredTransactions = () => {
-    if (transactionFilter === "all") {
-      return mockTransactions;
+  const handleFilterChange = (filter) => {
+    if (filter === "all") {
+      setFilteredTransactions(allTransactions);
+    } else {
+      const filtered = allTransactions.filter(
+        (transaction) => transaction.status === filter
+      );
+      setFilteredTransactions(filtered);
     }
-    return mockTransactions.filter((tx) => tx.status === transactionFilter);
   };
-
-  const filteredTransactions = getFilteredTransactions();
 
   if (!showAgentDetails) {
     return (
@@ -683,8 +717,11 @@ const AgentDetails = ({
 
                   <div className="flex flex-wrap gap-2">
                     <button
-                      onClick={() => setTransactionFilter("all")}
-                      className={`px-3 py-1.5 text-sm rounded-md transition-colors duration-200 flex items-center ${
+                      onClick={() => {
+                        handleFilterChange("all");
+                        setTransactionFilter("all");
+                      }}
+                      className={`px-3 py-1.5 text-sm cursor-pointer rounded-md transition-colors duration-200 flex items-center ${
                         transactionFilter === "all"
                           ? "bg-gray-900 text-white"
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -694,8 +731,11 @@ const AgentDetails = ({
                       All
                     </button>
                     <button
-                      onClick={() => setTransactionFilter("pending")}
-                      className={`px-3 py-1.5 text-sm rounded-md transition-colors duration-200 flex items-center ${
+                      onClick={() => {
+                        handleFilterChange("pending");
+                        setTransactionFilter("pending");
+                      }}
+                      className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
                         transactionFilter === "pending"
                           ? "bg-gray-900 text-white"
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -705,14 +745,45 @@ const AgentDetails = ({
                       Pending
                     </button>
                     <button
-                      onClick={() => setTransactionFilter("completed")}
-                      className={`px-3 py-1.5 text-sm rounded-md transition-colors duration-200 flex items-center ${
-                        transactionFilter === "completed"
+                      onClick={() => {
+                        handleFilterChange("accepted");
+                        setTransactionFilter("accepted");
+                      }}
+                      className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
+                        transactionFilter === "accepted"
                           ? "bg-gray-900 text-white"
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                       }`}
                     >
                       <Check size={14} className="mr-1.5" />
+                      Accepted
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleFilterChange("rejected");
+                        setTransactionFilter("rejected");
+                      }}
+                      className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
+                        transactionFilter === "rejected"
+                          ? "bg-gray-900 text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      <XCircle size={14} className="mr-1.5" />
+                      Rejected
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleFilterChange("completed");
+                        setTransactionFilter("completed");
+                      }}
+                      className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
+                        transactionFilter === "completed"
+                          ? "bg-gray-900 text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      <CheckCircle size={14} className="mr-1.5" />
                       Completed
                     </button>
                   </div>
@@ -728,85 +799,83 @@ const AgentDetails = ({
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {filteredTransactions.map((transaction) => (
-                      <div
-                        key={transaction.id}
-                        className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200"
-                      >
-                        <div className="p-4 bg-white">
-                          <div className="flex flex-col md:flex-row justify-between">
-                            <div className="mb-2 md:mb-0">
-                              <div className="flex items-center mb-1">
-                                <span className="font-medium text-gray-900">
-                                  {transaction.type === "deposit"
-                                    ? "Deposit"
-                                    : "Withdrawal"}
-                                </span>
-                                <span className="ml-2 text-sm text-gray-500">
-                                  #{transaction.id}
-                                </span>
-                                <span
-                                  className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
-                                    transaction.status === "completed"
-                                      ? "bg-green-100 text-green-800"
-                                      : transaction.status === "pending"
-                                      ? "bg-yellow-100 text-yellow-800"
-                                      : "bg-red-100 text-red-800"
-                                  }`}
-                                >
-                                  {transaction.status.charAt(0).toUpperCase() +
-                                    transaction.status.slice(1)}
-                                </span>
+                    {filteredTransactions
+                      ?.sort((a, b) => {
+                        return (
+                          new Date(b.transactionDate) -
+                          new Date(a.transactionDate)
+                        );
+                      })
+                      .map((transaction) => (
+                        <div
+                          key={transaction?._id}
+                          className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200"
+                        >
+                          <div className="p-4 bg-white">
+                            <div className="flex flex-col md:flex-row justify-between">
+                              <div className="mb-2 md:mb-0">
+                                <div className="flex items-center mb-1">
+                                  <span className="font-medium text-gray-900">
+                                    {transaction?.conversionType ===
+                                    "cashToERupees"
+                                      ? "Deposit"
+                                      : "Withdrawal"}
+                                  </span>
+                                  <span className="ml-2 text-sm text-gray-500">
+                                    #{transaction?._id}
+                                  </span>
+                                  <span
+                                    className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
+                                      transaction?.status === "completed"
+                                        ? "bg-blue-100 text-blue-800"
+                                        : transaction?.status === "pending"
+                                        ? "bg-yellow-100 text-yellow-800"
+                                        : transaction?.status === "accepted"
+                                        ? "bg-green-100 text-green-800"
+                                        : "bg-red-100 text-red-800"
+                                    }`}
+                                  >
+                                    {transaction?.status
+                                      .charAt(0)
+                                      .toUpperCase() +
+                                      transaction?.status.slice(1)}
+                                  </span>
+                                </div>
+                                <div className="text-sm text-gray-600 flex items-center">
+                                  <span className="text-xs text-gray-500">
+                                    {formatDateTime(
+                                      transaction?.transactionDate
+                                    )}
+                                  </span>
+                                </div>
                               </div>
-                              <div className="text-sm text-gray-600 flex items-center">
-                                <span className="mr-4">
-                                  From: {transaction.userName}
+                              <div className="flex flex-col items-end">
+                                <span className="font-bold text-black">
+                                  ₹{transaction?.amount.toLocaleString("en-IN")}
                                 </span>
                                 <span className="text-xs text-gray-500">
-                                  {formatDateTime(transaction.date)}
+                                  Commission: ₹
+                                  {transaction?.commission?.toLocaleString(
+                                    "en-IN"
+                                  )}
                                 </span>
                               </div>
                             </div>
-                            <div className="flex flex-col items-end">
-                              <span className="font-bold text-black">
-                                ₹{transaction.amount.toLocaleString("en-IN")}
-                              </span>
-                              <span className="text-xs text-gray-500">
-                                Commission: ₹
-                                {transaction.commissionAmount.toLocaleString(
-                                  "en-IN"
-                                )}
-                              </span>
+                          </div>
+
+                          {transaction?.status === "completed" && (
+                            <div className="px-4 py-2 bg-gray-50 border-t border-gray-200 flex items-center text-sm text-gray-500">
+                              <Check
+                                size={14}
+                                className="mr-1.5 text-green-500"
+                              />
+                              {transaction?.conversionType === "cashToERupees"
+                                ? "Cash received and eRupees credited to user"
+                                : "Cash given to user and eRupees deducted"}
                             </div>
-                          </div>
+                          )}
                         </div>
-
-                        {transaction.status === "pending" && (
-                          <div className="px-4 py-2 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
-                            <button className="px-3 py-1 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-100 transition-colors duration-200">
-                              Reject
-                            </button>
-                            <button className="px-3 py-1 text-sm bg-black text-white rounded-md hover:bg-gray-800 transition-colors duration-200">
-                              {transaction.type === "deposit"
-                                ? "Confirm Receipt"
-                                : "Complete Withdrawal"}
-                            </button>
-                          </div>
-                        )}
-
-                        {transaction.status === "completed" && (
-                          <div className="px-4 py-2 bg-gray-50 border-t border-gray-200 flex items-center text-sm text-gray-500">
-                            <Check
-                              size={14}
-                              className="mr-1.5 text-green-500"
-                            />
-                            {transaction.type === "deposit"
-                              ? "Cash received and eRupees credited to user"
-                              : "Cash given to user and eRupees deducted"}
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 )}
               </div>
@@ -829,10 +898,13 @@ const AgentDetails = ({
                       <li className="pl-1">Agent accepts request</li>
                       <li className="pl-1">Agent gives real cash to user</li>
                       <li className="pl-1">Agent clicks "Complete"</li>
-                      <li className="pl-1">System deducts erupees from user</li>
-                      <li className="pl-1 text-green-600 font-medium">
-                        Transaction marked completed, audit logged
+                      <li className="pl-1">
+                        System deducts eRupees from user's wallet
                       </li>
+                      <li className="pl-1">
+                        System credits eRupees to agent's wallet
+                      </li>
+                      <li className="pl-1">Transaction marked completed</li>
                     </ol>
                   </div>
 
@@ -844,9 +916,7 @@ const AgentDetails = ({
                       <li className="pl-1">
                         User sends deposit request to agent
                       </li>
-                      <li className="pl-1">
-                        Agent accepts after verifying identity
-                      </li>
+                      <li className="pl-1">Agent accepts request</li>
                       <li className="pl-1">
                         User gives real cash to agent physically
                       </li>
@@ -856,9 +926,10 @@ const AgentDetails = ({
                       <li className="pl-1">
                         System credits eRupees to user's wallet
                       </li>
-                      <li className="pl-1 text-green-600 font-medium">
-                        Transaction marked completed, audit logged
+                      <li className="pl-1">
+                        System deducts eRupees from agent's wallet
                       </li>
+                      <li className="pl-1">Transaction marked completed</li>
                     </ol>
                   </div>
                 </div>

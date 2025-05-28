@@ -13,6 +13,19 @@ const getAllTransactionsByAgentId = async (req, res) => {
     }
 }
 
+const getAllCompleteTransactionsByUserId= async (req, res) => {
+    try {
+        const { id } = req.params;
+        const transactions = await AgentToUserTransaction.find({ userId:id, status: "completed" }).populate('agentId');
+        if (!transactions) {
+            return res.status(404).json({ message: "No completed transactions found", success: false });
+        }
+        return res.status(200).json({ transactions, message: "Completed transactions found", success: true });
+    } catch (error) {
+        return res.status(500).json({ message: "Error fetching completed transactions", error, success: false });
+    }
+}
+
 const createAgentToUserTransaction = async (req, res) => {
     try {
         const {agentId,userId,amount,commission,conversionType,notes} = req.body;
@@ -57,4 +70,5 @@ module.exports = {
 getAllTransactionsByAgentId,
 createAgentToUserTransaction,
 updateAgentToUserTransactionStatus,
+getAllCompleteTransactionsByUserId,
 };

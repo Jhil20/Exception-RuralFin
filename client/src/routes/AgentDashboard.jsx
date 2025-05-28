@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { Filter, BadgeCheck } from "lucide-react";
 import {
   IndianRupee,
   Users,
@@ -137,21 +138,45 @@ const AgentDashboard = () => {
     }
   };
 
-  const handleDepositTransactionRequestComplete = async (transactionToComplete) => {
-    try{
+  const handleDepositTransactionRequestComplete = async (
+    transactionToComplete
+  ) => {
+    try {
       const response = await axios.post(
-        `${BACKEND_URL}/api/finance/depositFunds`,{
+        `${BACKEND_URL}/api/finance/depositFunds`,
+        {
           trId: transactionToComplete?._id,
           amount: transactionToComplete?.amount,
-          agentId:decoded.id,
+          agentId: decoded.id,
           userId: transactionToComplete?.userId?._id,
           commission: transactionToComplete?.commission,
-        })
-        console.log("Deposit transaction completed:", response.data);
-    }catch(err) {
+        }
+      );
+      console.log("Deposit transaction completed:", response.data);
+    } catch (err) {
       console.error("Error completing deposit transaction request:", err);
     }
-  }
+  };
+
+  const handleWithdrawalTransactionRequestComplete = async (
+    transactionToComplete
+  ) => {
+    try {
+      const response = await axios.post(
+        `${BACKEND_URL}/api/finance/withdrawFunds`,
+        {
+          trId: transactionToComplete?._id,
+          amount: transactionToComplete?.amount,
+          agentId: decoded.id,
+          userId: transactionToComplete?.userId?._id,
+          commission: transactionToComplete?.commission,
+        }
+      );
+      console.log("Withdrawal transaction completed:", response.data);
+    } catch (err) {
+      console.error("Error completing withdrawal transaction request:", err);
+    }
+  };
 
   const handleFilterChange = (filter) => {
     setActiveFilter(filter);
@@ -343,150 +368,177 @@ const AgentDashboard = () => {
             <h2 className="text-lg font-semibold mb-4 sm:mb-0">
               {capitalize(activeFilter)} Requests
             </h2>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2">
               {/* All Filter */}
               <button
                 onClick={() => handleFilterChange("all")}
-                className={`px-3 cursor-pointer py-1 rounded-full text-sm font-medium border transition-all duration-200 transform ${
+                className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
                   activeFilter === "all"
-                    ? "shadow-sm bg-gray-100 text-gray-800 border-gray-300"
-                    : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+                    ? "bg-gray-900 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
+                <Filter size={14} className="mr-1.5" />
                 All
               </button>
 
               {/* Pending Filter */}
               <button
                 onClick={() => handleFilterChange("pending")}
-                className={`px-3 cursor-pointer py-1 rounded-full text-sm font-medium border transition-all duration-200 transform ${
+                className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
                   activeFilter === "pending"
-                    ? "shadow-sm  bg-yellow-100 text-yellow-800 border-yellow-300"
-                    : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+                    ? "bg-gray-900 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
+                <Clock size={14} className="mr-1.5" />
                 Pending
               </button>
 
               {/* Accepted Filter */}
               <button
                 onClick={() => handleFilterChange("accepted")}
-                className={`px-3 cursor-pointer py-1 rounded-full text-sm font-medium border transition-all duration-200 transform ${
+                className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
                   activeFilter === "accepted"
-                    ? "shadow-sm bg-green-100 text-green-800 border-green-300"
-                    : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+                    ? "bg-gray-900 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
+                <CheckCircle size={14} className="mr-1.5" />
                 Accepted
               </button>
 
               {/* Rejected Filter */}
               <button
                 onClick={() => handleFilterChange("rejected")}
-                className={`px-3 cursor-pointer py-1 rounded-full text-sm font-medium border transition-all duration-200 transform ${
+                className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
                   activeFilter === "rejected"
-                    ? "shadow-sm bg-red-100 text-red-800 border-red-300"
-                    : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+                    ? "bg-gray-900 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
+                <XCircle size={14} className="mr-1.5" />
                 Rejected
+              </button>
+
+              {/* Completed Filter */}
+              <button
+                onClick={() => handleFilterChange("completed")}
+                className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
+                  activeFilter === "completed"
+                    ? "bg-gray-900 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                <BadgeCheck size={14} className="mr-1.5" />
+                Completed
               </button>
             </div>
           </div>
 
           <div className="divide-y divide-gray-200">
-            {filteredTransactions?.map((transaction) => (
-              <div key={transaction?._id} className="px-8 py-4">
-                <div className="flex justify-between items-center">
-                  <div className="space-y-1">
-                    <div className="flex items-center">
-                      <p className="font-medium">
-                        Request #{transaction?._id?.toLocaleString()}
-                      </p>
-                      <span
-                        className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 pb-1 border border-gray-400 text-gray-600`}
-                      >
-                        {transaction?.conversionType === "cashToERupees"
-                          ? "Deposit"
-                          : "Withdrawal"}
-                      </span>
-                      <span
-                        className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${
-                          transaction?.status === "rejected"
-                            ? "bg-red-100 text-red-800"
-                            : transaction?.status === "pending"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : transaction?.status === "accepted"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {transaction?.status.charAt(0).toUpperCase() +
-                          transaction?.status.slice(1)}
-                      </span>
-                      {transaction?.status === "accepted" && (
-                        <span className="ml-4 text-sm bg-gray-100 border border-gray-200 font-medium flex text-gray-800 rounded-xl py-0.5 items-center px-4 ">
-                          <Info size={16} className="mt-[0px] mr-1" /> Press the
-                          complete button only when the cash transaction with
-                          the user is successfull.
+            {filteredTransactions
+              ?.sort((a, b) => {
+                return (
+                  new Date(b.transactionDate) - new Date(a.transactionDate)
+                );
+              })
+              .map((transaction) => (
+                <div key={transaction?._id} className="px-8 py-4">
+                  <div className="flex justify-between items-center">
+                    <div className="space-y-1">
+                      <div className="flex items-center">
+                        <p className="font-medium">
+                          {transaction?.conversionType === "cashToERupees"
+                            ? "Deposit"
+                            : "Withdrawal"}{" "}
+                          Request #{transaction?._id?.toLocaleString()}
+                        </p>
+
+                        <span
+                          className={`ml-2 px-2 py-0.5 rounded-full text-xs font-normal ${
+                            transaction?.status === "rejected"
+                              ? "bg-red-100 text-red-800"
+                              : transaction?.status === "pending"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : transaction?.status === "accepted"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-blue-100 text-blue-800"
+                          }`}
+                        >
+                          {transaction?.status.charAt(0).toUpperCase() +
+                            transaction?.status.slice(1)}
                         </span>
-                      )}
+                        {transaction?.status === "accepted" && (
+                          <span className="ml-4 text-sm bg-gray-100 border border-gray-200 font-medium flex text-gray-800 rounded-xl py-0.5 items-center px-4 ">
+                            <Info size={16} className="mt-[0px] mr-1" /> Press
+                            the complete button only when the cash transaction
+                            with the user is successfull.
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-gray-600">
+                        Amount: ₹{transaction?.amount.toLocaleString()}
+                      </p>
+                      <p className="text-gray-600">
+                        User:{" "}
+                        {capitalize(transaction?.userId?.firstName) +
+                          " " +
+                          capitalize(transaction?.userId?.lastName)}
+                      </p>
+                      <p className="text-gray-500 text-sm">
+                        {formatDate(transaction?.transactionDate)}
+                      </p>
                     </div>
-                    <p className="text-gray-600">
-                      Amount: ₹{transaction?.amount.toLocaleString()}
-                    </p>
-                    <p className="text-gray-600">
-                      User:{" "}
-                      {capitalize(transaction?.userId?.firstName) +
-                        " " +
-                        capitalize(transaction?.userId?.lastName)}
-                    </p>
-                    <p className="text-gray-500 text-sm">
-                      {formatDate(transaction?.transactionDate)}
-                    </p>
+                    {transaction?.status == "pending" && (
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => {
+                            handleTransactionRequestAccept(transaction);
+                          }}
+                          className="flex items-center px-4 py-2 cursor-pointer hover:shadow-lg shadow-md shadow-gray-400 transition-all duration-300 hover:shadow-black/50 bg-black text-white rounded-md hover:bg-gray-900"
+                        >
+                          <CheckCircle size={16} className="mr-2" />
+                          Accept
+                        </button>
+                        <button
+                          onClick={() => {
+                            handleTransactionRequestReject(transaction);
+                          }}
+                          className="flex items-center px-4 py-2 cursor-pointer hover:shadow-lg shadow-md shadow-gray-400 transition-all duration-300 hover:shadow-black/50 border border-gray-300 rounded-md hover:bg-gray-50"
+                        >
+                          <XCircle size={16} className="mr-2" />
+                          Decline
+                        </button>
+                      </div>
+                    )}
+                    {transaction?.status == "accepted" && (
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => {
+                            if (
+                              transaction?.conversionType === "cashToERupees"
+                            ) {
+                              handleDepositTransactionRequestComplete(
+                                transaction
+                              );
+                            } else {
+                              // console.error("Cannot complete withdrawal transactions");
+                              handleWithdrawalTransactionRequestComplete(
+                                transaction
+                              );
+                            }
+                          }}
+                          className="flex items-center px-4 py-2 cursor-pointer hover:shadow-lg shadow-md shadow-gray-400 transition-all duration-300 hover:shadow-black/50 bg-black text-white rounded-md hover:bg-gray-900"
+                        >
+                          <CheckCircle size={16} className="mr-2" />
+                          Complete
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  {transaction?.status == "pending" && (
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => {
-                          handleTransactionRequestAccept(transaction);
-                        }}
-                        className="flex items-center px-4 py-2 cursor-pointer hover:shadow-lg shadow-md shadow-gray-400 transition-all duration-300 hover:shadow-black/50 bg-black text-white rounded-md hover:bg-gray-900"
-                      >
-                        <CheckCircle size={16} className="mr-2" />
-                        Accept
-                      </button>
-                      <button
-                        onClick={() => {
-                          handleTransactionRequestReject(transaction);
-                        }}
-                        className="flex items-center px-4 py-2 cursor-pointer hover:shadow-lg shadow-md shadow-gray-400 transition-all duration-300 hover:shadow-black/50 border border-gray-300 rounded-md hover:bg-gray-50"
-                      >
-                        <XCircle size={16} className="mr-2" />
-                        Decline
-                      </button>
-                    </div>
-                  )}
-                  {transaction?.status == "accepted" && (
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => {
-                          if(transaction?.conversionType === "cashToERupees") {
-                          handleDepositTransactionRequestComplete(transaction);
-                          }else {
-                            console.error("Cannot complete withdrawal transactions");
-                          }
-                        }}
-                        className="flex items-center px-4 py-2 cursor-pointer hover:shadow-lg shadow-md shadow-gray-400 transition-all duration-300 hover:shadow-black/50 bg-black text-white rounded-md hover:bg-gray-900"
-                      >
-                        <CheckCircle size={16} className="mr-2" />
-                        Complete
-                      </button>
-                    </div>
-                  )}
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
           {filteredTransactions.length === 0 && (
             <div className="p-8 text-center text-gray-500">

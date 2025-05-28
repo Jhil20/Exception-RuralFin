@@ -107,7 +107,14 @@ const UserDashboard = () => {
       console.log("result", result);
       setTransactionData(result?.data?.transactions);
     } catch (err) {
-      console.log("error in fetching transactions", err);
+      console.log("error in fetching user-user transactions", err);
+    }
+    try{
+      const result2=await axios.get(`${BACKEND_URL}/api/agentToUserTransaction/byUser/${decoded.id}`);
+      console.log("result2 ttttttttttttttttttttttt", result2);
+      setTransactionData((prev) => [...prev, ...result2?.data?.transactions]);
+    }catch (err) {
+      console.log("error in fetching user-agent transactions", err);
     }
   };
 

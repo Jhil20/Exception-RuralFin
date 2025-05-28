@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import { ArrowDownCircle, ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import capitalize from "../utils/capitalize";
 import TransactionIcon from "../utils/TransactionIcon";
 
@@ -31,87 +31,150 @@ const RecentTransactions = ({
           </div>
         )}
         {transactionData
+          .sort((a, b) => {
+            return new Date(b.transactionDate) - new Date(a.transactionDate);
+          })
           .slice(
             0,
             userFinance?.isBudgetPlanningEnabled || budgetPlanningEnabled
               ? 7
               : 5
           )
-          .map((transaction) => (
-            <div
-              key={transaction?._id}
-              className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0"
-            >
-              <div className="flex items-center space-x-3">
-                <TransactionIcon type={transaction?.remarks} />
-
-                <div>
-                  {transaction?.senderId == decoded.id ? (
-                    <>
-                      <p className="font-medium text-gray-900">
-                        {capitalize(transaction?.receiverId?.firstName) +
-                          " " +
-                          capitalize(transaction?.receiverId?.lastName)}
-                        <span className="text-sm text-gray-500">
-                          {" "}
-                          - {transaction?.remarks}
-                        </span>
-                      </p>
-                    </>
+          .map((transaction) => {
+            const agentTransaction = Boolean(transaction?.agentId);
+            return (
+              <div
+                key={transaction?._id}
+                className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0"
+              >
+                <div className="flex items-center space-x-3">
+                  {agentTransaction ? (
+                    transaction?.conversionType === "cashToERupees" ? (
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center bg-gray-200`}
+                      >
+                        <ArrowDownCircle size={16} className="text-gray-800" />
+                      </div>
+                    ) : (
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center bg-gray-200`}
+                      >
+                        <ArrowDownLeft size={16} className="text-gray-800" />
+                      </div>
+                    )
                   ) : (
-                    <>
-                      <p className="font-medium text-gray-900">
-                        {capitalize(transaction?.senderId?.firstName) +
-                          " " +
-                          capitalize(transaction?.senderId?.lastName)}
-                        <span className="text-sm text-gray-500">
-                          {" "}
-                          - {transaction?.remarks}
-                        </span>
-                      </p>
-                    </>
+                    <TransactionIcon type={transaction?.remarks} />
                   )}
-                  <p className="text-xs text-gray-500">
-                    {new Date(transaction?.transactionDate).toLocaleString(
-                      "en-US",
-                      {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit",
-                        hour12: true,
-                      }
+
+                  <div>
+                    {agentTransaction ? (
+                      <>
+                        <p className="font-medium text-gray-900">
+                          {capitalize(transaction?.agentId?.firstName) +
+                            " " +
+                            capitalize(transaction?.agentId?.lastName)}
+                          <span className="text-sm text-gray-500">
+                            {" "}
+                            -{" "}
+                            {transaction?.conversionType === "cashToERupees"
+                              ? "Cash to eRupees"
+                              : "eRupees to Cash"}
+                          </span>
+                        </p>
+                      </>
+                    ) : transaction?.senderId == decoded.id ? (
+                      <>
+                        <p className="font-medium text-gray-900">
+                          {capitalize(transaction?.receiverId?.firstName) +
+                            " " +
+                            capitalize(transaction?.receiverId?.lastName)}
+                          <span className="text-sm text-gray-500">
+                            {" "}
+                            - {transaction?.remarks}
+                          </span>
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="font-medium text-gray-900">
+                          {capitalize(transaction?.senderId?.firstName) +
+                            " " +
+                            capitalize(transaction?.senderId?.lastName)}
+                          <span className="text-sm text-gray-500">
+                            {" "}
+                            - {transaction?.remarks}
+                          </span>
+                        </p>
+                      </>
                     )}
-                  </p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(transaction?.transactionDate).toLocaleString(
+                        "en-US",
+                        {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                          hour12: true,
+                        }
+                      )}
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex items-center">
-                <span
-                  className={`text-sm font-semibold ${
-                    transaction?.senderId != decoded.id
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  {transaction?.type === "incoming" ? "+ " : "- "}
-                  {new Intl.NumberFormat("en-US", {
-                    style: "currency",
-                    currency: "INR",
-                  }).format(transaction?.amount)}
-                </span>
+                {agentTransaction ? (
+                  <div className="flex items-center">
+                    <span
+                      className={`text-sm font-semibold ${
+                        transaction?.conversionType === "cashToERupees"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {transaction?.conversionType === "cashToERupees" ? "+ " : "- "}
+                      {new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "INR",
+                      }).format(transaction?.amount-transaction?.commission)}
+                    </span>
 
-                <div className="ml-2">
-                  {transaction?.senderId != decoded.id ? (
-                    <ArrowDownLeft size={16} className="text-green-600" />
-                  ) : (
-                    <ArrowUpRight size={16} className="text-red-600" />
-                  )}
-                </div>
+                    <div className="ml-2">
+                      {transaction?.conversionType === "cashToERupees"? (
+                        <ArrowDownLeft size={16} className="text-green-600" />
+                      ) : (
+                        <ArrowUpRight size={16} className="text-red-600" />
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center">
+                    <span
+                      className={`text-sm font-semibold ${
+                        transaction?.senderId != decoded.id
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {transaction?.type === "incoming" ? "+ " : "- "}
+                      {new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "INR",
+                      }).format(transaction?.amount)}
+                    </span>
+
+                    <div className="ml-2">
+                      {transaction?.senderId != decoded.id ? (
+                        <ArrowDownLeft size={16} className="text-green-600" />
+                      ) : (
+                        <ArrowUpRight size={16} className="text-red-600" />
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
       </div>
     </div>
   );
