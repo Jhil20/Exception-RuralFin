@@ -367,7 +367,7 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col">
+    <div className="min-h-[90.8vh] bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col">
       <ToastContainer
         className={"mt-16"}
         position="top-right"

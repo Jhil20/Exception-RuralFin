@@ -11,7 +11,7 @@ const RecentTransactions = ({
   budgetPlanningEnabled,
 }) => {
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-md shadow-gray-300">
+    <div className="bg-white min-h-full rounded-2xl p-6 shadow-md shadow-gray-300">
       <div className="flex justify-between items-center mb-3">
         <h3 className="text-xl font-semibold text-gray-900">
           Recent Transactions
@@ -26,8 +26,8 @@ const RecentTransactions = ({
 
       <div className="space-y-4">
         {transactionData.length === 0 && (
-          <div className="flex items-center justify-center py-4">
-            <p className="text-gray-500">No transactions found</p>
+          <div className="flex h-full items-center justify-center py-10">
+            <p className="text-gray-500 text-xl">No transactions found</p>
           </div>
         )}
         {transactionData

@@ -41,18 +41,12 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
   const setTransactionSuccess = toastControl.setTransactionSuccess;
   const setOtpVerified = toastControl.setOtpVerified;
   const showSendVar = showSend.showSend;
-  const users = [
-    { id: "1", name: "John Doe", ruralfinId: "RF001", avatar: "JD" },
-    { id: "2", name: "Jane Smith", ruralfinId: "RF002", avatar: "JS" },
-    { id: "3", name: "Mike Johnson", ruralfinId: "RF003", avatar: "MJ" },
-    { id: "4", name: "Sarah Wilson", ruralfinId: "RF004", avatar: "SW" },
-  ];
 
   useEffect(() => {
+    // console.log("get fav called in usseEffect");
     getFavourites();
   }, []);
 
-  // ✅ Setup reCAPTCHA once on component mount
   useEffect(() => {
     if (showSendVar) {
       if (window.recaptchaVerifier) {
@@ -201,7 +195,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
         console.log("response of transactiopn update", response);
       }
       console.log("Error in transaction", err);
-      toast.error("Transaction failed");
+      toast.error("Transaction failed. please refresh & try again.");
       return;
     }
   };
@@ -238,7 +232,13 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       //   }
       // );
 
-      console.log("before sending data to backend",user._id,transactionCreated?.receiverId,transactionCreated?.amount,transactionCreated?._id);
+      console.log(
+        "before sending data to backend",
+        user._id,
+        transactionCreated?.receiverId,
+        transactionCreated?.amount,
+        transactionCreated?._id
+      );
 
       const response = await axios.post(`${BACKEND_URL}/api/finance/transfer`, {
         senderId: user._id,
@@ -246,17 +246,18 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
         amount: transactionCreated?.amount,
         transactionId: transactionCreated?._id,
       });
-
-      if(response?.data?.success ==true && response?.data?.message == "Transaction completed successfully"){
-        const response2 = await axios.put(`${BACKEND_URL}/api/budget/updateBudgetSpending`,{
-          userId:user._id,
-          amount : transactionCreated?.amount,
-          category: transactionCreated?.remarks,
-        });
+      console.log("response of transaction complete", response);
+      if (finance?.isBudgetPlanningEnabled) {
+        const response2 = await axios.put(
+          `${BACKEND_URL}/api/budget/updateBudgetSpending`,
+          {
+            userId: user._id,
+            amount: transactionCreated?.amount,
+            category: transactionCreated?.remarks,
+          }
+        );
         console.log("response of budget update", response2);
       }
-
-      console.log("response of transaction complete", response);
       setTransactionSuccess(true);
       setStep("form");
       setSelectedUser(null);
@@ -298,16 +299,19 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
   };
 
   const getFavourites = async () => {
-    console.log("called");
+    // console.log("get fav called");
     const fav = user?.favourites || [];
-    const result = await Promise.all(
-      fav.map(async (f) => {
-        const response = await axios.get(`${BACKEND_URL}/api/user/${f}`);
-        return response.data;
-      })
-    );
-    console.log("result", result);
-    setFavourites(result);
+    try {
+      const response = await axios.get(
+        `${BACKEND_URL}/api/user/getFavourites/${user?._id}`
+      );
+      // console.log("response of get favourites", response?.data?.favourites);
+      setFavourites(response?.data?.favourites);
+    } catch (err) {
+      console.log("error in getting favourites", err);
+      toast.error("Error fetching favourites. Please Refresh & Try Again.");
+      return;
+    }
   };
 
   const handleAddFavourite = async () => {
@@ -324,8 +328,9 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
         `${BACKEND_URL}/api/user/addToFavourites`,
         { userId: user._id, ruralFinId: ruralfinValue }
       );
-      console.log("response", response);
+      console.log("response of add fav", response);
       if (response?.data?.success) {
+        getFavourites();
         toast.success("User added to favourites");
         setAddFavourites(false);
         setRuralFinValue("");
@@ -402,13 +407,12 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
           <form onSubmit={handleVerifyOtp} className="space-y-6">
             <div className="bg-gray-50 p-4 rounded-lg">
               <p className="text-sm text-gray-600">
-                Sending to:{" "}
-                {console.log("receiverUser", receiverUser)}
+                Sending to: {console.log("receiverUser", receiverUser)}
                 {receiverUser
-                  ? receiverUser?.firstName +
+                  ? capitalize(receiverUser?.firstName) +
                     " " +
-                    receiverUser?.lastName +
-                    " ( "+
+                    capitalize(receiverUser?.lastName) +
+                    " ( " +
                     receiverUser?.ruralFinId +
                     " )"
                   : "Unknown"}
@@ -544,7 +548,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by name or RuralFin ID"
+                placeholder="Search Favourites by name or RuralFin ID"
                 className={`w-full pl-10 pr-4 py-2 border ${
                   favourites.length === 0 ? "cursor-not-allowed" : "cursor-text"
                 } border-gray-200 rounded-lg focus:ring-black focus:border-transparent`}
@@ -560,37 +564,37 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
               ) : (
                 favourites.map((user) => (
                   <div
-                    key={user?.data?._id}
+                    key={user?._id}
                     onClick={() => {
                       handleUserSelect(user);
-                      setRuralFinId(user?.data?.ruralFinId);
+                      setRuralFinId(user?.ruralFinId);
                       formikRef.current?.setFieldValue(
                         "ruralfinId",
-                        user?.data?.ruralFinId
+                        user?.ruralFinId
                       );
-                      // setFieldValue("ruralFinId", user?.data?.ruralFinId);
+                      // setFieldValue("ruralFinId", user?.ruralFinId);
                     }}
                     className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                      selectedUser?.data?.id === user?.data?.id
+                      selectedUser?.id === user?.id
                         ? "bg-gray-100"
                         : "hover:bg-gray-50"
                     }`}
                   >
-                    {console.log("user selected", selectedUser, user?.data?.id)}
+                    {console.log("user selected", selectedUser, user?.id)}
                     <div className="bg-gray-200 h-10 w-10 rounded-full flex items-center justify-center">
                       <span className="text-sm font-medium text-gray-600">
-                        {user?.data?.firstName[0].toUpperCase() +
-                          user?.data?.lastName[0].toUpperCase()}
+                        {user?.firstName[0].toUpperCase() +
+                          user?.lastName[0].toUpperCase()}
                       </span>
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">
-                        {capitalize(user?.data?.firstName) +
+                        {capitalize(user?.firstName) +
                           " " +
-                          capitalize(user?.data?.lastName)}
+                          capitalize(user?.lastName)}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {user?.data?.ruralFinId}
+                        {user?.ruralFinId}
                       </p>
                     </div>
                   </div>
@@ -631,7 +635,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
                       </label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                          $
+                          ₹
                         </span>
                         <Field
                           type="number"

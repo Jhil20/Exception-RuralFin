@@ -106,14 +106,12 @@ const Register = () => {
               <p className="text-xs text-gray-500">
                 By creating an eWallet account, you agree to our{" "}
                 <a
-                  href="/terms"
                   className="text-gray-700 hover:text-black transition-colors"
                 >
                   Terms of Service
                 </a>{" "}
                 and{" "}
                 <a
-                  href="/privacy"
                   className="text-gray-700 hover:text-black transition-colors"
                 >
                   Privacy Policy

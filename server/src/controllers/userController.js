@@ -34,6 +34,29 @@ const getUserById = async (req, res) => {
   }
 };
 
+const getFavouritesByUserId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log("Fetching favourites for user ID:", id);
+    const userFavoruites = await User.findById(id).populate("favourites");
+    if (!userFavoruites) {
+      return res
+        .status(404)
+        .json({ message: "User not found", success: false });
+    }
+    console.log("User favourites found:", userFavoruites);
+    return res
+      .status(200)
+      .json({
+        message: "Favourites fetched successfully",
+        success: true,
+        favourites: userFavoruites.favourites,
+      });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching favourites", error });
+  }
+};
+
 const getUserByPhone = async (req, res) => {
   try {
     const { phoneNumber, role } = req.body;
@@ -61,19 +84,23 @@ const getUserByPhone = async (req, res) => {
 };
 
 const checkValidRuralFinId = async (req, res) => {
-  try{
-    const id=req.params.id;
-    console.log("id",id);
-    const user=await User.findOne({ruralFinId:id});
-    console.log("user",user);
-    if(!user){
-      return res.status(404).json({message:"User not found",success:false,found:false});
+  try {
+    const id = req.params.id;
+    console.log("id", id);
+    const user = await User.findOne({ ruralFinId: id });
+    console.log("user", user);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "User not found", success: false, found: false });
     }
-    return res.status(200).json({message:"User found",success:true,found:true});
-  }catch(error){
+    return res
+      .status(200)
+      .json({ message: "User found", success: true, found: true });
+  } catch (error) {
     res.status(500).json({ message: "Error fetching user", error });
   }
-}
+};
 
 const addFavouriteToUserById = async (req, res) => {
   try {
@@ -82,43 +109,57 @@ const addFavouriteToUserById = async (req, res) => {
     console.log("ruralFinId", ruralFinId);
 
     if (!userId) {
-      return res.status(400).json({ message: "User ID is required", success: false });
+      return res
+        .status(400)
+        .json({ message: "User ID is required", success: false });
     }
 
     const user = await User.findById(userId);
     console.log("user", user);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found", success: false });
+      return res
+        .status(404)
+        .json({ message: "User not found", success: false });
     }
 
     const favouriteUser = await User.findOne({ ruralFinId: ruralFinId });
     if (!favouriteUser) {
-      return res.status(404).json({ message: "User not found", success: false });
+      return res
+        .status(404)
+        .json({ message: "User not found", success: false });
     }
 
     const userFavourites = user.favourites || [];
     console.log("userFavourites", userFavourites);
 
-    const isAlreadyFavourite = userFavourites.some((id) => id.equals(favouriteUser._id));
+    const isAlreadyFavourite = userFavourites.some((id) =>
+      id.equals(favouriteUser._id)
+    );
 
     if (isAlreadyFavourite) {
-      return res.status(400).json({ message: "User already in favourites", success: false });
+      return res
+        .status(400)
+        .json({ message: "User already in favourites", success: false });
     }
 
-      user.favourites.push(favouriteUser._id);
+    user.favourites.push(favouriteUser._id);
     const updatedUser = await user.save();
 
     console.log("updatedUser", updatedUser);
 
-    return res.status(200).json({ message: "User updated successfully", success: true, updatedUser });
-
+    return res
+      .status(200)
+      .json({
+        message: "User updated successfully",
+        success: true,
+        updatedUser,
+      });
   } catch (error) {
     console.error("Error adding favourite:", error);
     return res.status(500).json({ message: "Error adding favourite", error });
   }
 };
-
 
 // Create a new user
 const createUser = async (req, res) => {
@@ -134,7 +175,6 @@ const createUser = async (req, res) => {
       "gender",
       "aadhar",
     ];
-    
 
     for (const field of requiredFields) {
       if (!req.body[field]) {
@@ -166,7 +206,7 @@ const createUser = async (req, res) => {
       aadhar: req.body.aadhar,
       password: hashedPassword,
       lastTransactionDate: null,
-      transactionPin:hashedPin,
+      transactionPin: hashedPin,
     });
 
     try {
@@ -267,5 +307,6 @@ module.exports = {
   deleteUser,
   getUserByPhone,
   checkValidRuralFinId,
-  addFavouriteToUserById
+  addFavouriteToUserById,
+  getFavouritesByUserId,
 };

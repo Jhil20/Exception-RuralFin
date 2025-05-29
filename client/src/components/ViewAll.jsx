@@ -8,7 +8,7 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
   const [transactionInfo, setTransactionInfo] = useState(null);
   const [showTransactionInfo, setShowTransactionInfo] = useState(false);
   const [isAgentTransaction, setIsAgentTransaction] = useState(false);
-
+  console.log("transactionData", transactionData);
   return (
     <div className="w-2/3 h-10/12 bg-white rounded-lg shadow-lg p-6">
       {transactionInfo != null && showTransactionInfo == true && (
@@ -55,7 +55,7 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                   style: "currency",
                   currency: "INR",
                 }).format(
-                  transactionInfo?.amount - transactionInfo?.commission
+                   transactionInfo?.commission ? transactionInfo?.amount-transactionInfo?.commission : transactionInfo?.amount
                 )}
               </p>
               <p>
@@ -293,6 +293,11 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
               </div>
             );
           })}
+          {transactionData.length === 0 && (
+            <div className="flex items-center justify-center pb-20 h-full">
+              <p className="text-gray-500  text-xl">No transactions found</p>
+            </div>
+          )}
       </div>
     </div>
   );

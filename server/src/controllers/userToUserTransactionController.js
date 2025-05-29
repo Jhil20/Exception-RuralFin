@@ -209,7 +209,7 @@ const getAllTransactionsByCategory = async (req, res) => {
     const selectedYear = req.body.selectedYear;
     const startOfMonth = new Date(selectedYear, selectedMonth, 1);
     const startOfNextMonth = new Date(selectedYear, selectedMonth + 1, 1);
-    // console.log("startOfMonth", startOfMonth, "startOfNextMonth", startOfNextMonth,selectedMonth);
+    console.log("startOfMonth", startOfMonth, "startOfNextMonth",userId, startOfNextMonth,selectedMonth);
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ error: "Invalid user ID" });
     }
@@ -219,7 +219,7 @@ const getAllTransactionsByCategory = async (req, res) => {
       transactionDate: { $gte: startOfMonth, $lt: startOfNextMonth },
       remarks: category,
     }).populate("receiverId");
-    // console.log("transactions", transactions);
+    console.log("transactions", transactions);
 
     if (!transactions) {
       return res

@@ -31,11 +31,11 @@ const transferFunds = async (req, res) => {
 
   try {
     const { senderId, receiverId, amount, transactionId } = req.body;
-    console.log("Transfer Funds Request:", req.body);
-    console.log("senderId:", senderId);
-    console.log("receiverId:", receiverId);
-    console.log("amount:", amount);
-    console.log("transactionId:", transactionId);
+    // console.log("Transfer Funds Request:", req.body);
+    // console.log("senderId:", senderId);
+    // console.log("receiverId:", receiverId);
+    // console.log("amount:", amount);
+    // console.log("transactionId:", transactionId);
 
     if (!senderId || !receiverId || !amount || !transactionId) {
       return res
@@ -45,7 +45,7 @@ const transferFunds = async (req, res) => {
 
     const sender = await User.findById(senderId).session(session);
     const receiver = await User.findById(receiverId).session(session);
-    console.log("sender and receiver found");
+    // console.log("sender and receiver found");
     if (!sender || !receiver) {
       return res
         .status(404)
@@ -55,7 +55,7 @@ const transferFunds = async (req, res) => {
     const transaction = await UserToUserTransaction.findById(
       transactionId
     ).session(session);
-    console.log("transaction found");
+    // console.log("transaction found");
     if (!transaction) {
       return res
         .status(404)
@@ -67,7 +67,7 @@ const transferFunds = async (req, res) => {
         .status(400)
         .json({ message: "Transaction is not pending", success: false });
     }
-    console.log("Transaction is pending");
+    // console.log("Transaction is pending");
     const senderFinance = await Finance.findOne({ userId: senderId }).session(
       session
     );
@@ -82,12 +82,11 @@ const transferFunds = async (req, res) => {
     }
 
     // Check sufficient balance
-    if (senderFinance.balance < amount) {
-      return res
-        .status(400)
-        .json({ message: "Insufficient balance", success: false });
-    }
-    console.log("Sufficient balance found", senderFinance, receiverFinance);
+    // if (senderFinance.balance < amount) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "Insufficient balance", success: false });
+    // }
     let isDebitSuccessful = false;
     let isCreditSuccessful = false;
 

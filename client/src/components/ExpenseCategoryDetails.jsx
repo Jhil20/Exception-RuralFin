@@ -22,6 +22,9 @@ const ExpenseCategoryDetails = ({
   const [whichCategory, setWhichCategory] = useState("");
 
   const handleViewDetails = async (category) => {
+    if(category =="Food"){
+      category = "Food & Dining";
+    }
     setShowViewDetails(true);
     setWhichCategory(category);
     const values = {

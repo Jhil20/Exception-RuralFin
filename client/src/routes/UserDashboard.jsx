@@ -109,11 +109,13 @@ const UserDashboard = () => {
     } catch (err) {
       console.log("error in fetching user-user transactions", err);
     }
-    try{
-      const result2=await axios.get(`${BACKEND_URL}/api/agentToUserTransaction/byUser/${decoded.id}`);
+    try {
+      const result2 = await axios.get(
+        `${BACKEND_URL}/api/agentToUserTransaction/byUser/${decoded.id}`
+      );
       console.log("result2 ttttttttttttttttttttttt", result2);
       setTransactionData((prev) => [...prev, ...result2?.data?.transactions]);
-    }catch (err) {
+    } catch (err) {
       console.log("error in fetching user-agent transactions", err);
     }
   };
@@ -123,13 +125,13 @@ const UserDashboard = () => {
     try {
       // console.log("hiiii");
       const response = await axios.get(`${BACKEND_URL}/api/user/${decoded.id}`);
-      // console.log("response", response);
+      console.log("response", response);
       setUserData(response?.data?.data);
       // console.log("FIDDDD", response?.data?.data?.finance);
       const response2 = await axios.get(
         `${BACKEND_URL}/api/finance/${response?.data?.data?.finance}`
       );
-      // console.log("response fr", response2?.data?.finance);
+      console.log("response fr", response2?.data?.finance);
       setUserFinance(response2?.data?.finance);
     } catch (err) {
       console.log(err);
@@ -204,7 +206,11 @@ const UserDashboard = () => {
 
       {showAgentsViewMore && (
         <div className="bg-black/40 flex justify-center items-center fixed top-0 z-51 w-full h-full">
-          <AgentsViewMore setShowAgentsViewMore={setShowAgentsViewMore} setShowAgentDetails={setShowAgentDetails} setSelectedAgent={setSelectedAgent}/>
+          <AgentsViewMore
+            setShowAgentsViewMore={setShowAgentsViewMore}
+            setShowAgentDetails={setShowAgentDetails}
+            setSelectedAgent={setSelectedAgent}
+          />
         </div>
       )}
 
@@ -232,6 +238,7 @@ const UserDashboard = () => {
         <div className="grid grid-cols-1 h-[15rem] lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-1">
             <BalanceCard
+              user={userData}
               balance={userFinance?.balance}
               lastUpdated={userFinance?.updatedAt}
               showSend={{ showSend, setShowSend }}
@@ -247,7 +254,7 @@ const UserDashboard = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 ">
           <div className="lg:col-span-2">
             <RecentTransactions
               transactionData={transactionData}
