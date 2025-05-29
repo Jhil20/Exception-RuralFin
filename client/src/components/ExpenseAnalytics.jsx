@@ -67,7 +67,7 @@ const ExpenseAnalytics = ({ setIsReportOpen, setBudgetPlanningForm ,setShowDetai
             <PieChart size={20} className="text-gray-700" />
           </div>
         </div>
-        <div onClick={()=>setBudgetPlanningForm(true)} className="bg-gray-200 p-2 hover:ring-2 transition-all duration-300 cursor-pointer rounded-full">
+        <div onClick={()=>setBudgetPlanningForm(true)} className="hover:bg-gray-200 p-2  transition-all duration-300 cursor-pointer rounded-full">
           <Settings size={22} className="text-gray-700" />
         </div>
       </div>

@@ -21,24 +21,7 @@ import capitalize from "../utils/capitalize";
 
 const AgentDashboard = () => {
   useAuth();
-  const [transactions] = useState([
-    {
-      id: "1",
-      amount: 1000,
-      user: "John Doe",
-      status: "pending",
-      type: "deposit",
-      timestamp: "2025-04-20T10:25:00",
-    },
-    {
-      id: "2",
-      amount: 1500,
-      user: "Jane Smith",
-      status: "pending",
-      type: "withdrawal",
-      timestamp: "2025-04-20T10:15:00",
-    },
-  ]);
+  const [isLengthZero, setIsLengthZero] = useState(false);
   const [transactionsDone, setTransactionsDone] = useState([]);
   const [agentData, setAgentData] = useState({});
   const [activeFilter, setActiveFilter] = useState("all");
@@ -184,10 +167,20 @@ const AgentDashboard = () => {
     // console.log("Transactions before filtering:", transactionsDone);
     if (filter === "all") {
       setFilteredTransactions(transactionsDone);
+      if (transactionsDone.length === 0) {
+        setIsLengthZero(true);
+      }else{
+        setIsLengthZero(false);
+      }
     } else {
       const filteredTransactions = transactionsDone.filter(
         (tr) => tr.status === filter
       );
+      if (filteredTransactions.length === 0) {
+        setIsLengthZero(true);
+      }else{
+        setIsLengthZero(false);
+      }
       setFilteredTransactions(filteredTransactions);
     }
   };
@@ -213,18 +206,8 @@ const AgentDashboard = () => {
       <header className="bg-white text-black shadow-md mx-4 mx rounded-md mt-3">
         <div className="container mx-auto p-4">
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-xl font-bold">Agent Dashboard</h1>
-            <div className="flex items-center space-x-4">
-              <button className="relative p-2 hover:bg-gray-200 transition-all duration-300 cursor-pointer rounded-full">
-                <Bell size={20} />
-                <span className="absolute top-0 right-0 h-4 w-4 bg-red-300 rounded-full text-xs flex items-center justify-center">
-                  2
-                </span>
-              </button>
-              <button className="bg-white p-2 hover:bg-gray-200 transition-all duration-300 cursor-pointer text-black px-4 py-2 rounded-md font-medium">
-                New Transaction
-              </button>
-            </div>
+            <h1 className="ml-2 text-xl font-bold">Agent Dashboard</h1>
+            
           </div>
 
           {/* Quick stats bar */}
@@ -436,7 +419,7 @@ const AgentDashboard = () => {
             </div>
           </div>
 
-          <div className="divide-y divide-gray-200">
+          <div className={`divide-y ${isLengthZero?"h-fit":"h-96"} overflow-y-auto divide-gray-200`}>
             {filteredTransactions
               ?.sort((a, b) => {
                 return (
