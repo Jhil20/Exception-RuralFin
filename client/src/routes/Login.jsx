@@ -7,6 +7,8 @@ import {
   Lock,
   Presentation,
   ArrowLeftIcon,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -19,25 +21,27 @@ import { ToastContainer, toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
 // import Cookie from "js-cookie";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 import { SignedIn } from "../redux/slices/isSignInSlice";
 import capitalize from "../utils/capitalize";
 
 const Login = () => {
   const [firebaseError, setFirebaseError] = useState("");
-  const [isSignup, setIsSignup] = useState(false);
+  // const [isSignup, setIsSignup] = useState(false);
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [phoneState, setPhoneState] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRendered, setIsRendered] = useState(false);
   const [whatRole, setWhatRole] = useState("");
   const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = useState(false);
   const initialValues = {
     phoneNumber: "",
     role: "",
+    password: "",
   };
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const validationSchemaOTP = Yup.object({
     otpNumber: Yup.string()
       .required("OTP is required")
@@ -88,7 +92,7 @@ const Login = () => {
     try {
       const whichRole = values.role;
       setWhatRole(whichRole);
-      
+
       const response = await axios.post(
         `${BACKEND_URL}/api/${whichRole}/get${capitalize(whichRole)}ByPhone`,
         values
@@ -100,6 +104,17 @@ const Login = () => {
         setSubmitting(false);
       } else {
         console.log("in else");
+
+        const response2 = await axios.post(
+          `${BACKEND_URL}/api/${whichRole}/checkPassword`,
+          values
+        );
+        console.log("Response from server for password check:", response2);
+        if(!response2?.data?.success) {
+          toast.error("Incorrect Password or Phone Number. Please try again.");
+          setSubmitting(false);
+          return;
+        }
         const token = response?.data?.token;
         Cookies.set("token", token, { expires: 1 });
         // const decodedToken = jwt(token);
@@ -210,15 +225,14 @@ const Login = () => {
       toast.success("OTP verified successfully!");
       setTimeout(() => {
         dispatch(SignedIn());
-        if(whatRole==="user"){
-
+        if (whatRole === "user") {
           navigate("/dashboard");
-        }else if(whatRole==="agent"){
+        } else if (whatRole === "agent") {
           navigate("/agentDashboard");
-        }else{
+        } else {
           navigate("/adminDashboard");
         }
-      },2000);
+      }, 2000);
     } catch (error) {
       console.error("Error verifying OTP:", error);
       toast.error("Invalid OTP. Please try again.");
@@ -229,7 +243,7 @@ const Login = () => {
 
   if (isOtpSent) {
     return (
-      <div className="min-h-[90.8vh] bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col">
+      <div className="min-h-[90vh] bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col">
         {/* <Header /> */}
         <ToastContainer
           position="top-right"
@@ -291,6 +305,8 @@ const Login = () => {
                           if (Cookies.get("token")) {
                             Cookies.remove("token");
                           }
+                          window.confirmationResult = null;
+                          window.location.reload();
                         }}
                         className="mb-5 flex hover:text-gray-600 transition-all duration-300 items-center cursor-pointer"
                       >
@@ -381,7 +397,7 @@ const Login = () => {
         pauseOnHover
       />
 
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 ">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-extrabold text-gray-900 mb-2">
@@ -452,6 +468,7 @@ const Login = () => {
                           onChange={handleChange}
                           onBlur={handleBlur}
                           required
+                          title="Select your role"
                         >
                           <option value="" disabled>
                             Select Role
@@ -460,6 +477,36 @@ const Login = () => {
                           <option value="agent">Agent</option>
                           <option value="admin">Admin</option>
                         </Field>
+                      </div>
+                    </div>
+                    <div className="h-full mt-3">
+                      <label
+                        htmlFor="password"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Password
+                      </label>
+                      <div className="relative rounded-md shadow-sm">
+                        <div onClick={()=>setShowPassword(!showPassword)} className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                          {showPassword ? (
+                            <EyeOff className="h-5 w-5 text-gray-600 cursor-pointer" />
+                          ) : (
+                            <Eye className="h-5 w-5 text-gray-600 cursor-pointer" />
+                          )}
+                        </div>
+                        <Field
+                          type={`${showPassword ? "text" : "password"}`}
+                          id="password"
+                          name="password"
+                          className="block mt-2 w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                          placeholder="Enter Your Password"
+                          value={values.password}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          required
+                          maxLength={10}
+                          title="Please enter your password"
+                        />
                       </div>
                     </div>
 

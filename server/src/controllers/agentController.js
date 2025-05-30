@@ -28,6 +28,36 @@ const getAgentById = async (req, res) => {
   }
 };
 
+const checkAgentPassword = async (req, res) => {
+  try {
+    const { phoneNumber, role, password } = req.body;
+    console.log("userId", phoneNumber);
+    console.log("role", role);
+    console.log("password", password);
+
+    const agent = await Agent.findOne({ phone: phoneNumber, role: role });
+    if (!agent) {
+      return res
+        .status(404)
+        .json({ message: "Agent not found", success: false });
+    }
+    const isPasswordValid = await bcrypt.compare(password, agent.password);
+
+    if (!isPasswordValid) {
+      return res
+        .status(200)
+        .json({ message: "Invalid password", success: false });
+    }
+    return res.status(200).json({
+      message: "Password is valid",
+      success: true,
+      userId: agent._id,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error checking agent password", error });
+  }
+};
+
 // Create new agent (sync with frontend AgentForm, use bcrypt & jwt)
 const createAgent = async (req, res) => {
   try {
@@ -184,4 +214,5 @@ module.exports = {
   updateAgent,
   deleteAgent,
   getAgentByPhone,
+  checkAgentPassword,
 };

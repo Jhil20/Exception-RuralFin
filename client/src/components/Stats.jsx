@@ -55,28 +55,28 @@ const Stats = () => {
           ref={statsRef}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
         >
-          <div className="bg-white p-8 rounded-xl shadow-sm text-center">
+          <div className="bg-white hover:shadow-lg hover:shadow-gray-300 transition-all duration-300 p-8 rounded-xl shadow-sm text-center">
             <p className="text-4xl font-bold mb-2">
               <span className="stat-number">190</span>M
             </p>
             <p className="text-gray-600">Indians remain unbanked despite financial inclusion initiatives</p>
           </div>
 
-          <div className="bg-white p-8 rounded-xl shadow-sm text-center">
+          <div className="bg-white hover:shadow-lg hover:shadow-gray-300 transition-all duration-300 p-8 rounded-xl shadow-sm text-center">
             <p className="text-4xl font-bold mb-2">
               <span className="stat-number">53</span>%
             </p>
             <p className="text-gray-600">Of women in rural India use financial services regularly</p>
           </div>
 
-          <div className="bg-white p-8 rounded-xl shadow-sm text-center">
+          <div className="bg-white hover:shadow-lg hover:shadow-gray-300 transition-all duration-300 p-8 rounded-xl shadow-sm text-center">
             <p className="text-4xl font-bold mb-2">
               <span className="stat-number">82</span>%
             </p>
             <p className="text-gray-600">Of village transactions are still cash-based</p>
           </div>
 
-          <div className="bg-white p-8 rounded-xl shadow-sm text-center">
+          <div className="bg-white hover:shadow-lg hover:shadow-gray-300 transition-all duration-300 p-8 rounded-xl shadow-sm text-center">
             <p className="text-4xl font-bold mb-2">
               <span className="stat-number">23</span>%
             </p>

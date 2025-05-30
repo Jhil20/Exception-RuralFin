@@ -45,15 +45,43 @@ const getFavouritesByUserId = async (req, res) => {
         .json({ message: "User not found", success: false });
     }
     console.log("User favourites found:", userFavoruites);
-    return res
-      .status(200)
-      .json({
-        message: "Favourites fetched successfully",
-        success: true,
-        favourites: userFavoruites.favourites,
-      });
+    return res.status(200).json({
+      message: "Favourites fetched successfully",
+      success: true,
+      favourites: userFavoruites.favourites,
+    });
   } catch (error) {
     res.status(500).json({ message: "Error fetching favourites", error });
+  }
+};
+
+const checkUserPassword = async (req, res) => {
+  try {
+    const { phoneNumber, role, password } = req.body;
+    console.log("userId", phoneNumber);
+    console.log("role", role);
+    console.log("password", password);
+
+    const user = await User.findOne({ phone: phoneNumber, role: role });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "User not found", success: false });
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res
+        .status(200)
+        .json({ message: "Invalid password", success: false });
+    }
+    return res.status(200).json({
+      message: "Password is valid",
+      success: true,
+      userId: user._id,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error checking user password", error });
   }
 };
 
@@ -148,13 +176,11 @@ const addFavouriteToUserById = async (req, res) => {
 
     console.log("updatedUser", updatedUser);
 
-    return res
-      .status(200)
-      .json({
-        message: "User updated successfully",
-        success: true,
-        updatedUser,
-      });
+    return res.status(200).json({
+      message: "User updated successfully",
+      success: true,
+      updatedUser,
+    });
   } catch (error) {
     console.error("Error adding favourite:", error);
     return res.status(500).json({ message: "Error adding favourite", error });
@@ -309,4 +335,5 @@ module.exports = {
   checkValidRuralFinId,
   addFavouriteToUserById,
   getFavouritesByUserId,
+  checkUserPassword,
 };

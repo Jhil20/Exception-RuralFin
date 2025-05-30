@@ -53,6 +53,12 @@ const Header = () => {
               location.pathname === "/register" ? (
                 <>
                   <Link
+                    to="/home"
+                    className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                  >
+                    Home
+                  </Link>
+                  <Link
                     to="/home#features"
                     className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
                   >

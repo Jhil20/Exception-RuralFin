@@ -139,7 +139,7 @@ const BudgetTracking = () => {
                   <div className="space-y-4">
                     <div>
                       <div className="flex justify-between items-center mb-1">
-                        <p className="text-xs">Groceries</p>
+                        <p className="text-xs">Food & Dining</p>
                         <p className="text-xs">₹3,200 / ₹4,000</p>
                       </div>
                       <div className="w-full bg-gray-100 rounded-full h-2">
@@ -197,7 +197,7 @@ const BudgetTracking = () => {
               {budgetFeatures.map((feature, index) => (
                 <div
                   key={index}
-                  className="budget-feature bg-white p-6 rounded-xl shadow-sm"
+                  className="budget-feature p-8 border-2 border-gray-300 hover:shadow-lg hover:shadow-gray-300 transition-shadow duration-300 bg-white  rounded-xl shadow-sm"
                 >
                   <div className="bg-black text-white h-12 w-12 rounded-lg flex items-center justify-center mb-4">
                     {feature.icon}

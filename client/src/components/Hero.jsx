@@ -84,7 +84,7 @@ const Hero = () => {
               financial control, and build a better future.
             </p>
             <div ref={ctaRef} className="flex flex-col sm:flex-row gap-4">
-              <Link to={"/signup"}>
+              <Link to={"/register"}>
               <button className="bg-black cursor-pointer text-white px-8 py-4 rounded-full font-medium hover:shadow-gray-600 hover:shadow-lg duration-300 transition-all flex items-center justify-center">
                 Get Started <ArrowRight size={20} className="ml-2" />
               </button>

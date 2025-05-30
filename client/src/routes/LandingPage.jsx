@@ -7,7 +7,7 @@ import BudgetTracking from "../components/BudgetTracking";
 import FinancialLiteracy from "../components/FinancialLiteracy";
 import Stats from "../components/Stats";
 import { useGSAP } from "../hooks/useGSAP";
-import Footer1 from "../components/Footer1";
+import LandingFooter from "../components/Footer1";
 import Header from "../components/Header";
 
 const LandingPage = () => {
@@ -23,7 +23,7 @@ const LandingPage = () => {
         <SecuritySection />
         <BudgetTracking />
         <FinancialLiteracy />
-      <Footer1 />
+      <LandingFooter />
     </div>
   );
 };

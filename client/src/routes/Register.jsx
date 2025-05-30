@@ -80,17 +80,17 @@ const Register = () => {
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-1">
         <div className={`w-full ${!role ? "max-w-3xl" : userFormStep2 ? "max-w-2xl" : "max-w-9/12"} `}>
           <div className="text-center mb-4">
-            <h1 className="text-4xl font-extrabold text-gray-900 mb-2">
+            <h1 className="text-4xl font-extrabold text-gray-900 mb-7">
               {!role
                 ? "Register To Become a User or an Agent"
                 : role == "user"
                 ? "Create Your eWallet"
                 : "Create Your Agent Account"}
             </h1>
-            <p className="text-gray-600 text-lg">
+            {/* <p className="text-gray-600 text-lg">
               Join RuralFin Finance to access financial services and manage your
               eWallet easily.
-            </p>
+            </p> */}
           </div>
 
           <div

@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { Lock, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
 
-const Footer1 = () => {
+const LandingFooter = () => {
   const footerRef = useRef(null);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ const Footer1 = () => {
           <div className="lg:col-span-2">
             <div className="flex items-center mb-6">
               <Lock size={28} className="text-white mr-2" />
-              <span className="text-xl font-bold">FinSecure</span>
+              <span className="text-xl font-bold">RuralFin</span>
             </div>
             <p className="text-gray-400 mb-6 max-w-md">
               Empowering underbanked communities with secure, accessible financial
@@ -61,7 +61,7 @@ const Footer1 = () => {
             <div className="space-y-3">
               <div className="flex items-center">
                 <Mail size={18} className="text-gray-400 mr-3" />
-                <p className="text-gray-400">contact@finsecure.com</p>
+                <p className="text-gray-400">ruralfin@gmail.com</p>
               </div>
               <div className="flex items-center">
                 <Phone size={18} className="text-gray-400 mr-3" />
@@ -94,7 +94,7 @@ const Footer1 = () => {
 
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 mb-6 md:mb-0">
-            &copy; {new Date().getFullYear()} FinSecure. All rights reserved.
+            &copy; {new Date().getFullYear()} RuralFin. All rights reserved.
           </p>
           <div className="flex space-x-4">
             <a href="#" className="text-gray-400 hover:text-white transition-colors">
@@ -116,4 +116,4 @@ const Footer1 = () => {
   );
 };
 
-export default Footer1;
+export default LandingFooter;
