@@ -32,6 +32,7 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { BACKEND_URL } from "../utils/constants";
+import { toast, ToastContainer } from "react-toastify";
 
 const AgentDetails = ({
   showAgentDetails,
@@ -170,6 +171,7 @@ const AgentDetails = ({
         "response of creating agent to user transactions",
         response.data
       );
+      toast.success(`${transactionType === "deposit" ? "Deposit" : "Withdrawal"} request successful!`)
       resetForm();
     } catch (error) {
       console.error("Error creating agent to user transaction:", error);
@@ -225,6 +227,16 @@ const AgentDetails = ({
 
   return (
     <div className="bg-white h-11/12 w-2/3 rounded-2xl shadow-xl transition-all duration-300 transform animate-fade-in">
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       {/* Header */}
       <div className="flex justify-between items-center h-22 mt-2 px-6 pb-2 border-b border-gray-100">
         <div>

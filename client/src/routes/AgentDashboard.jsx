@@ -461,13 +461,14 @@ const AgentDashboard = () => {
                         )}
                       </div>
                       <p className="text-gray-600">
-                        Amount: ₹{transaction?.amount.toLocaleString()}
+                        Amount: ₹{transaction?.amount.toLocaleString()} | Commission: ₹
+                        {transaction?.commission?.toLocaleString() || 0}
                       </p>
                       <p className="text-gray-600">
                         User:{" "}
                         {capitalize(transaction?.userId?.firstName) +
                           " " +
-                          capitalize(transaction?.userId?.lastName)}
+                          capitalize(transaction?.userId?.lastName)} | Note: {transaction?.notes || "No note provided"}
                       </p>
                       <p className="text-gray-500 text-sm">
                         {formatDate(transaction?.transactionDate)}
