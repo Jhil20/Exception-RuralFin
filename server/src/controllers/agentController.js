@@ -3,7 +3,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 // Get all agents
-// Get all agents
 const getAllAgents = async (req, res) => {
   try {
     const agents = await Agent.find();
@@ -92,7 +91,7 @@ const createAgent = async (req, res) => {
       "bankName",
       "securityDeposit",
     ];
-    console.log(req.body);
+    // console.log(req.body);
     // Check if all required fields are present
     for (const field of requiredFields) {
       if (!req.body[field]) {
@@ -126,6 +125,7 @@ const createAgent = async (req, res) => {
       ifscCode,
       bankName,
       securityDeposit: securityDeposit,
+      balance: securityDeposit, 
       password: hashedPassword,
       phone,
       address,

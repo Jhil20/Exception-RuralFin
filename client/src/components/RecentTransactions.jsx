@@ -136,7 +136,7 @@ const RecentTransactions = ({
                       {new Intl.NumberFormat("en-US", {
                         style: "currency",
                         currency: "INR",
-                      }).format(transaction?.amount-transaction?.commission)}
+                      }).format(transaction?.conversionType === "cashToERupees"?transaction?.amount-transaction?.commission:transaction?.amount+transaction?.commission)}
                     </span>
 
                     <div className="ml-2">

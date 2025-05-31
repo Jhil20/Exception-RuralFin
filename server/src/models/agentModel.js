@@ -15,6 +15,7 @@ const agentSchema = new Schema(
     accountNumber: { type: String, required: true },
     password: { type: String, required: true },
     securityDeposit: { type: Number, default: 0 },
+    balance: { type: Number, default: 0 },
     ifscCode: { type: String, required: true },
     bankName: { type: String, required: true },
     commissionEarned: { type: Number, default: 0 },

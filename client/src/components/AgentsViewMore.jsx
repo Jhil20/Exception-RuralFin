@@ -105,7 +105,7 @@ const AgentsViewMore = ({
               setSelectedAgent(agent);
               setShowAgentDetails(true);
             }}
-            className="bg-white ring-1 ring-gray-300  mx-0.5 cursor-pointer p-5 rounded-lg shadow-md hover:shadow-lg shadow-black/30 transition-all duration-300 transform hover:scale-101"
+            className="bg-white ring-1 ring-gray-300 h-46 mx-0.5 cursor-pointer p-5 rounded-lg shadow-md hover:shadow-lg shadow-black/30 transition-all duration-300 transform hover:scale-101"
           >
             <div className="flex items-center">
               <div className="bg-gray-900 p-2 rounded-full mr-4">
@@ -118,7 +118,7 @@ const AgentsViewMore = ({
                     capitalize(agent?.lastName)}
                 </span>
                 <span className="text-gray-700 text-sm my-1 font-normal">
-                  Amount: ₹{agent?.securityDeposit}
+                  Amount: ₹{agent?.balance}
                 </span>
                 <div className="text-gray-700 text-sm  ">
                   Address : {agent?.address}

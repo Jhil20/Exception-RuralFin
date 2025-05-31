@@ -49,7 +49,7 @@ const AgentList = ({
                     capitalize(agent?.lastName)}
                 </span>
                 <span className="text-gray-700 text-sm my-1 font-normal">
-                  Amount: ₹{agent?.securityDeposit}
+                  Amount: ₹{agent?.balance}
                 </span>
                 <div className="text-gray-700 text-sm  ">
                   Address : {agent?.address}

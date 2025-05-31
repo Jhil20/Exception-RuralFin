@@ -57,7 +57,7 @@ const ExpenseAnalytics = ({ setIsReportOpen, setBudgetPlanningForm ,setShowDetai
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-md shadow-gray-300">
+    <div className="bg-white rounded-2xl  p-6 shadow-md shadow-gray-300">
       <div className="flex justify-between items-center mb-3">
         <div className="flex items-center bg-gray-900 p-2 px-2 pl-4 rounded-4xl">
           <h3 className="text-lg font-semibold mr-2 text-white">

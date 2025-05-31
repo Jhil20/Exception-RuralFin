@@ -101,7 +101,7 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
     <Loader />
   ) : (
     <>
-    <ToastContainer
+    {/* <ToastContainer
       position="top-right"
       autoClose={3000}
       hideProgressBar={false}
@@ -112,7 +112,7 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
       draggable
       pauseOnHover
       theme="light"
-    />
+    /> */}
     <div className="space-y-6">
       {step == 1 && (
         <Formik

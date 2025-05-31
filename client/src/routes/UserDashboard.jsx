@@ -153,17 +153,7 @@ const UserDashboard = () => {
     <Loader />
   ) : (
     <div className="bg-gray-50 min-h-screen">
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={true}
-        closeOnClick={true}
-        rtl={false}
-        pauseOnFocusLoss={false}
-        draggable={false}
-        pauseOnHover={false}
-      />
+      
       {showSend && (
         <div className="bg-black/40 flex justify-center items-center fixed top-0 z-50 w-full h-full">
           <SendMoney
@@ -235,8 +225,8 @@ const UserDashboard = () => {
           </p>
         </section>
 
-        <div className="grid grid-cols-1 h-[15rem] lg:grid-cols-3 gap-6 mb-8">
-          <div className="lg:col-span-1">
+        <div className="grid grid-cols-1 h-fit lg:grid-cols-3 gap-6 mb-8">
+          <div className="lg:col-span-1 h-full">
             <BalanceCard
               user={userData}
               balance={userFinance?.balance}
@@ -254,7 +244,7 @@ const UserDashboard = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 ">
+        <div className="grid grid-cols-1 h-full lg:grid-cols-3 gap-6 ">
           <div className="lg:col-span-2">
             <RecentTransactions
               transactionData={transactionData}
@@ -275,7 +265,7 @@ const UserDashboard = () => {
                 setIsReportOpen={setIsReportOpen}
               />
             ) : (
-              <div className="bg-white rounded-2xl flex flex-wrap justify-center content-center items-center h-full p-6 shadow-sm">
+              <div className="bg-white  rounded-2xl flex flex-wrap justify-center content-center items-center h-full p-6 shadow-sm">
                 <div className="w-full">
                   <h1 className="text-xl px-16 text-center font-semibold text-gray-800">
                     Budget Planning is not enabled for your account. Enable it

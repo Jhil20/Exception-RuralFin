@@ -4,6 +4,7 @@ const User = require("../models/userModel");
 const UserToUserTransaction = require("../models/userToUserTransactionModel");
 const userToAgentTransaction = require("../models/userToAgentTransactionModel");
 const Agent = require("../models/agentModel");
+const AgentCommission = require("../models/agentCommission");
 
 const getFinanceById = async (req, res) => {
   try {
@@ -24,6 +25,35 @@ const getFinanceById = async (req, res) => {
     });
   }
 };
+
+const getfinanceByUserId = async (req, res) => {
+  try{
+    const { userId } = req.params;
+    // console.log("Fetching finance record for userId:", userId);
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ message: "User ID is required", success: false });
+    }
+
+    const finance = await Finance.findOne({ userId });
+    // console.log("Finance record found:", finance);
+    if (!finance) {
+      return res
+        .status(404)
+        .json({ message: "Finance record not found", success: false });
+    }
+    return res
+      .status(200)
+      .json({ finance, message: "Finance record found", success: true });
+  }catch (error) {
+    return res.status(500).json({
+      message: "Error fetching finance record by userId",
+      error,
+      success: false,
+    });
+  }
+}
 
 const transferFunds = async (req, res) => {
   const session = await mongoose.startSession();
@@ -159,19 +189,17 @@ const depositFunds = async (req, res) => {
         .json({ message: "Finance record not found", success: false });
     }
 
-    finance.balance += (amount-commission);
+    finance.balance += amount - commission;
     await finance.save({ session });
     // console.log("Finance balance updated:", finance.balance);
-    
 
     const agentUpdate = await Agent.findByIdAndUpdate(
-      {_id:agentId},
+      { _id: agentId },
       {
         $inc: {
-          securityDeposit: commission-amount,
+          balance: commission - amount,
           commissionEarned: commission,
         },
-        
       },
       { new: true, session }
     );
@@ -182,9 +210,11 @@ const depositFunds = async (req, res) => {
         .json({ message: "Agent not found", success: false });
     }
 
-    const transactionUpdate = await userToAgentTransaction
-      .findByIdAndUpdate({_id:trId}, { status: "completed",transactionDate:new Date() }, { new: true, session })
-      ;
+    const transactionUpdate = await userToAgentTransaction.findByIdAndUpdate(
+      { _id: trId },
+      { status: "completed", transactionDate: new Date() },
+      { new: true, session }
+    );
     // console.log("Transaction update:", transactionUpdate);
     if (!transactionUpdate) {
       return res
@@ -192,6 +222,24 @@ const depositFunds = async (req, res) => {
         .json({ message: "Transaction not found", success: false });
     }
 
+    const agentCommissionUpdate = await AgentCommission.updateOne(
+      {
+        agentId,
+        month: new Date().getMonth() + 1,
+        year: new Date().getFullYear(),
+      },
+      {
+        $inc: { totalCommissionEarned: commission },
+        $set: { lastUpdated: new Date() },
+      },
+      { upsert: true, session }
+    );
+
+    if (!agentCommissionUpdate) {
+      return res
+        .status(404)
+        .json({ message: "Agent commission record not found", success: false });
+    }
 
     await session.commitTransaction();
     session.endSession();
@@ -212,7 +260,7 @@ const withdrawFunds = async (req, res) => {
   session.startTransaction();
 
   try {
-    const { userId, amount,agentId,trId,commission } = req.body;
+    const { userId, amount, agentId, trId, commission } = req.body;
     console.log("Withdraw Funds Request:", req.body);
     if (!userId || !amount) {
       return res
@@ -233,9 +281,9 @@ const withdrawFunds = async (req, res) => {
         .status(400)
         .json({ message: "Insufficient balance", success: false });
     }
-    const val=amount+commission;
+    const val = amount + commission;
 
-    finance.balance -= (val);
+    finance.balance -= val;
     await finance.save({ session });
     console.log("Finance balance updated:", finance.balance);
 
@@ -243,12 +291,12 @@ const withdrawFunds = async (req, res) => {
       agentId,
       {
         $inc: {
-          securityDeposit: amount+commission,
+          balance: amount + commission,
           commissionEarned: commission,
         },
       },
       { new: true, session }
-    )
+    );
     console.log("Agent update:", agentUpdate);
     if (!agentUpdate) {
       return res
@@ -256,8 +304,8 @@ const withdrawFunds = async (req, res) => {
         .json({ message: "Agent not found", success: false });
     }
     const transactionUpdate = await userToAgentTransaction.findOneAndUpdate(
-      {_id:trId},
-      { status: "completed",transactionDate:new Date() },
+      { _id: trId },
+      { status: "completed", transactionDate: new Date() },
       { new: true, session }
     );
     console.log("Transaction update:", transactionUpdate);
@@ -267,7 +315,25 @@ const withdrawFunds = async (req, res) => {
         .status(404)
         .json({ message: "Transaction not found", success: false });
     }
-    
+
+    const agentCommissionUpdate = await AgentCommission.updateOne(
+      {
+        agentId,
+        month: new Date().getMonth() + 1,
+        year: new Date().getFullYear(),
+      },
+      {
+        $inc: { totalCommissionEarned: commission },
+        $set: { lastUpdated: new Date() },
+      },
+      { upsert: true, session }
+    );
+    if (!agentCommissionUpdate) {
+      return res
+        .status(404)
+        .json({ message: "Agent commission record not found", success: false });
+    }
+
 
     await session.commitTransaction();
     session.endSession();
@@ -281,11 +347,12 @@ const withdrawFunds = async (req, res) => {
     console.error("Withdrawal failed:", error.message);
     res.status(500).json({ success: false, message: error.message });
   }
-}
+};
 
 module.exports = {
   getFinanceById,
   transferFunds,
   depositFunds,
   withdrawFunds,
+  getfinanceByUserId,
 };

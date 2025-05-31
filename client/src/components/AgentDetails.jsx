@@ -32,7 +32,7 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { BACKEND_URL } from "../utils/constants";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 
 const AgentDetails = ({
   showAgentDetails,
@@ -62,6 +62,7 @@ const AgentDetails = ({
   const [transactionFilter, setTransactionFilter] = useState("all");
   const [allTransactions, setAllTransactions] = useState([]);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
+  const [userData, setUserData] = useState(null);
   const token = Cookies.get("token");
   const decoded = useMemo(() => {
     if (!token) return null;
@@ -145,12 +146,20 @@ const AgentDetails = ({
     return masked;
   };
 
-  const handleAmountChange = (e) => {
-    const value = e.target.value;
-    if (/^\d*\.?\d*$/.test(value)) {
-      setAmount(value);
-    }
-  };
+const getUser=async()=>{
+  try{
+    console.log("Fetching user data for ID:", decoded.id);
+    const response=await axios.get(`${BACKEND_URL}/api/finance/getFinance/${decoded.id}`);
+    console.log("User finance data fetched successfully:", response.data);
+    setUserData(response.data.finance);
+  }catch(error) {
+    console.error("Error fetching user data:", error);
+  }
+}
+
+useEffect(()=>{
+  getUser();
+},[decoded])
 
   const handleAgentToUserSubmit = async (values, { resetForm }) => {
     const data = {
@@ -162,6 +171,10 @@ const AgentDetails = ({
         transactionType == "deposit" ? "cashToERupees" : "eRupeesToCash",
       notes: values.notes || "",
     };
+    if(transactionType!="deposit" && data.amount + data.commission > userData.balance) {
+      toast.error("Withdrawal amount exceeds available balance!");
+      return;
+    }
     try {
       const response = await axios.post(
         `${BACKEND_URL}/api/agentToUserTransaction/`,
@@ -227,16 +240,7 @@ const AgentDetails = ({
 
   return (
     <div className="bg-white h-11/12 w-2/3 rounded-2xl shadow-xl transition-all duration-300 transform animate-fade-in">
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={true}
-        closeOnClick
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
+      
       {/* Header */}
       <div className="flex justify-between items-center h-22 mt-2 px-6 pb-2 border-b border-gray-100">
         <div>
@@ -435,7 +439,7 @@ const AgentDetails = ({
                           </label>
                           <p className="text-black font-medium">
                             ₹
-                            {selectedAgent?.securityDeposit.toLocaleString(
+                            {selectedAgent?.balance.toLocaleString(
                               "en-IN"
                             )}
                           </p>
@@ -500,13 +504,27 @@ const AgentDetails = ({
                     <div className="bg-gray-50 border-gray-200 border rounded-lg p-4">
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium text-gray-500">
+                          Balance
+                        </span>
+                        <span className="text-black font-bold">
+                          ₹
+                          {selectedAgent?.balance.toLocaleString(
+                            "en-IN"
+                          ) || "0"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 border-gray-200 border rounded-lg p-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium text-gray-500">
                           Security Deposit
                         </span>
                         <span className="text-black font-bold">
                           ₹
                           {selectedAgent?.securityDeposit.toLocaleString(
                             "en-IN"
-                          )}
+                          ) || "0"}
                         </span>
                       </div>
                     </div>

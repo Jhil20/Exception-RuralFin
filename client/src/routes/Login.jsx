@@ -245,7 +245,7 @@ const Login = () => {
     return (
       <div className="min-h-[90vh] bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col">
         {/* <Header /> */}
-        <ToastContainer
+        {/* <ToastContainer
           position="top-right"
           autoClose={3000}
           hideProgressBar={false}
@@ -256,7 +256,7 @@ const Login = () => {
           draggable
           pauseOnHover
           style={{ marginTop: "70px" }}
-        />
+        /> */}
 
         <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
           <div className="w-full max-w-md">
@@ -384,7 +384,7 @@ const Login = () => {
 
   return (
     <div className="min-h-[90.8vh] bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col">
-      <ToastContainer
+      {/* <ToastContainer
         className={"mt-16"}
         position="top-right"
         autoClose={3000}
@@ -395,7 +395,7 @@ const Login = () => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-      />
+      /> */}
 
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 ">
         <div className="w-full max-w-md">

@@ -8,7 +8,6 @@ import { SignedIn } from '../redux/slices/isSignInSlice';
 
 
 const RazorPay = () => {
-
     const location=useLocation();
     const formData=location?.state?.data || null;
     const dispatch=useDispatch();

@@ -40,7 +40,7 @@ const AdminDashboard=()=> {
 
   return (
     <div className="flex h-[90.7vh] bg-gray-100">
-      <ToastContainer
+      {/* <ToastContainer
         position="top-right"
         autoClose={3000}
         hideProgressBar={false}
@@ -50,7 +50,7 @@ const AdminDashboard=()=> {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-      />
+      /> */}
 
       <Sidebar 
         activeTab={activeTab} 

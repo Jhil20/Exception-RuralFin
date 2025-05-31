@@ -69,6 +69,7 @@ const AgentDashboard = () => {
 
   const getAgentData = async () => {
     try {
+      console.log("Decoded token:", decoded, token);
       const response = await axios.get(
         `${BACKEND_URL}/api/agent/${decoded.id}`
       );
@@ -169,7 +170,7 @@ const AgentDashboard = () => {
       setFilteredTransactions(transactionsDone);
       if (transactionsDone.length === 0) {
         setIsLengthZero(true);
-      }else{
+      } else {
         setIsLengthZero(false);
       }
     } else {
@@ -178,7 +179,7 @@ const AgentDashboard = () => {
       );
       if (filteredTransactions.length === 0) {
         setIsLengthZero(true);
-      }else{
+      } else {
         setIsLengthZero(false);
       }
       setFilteredTransactions(filteredTransactions);
@@ -207,7 +208,6 @@ const AgentDashboard = () => {
         <div className="container mx-auto p-4">
           <div className="flex justify-between items-center mb-4">
             <h1 className="ml-2 text-xl font-bold">Agent Dashboard</h1>
-            
           </div>
 
           {/* Quick stats bar */}
@@ -217,7 +217,7 @@ const AgentDashboard = () => {
               <p className="text-lg font-semibold text-white">
                 {transactionsDone?.filter((tr) => {
                   const today = new Date();
-                  const transactionDate = new Date(tr.transactionDate);
+                  const transactionDate = new Date(tr?.transactionDate);
                   if (
                     today.getDate() === transactionDate.getDate() &&
                     today.getMonth() === transactionDate.getMonth() &&
@@ -236,7 +236,7 @@ const AgentDashboard = () => {
               <p className="text-lg font-semibold text-white">
                 {transactionsDone?.filter((tr) => {
                   const today = new Date();
-                  const transactionDate = new Date(tr.transactionDate);
+                  const transactionDate = new Date(tr?.transactionDate);
                   if (
                     today.getMonth() === transactionDate.getMonth() &&
                     today.getFullYear() === transactionDate.getFullYear()
@@ -258,7 +258,7 @@ const AgentDashboard = () => {
               <p className="text-lg font-semibold text-white">
                 ₹
                 {transactionsDone
-                  ?.filter((tr) => tr.status == "completed")
+                  ?.filter((tr) => tr?.status == "completed")
                   ?.reduce((acc, tr) => acc + (tr.commission || 0), 0)}
               </p>
             </div>
@@ -274,7 +274,7 @@ const AgentDashboard = () => {
               <div>
                 <p className="text-gray-600 font-normal">Available Balance</p>
                 <p className="text-2xl font-bold mt-1">
-                  ₹{agentData?.securityDeposit}
+                  ₹{agentData?.balance || "0"}
                 </p>
               </div>
               <div className="p-2 rounded-md bg-gray-200">
@@ -305,7 +305,7 @@ const AgentDashboard = () => {
                         tr.status == "completed"
                       );
                     })
-                    ?.reduce((acc, tr) => acc + (tr.commission || 0), 0)}
+                    ?.reduce((acc, tr) => acc + (tr.commission || 0), 0) || "0"}
                 </p>
               </div>
               <div className="p-2 rounded-md bg-gray-200">
@@ -323,7 +323,7 @@ const AgentDashboard = () => {
               <div>
                 <p className="text-gray-600 font-normal">Security Bond</p>
                 <p className="text-2xl font-bold mt-1">
-                  ₹{stats.securityBond.toLocaleString()}
+                  ₹{agentData?.securityDeposit || "0"}
                 </p>
               </div>
               <div className="p-2 rounded-md bg-gray-200">
@@ -419,111 +419,118 @@ const AgentDashboard = () => {
             </div>
           </div>
 
-          <div className={`divide-y ${isLengthZero?"h-fit":"h-96"} overflow-y-auto divide-gray-200`}>
-            {filteredTransactions
-              ?.sort((a, b) => {
-                return (
-                  new Date(b.transactionDate) - new Date(a.transactionDate)
-                );
-              })
-              .map((transaction) => (
-                <div key={transaction?._id} className="px-8 py-4">
-                  <div className="flex justify-between items-center">
-                    <div className="space-y-1">
-                      <div className="flex items-center">
-                        <p className="font-medium">
-                          {transaction?.conversionType === "cashToERupees"
-                            ? "Deposit"
-                            : "Withdrawal"}{" "}
-                          Request #{transaction?._id?.toLocaleString()}
-                        </p>
+          {filteredTransactions.length != 0 && (
+            <div
+              className={`divide-y ${
+                isLengthZero ? "h-fit" : "h-96"
+              } overflow-y-auto divide-gray-200`}
+            >
+              {filteredTransactions
+                ?.sort((a, b) => {
+                  return (
+                    new Date(b.transactionDate) - new Date(a.transactionDate)
+                  );
+                })
+                .map((transaction) => (
+                  <div key={transaction?._id} className="px-8 py-4">
+                    <div className="flex justify-between items-center">
+                      <div className="space-y-1">
+                        <div className="flex items-center">
+                          <p className="font-medium">
+                            {transaction?.conversionType === "cashToERupees"
+                              ? "Deposit"
+                              : "Withdrawal"}{" "}
+                            Request #{transaction?._id || ""}
+                          </p>
 
-                        <span
-                          className={`ml-2 px-2 py-0.5 rounded-full text-xs font-normal ${
-                            transaction?.status === "rejected"
-                              ? "bg-red-100 text-red-800"
-                              : transaction?.status === "pending"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : transaction?.status === "accepted"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-blue-100 text-blue-800"
-                          }`}
-                        >
-                          {transaction?.status.charAt(0).toUpperCase() +
-                            transaction?.status.slice(1)}
-                        </span>
-                        {transaction?.status === "accepted" && (
-                          <span className="ml-4 text-sm bg-gray-100 border border-gray-200 font-medium flex text-gray-800 rounded-xl py-0.5 items-center px-4 ">
-                            <Info size={16} className="mt-[0px] mr-1" /> Press
-                            the complete button only when the cash transaction
-                            with the user is successfull.
+                          <span
+                            className={`ml-2 px-2 py-0.5 rounded-full text-xs font-normal ${
+                              transaction?.status === "rejected"
+                                ? "bg-red-100 text-red-800"
+                                : transaction?.status === "pending"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : transaction?.status === "accepted"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-blue-100 text-blue-800"
+                            }`}
+                          >
+                            {transaction?.status.charAt(0).toUpperCase() +
+                              transaction?.status.slice(1)}
                           </span>
-                        )}
+                          {transaction?.status === "accepted" && (
+                            <span className="ml-4 text-sm bg-gray-100 border border-gray-200 font-medium flex text-gray-800 rounded-xl py-0.5 items-center px-4 ">
+                              <Info size={16} className="mt-[0px] mr-1" /> Press
+                              the complete button only when the cash transaction
+                              with the user is successfull.
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-gray-600">
+                          Amount: ₹{transaction?.amount} | Commission: ₹
+                          {transaction?.commission || 0}
+                        </p>
+                        <p className="text-gray-600">
+                          User:{" "}
+                          {capitalize(transaction?.userId?.firstName) +
+                            " " +
+                            capitalize(transaction?.userId?.lastName)}{" "}
+                          | Note: {transaction?.notes || "No note provided"}
+                        </p>
+                        <p className="text-gray-500 text-sm">
+                          {formatDate(transaction?.transactionDate)}
+                        </p>
                       </div>
-                      <p className="text-gray-600">
-                        Amount: ₹{transaction?.amount.toLocaleString()} | Commission: ₹
-                        {transaction?.commission?.toLocaleString() || 0}
-                      </p>
-                      <p className="text-gray-600">
-                        User:{" "}
-                        {capitalize(transaction?.userId?.firstName) +
-                          " " +
-                          capitalize(transaction?.userId?.lastName)} | Note: {transaction?.notes || "No note provided"}
-                      </p>
-                      <p className="text-gray-500 text-sm">
-                        {formatDate(transaction?.transactionDate)}
-                      </p>
+                      {transaction?.status == "pending" && (
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => {
+                              handleTransactionRequestAccept(transaction);
+                            }}
+                            className="flex items-center px-4 py-2 cursor-pointer hover:shadow-lg shadow-md shadow-gray-400 transition-all duration-300 hover:shadow-black/50 bg-black text-white rounded-md hover:bg-gray-900"
+                          >
+                            <CheckCircle size={16} className="mr-2" />
+                            Accept
+                          </button>
+                          <button
+                            onClick={() => {
+                              handleTransactionRequestReject(transaction);
+                            }}
+                            className="flex items-center px-4 py-2 cursor-pointer hover:shadow-lg shadow-md shadow-gray-400 transition-all duration-300 hover:shadow-black/50 border border-gray-300 rounded-md hover:bg-gray-50"
+                          >
+                            <XCircle size={16} className="mr-2" />
+                            Decline
+                          </button>
+                        </div>
+                      )}
+                      {transaction?.status == "accepted" && (
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => {
+                              if (
+                                transaction?.conversionType === "cashToERupees"
+                              ) {
+                                handleDepositTransactionRequestComplete(
+                                  transaction
+                                );
+                              } else {
+                                // console.error("Cannot complete withdrawal transactions");
+                                handleWithdrawalTransactionRequestComplete(
+                                  transaction
+                                );
+                              }
+                            }}
+                            className="flex items-center px-4 py-2 cursor-pointer hover:shadow-lg shadow-md shadow-gray-400 transition-all duration-300 hover:shadow-black/50 bg-black text-white rounded-md hover:bg-gray-900"
+                          >
+                            <CheckCircle size={16} className="mr-2" />
+                            Complete
+                          </button>
+                        </div>
+                      )}
                     </div>
-                    {transaction?.status == "pending" && (
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => {
-                            handleTransactionRequestAccept(transaction);
-                          }}
-                          className="flex items-center px-4 py-2 cursor-pointer hover:shadow-lg shadow-md shadow-gray-400 transition-all duration-300 hover:shadow-black/50 bg-black text-white rounded-md hover:bg-gray-900"
-                        >
-                          <CheckCircle size={16} className="mr-2" />
-                          Accept
-                        </button>
-                        <button
-                          onClick={() => {
-                            handleTransactionRequestReject(transaction);
-                          }}
-                          className="flex items-center px-4 py-2 cursor-pointer hover:shadow-lg shadow-md shadow-gray-400 transition-all duration-300 hover:shadow-black/50 border border-gray-300 rounded-md hover:bg-gray-50"
-                        >
-                          <XCircle size={16} className="mr-2" />
-                          Decline
-                        </button>
-                      </div>
-                    )}
-                    {transaction?.status == "accepted" && (
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => {
-                            if (
-                              transaction?.conversionType === "cashToERupees"
-                            ) {
-                              handleDepositTransactionRequestComplete(
-                                transaction
-                              );
-                            } else {
-                              // console.error("Cannot complete withdrawal transactions");
-                              handleWithdrawalTransactionRequestComplete(
-                                transaction
-                              );
-                            }
-                          }}
-                          className="flex items-center px-4 py-2 cursor-pointer hover:shadow-lg shadow-md shadow-gray-400 transition-all duration-300 hover:shadow-black/50 bg-black text-white rounded-md hover:bg-gray-900"
-                        >
-                          <CheckCircle size={16} className="mr-2" />
-                          Complete
-                        </button>
-                      </div>
-                    )}
                   </div>
-                </div>
-              ))}
-          </div>
+                ))}
+            </div>
+          )}
           {filteredTransactions.length === 0 && (
             <div className="p-8 text-center text-gray-500">
               No pending transactions

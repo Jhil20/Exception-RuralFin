@@ -384,7 +384,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       </div>
       {step == "otp" ? (
         <div className="bg-white w-1/3 rounded-xl shadow-lg p-6">
-          <ToastContainer
+          {/* <ToastContainer
             position="top-right"
             autoClose={3000}
             hideProgressBar={false}
@@ -392,7 +392,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
             closeOnClick
             rtl={false}
             pauseOnFocusLoss
-          />
+          /> */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-900">
               Verify Transfer
@@ -445,7 +445,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
         </div>
       ) : (
         <div className="bg-white h-fit  w-2/3 rounded-xl shadow-lg p-6 relative">
-          <ToastContainer
+          {/* <ToastContainer
             position="top-right"
             autoClose={3000}
             hideProgressBar={false}
@@ -453,7 +453,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
             closeOnClick
             rtl={false}
             pauseOnFocusLoss
-          />
+          /> */}
 
           <div className="flex items-center justify-between mb-6">
             <X
