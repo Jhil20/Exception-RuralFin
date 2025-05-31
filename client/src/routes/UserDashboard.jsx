@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 import BalanceCard from "../components/BalanceCard";
 import RecentTransactions from "../components/RecentTransactions";
 import ExpenseAnalytics from "../components/ExpenseAnalytics";
-import { expenseAnalytics } from "../data/mockdata";
+import { expenseAnalytics } from "../data/mockData";
 import useAuth from "../utils/useAuth";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";

@@ -12,6 +12,7 @@ import { Provider } from "react-redux";
 import store from "./redux/store/store";
 import RazorPay from "./routes/RazorPay";
 import AgentDashboard from "./routes/AgentDashboard";
+import AdminDashboard from "./routes/AdminDashboard";
 
 //start by fixing transaction otp and  user to user debit and credit
 
@@ -26,7 +27,7 @@ const appRouter = createBrowserRouter([
       },
       {
         path: "/home",
-        element: <LandingPage />,
+        element: <AdminDashboard />,
       },
       {
         path: "/login",
