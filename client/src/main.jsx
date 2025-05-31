@@ -27,7 +27,7 @@ const appRouter = createBrowserRouter([
       },
       {
         path: "/home",
-        element: <LandingPage />,
+        element: <AdminDashboard />,
       },
       {
         path: "/login",

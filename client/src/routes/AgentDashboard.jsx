@@ -187,18 +187,18 @@ const AgentDashboard = () => {
   };
 
   const monthsMapping = {
-    1: "Jan",
-    2: "Feb",
-    3: "Mar",
-    4: "Apr",
+    1: "January",
+    2: "February",
+    3: "March",
+    4: "April",
     5: "May",
-    6: "Jun",
-    7: "Jul",
-    8: "Aug",
-    9: "Sep",
-    10: "Oct",
-    11: "Nov",
-    12: "Dec",
+    6: "June",
+    7: "July",
+    8: "August",
+    9: "September",
+    10: "October",
+    11: "November",
+    12: "December",
   };
 
   return (
@@ -281,18 +281,13 @@ const AgentDashboard = () => {
                 <Wallet size={20} className="text-gray-800" />
               </div>
             </div>
-            <div className="mt-4 flex items-center">
-              <ArrowUpRight size={16} className="text-green-600 mr-1" />
-              <span className="text-sm text-green-600">
-                +₹2,500 from last week
-              </span>
-            </div>
+            
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md shadow-gray-300 hover:shadow-lg hover:shadow-black/40 transition-all duration-300">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-gray-600 font-normal">Commission Earned</p>
+                <p className="text-gray-600 font-normal">{monthsMapping[new Date().getMonth()+1]}'s Commission Earned</p>
                 <p className="text-2xl font-bold mt-1">
                   ₹
                   {transactionsDone
@@ -312,10 +307,7 @@ const AgentDashboard = () => {
                 <IndianRupee size={20} className="text-gray-800" />
               </div>
             </div>
-            <div className="mt-4 flex items-center">
-              <ArrowUpRight size={16} className="text-green-600 mr-1" />
-              <span className="text-sm text-green-600">+₹150 today</span>
-            </div>
+            
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md shadow-gray-300 hover:shadow-lg hover:shadow-black/40 transition-all duration-300">
@@ -330,18 +322,7 @@ const AgentDashboard = () => {
                 <Clock size={20} className="text-gray-800" />
               </div>
             </div>
-            <div className="space-y-2">
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-black rounded-full h-2 transition-all duration-500"
-                  style={{ width: `${stats.bondCompletion}%` }}
-                ></div>
-              </div>
-              <div className="flex justify-between text-sm font-normal text-gray-600">
-                <span>{stats.bondCompletion}% Complete</span>
-                <span>{calculateDaysRemaining()} days remaining</span>
-              </div>
-            </div>
+            
           </div>
         </div>
 

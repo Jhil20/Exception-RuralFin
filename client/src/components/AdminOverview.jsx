@@ -1,91 +1,75 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import {
   DownloadCloud,
   Users,
   BadgeDollarSign,
   RefreshCw,
   TrendingUp,
-} from 'lucide-react';
-import Card from '../components/Card';
-import Button from '../components/Button';
-import { toast } from 'react-toastify';
+} from "lucide-react";
+import Card from "../components/Card";
+import Button from "../components/Button";
+import { toast } from "react-toastify";
+import axios from "axios";
+import { BACKEND_URL } from "../utils/constants";
 
-const StatCard = ({ title, value, icon, trend, trendLabel }) => {
+const StatCard = ({ title, value, icon }) => {
   return (
     <Card className="flex flex-col h-full">
-      <div className="flex justify-between items-start mb-2">
+      <div className="flex justify-between items-start mb-0">
         <h3 className="text-gray-500 font-medium">{title}</h3>
-        <div className="p-2 bg-gray-200 rounded-lg text-gray-900">
-          {icon}
-        </div>
+        <div className="p-2 bg-gray-200 rounded-lg text-gray-900">{icon}</div>
       </div>
-      <div className="flex-1">
+      <div className="flex-1 mb-1">
         <p className="text-3xl font-bold text-gray-800">{value}</p>
-
-        {trend !== undefined && (
-          <div className="flex items-center mt-2">
-            <div
-              className={`flex items-center ${
-                trend >= 0 ? 'text-green-600' : 'text-red-600'
-              }`}
-            >
-              {trend >= 0 ? (
-                <TrendingUp size={16} />
-              ) : (
-                <TrendingUp size={16} className="transform rotate-180" />
-              )}
-              <span className="ml-1 text-sm font-medium">
-                {Math.abs(trend)}%
-              </span>
-            </div>
-            {trendLabel && (
-              <span className="ml-2 text-xs text-gray-500">{trendLabel}</span>
-            )}
-          </div>
-        )}
       </div>
     </Card>
   );
 };
 
 const AdminOverview = () => {
-  
+  const [overviewCardData, setOverviewCardData] = useState({});
+  const getOverviewCardData=async()=>{
+    try{
+      const response=await axios.get(`${BACKEND_URL}/api/admin/OverviewCardData`);
+      console.log("Overview Card Data:", response.data);
+      setOverviewCardData(response.data.data);
+    }catch(error){
+      console.error("Error fetching overview card data:", error);
+    }
+  }
+
+  useEffect(()=>{
+    getOverviewCardData();
+  },[])
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard Overview</h1>
-        
+        <h1 className="text-2xl font-bold text-gray-800">
+          Admin Dashboard Overview
+        </h1>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Platform Balance"
-          value="₹24,587,230"
+          value={`₹${overviewCardData?.totalBalance || "0"}`}
           icon={<BadgeDollarSign size={20} />}
-          trend={12.8}
-          trendLabel="vs last month"
         />
         <StatCard
           title="Active Agents"
-          value="342"
+          value={`${overviewCardData?.totalAgents || "0"}`}
           icon={<Users size={20} />}
-          trend={5.4}
-          trendLabel="vs last month"
         />
         <StatCard
           title="Active Users"
-          value="12,845"
+          value={`${overviewCardData?.totalUsers || "0"}`}
           icon={<Users size={20} />}
-          trend={18.7}
-          trendLabel="vs last month"
         />
         <StatCard
           title="Monthly Transactions"
-          value="58,347"
+          value={`${overviewCardData?.thisMonthTransactions || "0"}`}
           icon={<RefreshCw size={20} />}
-          trend={-2.3}
-          trendLabel="vs last month"
         />
       </div>
 
@@ -111,21 +95,21 @@ const AdminOverview = () => {
                 <div>
                   <p className="font-medium text-gray-800">
                     {index % 3 === 0
-                      ? 'New user registered via Agent #123'
+                      ? "New user registered via Agent #123"
                       : index % 3 === 1
-                      ? 'Withdrawal request processed for ₹12,500'
-                      : 'Agent #456 completed 24 transactions today'}
+                      ? "Withdrawal request processed for ₹12,500"
+                      : "Agent #456 completed 24 transactions today"}
                   </p>
                   <p className="text-sm text-gray-500 mt-1">
                     {index === 0
-                      ? 'Just now'
+                      ? "Just now"
                       : index === 1
-                      ? '5 minutes ago'
+                      ? "5 minutes ago"
                       : index === 2
-                      ? '25 minutes ago'
+                      ? "25 minutes ago"
                       : index === 3
-                      ? '1 hour ago'
-                      : '3 hours ago'}
+                      ? "1 hour ago"
+                      : "3 hours ago"}
                   </p>
                 </div>
               </div>

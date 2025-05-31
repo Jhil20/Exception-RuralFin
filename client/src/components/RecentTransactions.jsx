@@ -53,13 +53,13 @@ const RecentTransactions = ({
                       <div
                         className={`w-8 h-8 rounded-full flex items-center justify-center bg-gray-200`}
                       >
-                        <ArrowDownCircle size={16} className="text-gray-800" />
+                        <ArrowDownLeft size={16} className="text-gray-800" />
                       </div>
                     ) : (
                       <div
                         className={`w-8 h-8 rounded-full flex items-center justify-center bg-gray-200`}
                       >
-                        <ArrowDownLeft size={16} className="text-gray-800" />
+                        <ArrowUpRight size={16} className="text-gray-800" />
                       </div>
                     )
                   ) : (
