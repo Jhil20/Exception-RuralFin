@@ -92,7 +92,6 @@ const Login = () => {
     try {
       const whichRole = values.role;
       setWhatRole(whichRole);
-
       const response = await axios.post(
         `${BACKEND_URL}/api/${whichRole}/get${capitalize(whichRole)}ByPhone`,
         values
@@ -111,7 +110,7 @@ const Login = () => {
         );
         console.log("Response from server for password check:", response2);
         if(!response2?.data?.success) {
-          toast.error("Incorrect Password or Phone Number. Please try again.");
+          toast.error("Incorrect Password or Phone Number.");
           setSubmitting(false);
           return;
         }
@@ -132,7 +131,6 @@ const Login = () => {
         window.confirmationResult = confirmationResult;
         // })
         setIsOtpSent(true);
-        // navigate("/verifyotp", { state: { phoneNumber: fullPhone } });
       }
     } catch (error) {
       console.error("SMS not sent:", error);
@@ -245,18 +243,6 @@ const Login = () => {
     return (
       <div className="min-h-[90vh] bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col">
         {/* <Header /> */}
-        {/* <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          style={{ marginTop: "70px" }}
-        /> */}
 
         <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
           <div className="w-full max-w-md">
@@ -332,8 +318,6 @@ const Login = () => {
                           value={values.otpNumber}
                           onChange={handleChange}
                           onBlur={handleBlur}
-                          // required
-                          // maxLength={6}
                         />
                       </div>
                       <ErrorMessage
@@ -384,18 +368,6 @@ const Login = () => {
 
   return (
     <div className="min-h-[90.8vh] bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col">
-      {/* <ToastContainer
-        className={"mt-16"}
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      /> */}
 
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 ">
         <div className="w-full max-w-md">

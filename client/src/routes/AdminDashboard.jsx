@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import Sidebar from '../components/AdminSidebar';
-import Overview from '../components/AdminOverview';
 import AgentManagement from '../components/AgentManagement';
 import UserManagement from '../components/UserManagement';
 import AgentCommissions from '../components/AgentCommissions';
 import PlatformSettings from '../components/PlatformSettings';
+import AdminOverview from '../components/AdminOverview';
 
 const AdminDashboard=()=> {
   const [activeTab, setActiveTab] = useState('overview');
@@ -14,7 +14,7 @@ const AdminDashboard=()=> {
   const renderActiveComponent = () => {
     switch (activeTab) {
       case 'overview':
-        return <Overview />;
+        return <AdminOverview />;
       case 'agents':
         return <AgentManagement />;
       case 'users':
@@ -45,7 +45,7 @@ const AdminDashboard=()=> {
 
       <div className="flex-1 flex flex-col overflow-hidden">
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-3">
           {renderActiveComponent()}
         </main>
       </div>

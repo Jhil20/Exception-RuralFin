@@ -5,12 +5,17 @@ import {
   BadgeDollarSign,
   RefreshCw,
   TrendingUp,
+  IndianRupee,
+  Headset,
+  UserCheck,
+  User,
 } from "lucide-react";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
+import capitalize from "../utils/capitalize";
 
 const StatCard = ({ title, value, icon }) => {
   return (
@@ -28,33 +33,69 @@ const StatCard = ({ title, value, icon }) => {
 
 const AdminOverview = () => {
   const [overviewCardData, setOverviewCardData] = useState({});
-  const getOverviewCardData=async()=>{
-    try{
-      const response=await axios.get(`${BACKEND_URL}/api/admin/OverviewCardData`);
+  const [recentActivityData, setRecentActivityData] = useState([]);
+  const getOverviewCardData = async () => {
+    try {
+      const response = await axios.get(
+        `${BACKEND_URL}/api/admin/OverviewCardData`
+      );
       console.log("Overview Card Data:", response.data);
       setOverviewCardData(response.data.data);
-    }catch(error){
+    } catch (error) {
       console.error("Error fetching overview card data:", error);
     }
-  }
+  };
 
-  useEffect(()=>{
+  const getRecentActivityData = async () => {
+    try {
+      const response = await axios.get(
+        `${BACKEND_URL}/api/admin/recentActivity`
+      );
+      console.log("Recent Activity Data:", response.data);
+      // Process and display recent activity data as needed
+      setRecentActivityData(response?.data?.data);
+    } catch (error) {
+      console.error("Error fetching recent activity data:", error);
+    }
+  };
+
+  // const adminInsert=async()=>{
+  //   try{
+  //     const response=await axios.post(`${BACKEND_URL}/api/admin/insertAdmin`, {
+  //       firstName: "Harsh",
+  //       lastName: "Patadia",
+  //       phone: "9998076910",
+  //       password: "admin123",
+  //     });
+  //     console.log("Admin Insert Response:", response.data);
+  //   }catch(error){
+  //     console.error("Error inserting admin data:", error);
+  //   }
+  // }
+  useEffect(() => {
     getOverviewCardData();
-  },[])
+    // adminInsert();
+    getRecentActivityData();
+  }, []);
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center mt-2 justify-between">
         <h1 className="text-2xl font-bold text-gray-800">
           Admin Dashboard Overview
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <StatCard
+          title="Profit Earned"
+          value={`₹${overviewCardData?.totalBalance || "0"}`}
+          icon={<IndianRupee size={20} />}
+        />
         <StatCard
           title="Platform Balance"
           value={`₹${overviewCardData?.totalBalance || "0"}`}
-          icon={<BadgeDollarSign size={20} />}
+          icon={<IndianRupee size={20} />}
         />
         <StatCard
           title="Active Agents"
@@ -74,50 +115,88 @@ const AdminOverview = () => {
       </div>
 
       <div className="grid grid-cols-1 h-11/12 overflow-y-auto lg:grid-cols-2 gap-6">
-        <Card title="Recent Activity">
+        <Card className="mb-3 ml-1  " title="Recent Activity">
           <div className="space-y-4">
-            {[...Array(5)].map((_, index) => (
+            {recentActivityData.map((activity) => (
               <div
-                key={index}
-                className="flex items-start border-b border-gray-100 pb-4 last:border-0 last:pb-0"
+                key={activity._id}
+                className="flex items-start h-20 mb-1 pb-3 border-b border-gray-200 last:border-0 last:pb-0"
               >
                 <div
-                  className={`h-10 w-10 rounded-full flex items-center justify-center text-black mr-4 bg-gray-200 ring-[1px] ring-gray-300 `}
+                  className={`h-10 mt-3 w-10 rounded-full flex items-center justify-center text-black mr-4 bg-gray-200 ring-[1px] ring-gray-300 `}
                 >
-                  {index % 3 === 0 ? (
-                    <Users size={18} />
-                  ) : index % 3 === 1 ? (
-                    <BadgeDollarSign size={18} />
+                  {activity.type == "User Created" ? (
+                    <User size={18} />
+                  ) : activity.type == "Agent Created" ? (
+                    <UserCheck size={18} />
                   ) : (
-                    <RefreshCw size={18} />
+                    <BadgeDollarSign size={18} />
                   )}
                 </div>
-                <div>
-                  <p className="font-medium text-gray-800">
-                    {index % 3 === 0
-                      ? "New user registered via Agent #123"
-                      : index % 3 === 1
-                      ? "Withdrawal request processed for ₹12,500"
-                      : "Agent #456 completed 24 transactions today"}
+                <div className="w-11/12">
+                  <div className="font-medium flex items-center justify-between text-gray-800">
+                    <p>
+                      {activity.type == "User Created"
+                        ? `User created with ID #${activity._id}`
+                        : activity.type == "Agent Created"
+                        ? `Agent created with ID #${activity._id}`
+                        : `Transaction of ₹${activity.amount} completed by Agent`}
+                    </p>
+                    <div className="text-xs text-gray-500 mt-[1px] mr-1">
+                      <p className="text-xs text-gray-500">
+                        {new Date(
+                          activity.createdAt || activity.transactionDate
+                        ).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                        </p>
+                      <p className="text-xs text-gray-500 ml-[23px]">
+                        {new Date(
+                          activity.createdAt || activity.transactionDate
+                        ).toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true,
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 ">
+                    {activity.type == "User Created"
+                      ? `Name : ${capitalize(activity.firstName)} ${capitalize(
+                          activity.lastName
+                        )}`
+                      : activity.type == "Agent Created"
+                      ? `Name : ${capitalize(activity.firstName)} ${capitalize(
+                          activity.lastName
+                        )}`
+                      : `User : ${capitalize(
+                          activity.user.firstName
+                        )} ${capitalize(activity.user.lastName)} | #${
+                          activity.user._id
+                        } `}
                   </p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {index === 0
-                      ? "Just now"
-                      : index === 1
-                      ? "5 minutes ago"
-                      : index === 2
-                      ? "25 minutes ago"
-                      : index === 3
-                      ? "1 hour ago"
-                      : "3 hours ago"}
+                  <p className="text-xs text-gray-500 mt-0">
+                    {activity.type == "User Created"
+                      ? `Phone : ${activity.phone}`
+                      : activity.type == "Agent Created"
+                      ? `Phone : ${activity.phone}`
+                      : `Agent : ${capitalize(
+                          activity.agent.firstName
+                        )} ${capitalize(activity.agent.lastName)} | ${
+                          activity.agent._id
+                        }`}
                   </p>
+                  <p className="text-xs text-gray-500 mt-1"></p>
                 </div>
               </div>
             ))}
           </div>
         </Card>
 
-        <Card title="Transaction Volume">
+        <Card className="mb-3" title="Transaction Volume">
           <div className="h-64 flex items-center justify-center bg-gray-50 rounded-xl">
             <p className="text-gray-500 text-center">
               Transaction volume chart will appear here.

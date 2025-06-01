@@ -43,7 +43,8 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           {location.pathname === "/dashboard" ||
-          location.pathname === "/agentDashboard" ? (
+          location.pathname === "/agentDashboard" ||
+          location.pathname==="/adminDashboard" ? (
             <div></div>
           ) : (
             <nav className="hidden md:flex space-x-8">

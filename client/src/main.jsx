@@ -27,7 +27,7 @@ const appRouter = createBrowserRouter([
       },
       {
         path: "/home",
-        element: <AdminDashboard />,
+        element: <LandingPage />,
       },
       {
         path: "/login",
@@ -52,6 +52,10 @@ const appRouter = createBrowserRouter([
       {
         path: "/agentDashboard",
         element: <AgentDashboard />,
+      },
+      {
+        path: "/adminDashboard",
+        element: <AdminDashboard />,
       },
     ],
   },

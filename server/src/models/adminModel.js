@@ -3,10 +3,12 @@ const { Schema } = mongoose;
 
 // Admin Model
 const adminSchema = new Schema({
-  fullName: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  phone: { type: String, required: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['superadmin', 'admin'], default: 'admin' }
+  role: { type: String,  default: 'admin' },
+  profitPerMonth: { type: Number, default: 0 },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Admin', adminSchema);
