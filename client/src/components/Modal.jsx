@@ -6,7 +6,6 @@ const Modal = ({
   onClose, 
   title, 
   children, 
-  size = 'md' 
 }) => {
   const modalRef = useRef(null);
   
@@ -47,26 +46,20 @@ const Modal = ({
   }, [isOpen, onClose]);
   
   if (!isOpen) return null;
-  
-  const sizeClasses = {
-    sm: 'max-w-md',
-    md: 'max-w-lg',
-    lg: 'max-w-2xl',
-    xl: 'max-w-4xl'
-  };
+
   
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-center w-full h-full justify-center bg-black/50">
       <div 
         ref={modalRef}
-        className={`${sizeClasses[size]} w-full bg-white rounded-2xl shadow-xl transform transition-all duration-300 max-h-[90vh] flex flex-col`}
+        className={`w-10/12 bg-white rounded-2xl shadow-xl transform transition-all duration-300 max-h-[90vh] flex flex-col`}
         style={{ animation: 'fadeIn 0.3s ease-out' }}
       >
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
+          <h3 className="text-2xl font-bold ml-2 text-gray-800">{title}</h3>
           <button 
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+            className="p-2 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors duration-300"
             aria-label="Close modal"
           >
             <X size={20} />

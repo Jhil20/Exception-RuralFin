@@ -8,7 +8,7 @@ const findChange = ( newValue,oldValue) => {
 
 
   const change = ((newNum - oldNum) / oldNum) * 100;
-  console.log(`Change from ${oldValue} to ${newValue}: ${Math.abs(change)}%`);
+//   console.log(`Change from ${oldValue} to ${newValue}: ${Math.abs(change)}%`);
   return change.toFixed(1); // Returns a string, e.g., "12.345"
 };
 
