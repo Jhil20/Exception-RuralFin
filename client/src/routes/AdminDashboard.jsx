@@ -43,9 +43,9 @@ const AdminDashboard=()=> {
         setActiveTab={setActiveTab} 
       />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className=" h-full flex flex-col overflow-hidden">
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-3">
+        <main className=" h-full overflow-y-auto p-4 md:p-3">
           {renderActiveComponent()}
         </main>
       </div>

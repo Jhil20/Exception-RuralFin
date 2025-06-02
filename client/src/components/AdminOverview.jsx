@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import {
-  DownloadCloud,
   Users,
   BadgeDollarSign,
   RefreshCw,
   TrendingUp,
   IndianRupee,
-  Headset,
   UserCheck,
   User,
+  TrendingDown,
 } from "lucide-react";
 import Card from "../components/Card";
 import Button from "../components/Button";
@@ -16,6 +15,11 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import capitalize from "../utils/capitalize";
+import { Pie } from "react-chartjs-2";
+import { Chart, ArcElement, Tooltip, Legend } from "chart.js";
+import findChange from "../utils/findChange";
+
+Chart.register(ArcElement, Tooltip, Legend);
 
 const StatCard = ({ title, value, icon }) => {
   return (
@@ -34,6 +38,7 @@ const StatCard = ({ title, value, icon }) => {
 const AdminOverview = () => {
   const [overviewCardData, setOverviewCardData] = useState({});
   const [recentActivityData, setRecentActivityData] = useState([]);
+  const [transactionVolumeData, setTransactionVolumeData] = useState();
   const getOverviewCardData = async () => {
     try {
       const response = await axios.get(
@@ -59,6 +64,18 @@ const AdminOverview = () => {
     }
   };
 
+  const getTransationVolume = async () => {
+    try {
+      const response = await axios.get(
+        `${BACKEND_URL}/api/admin/transactionVolume`
+      );
+      console.log("Transaction Volume Data:", response.data);
+      setTransactionVolumeData(response.data.data);
+    } catch (error) {
+      console.error("Error fetching transaction volume data:", error);
+    }
+  };
+
   // const adminInsert=async()=>{
   //   try{
   //     const response=await axios.post(`${BACKEND_URL}/api/admin/insertAdmin`, {
@@ -76,17 +93,18 @@ const AdminOverview = () => {
     getOverviewCardData();
     // adminInsert();
     getRecentActivityData();
+    getTransationVolume();
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 h-10/12">
       <div className="flex items-center mt-2 justify-between">
         <h1 className="text-2xl font-bold text-gray-800">
           Admin Dashboard Overview
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-5 gap-6">
         <StatCard
           title="Profit Earned"
           value={`₹${overviewCardData?.totalBalance || "0"}`}
@@ -114,9 +132,12 @@ const AdminOverview = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 h-11/12 overflow-y-auto lg:grid-cols-2 gap-6">
-        <Card className="mb-3 ml-1  " title="Recent Activity">
-          <div className="space-y-4">
+      <div className="grid h-full pb-3 lg:grid-cols-2 gap-6">
+        <Card
+          className="mb-3 ml-1 h-12/12 overflow-y-hidden"
+          title="Recent Activity"
+        >
+          <div className="space-y-4 h-11/12 overflow-y-auto">
             {recentActivityData.map((activity) => (
               <div
                 key={activity._id}
@@ -142,8 +163,8 @@ const AdminOverview = () => {
                         ? `Agent created with ID #${activity._id}`
                         : `Transaction of ₹${activity.amount} completed by Agent`}
                     </p>
-                    <div className="text-xs text-gray-500 mt-[1px] mr-1">
-                      <p className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 mt-[1px] mr-2">
+                      <p className="text-xs text-end text-gray-500">
                         {new Date(
                           activity.createdAt || activity.transactionDate
                         ).toLocaleDateString("en-US", {
@@ -151,8 +172,8 @@ const AdminOverview = () => {
                           month: "short",
                           day: "numeric",
                         })}
-                        </p>
-                      <p className="text-xs text-gray-500 ml-[23px]">
+                      </p>
+                      <p className="text-xs text-end text-gray-500 ">
                         {new Date(
                           activity.createdAt || activity.transactionDate
                         ).toLocaleTimeString("en-US", {
@@ -196,38 +217,163 @@ const AdminOverview = () => {
           </div>
         </Card>
 
-        <Card className="mb-3" title="Transaction Volume">
-          <div className="h-64 flex items-center justify-center bg-gray-50 rounded-xl">
-            <p className="text-gray-500 text-center">
-              Transaction volume chart will appear here.
-              <br />
-              (Implemented with Chart.js in the analytics section)
-            </p>
-          </div>
+        <Card className="mt-0 h-12/12" title="Transaction Volume">
+          <div className="h-11/12">
+            <div className="h-72 flex items-center justify-center shadow-lg hover:shadow-black/20 transition-all duration-300 shadow-black/10 border border-gray-200 bg-gray-100 rounded-xl">
+              <div className="w-full h-full max-w-[300px] max-h-[240px]">
+                <Pie
+                  data={{
+                    labels: ["Today", "This Week", "This Month"],
+                    datasets: [
+                      {
+                        data: [
+                          transactionVolumeData?.todayTransactions,
+                          transactionVolumeData?.thisWeekTransactions,
+                          transactionVolumeData?.thisMonthTransactions,
+                        ],
+                        backgroundColor: ["#AAAAAA", "#444444", "black "],
+                        borderColor: "#fff",
+                        borderWidth: 1,
+                      },
+                    ],
+                  }}
+                  options={{
+                    plugins: {
+                      legend: {
+                        position: "right",
+                        labels: {
+                          color: "#333",
+                          font: { size: 14 },
+                          boxWidth: 12,
+                        },
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: function (context) {
+                            const label = context.label || "";
+                            const value = context.parsed || 0;
+                            return `${label}: ₹${value.toLocaleString(
+                              "en-IN"
+                            )}`;
+                          },
+                        },
+                      },
+                    },
+                    maintainAspectRatio: false,
+                  }}
+                />
+              </div>
+            </div>
 
-          <div className="grid grid-cols-3 gap-4 mt-6">
-            <div className="text-center">
-              <p className="text-gray-500 text-sm">Today</p>
-              <p className="font-semibold text-gray-800 text-lg">₹1,423,850</p>
-              <div className="text-green-600 text-xs flex items-center justify-center mt-1">
-                <TrendingUp size={12} />
-                <span className="ml-1">8.2%</span>
+            <div className="grid grid-cols-3 gap-4 mt-6">
+              <div className="text-center border border-gray-200 bg-gray-50 shadow-lg hover:shadow-black/20 transition-all duration-300 shadow-black/10 rounded-lg p-4">
+                <p className="text-gray-500 text-sm">Today</p>
+                <p className="font-semibold text-gray-800 text-lg">
+                  ₹{transactionVolumeData?.todayTransactions || "0"}
+                </p>
+
+                {findChange(
+                  transactionVolumeData?.todayTransactions,
+                  transactionVolumeData?.yesterdayTransactions
+                ) >= 0 ? (
+                  <div className="text-green-600 text-xs flex items-center justify-center mt-1">
+                    <TrendingUp size={12} />
+                    <span className="ml-1">
+                      {Math.abs(
+                        findChange(
+                          transactionVolumeData?.todayTransactions,
+                          transactionVolumeData?.yesterdayTransactions
+                        )
+                      )}
+                      %
+                    </span>
+                  </div>
+                ) : (
+                  <div className="text-red-600 text-xs flex items-center justify-center mt-1">
+                    <TrendingDown size={12} />
+                    <span className="ml-1">
+                      {Math.abs(
+                        findChange(
+                          transactionVolumeData?.todayTransactions,
+                          transactionVolumeData?.yesterdayTransactions
+                        )
+                      )}
+                      %
+                    </span>
+                  </div>
+                )}
               </div>
-            </div>
-            <div className="text-center">
-              <p className="text-gray-500 text-sm">This Week</p>
-              <p className="font-semibold text-gray-800 text-lg">₹8,432,190</p>
-              <div className="text-green-600 text-xs flex items-center justify-center mt-1">
-                <TrendingUp size={12} />
-                <span className="ml-1">12.5%</span>
+              <div className="text-center border border-gray-200 bg-gray-50 shadow-lg hover:shadow-black/20 transition-all duration-300 shadow-black/10 rounded-lg p-4">
+                <p className="text-gray-500 text-sm">This Week</p>
+                <p className="font-semibold text-gray-800 text-lg">
+                  ₹{transactionVolumeData?.thisWeekTransactions || "0"}
+                </p>
+                {findChange(
+                  transactionVolumeData?.thisWeekTransactions,
+                  transactionVolumeData?.lastWeekTransactions
+                ) >= 0 ? (
+                  <div className="text-green-600 text-xs flex items-center justify-center mt-1">
+                    <TrendingUp size={12} />
+                    <span className="ml-1">
+                      {Math.abs(
+                        findChange(
+                          transactionVolumeData?.thisWeekTransactions,
+                          transactionVolumeData?.lastWeekTransactions
+                        )
+                      )}
+                      %
+                    </span>
+                  </div>
+                ) : (
+                  <div className="text-red-600 text-xs flex items-center justify-center mt-1">
+                    <TrendingDown size={12} />
+                    <span className="ml-1">
+                      {Math.abs(
+                        findChange(
+                          transactionVolumeData?.thisWeekTransactions,
+                          transactionVolumeData?.lastWeekTransactions
+                        )
+                      )}
+                      %
+                    </span>
+                  </div>
+                )}
               </div>
-            </div>
-            <div className="text-center">
-              <p className="text-gray-500 text-sm">This Month</p>
-              <p className="font-semibold text-gray-800 text-lg">₹32,845,700</p>
-              <div className="text-green-600 text-xs flex items-center justify-center mt-1">
-                <TrendingUp size={12} />
-                <span className="ml-1">15.8%</span>
+              <div className="text-center border border-gray-200 bg-gray-50 shadow-lg hover:shadow-black/20 transition-all duration-300 shadow-black/10 rounded-lg p-4">
+                <p className="text-gray-500 text-sm">This Month</p>
+                <p className="font-semibold text-gray-800 text-lg">
+                  ₹{transactionVolumeData?.thisMonthTransactions || "0"}
+                </p>
+                {findChange(
+                  transactionVolumeData?.thisMonthTransactions,
+                  transactionVolumeData?.lastMonthTransactions
+                ) >= 0 ? (
+                  <div className="text-green-600 text-xs flex items-center justify-center mt-1">
+                    <TrendingUp size={12} />
+                    <span className="ml-1">
+                      {Math.abs(
+                        findChange(
+                          transactionVolumeData?.thisMonthTransactions,
+                          transactionVolumeData?.lastMonthTransactions
+                        )
+                      )}
+                      %
+                    </span>
+                  </div>
+                ) : (
+                  <div className="text-red-600 text-xs flex items-center justify-center mt-1">
+                    <TrendingDown size={12} />
+                    <span className="ml-1">
+                      {Math.abs(
+                        findChange(
+                          transactionVolumeData?.thisMonthTransactions,
+                          transactionVolumeData?.lastMonthTransactions
+                        )
+                      )}
+                      %
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

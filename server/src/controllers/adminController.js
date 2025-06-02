@@ -2,11 +2,11 @@ const Agent = require("../models/agentModel");
 const Finance = require("../models/financeModel");
 const User = require("../models/userModel");
 const UserToUserTransaction = require("../models/userToUserTransactionModel");
-const userToAgentTransaction = require("../models/userToAgentTransactionModel");
+const UserToAgentTransaction = require("../models/userToAgentTransactionModel");
 const Admin = require("../models/adminModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { type } = require("os");
+const moment = require("moment");
 
 const getAdminOverviewCardData = async (req, res) => {
   try {
@@ -64,7 +64,7 @@ const getAdminOverviewCardData = async (req, res) => {
       },
     ]);
     // console.log("this month user transactions", thisMonthUserTransactions);
-    const thisMonthAgentTransactions = await userToAgentTransaction.aggregate([
+    const thisMonthAgentTransactions = await UserToAgentTransaction.aggregate([
       {
         $match: {
           transactionDate: {
@@ -200,8 +200,8 @@ const getRecentActivityData = async (req, res) => {
       {},
       "firstName lastName phone createdAt _id"
     ).sort({ createdAt: -1 });
-    const userToAgentTransactionsActivity = await userToAgentTransaction
-      .find({}, "userId agentId amount transactionDate status")
+    const userToAgentTransactionsActivity = await UserToAgentTransaction
+      .find({}, "_id userId agentId amount transactionDate status")
       .populate("userId", "firstName _id lastName phone")
       .populate("agentId", "firstName _id lastName phone")
       .sort({ transactionDate: -1 });
@@ -243,6 +243,7 @@ const getRecentActivityData = async (req, res) => {
         transactionDate: transaction.transactionDate,
         status: transaction.status,
         type: "User to Agent Transaction",
+        _id: transaction._id,
       }));
     const allActivities = [
       ...userActivityRefined,
@@ -265,9 +266,311 @@ const getRecentActivityData = async (req, res) => {
   }
 };
 
+const getTransactionVolumeData = async (req, res) => {
+  try {
+    // TODAY
+    const startOfToday = moment().startOf("day").toDate();
+    const endOfToday = moment().endOf("day").toDate();
+
+    // THIS WEEK (Sunday to Saturday)
+    const startOfWeek = moment().startOf("week").toDate();
+    const endOfWeek = moment().endOf("week").toDate();
+
+    // THIS MONTH
+    const startOfMonth = moment().startOf("month").toDate();
+    const endOfMonth = moment().endOf("month").toDate();
+
+    const startOfYesterday = moment()
+      .subtract(1, "days")
+      .startOf("day")
+      .toDate();
+    const endOfYesterday = moment().subtract(1, "days").endOf("day").toDate();
+
+    const startOfLastWeek = moment()
+      .subtract(1, "weeks")
+      .startOf("week")
+      .toDate();
+    const endOfLastWeek = moment().subtract(1, "weeks").endOf("week").toDate();
+
+    const startOfLastMonth = moment()
+      .subtract(1, "months")
+      .startOf("month")
+      .toDate();
+    const endOfLastMonth = moment()
+      .subtract(1, "months")
+      .endOf("month")
+      .toDate();
+
+    const todayUserTransactions = await UserToUserTransaction.aggregate([
+      {
+        $match: {
+          transactionDate: {
+            $gte: startOfToday,
+            $lt: endOfToday,
+          },
+          status: "completed",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$amount" },
+          totalTransactions: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const todayAgentTransactions = await UserToAgentTransaction.aggregate([
+      {
+        $match: {
+          transactionDate: {
+            $gte: startOfToday,
+            $lt: endOfToday,
+          },
+          status: "completed",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$amount" },
+          totalTransactions: { $sum: 1 },
+        },
+      },
+    ]);
+    const todayTransactions =
+      (todayUserTransactions[0]?.totalAmount || 0) +
+      (todayAgentTransactions[0]?.totalAmount || 0);
+
+    const thisWeekUserTransactions = await UserToUserTransaction.aggregate([
+      {
+        $match: {
+          transactionDate: {
+            $gte: startOfWeek,
+            $lt: endOfWeek,
+          },
+          status: "completed",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$amount" },
+          totalTransactions: { $sum: 1 },
+        },
+      },
+    ]);
+    const thisWeekAgentTransactions = await UserToAgentTransaction.aggregate([
+      {
+        $match: {
+          transactionDate: {
+            $gte: startOfWeek,
+            $lt: endOfWeek,
+          },
+          status: "completed",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$amount" },
+          totalTransactions: { $sum: 1 },
+        },
+      },
+    ]);
+    const thisWeekTransactions =
+      (thisWeekUserTransactions[0]?.totalAmount || 0) +
+      (thisWeekAgentTransactions[0]?.totalAmount || 0);
+
+    const thisMonthUserTransactions = await UserToUserTransaction.aggregate([
+      {
+        $match: {
+          transactionDate: {
+            $gte: startOfMonth,
+            $lt: endOfMonth,
+          },
+          status: "completed",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$amount" },
+          totalTransactions: { $sum: 1 },
+        },
+      },
+    ]);
+    const thisMonthAgentTransactions = await UserToAgentTransaction.aggregate([
+      {
+        $match: {
+          transactionDate: {
+            $gte: startOfMonth,
+            $lt: endOfMonth,
+          },
+          status: "completed",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$amount" },
+          totalTransactions: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const thisMonthTransactions =
+      (thisMonthUserTransactions[0]?.totalAmount || 0) +
+      (thisMonthAgentTransactions[0]?.totalAmount || 0);
+
+    const yesterdayUserTransactions = await UserToUserTransaction.aggregate([
+      {
+        $match: {
+          transactionDate: {
+            $gte: startOfYesterday,
+            $lt: endOfYesterday,
+          },
+          status: "completed",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$amount" },
+          totalTransactions: { $sum: 1 },
+        },
+      },
+    ]);
+    
+    const yesterdayAgentTransactions = await UserToAgentTransaction.aggregate([
+      {
+        $match: {
+          transactionDate: {
+            $gte: startOfYesterday,
+            $lt: endOfYesterday,
+          },
+          status: "completed",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$amount" },
+          totalTransactions: { $sum: 1 },
+        },
+      },
+    ]);
+    const yesterdayTransactions =
+      (yesterdayUserTransactions[0]?.totalAmount || 0) +
+      (yesterdayAgentTransactions[0]?.totalAmount || 0);
+// console.log(
+//       "yesterday user transactions")
+    const lastWeekUserTransactions = await UserToUserTransaction.aggregate([
+      {
+        $match: {
+          transactionDate: {
+            $gte: startOfLastWeek,
+            $lt: endOfLastWeek,
+          },
+          status: "completed",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$amount" },
+          totalTransactions: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const lastWeekAgentTransactions = await UserToAgentTransaction.aggregate([
+      {
+        $match: {
+          transactionDate: {
+            $gte: startOfLastWeek,
+            $lt: endOfLastWeek,
+          },
+          status: "completed",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$amount" },
+          totalTransactions: { $sum: 1 },
+        },
+      },
+    ]);
+    const lastWeekTransactions =
+      (lastWeekUserTransactions[0]?.totalAmount || 0) +
+      (lastWeekAgentTransactions[0]?.totalAmount || 0);
+
+    const lastMonthUserTransactions = await UserToUserTransaction.aggregate([
+      {
+        $match: {
+          transactionDate: {
+            $gte: startOfLastMonth,
+            $lt: endOfLastMonth,
+          },
+          status: "completed",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$amount" },
+          totalTransactions: { $sum: 1 },
+        },
+      },
+    ]);
+    const lastMonthAgentTransactions = await UserToAgentTransaction.aggregate([
+      {
+        $match: {
+          transactionDate: {
+            $gte: startOfLastMonth,
+            $lt: endOfLastMonth,
+          },
+          status: "completed",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$amount" },
+          totalTransactions: { $sum: 1 },
+        },
+      },
+    ]);
+    const lastMonthTransactions =
+      (lastMonthUserTransactions[0]?.totalAmount || 0) +
+      (lastMonthAgentTransactions[0]?.totalAmount || 0);
+    // console.log(
+    //   "last month transactions",
+    //   lastMonthTransactions
+    // );
+    return res.status(200).json({
+      success: true,
+      data: {
+        todayTransactions,
+        thisWeekTransactions,
+        thisMonthTransactions,
+        yesterdayTransactions,
+        lastWeekTransactions,
+        lastMonthTransactions,
+      },
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error fetching transaction volume data", error });
+  }
+};
+
 module.exports = {
   getAdminOverviewCardData,
   createAdmin,
+  getTransactionVolumeData,
   getAdminByPhone,
   checkAdminPassword,
   getRecentActivityData,
