@@ -8,6 +8,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
 const AgentCommission = require("../models/agentCommissionModel");
+const SystemSettings = require("../models/systemSettingsModel");
 
 const getAdminOverviewCardData = async (req, res) => {
   try {
@@ -109,9 +110,9 @@ const getAdminOverviewCardData = async (req, res) => {
   }
 };
 
-const commissionData=async (req, res) => {
-  try{
-    const totalCommission=await AgentCommission.aggregate([
+const commissionData = async (req, res) => {
+  try {
+    const totalCommission = await AgentCommission.aggregate([
       {
         $group: {
           _id: null,
@@ -119,7 +120,7 @@ const commissionData=async (req, res) => {
         },
       },
     ]);
-    const AllCommissions=await AgentCommission.find();
+    const AllCommissions = await AgentCommission.find();
     return res.status(200).json({
       success: true,
       data: {
@@ -127,10 +128,42 @@ const commissionData=async (req, res) => {
         AllCommissions: AllCommissions,
       },
     });
-  }catch (err) {
-    res.status(500).json({ error: err.message , success: false });
+  } catch (err) {
+    res.status(500).json({ error: err.message, success: false });
   }
-}
+};
+
+const createSystemSettings = async (req, res) => {
+  try {
+    const system = await SystemSettings.create({
+      updatedBy: "683c1fa1ba1ad62f40a22554",
+    });
+    console.log("system settings created", system);
+    return res.status(201).json({
+      success: true,
+      data: system,
+      message: "System settings created successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error creating system settings", error });
+  }
+};
+
+const getSystemSettings = async (req, res) => {
+  try {
+    const systemSettings = await SystemSettings.findOne();
+    if (!systemSettings) {
+      return res.status(404).json({ message: "System settings not found" });
+    }
+    return res.status(200).json({
+      success: true,
+      data: systemSettings,
+      message: "System settings fetched successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching system settings", error });
+  }
+};
 
 const getAdminByPhone = async (req, res) => {
   try {
@@ -593,7 +626,62 @@ const getTransactionVolumeData = async (req, res) => {
   }
 };
 
+const updateSystemSettings = async (req, res) => {
+  try {
+    const {
+      maxSingleTransaction,
+      maxDailyLimit,
+      maxWeeklyLimit,
+      minTransactionAmount,
+      transactionFee500to999,
+      transactionFee1000to4999,
+      transactionFee5000to9999,
+      transactionFee10000,
+      updatedBy,
+    } = req.body;
 
+    if (
+      maxSingleTransaction === undefined ||
+      maxDailyLimit === undefined ||
+      maxWeeklyLimit === undefined ||
+      minTransactionAmount === undefined ||
+      transactionFee500to999 === undefined ||
+      transactionFee1000to4999 === undefined ||
+      transactionFee5000to9999 === undefined ||
+      transactionFee10000 === undefined ||
+      !updatedBy
+    ) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+    const updatedSettings = await SystemSettings.findOneAndUpdate(
+      {},
+      {
+        maxSingleTransaction,
+        maxDailyLimit,
+        maxWeeklyLimit,
+        minTransactionAmount,
+        transactionFee500to999,
+        transactionFee1000to4999,
+        transactionFee5000to9999,
+        transactionFee10000,
+        updatedBy,
+      },
+      { new: true }
+    );
+
+    if (!updatedSettings) {
+      return res.status(404).json({ message: "System settings not found" });
+    }
+    return res.status(200).json({
+      success: true,
+      data: updatedSettings,
+      message: "System settings updated successfully",
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: "Error updating system settings", error });
+  }
+};
 
 const getAllUserRelatedTransactions = async (req, res) => {
   try {
@@ -627,7 +715,7 @@ const getAllUserRelatedTransactions = async (req, res) => {
       (a, b) => new Date(b.transactionDate) - new Date(a.transactionDate)
     );
 
-    return res.status(200).json({ success: true, data:transactions });
+    return res.status(200).json({ success: true, data: transactions });
   } catch (error) {
     console.error("Error fetching user related transactions:", error);
     res
@@ -639,10 +727,13 @@ const getAllUserRelatedTransactions = async (req, res) => {
 module.exports = {
   getAdminOverviewCardData,
   createAdmin,
+  getSystemSettings,
   getAllUserRelatedTransactions,
   getTransactionVolumeData,
   getAdminByPhone,
+  createSystemSettings,
   checkAdminPassword,
   getRecentActivityData,
   commissionData,
+  updateSystemSettings,
 };

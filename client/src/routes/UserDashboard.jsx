@@ -22,6 +22,7 @@ import BudgetPlanningForm from "../components/BudgetPlanningForm";
 import DetailedExpenseReport from "../components/DetailedExpenseReport";
 import AgentDetails from "../components/AgentDetails";
 import AgentsViewMore from "../components/AgentsViewMore";
+import speak from "../utils/speak";
 
 const UserDashboard = () => {
   // const [isLoading, setIsLoading] = useState(true);
@@ -89,6 +90,9 @@ const UserDashboard = () => {
     if (transactionSuccess) {
       setTransactionSuccess(false);
       toast.success("Transaction successful");
+      
+      speak("Transaction successful");
+
       getUserData();
     }
   }, [transactionSuccess]);
@@ -153,7 +157,6 @@ const UserDashboard = () => {
     <Loader />
   ) : (
     <div className="bg-gray-50 min-h-screen">
-      
       {showSend && (
         <div className="bg-black/40 flex justify-center items-center fixed top-0 z-50 w-full h-full">
           <SendMoney

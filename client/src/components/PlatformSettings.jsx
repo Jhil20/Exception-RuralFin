@@ -1,90 +1,135 @@
-import { useState } from 'react';
-import { Save, RefreshCw, Lock, Bell, DollarSign, Percent, Clock } from 'lucide-react';
-import Card from '../components/Card';
-import Button from '../components/Button';
-import { toast } from 'react-toastify';
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Save,
+  RefreshCw,
+  Lock,
+  Bell,
+  DollarSign,
+  Percent,
+  Clock,
+} from "lucide-react";
+import Card from "../components/Card";
+import Button from "../components/Button";
+import { toast } from "react-toastify";
+import axios from "axios";
+import { BACKEND_URL } from "../utils/constants";
+import { Formik } from "formik";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 
 const PlatformSettings = () => {
-  const [settings, setSettings] = useState([
-    {
-      title: 'Transaction Limits',
-      description: 'Configure maximum transaction amounts and daily limits',
-      icon: <DollarSign size={20} />,
-      fields: [
-        { id: 'max-single-transaction', label: 'Maximum Single Transaction (₹)', type: 'number', value: 50000 },
-        { id: 'max-daily-limit', label: 'Maximum Daily Limit (₹)', type: 'number', value: 100000 },
-        { id: 'max-weekly-limit', label: 'Maximum Weekly Limit (₹)', type: 'number', value: 500000 },
-        { id: 'min-transaction', label: 'Minimum Transaction Amount (₹)', type: 'number', value: 100 },
-      ]
-    },
-    {
-      title: 'Fee Configuration',
-      description: 'Set transaction fees and agent commissions',
-      icon: <Percent size={20} />,
-      fields: [
-        { id: 'transaction-fee', label: 'Transaction Fee (%)', type: 'number', value: 1.5 },
-        { id: 'agent-commission', label: 'Agent Commission (%)', type: 'number', value: 2.5 },
-        { id: 'withdrawal-fee', label: 'Withdrawal Fee (₹)', type: 'number', value: 25 },
-        { id: 'large-transaction-fee', label: 'Large Transaction Fee (%)', type: 'number', value: 1.0 },
-      ]
-    },
-    {
-      title: 'Security Settings',
-      description: 'Configure security and verification requirements',
-      icon: <Lock size={20} />,
-      fields: [
-        { id: 'otp-verification', label: 'OTP Verification', type: 'toggle', value: true },
-        { id: 'two-factor', label: 'Two-Factor Authentication', type: 'toggle', value: true },
-        { id: 'session-timeout', label: 'Session Timeout (minutes)', type: 'number', value: 30 },
-        { id: 'encryption-level', label: 'Encryption Level', type: 'select', options: ['Standard', 'Advanced', 'Military-Grade'], value: 'Advanced' },
-      ]
-    },
-    {
-      title: 'Notification Settings',
-      description: 'Configure alert thresholds and notification preferences',
-      icon: <Bell size={20} />,
-      fields: [
-        { id: 'large-transaction-alert', label: 'Large Transaction Alert Threshold (₹)', type: 'number', value: 25000 },
-        { id: 'suspicious-activity', label: 'Suspicious Activity Alerts', type: 'toggle', value: true },
-        { id: 'admin-notifications', label: 'Admin Email Notifications', type: 'toggle', value: true },
-        { id: 'agent-notifications', label: 'Agent SMS Notifications', type: 'toggle', value: true },
-      ]
-    },
-  ]);
+  const [uptime, setUptime] = useState("Calculating...");
+  const [deployTime, setDeployTime] = useState(null);
+  const [upTimeInterval, setUpTimeInterval] = useState(null);
+  const [systemSettings, setSystemSettings] = useState({});
+  const formikFormTransaction = useRef(null);
+  const formikFormFee = useRef(null);
+  const getUpTime = async () => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/api/uptime`);
+      // console.log("Uptime response:", response.data);
+      const startTime = new Date(response.data.startTime);
+      setDeployTime(startTime);
+      const interval = setInterval(() => {
+        const now = new Date();
+        const diffMs = now - startTime;
+
+        const seconds = Math.floor((diffMs / 1000) % 60);
+        const minutes = Math.floor((diffMs / 1000 / 60) % 60);
+        const hours = Math.floor((diffMs / (1000 * 60 * 60)) % 24);
+        const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        // console.log("Uptime:", days, "days", hours, "hours", minutes, "minutes");
+        setUptime(`${days}d ${hours}h ${minutes}m`);
+      }, 60000);
+      setUpTimeInterval(interval);
+    } catch (error) {
+      console.error("Error fetching uptime:", error);
+    }
+  };
+  const token = Cookies.get("token");
+  const decoded = useMemo(() => {
+    if (!token) {
+      return null;
+    }
+    return jwtDecode(token);
+  }, [token]);
+  useEffect(() => {
+    getUpTime();
+    // createSystem();
+    getSystemSettings();
+    if (upTimeInterval) {
+      clearInterval(upTimeInterval);
+    }
+  }, []);
+
+  // const createSystem=async()=>{
+  //   try{
+  //     const response=await axios.post(`${BACKEND_URL}/api/admin/createSystem`);
+  //     console.log("System created successfully:", response.data);
+  //   }catch(error){
+  //     console.error("Error creating system:", error);
+  //   }
+  // }
+
+  const getSystemSettings = async () => {
+    try {
+      const response = await axios.get(
+        `${BACKEND_URL}/api/admin/getSystemSettings`
+      );
+      console.log("System settings fetched successfully:", response.data);
+      setSystemSettings(response.data.data);
+    } catch (error) {
+      console.error("Error fetching system settings:", error);
+    }
+  };
 
   const systemStats = [
-    { label: 'System Uptime', value: '99.98%' },
-    { label: 'Last Deployment', value: '2025-04-10 14:30:22' },
-    { label: 'Active Users Today', value: '8,452' },
-    { label: 'Transaction Success Rate', value: '99.76%' },
+    { label: "System Uptime", value: uptime },
+    {
+      label: "Last Deployment",
+      value: new Date(deployTime).toLocaleDateString(),
+    },
+    { label: "Active Users Today", value: "8,452" },
   ];
 
-  const handleInputChange = (sectionIndex, fieldIndex, value) => {
-    const newSettings = [...settings];
-    newSettings[sectionIndex].fields[fieldIndex].value = value;
-    setSettings(newSettings);
-  };
-
-  const handleSaveSettings = () => {
-    toast.success('Settings saved successfully!');
-  };
-
-  const handleRestartServices = () => {
-    toast.info('System services restart initiated. This may take a few moments.');
+  const handleSaveSettings = async () => {
+    try {
+      const values = {
+        maxSingleTransaction:
+          formikFormTransaction.current.values["max-single-transaction"],
+        maxDailyLimit: formikFormTransaction.current.values["max-daily-limit"],
+        maxWeeklyLimit:
+          formikFormTransaction.current.values["max-weekly-limit"],
+        minTransactionAmount:
+          formikFormTransaction.current.values["min-transaction"],
+        transactionFee500to999:
+          formikFormFee.current.values["transaction-fee-500-999"],
+        transactionFee1000to4999:
+          formikFormFee.current.values["transaction-fee-1000-4999"],
+        transactionFee5000to9999:
+          formikFormFee.current.values["transaction-fee-5000-9999"],
+        transactionFee10000:
+          formikFormFee.current.values["transaction-fee-10000"],
+        updatedBy: decoded.id,
+      };
+      const response = await axios.post(
+        `${BACKEND_URL}/api/admin/updateSystemSettings`,
+        values
+      );
+      console.log("Settings saved successfully:", response.data);
+      if(response.data.success){
+        toast.success("Settings saved successfully!");
+        getSystemSettings();
+      }
+    } catch (error) {
+      console.error("Error saving settings:", error);
+    }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-3">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <h1 className="text-2xl font-bold text-gray-800">Platform Settings</h1>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" leftIcon={<RefreshCw size={18} />} onClick={handleRestartServices}>
-            Restart Services
-          </Button>
-          <Button variant="primary" leftIcon={<Save size={18} />} onClick={handleSaveSettings}>
-            Save Changes
-          </Button>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -104,77 +149,169 @@ const PlatformSettings = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {settings.map((section, sectionIndex) => (
-          <Card key={sectionIndex}>
-            <div className="flex items-start mb-6">
-              <div className="p-3 bg-blue-100 rounded-lg text-blue-600 mr-3">
-                {section.icon}
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold text-gray-800">{section.title}</h2>
-                <p className="text-gray-500">{section.description}</p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              {section.fields.map((field, fieldIndex) => (
-                <div key={field.id} className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                  <label htmlFor={field.id} className="font-medium text-gray-700">
-                    {field.label}
-                  </label>
-
-                  {field.type === 'toggle' ? (
-                    <div className="flex items-center">
-                      <button
-                        type="button"
-                        className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                          field.value ? 'bg-blue-600' : 'bg-gray-200'
-                        }`}
-                        onClick={() => handleInputChange(sectionIndex, fieldIndex, !field.value)}
-                      >
-                        <span
-                          className={`inline-block w-4 h-4 transform transition-transform bg-white rounded-full ${
-                            field.value ? 'translate-x-6' : 'translate-x-1'
-                          }`}
-                        />
-                      </button>
-                      <span className="ml-3 text-sm text-gray-500">
-                        {field.value ? 'Enabled' : 'Disabled'}
-                      </span>
-                    </div>
-                  ) : field.type === 'select' ? (
-                    <select
-                      id={field.id}
-                      className="input-field"
-                      value={field.value}
-                      onChange={(e) => handleInputChange(sectionIndex, fieldIndex, e.target.value)}
-                    >
-                      {field.options.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <input
-                      id={field.id}
-                      type={field.type}
-                      className="input-field"
-                      value={field.value}
-                      onChange={(e) =>
-                        handleInputChange(
-                          sectionIndex,
-                          fieldIndex,
-                          field.type === 'number' ? Number(e.target.value) : e.target.value
-                        )
-                      }
-                    />
-                  )}
+        {/* Transaction Limits Form */}
+        <Formik
+          innerRef={formikFormTransaction}
+          enableReinitialize
+          initialValues={{
+            "max-single-transaction": systemSettings?.maxSingleTransaction ?? 0,
+            "max-daily-limit": systemSettings?.maxDailyLimit ?? 0,
+            "max-weekly-limit": systemSettings?.maxWeeklyLimit ?? 0,
+            "min-transaction": systemSettings?.minTransactionAmount ?? 1,
+          }}
+          onSubmit={(values) => {
+            console.log("Transaction Limits Submitted:", values);
+          }}
+        >
+          {({ values, handleChange, handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <Card>
+                <div className="flex items-start mb-6">
+                  <div className="p-3 bg-blue-100 rounded-lg text-blue-600 mr-3">
+                    <DollarSign size={20} />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-800">
+                      Transaction Limits
+                    </h2>
+                    <p className="text-gray-500">
+                      Configure maximum transaction amounts and daily limits
+                    </p>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </Card>
-        ))}
+
+                <div className="space-y-4">
+                  {[
+                    {
+                      id: "max-single-transaction",
+                      label: "Maximum Single Transaction (₹)",
+                    },
+                    {
+                      id: "max-daily-limit",
+                      label: "Maximum Daily Limit (₹)",
+                    },
+                    {
+                      id: "max-weekly-limit",
+                      label: "Maximum Weekly Limit (₹)",
+                    },
+                    {
+                      id: "min-transaction",
+                      label: "Minimum Transaction Amount (₹)",
+                    },
+                  ].map((field) => (
+                    <div
+                      key={field.id}
+                      className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center"
+                    >
+                      <label
+                        htmlFor={field.id}
+                        className="font-medium text-gray-700"
+                      >
+                        {field.label}
+                      </label>
+                      <input
+                        id={field.id}
+                        type="number"
+                        className="input-field border-2 py-1 px-2 hover:border-gray-500 transition-all duration-400 border-gray-300 rounded-md"
+                        value={values[field.id]}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </form>
+          )}
+        </Formik>
+
+        {/* Fee Configuration Form */}
+        <Formik
+          innerRef={formikFormFee}
+          enableReinitialize
+          initialValues={{
+            "transaction-fee-500-999":
+              systemSettings?.transactionFee500to999 ?? 0,
+            "transaction-fee-1000-4999":
+              systemSettings?.transactionFee1000to4999 ?? 0,
+            "transaction-fee-5000-9999":
+              systemSettings?.transactionFee5000to9999 ?? 0,
+            "transaction-fee-10000": systemSettings?.transactionFee10000 ?? 0,
+          }}
+          onSubmit={(values) => {
+            console.log("Fee Configuration Submitted:", values);
+          }}
+        >
+          {({ values, handleChange, handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <Card>
+                <div className="flex items-start mb-6">
+                  <div className="p-3 bg-blue-100 rounded-lg text-blue-600 mr-3">
+                    <Percent size={20} />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-800">
+                      Fee Configuration
+                    </h2>
+                    <p className="text-gray-500">
+                      Set transaction fees for user-agent transactions and agent
+                      commissions
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {[
+                    {
+                      id: "transaction-fee-500-999",
+                      label: "Transaction Fee for ₹500-₹999 (%)",
+                    },
+                    {
+                      id: "transaction-fee-1000-4999",
+                      label: "Transaction Fee for ₹1000-₹4999 (%)",
+                    },
+                    {
+                      id: "transaction-fee-5000-9999",
+                      label: "Transaction Fee for ₹5000-₹9999 (%)",
+                    },
+                    {
+                      id: "transaction-fee-10000",
+                      label: "Transaction Fee for ₹10000+ (%)",
+                    },
+                  ].map((field) => (
+                    <div
+                      key={field.id}
+                      className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center"
+                    >
+                      <label
+                        htmlFor={field.id}
+                        className="font-medium text-gray-700"
+                      >
+                        {field.label}
+                      </label>
+                      <input
+                        id={field.id}
+                        type="number"
+                        className="input-field border-2 py-1 px-2 hover:border-gray-500 transition-all duration-400 border-gray-300 rounded-md"
+                        value={values[field.id]}
+                        max={100}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </form>
+          )}
+        </Formik>
+        <div className="flex items-center gap-3">
+          <button
+          className="bg-white flex items-center cursor-pointer px-4 py-2 text-black focus:ring-white hover:bg-gray-800 hover:text-white hover:ring-2 hover:ring-gray-600 font-semibold rounded-xl transition-all duration-300 focus:outline-none focus:ring-2  disabled:opacity-50 disabled:cursor-not-allowed "
+            onClick={handleSaveSettings}
+          >
+            <span className={`mr-2`}>{<Save size={18} />}</span>
+            Save Changes
+          </button>
+        </div>
       </div>
     </div>
   );

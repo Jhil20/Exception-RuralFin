@@ -30,6 +30,12 @@ app.use("/api/userToUserTransaction", userToUserTransactionRoutes);
 app.use("/api/budget", budgetRoutes);
 app.use('/api/agentToUserTransaction',agentToUserTransactionRoutes)
 app.use("/api/admin",adminRoutes);
+// server.js or app.js
+const serverStartTime = new Date();
+
+app.use('/api/uptime', (req, res) => {
+  res.json({ startTime: serverStartTime });
+});
 
 app.listen(5000, () => {
   try {
