@@ -36,16 +36,24 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
   const [addFavourites, setAddFavourites] = useState(false);
   const [transactionCreated, setTransactionCreated] = useState(null);
   const [resetCaptcha, setResetCaptcha] = useState(false);
+  const [settings, setSettings] = useState({});
   const formikRef = useRef();
   const setShowSend = showSend.setShowSend;
   const setTransactionSuccess = toastControl.setTransactionSuccess;
   const setOtpVerified = toastControl.setOtpVerified;
   const showSendVar = showSend.showSend;
 
-  useEffect(() => {
-    // console.log("get fav called in usseEffect");
-    getFavourites();
-  }, []);
+  const getSettings = async () => {
+    try {
+      const response = await axios.get(
+        `${BACKEND_URL}/api/admin/getSystemSettings`
+      );
+      console.log("Settings response:", response);
+      setSettings(response.data.data);
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+    }
+  };
 
   useEffect(() => {
     if (showSendVar) {
@@ -123,6 +131,35 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       return;
     }
     try {
+      const response2 = await axios.get(
+        `${BACKEND_URL}/api/user/getTodayTransactionAmount/${user._id}`
+      );
+      const transactionsAmount = response2?.data?.data?.today;
+      console.log("transactionsAmount", transactionsAmount);
+      if (transactionsAmount + amount > settings?.maxDailyLimit) {
+        toast.error(
+          `You can only transfer upto ₹${settings?.maxDailyLimit} per day`
+        );
+        return;
+      } else if (amount < settings?.minTransactionAmount) {
+        toast.error(
+          `Minimum transaction amount is ₹${settings?.minTransactionAmount}`
+        );
+        return;
+      } else if (amount > settings?.maxTransactionAmount) {
+        toast.error(
+          `Maximum transaction amount is ₹${settings?.maxTransactionAmount}`
+        );
+        return;
+      } else if (
+        amount + response2?.data?.data?.thisWeek >
+        settings?.maxWeeklyLimit
+      ) {
+        toast.error(
+          `You can only transfer upto ₹${settings?.maxWeeklyLimit} per week`
+        );
+        return;
+      }
       const response = await axios.post(
         `${BACKEND_URL}/api/userToUserTransaction/`,
         {
@@ -377,6 +414,12 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
     }
   };
 
+  useEffect(() => {
+    // console.log("get fav called in usseEffect");
+    getFavourites();
+    getSettings();
+  }, []);
+
   return (
     <div className="w-full h-full flex justify-center items-center">
       <div className="recaptcha-wrapper mb-4">
@@ -384,7 +427,6 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       </div>
       {step == "otp" ? (
         <div className="bg-white w-1/3 rounded-xl shadow-lg p-6">
-          
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-900">
               Verify Transfer

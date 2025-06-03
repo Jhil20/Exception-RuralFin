@@ -3,15 +3,24 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { allocateRuralFinId } = require("../utils/allocateRuralFinId");
 const Finance = require("../models/financeModel");
+const UserToUserTransaction = require("../models/userToUserTransactionModel");
+const AgentToUserTransaction = require("../models/userToAgentTransactionModel");
+const moment = require("moment");
 
 // Get all users
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find();
     if (!users || users.length === 0) {
-      return res.status(404).json({ message: "No users found", success: false });
+      return res
+        .status(404)
+        .json({ message: "No users found", success: false });
     }
-    res.status(200).json({data:users, message: "Users fetched successfully", success: true });
+    res.status(200).json({
+      data: users,
+      message: "Users fetched successfully",
+      success: true,
+    });
   } catch (error) {
     res.status(500).json({ message: "Error fetching users", error });
   }
@@ -21,9 +30,15 @@ const getAllUsersWithFinanceData = async (req, res) => {
   try {
     const users = await User.find().populate("finance");
     if (!users || users.length === 0) {
-      return res.status(404).json({ message: "No users found", success: false });
+      return res
+        .status(404)
+        .json({ message: "No users found", success: false });
     }
-    res.status(200).json({data:users, message: "Users fetched successfully", success: true });
+    res.status(200).json({
+      data: users,
+      message: "Users fetched successfully",
+      success: true,
+    });
   } catch (error) {
     res.status(500).json({ message: "Error fetching users", error });
   }
@@ -340,14 +355,130 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const getAllTransactionsAmountsByUserId = async (req, res) => {
+  try {
+    const start = moment().startOf("week").add(1, "days"); 
+    const end = moment().endOf("week").add(1, "days");
+    const { id } = req.params;
+    const userTodayTransactions = await UserToUserTransaction.aggregate([
+      {
+        $match: {
+          senderId: id,
+          status: "completed",
+          transactionDate: {
+            $gte: new Date(new Date().setHours(0, 0, 0, 0)),
+            $lt: new Date(new Date().setHours(23, 59, 59, 999)),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$amount" },
+        },
+      },
+    ]);
+    if (!userTodayTransactions || userTodayTransactions.length === 0) {
+      userTodayTransactions.push({ totalAmount: 0 });
+    }
+    const thisWeekUserTransactions = await UserToUserTransaction.aggregate([
+      {
+        $match: {
+          senderId: id,
+          status: "completed",
+          transactionDate: {
+            $gte: start.toDate(),
+            $lt: end.toDate(),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$amount" },
+        },
+      },
+    ]);
+    if (!thisWeekUserTransactions || thisWeekUserTransactions.length === 0) {
+      thisWeekUserTransactions.push({ totalAmount: 0 });
+    }
+    return res.status(200).json({
+      data: {today:userTodayTransactions[0].totalAmount,thisWeek:thisWeekUserTransactions[0].totalAmount},
+      message: "User transactions found",
+      success: true,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching transactions", error });
+  }
+};
+
+const getAllAgentTransactionsAmountsByUserId = async (req, res) => {
+  try {
+    const start = moment().startOf("week").add(1, "days"); 
+    const end = moment().endOf("week").add(1, "days");
+    const { id } = req.params;
+    const userTodayTransactions = await AgentToUserTransaction.aggregate([
+      {
+        $match: {
+          userId: id,
+          status: "completed",
+          transactionDate: {
+            $gte: new Date(new Date().setHours(0, 0, 0, 0)),
+            $lt: new Date(new Date().setHours(23, 59, 59, 999)),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$amount" },
+        },
+      },
+    ]);
+    if (!userTodayTransactions || userTodayTransactions.length === 0) {
+      userTodayTransactions.push({ totalAmount: 0 });
+    }
+    const thisWeekUserTransactions = await AgentToUserTransaction.aggregate([
+      {
+        $match: {
+          userId: id,
+          status: "completed",
+          transactionDate: {
+            $gte: start.toDate(),
+            $lt: end.toDate(),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$amount" },
+        },
+      },
+    ]);
+    if (!thisWeekUserTransactions || thisWeekUserTransactions.length === 0) {
+      thisWeekUserTransactions.push({ totalAmount: 0 });
+    }
+    return res.status(200).json({
+      data: {today:userTodayTransactions[0].totalAmount,thisWeek:thisWeekUserTransactions[0].totalAmount},
+      message: "User transactions found",
+      success: true,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching transactions", error });
+  }
+};
+
 module.exports = {
   getAllUsers,
   getUserById,
   getAllUsersWithFinanceData,
   createUser,
+  getAllTransactionsAmountsByUserId,
   updateUser,
   deleteUser,
   getUserByPhone,
+  getAllAgentTransactionsAmountsByUserId,
   checkValidRuralFinId,
   addFavouriteToUserById,
   getFavouritesByUserId,

@@ -1,11 +1,5 @@
-import {
-  Accessibility,
-  CheckCircle,
-  IndianRupee,
-  X,
-  XCircle,
-} from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { CheckCircle, IndianRupee, X, XCircle } from "lucide-react";
+import { useEffect, useState } from "react";
 import {
   User,
   Phone,
@@ -63,64 +57,12 @@ const AgentDetails = ({
   const [allTransactions, setAllTransactions] = useState([]);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [userData, setUserData] = useState(null);
+  const [settings, setSettings] = useState(null);
   const token = Cookies.get("token");
   const decoded = useMemo(() => {
     if (!token) return null;
     return jwtDecode(token);
   }, [token]);
-  // Mock transaction data
-  const mockTransactions = [
-    {
-      id: "TRX123456",
-      type: "deposit",
-      amount: 5000,
-      status: "completed",
-      date: new Date(2025, 4, 10, 14, 30),
-      userName: "Raj Kumar",
-      userId: "USR789012",
-      commissionAmount: 100,
-    },
-    {
-      id: "TRX123457",
-      type: "withdrawal",
-      amount: 2000,
-      status: "completed",
-      date: new Date(2025, 4, 9, 10, 15),
-      userName: "Priya Sharma",
-      userId: "USR789013",
-      commissionAmount: 40,
-    },
-    {
-      id: "TRX123458",
-      type: "deposit",
-      amount: 10000,
-      status: "pending",
-      date: new Date(2025, 4, 11, 9, 45),
-      userName: "Vikram Singh",
-      userId: "USR789014",
-      commissionAmount: 250,
-    },
-    {
-      id: "TRX123459",
-      type: "withdrawal",
-      amount: 7500,
-      status: "pending",
-      date: new Date(2025, 4, 11, 16, 20),
-      userName: "Ananya Patel",
-      userId: "USR789015",
-      commissionAmount: 150,
-    },
-    {
-      id: "TRX123460",
-      type: "deposit",
-      amount: 3000,
-      status: "cancelled",
-      date: new Date(2025, 4, 8, 11, 10),
-      userName: "Mohan Das",
-      userId: "USR789016",
-      commissionAmount: 45,
-    },
-  ];
 
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("en-US", {
@@ -146,36 +88,85 @@ const AgentDetails = ({
     return masked;
   };
 
-const getUser=async()=>{
-  try{
-    console.log("Fetching user data for ID:", decoded.id);
-    const response=await axios.get(`${BACKEND_URL}/api/finance/getFinance/${decoded.id}`);
-    console.log("User finance data fetched successfully:", response.data);
-    setUserData(response.data.finance);
-  }catch(error) {
-    console.error("Error fetching user data:", error);
-  }
-}
+  const getUser = async () => {
+    try {
+      console.log("Fetching user data for ID:", decoded.id);
+      const response = await axios.get(
+        `${BACKEND_URL}/api/finance/getFinance/${decoded.id}`
+      );
+      console.log("User finance data fetched successfully:", response.data);
+      setUserData(response.data.finance);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
 
-useEffect(()=>{
-  getUser();
-},[decoded])
+  const getSettings = async () => {
+    try {
+      const response = await axios.get(
+        `${BACKEND_URL}/api/admin/getSystemSettings`
+      );
+      console.log("Settings response:", response);
+      setSettings(response.data.data);
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+    }
+  };
+
+  useEffect(() => {
+    getUser();
+    getSettings();
+  }, [decoded]);
 
   const handleAgentToUserSubmit = async (values, { resetForm }) => {
     const data = {
       agentId: selectedAgent._id,
       userId: decoded.id,
       amount: parseFloat(values.amount),
-      commission: calculateAgentCommission(values.amount),
+      commission: calculateAgentCommission(values.amount,settings),
       conversionType:
         transactionType == "deposit" ? "cashToERupees" : "eRupeesToCash",
       notes: values.notes || "",
     };
-    if(transactionType!="deposit" && data.amount + data.commission > userData.balance) {
+
+    if (
+      transactionType != "deposit" &&
+      data.amount + data.commission > userData.balance
+    ) {
       toast.error("Withdrawal amount exceeds available balance!");
       return;
     }
+
     try {
+      const result = await axios.get(
+        `${BACKEND_URL}/api/user/getTodayAgentTransactionAmount/${decoded.id}`
+      );
+      console.log("Today's agent transaction amount:", result.data,amount,settings);
+      const transactionsAmount = result.data.data.today || 0;
+      if (transactionsAmount + values.amount > settings?.maxDailyLimit) {
+        toast.error(
+          `You can only Deposit/Withdraw upto ₹${settings?.maxDailyLimit} per day`
+        );
+        return;
+      } else if (values.amount < settings?.minTransactionAmount) {
+        toast.error(
+          `Minimum Deposit/WithDraw amount is ₹${settings?.minTransactionAmount}`
+        );
+        return;
+      } else if (values.amount > settings?.maxTransactionAmount) {
+        toast.error(
+          `Maximum Deposit/Withdraw amount is ₹${settings?.maxTransactionAmount}`
+        );
+        return;
+      } else if (
+        values.amount + result?.data?.data?.thisWeek >
+        settings?.maxWeeklyLimit
+      ) {
+        toast.error(
+          `You can only Deposit/Withdraw upto ₹${settings?.maxWeeklyLimit} per week`
+        );
+        return;
+      }
       const response = await axios.post(
         `${BACKEND_URL}/api/agentToUserTransaction/`,
         data
@@ -184,7 +175,11 @@ useEffect(()=>{
         "response of creating agent to user transactions",
         response.data
       );
-      toast.success(`${transactionType === "deposit" ? "Deposit" : "Withdrawal"} request successful!`)
+      toast.success(
+        `${
+          transactionType === "deposit" ? "Deposit" : "Withdrawal"
+        } request successful!`
+      );
       resetForm();
     } catch (error) {
       console.error("Error creating agent to user transaction:", error);
@@ -240,7 +235,6 @@ useEffect(()=>{
 
   return (
     <div className="bg-white h-11/12 w-2/3 rounded-2xl shadow-xl transition-all duration-300 transform animate-fade-in">
-      
       {/* Header */}
       <div className="flex justify-between items-center h-22 mt-2 px-6 pb-2 border-b border-gray-100">
         <div>
@@ -438,10 +432,7 @@ useEffect(()=>{
                             Security Deposit
                           </label>
                           <p className="text-black font-medium">
-                            ₹
-                            {selectedAgent?.balance.toLocaleString(
-                              "en-IN"
-                            )}
+                            ₹{selectedAgent?.balance.toLocaleString("en-IN")}
                           </p>
                         </div>
                       </div>
@@ -508,9 +499,8 @@ useEffect(()=>{
                         </span>
                         <span className="text-black font-bold">
                           ₹
-                          {selectedAgent?.balance.toLocaleString(
-                            "en-IN"
-                          ) || "0"}
+                          {selectedAgent?.balance.toLocaleString("en-IN") ||
+                            "0"}
                         </span>
                       </div>
                     </div>
@@ -638,7 +628,7 @@ useEffect(()=>{
                               type="text"
                               name="commission"
                               id="commission"
-                              value={calculateAgentCommission(values.amount)}
+                              value={calculateAgentCommission(values.amount,settings)}
                               className="block w-full text-gray-500 pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:border-black transition-all duration-200"
                               placeholder="0.00"
                               disabled
@@ -723,10 +713,21 @@ useEffect(()=>{
                       </h4>
                       <ul className="text-sm text-gray-600 space-y-2">
                         <li>• ₹0–499: ₹5 flat</li>
-                        <li>• ₹500–999: 1% (rounded)</li>
-                        <li>• ₹1,000–4,999: 1.5% (rounded)</li>
-                        <li>• ₹5,000–9,999: 2% (rounded)</li>
-                        <li>• ₹10,000+: 2.5% (rounded)</li>
+                        <li>
+                          • ₹500–999: {settings?.transactionFee500to999}%
+                          (rounded)
+                        </li>
+                        <li>
+                          • ₹1,000–4,999: {settings?.transactionFee1000to4999}%
+                          (rounded)
+                        </li>
+                        <li>
+                          • ₹5,000–9,999: {settings?.transactionFee5000to9999}%
+                          (rounded)
+                        </li>
+                        <li>
+                          • ₹10,000+: {settings?.transactionFee10000}% (rounded)
+                        </li>
                       </ul>
                     </div>
                   </div>
