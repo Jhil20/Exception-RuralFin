@@ -27,6 +27,8 @@ const getAgentById = async (req, res) => {
   }
 };
 
+
+
 const checkAgentPassword = async (req, res) => {
   try {
     const { phoneNumber, role, password } = req.body;

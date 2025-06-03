@@ -4,7 +4,7 @@ const User = require("../models/userModel");
 const UserToUserTransaction = require("../models/userToUserTransactionModel");
 const userToAgentTransaction = require("../models/userToAgentTransactionModel");
 const Agent = require("../models/agentModel");
-const AgentCommission = require("../models/agentCommission");
+const AgentCommission = require("../models/agentCommissionModel");
 
 const getFinanceById = async (req, res) => {
   try {

@@ -7,6 +7,7 @@ const Admin = require("../models/adminModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
+const AgentCommission = require("../models/agentCommissionModel");
 
 const getAdminOverviewCardData = async (req, res) => {
   try {
@@ -107,6 +108,29 @@ const getAdminOverviewCardData = async (req, res) => {
       .json({ message: "Error fetching admin overview card data", error });
   }
 };
+
+const commissionData=async (req, res) => {
+  try{
+    const totalCommission=await AgentCommission.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalCommissionEarned: { $sum: "$totalCommissionEarned" },
+        },
+      },
+    ]);
+    const AllCommissions=await AgentCommission.find();
+    return res.status(200).json({
+      success: true,
+      data: {
+        totalCommission: totalCommission[0]?.totalCommissionEarned || 0,
+        AllCommissions: AllCommissions,
+      },
+    });
+  }catch (err) {
+    res.status(500).json({ error: err.message , success: false });
+  }
+}
 
 const getAdminByPhone = async (req, res) => {
   try {
@@ -569,6 +593,8 @@ const getTransactionVolumeData = async (req, res) => {
   }
 };
 
+
+
 const getAllUserRelatedTransactions = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -618,4 +644,5 @@ module.exports = {
   getAdminByPhone,
   checkAdminPassword,
   getRecentActivityData,
+  commissionData,
 };
