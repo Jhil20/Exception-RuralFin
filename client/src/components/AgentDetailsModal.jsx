@@ -61,8 +61,8 @@ const AgentDetailsModal = ({ isOpen, onClose, agent }) => {
                   Agent #{agent._id.toLocaleString()}
                 </p>
 
-                <div className="w-20 h-8 mb-3 bg-green-100 border-2 border-green-200 rounded-3xl text-center flex items-center justify-center">
-                  Active
+                <div className={`w-20 h-8 mb-3 ${agent?.isActive?"bg-green-100 border-2 border-green-200 text-green-800":"bg-red-100 border-2 border-red-200 text-red-900"}  rounded-3xl text-center flex items-center justify-center`}>
+                  {agent?.isActive?"Active":"Inactive"}
                 </div>
 
                 <div className="w-full space-y-4">

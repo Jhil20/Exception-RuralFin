@@ -8,7 +8,22 @@ const Finance = require("../models/financeModel");
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find();
-    res.status(200).json(users);
+    if (!users || users.length === 0) {
+      return res.status(404).json({ message: "No users found", success: false });
+    }
+    res.status(200).json({data:users, message: "Users fetched successfully", success: true });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching users", error });
+  }
+};
+
+const getAllUsersWithFinanceData = async (req, res) => {
+  try {
+    const users = await User.find().populate("finance");
+    if (!users || users.length === 0) {
+      return res.status(404).json({ message: "No users found", success: false });
+    }
+    res.status(200).json({data:users, message: "Users fetched successfully", success: true });
   } catch (error) {
     res.status(500).json({ message: "Error fetching users", error });
   }
@@ -328,6 +343,7 @@ const deleteUser = async (req, res) => {
 module.exports = {
   getAllUsers,
   getUserById,
+  getAllUsersWithFinanceData,
   createUser,
   updateUser,
   deleteUser,

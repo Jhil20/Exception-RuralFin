@@ -1,9 +1,10 @@
 const express = require('express');
-const { getAdminOverviewCardData, createAdmin, getAdminByPhone, checkAdminPassword, getRecentActivityData, getTransactionVolumeData } = require('../controllers/adminController');
+const { getAdminOverviewCardData, createAdmin, getAdminByPhone, checkAdminPassword, getRecentActivityData, getTransactionVolumeData, getAllUserRelatedTransactions } = require('../controllers/adminController');
 const router = express.Router();
 
 
 router.get("/OverviewCardData",getAdminOverviewCardData);
+router.get("/allTransactionsForUser/:id",getAllUserRelatedTransactions)
 router.get("/transactionVolume",getTransactionVolumeData);
 router.get("/recentActivity",getRecentActivityData)
 router.post("/getAdminByPhone",getAdminByPhone)

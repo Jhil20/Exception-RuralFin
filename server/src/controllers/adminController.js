@@ -200,8 +200,10 @@ const getRecentActivityData = async (req, res) => {
       {},
       "firstName lastName phone createdAt _id"
     ).sort({ createdAt: -1 });
-    const userToAgentTransactionsActivity = await UserToAgentTransaction
-      .find({}, "_id userId agentId amount transactionDate status")
+    const userToAgentTransactionsActivity = await UserToAgentTransaction.find(
+      {},
+      "_id userId agentId amount transactionDate status"
+    )
       .populate("userId", "firstName _id lastName phone")
       .populate("agentId", "firstName _id lastName phone")
       .sort({ transactionDate: -1 });
@@ -441,7 +443,7 @@ const getTransactionVolumeData = async (req, res) => {
         },
       },
     ]);
-    
+
     const yesterdayAgentTransactions = await UserToAgentTransaction.aggregate([
       {
         $match: {
@@ -463,8 +465,8 @@ const getTransactionVolumeData = async (req, res) => {
     const yesterdayTransactions =
       (yesterdayUserTransactions[0]?.totalAmount || 0) +
       (yesterdayAgentTransactions[0]?.totalAmount || 0);
-// console.log(
-//       "yesterday user transactions")
+    // console.log(
+    //       "yesterday user transactions")
     const lastWeekUserTransactions = await UserToUserTransaction.aggregate([
       {
         $match: {
@@ -567,11 +569,51 @@ const getTransactionVolumeData = async (req, res) => {
   }
 };
 
+const getAllUserRelatedTransactions = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+    const userTransactions = await UserToUserTransaction.find({
+      $or: [{ senderId: userId }, { receiverId: userId }],
+    })
+      .populate("senderId", "firstName lastName phone")
+      .populate("receiverId", "firstName lastName phone")
+      .sort({ transactionDate: -1 });
+    const agentTransactions = await UserToAgentTransaction.find({
+      userId: userId,
+    })
+      .populate("userId", "firstName lastName phone")
+      .populate("agentId", "firstName lastName phone")
+      .sort({ transactionDate: -1 });
+    const transactions = [
+      ...userTransactions.map((transaction) => ({
+        type: "User to User",
+        ...transaction.toObject(),
+      })),
+      ...agentTransactions.map((transaction) => ({
+        type: "User to Agent",
+        ...transaction.toObject(),
+      })),
+    ];
+    transactions.sort(
+      (a, b) => new Date(b.transactionDate) - new Date(a.transactionDate)
+    );
 
+    return res.status(200).json({ success: true, data:transactions });
+  } catch (error) {
+    console.error("Error fetching user related transactions:", error);
+    res
+      .status(500)
+      .json({ message: "Error fetching user related transactions", error });
+  }
+};
 
 module.exports = {
   getAdminOverviewCardData,
   createAdmin,
+  getAllUserRelatedTransactions,
   getTransactionVolumeData,
   getAdminByPhone,
   checkAdminPassword,

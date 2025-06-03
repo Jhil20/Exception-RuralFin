@@ -117,7 +117,7 @@ const AgentManagement = () => {
                 <p className="text-gray-500 text-sm">Total Agents</p>
                 <p className="text-2xl font-bold text-gray-800">{agents?.length}</p>
               </div>
-              <div className="p-3 bg-blue-100 rounded-lg text-blue-600">
+              <div className="p-3 bg-gray-200 rounded-lg text-gray-800">
                 <Wallet size={20} />
               </div>
             </div>
@@ -129,7 +129,7 @@ const AgentManagement = () => {
                 <p className="text-gray-500 text-sm">Active Agents</p>
                 <p className="text-2xl font-bold text-gray-800">{agents?.length}</p>
               </div>
-              <div className="p-3 bg-green-100 rounded-lg text-green-600">
+              <div className="p-3 bg-gray-200 rounded-lg text-gray-800">
                 <CheckCircle size={20} />
               </div>
             </div>

@@ -85,6 +85,7 @@ const getTransactionsByUserId = async (req, res) => {
     const userId = req.params.id;
     const creditTransactions = await UserToUserTransaction.find({
       receiverId: userId,
+      status: "completed",
     }).populate("senderId");
 
     if (!creditTransactions) {
@@ -94,6 +95,7 @@ const getTransactionsByUserId = async (req, res) => {
     }
     const debitTransactions = await UserToUserTransaction.find({
       senderId: userId,
+      status: "completed",
     }).populate("receiverId");
 
     if (!debitTransactions) {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Search,
   Filter,
@@ -11,19 +11,19 @@ import Card from "../components/Card";
 import Button from "../components/Button";
 import UserDetailsModal from "./UserDetailsModal";
 import { mockUsers } from "../data/mockData";
+import axios from "axios";
+import { BACKEND_URL } from "../utils/constants";
+import capitalize from "../utils/capitalize";
 
 const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentFilter, setCurrentFilter] = useState("all");
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
 
-  const filteredUsers = mockUsers.filter(
-    (user) =>
-      (user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.ruralFinID.includes(searchTerm)) &&
-      (currentFilter === "all" || user.status === currentFilter)
-  );
+  // const filteredUsers =
 
   const handleViewDetails = (user) => {
     setSelectedUser(user);
@@ -59,12 +59,28 @@ const UserManagement = () => {
     }
   };
 
+  useEffect(() => {
+    getUsers();
+  }, []);
+
+  const getUsers = async () => {
+    try {
+      const response = await axios.get(
+        `${BACKEND_URL}/api/user/getAllUsersWithFinance`
+      );
+      console.log("User data fetched successfully:", response.data);
+      setUsers(response?.data?.data);
+      setFilteredUsers(response?.data?.data);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
 
   return (
-    <div className="space-y-0 h-9/12">
+    <div className="space-y-0 p-3 h-9/12">
       <div className="flex h-fit items-center gap-4 mb-6">
         <div className="flex items-start w-4/12 flex-wrap">
-          <div className="flex flex-row  mb-4 w-full items-center justify-between gap-4">
+          <div className="flex flex-row mt-1 mb-4 w-full items-center justify-between gap-4">
             <h1 className="text-2xl font-bold text-gray-800">
               User Management
             </h1>
@@ -75,7 +91,18 @@ const UserManagement = () => {
               placeholder="Search users by name or ID..."
               className="w-full h-full border-gray-300 rounded-xl hover:border-gray-400 focus:border-gray-400 transition-all duration-300 border-2 outline-0 py-2 pl-10"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                const filter = users.filter(
+                  (user) =>
+                    (user.name
+                      .toLowerCase()
+                      .includes(searchTerm.toLowerCase()) ||
+                      user.ruralFinID.includes(searchTerm)) &&
+                    (currentFilter === "all" || user.status === currentFilter)
+                );
+                setFilteredUsers(filter);
+              }}
             />
             <Search
               size={18}
@@ -88,9 +115,11 @@ const UserManagement = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">Total Users</p>
-                <p className="text-2xl font-bold text-gray-800">12,845</p>
+                <p className="text-2xl font-bold text-gray-800">
+                  {users?.length || "0"}
+                </p>
               </div>
-              <div className="p-3 bg-blue-100 rounded-lg text-blue-600">
+              <div className="p-3 bg-gray-200 rounded-lg text-gray-800">
                 <Wallet size={20} />
               </div>
             </div>
@@ -100,9 +129,11 @@ const UserManagement = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">Active Users</p>
-                <p className="text-2xl font-bold text-gray-800">10,532</p>
+                <p className="text-2xl font-bold text-gray-800">
+                  {users?.filter((user) => user.isActive == true).length}
+                </p>
               </div>
-              <div className="p-3 bg-green-100 rounded-lg text-green-600">
+              <div className="p-3 bg-gray-200 rounded-lg text-gray-800">
                 <CheckCircle size={20} />
               </div>
             </div>
@@ -112,9 +143,15 @@ const UserManagement = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">With Budget Plans</p>
-                <p className="text-2xl font-bold text-gray-800">8,745</p>
+                <p className="text-2xl font-bold text-gray-800">
+                  {
+                    users?.filter(
+                      (user) => user?.finance?.isBudgetPlanningEnabled == true
+                    ).length
+                  }
+                </p>
               </div>
-              <div className="p-3 bg-purple-100 rounded-lg text-purple-600">
+              <div className="p-3 bg-gray-200 rounded-lg text-gray-800">
                 <Wallet size={20} />
               </div>
             </div>
@@ -122,32 +159,52 @@ const UserManagement = () => {
         </div>
       </div>
 
-      <div className="bg-gray-100 h-full rounded-2xl mt-8 hover:shadow-gray-300 hover:shadow-lg transition-all duration-300">
+      <div className="bg-gray-100 h-[64vh] rounded-2xl mt-8 hover:shadow-gray-300 hover:shadow-lg transition-all duration-300">
         <div className="bg-white h-full overflow-y-auto rounded-xl border-2 border-gray-300">
           <div className="bg-gray-200 grid grid-cols-7 p-3 justify-items-center rounded-t-md text-sm font-semibold text-gray-700 text-center">
-            <span>User ID</span>
-            <span>Name</span>
-            <span>Rural Fin ID</span>
-            <span>Wallet Balance</span>
-            <span>Budget Status</span>
-            <span>Status</span>
-            <span>Last Transaction</span>
+            <span className="text-center pl-11">User ID</span>
+            <span className="text-center pl-12">Name</span>
+            <span className="text-center pl-12">Rural Fin ID</span>
+            <span className="text-center pl-13">Wallet Balance</span>
+            <span className="text-center pl-7">Budget Status</span>
+            <span className="text-center pl-6">Status</span>
+            <span className="text-center">Last User Activity</span>
           </div>
           <div className="h-14/16 overflow-y-auto">
             {filteredUsers.map((user) => (
               <div
-                key={user.id}
+                key={user?._id}
                 onClick={() => handleViewDetails(user)}
                 className="grid w-full grid-cols-7  border-b border-b-gray-300 text-center px-4 py-3 items-center hover:bg-gray-100 cursor-pointer"
               >
-                <div className="pr-1">#{user.id}</div>
-                <div className="font-medium text-gray-800">{user.name}</div>
-                <div className="pl-3">{user.ruralFinID}</div>
-                <div className="pl-5">₹{user.walletBalance.toLocaleString()}</div>
-                <div className="pl-8 mx-3">{getStatusBadge(user.budgetStatus)}</div>
-                <div className="pl-7 mx-4">{getStatusBadge(user.status)}</div>
-                <div className="pl-9">{user.lastActivity}</div>
-                
+                <div className="pr-1">#{user._id}</div>
+                <div className="font-medium text-gray-800 ml-11">
+                  {capitalize(user?.firstName) +
+                    " " +
+                    capitalize(user?.lastName)}
+                </div>
+                <div className="pl-3 text-center ">{user?.ruralFinId}</div>
+                <div className="pl-13">
+                  ₹{user?.finance?.balance.toLocaleString()}
+                </div>
+                <div className="pl-8 mx-3">
+                  {getStatusBadge(
+                    user?.finance?.isBudgetPlanningEnabled
+                      ? "active"
+                      : "inactive"
+                  )}
+                </div>
+                <div className="pl-7 mx-4">
+                  {getStatusBadge(user.isActive ? "active" : "inactive")}
+                </div>
+                <div className="pl-4">
+                  {new Date(
+                    Math.max(
+                      new Date(user?.finance?.updatedAt).getTime(),
+                      new Date(user?.updatedAt).getTime()
+                    )
+                  ).toLocaleDateString()}
+                </div>
               </div>
             ))}
           </div>

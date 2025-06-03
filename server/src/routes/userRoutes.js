@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { createUser, getUserByPhone, getUserById, checkValidRuralFinId, addFavouriteToUserById, getFavouritesByUserId, checkUserPassword } = require('../controllers/userController');
+const { createUser, getUserByPhone, getUserById, checkValidRuralFinId, addFavouriteToUserById, getFavouritesByUserId, checkUserPassword, getAllUsers, getAllUsersWithFinanceData } = require('../controllers/userController');
 
-
+router.get('/', getAllUsers); 
+router.get("/getAllUsersWithFinance",getAllUsersWithFinanceData)
 router.post('/register',createUser)
 router.post('/getUserByPhone',getUserByPhone);
 router.post('/checkPassword',checkUserPassword);
