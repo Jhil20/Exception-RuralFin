@@ -23,6 +23,7 @@ import DetailedExpenseReport from "../components/DetailedExpenseReport";
 import AgentDetails from "../components/AgentDetails";
 import AgentsViewMore from "../components/AgentsViewMore";
 import speak from "../utils/speak";
+import { getSocket } from "../utils/socket";
 
 const UserDashboard = () => {
   // const [isLoading, setIsLoading] = useState(true);
@@ -85,13 +86,24 @@ const UserDashboard = () => {
     if (token) return jwtDecode(token);
     return null;
   }, [token]);
+  const socket=getSocket(decoded?.id);
+  useEffect(()=>{
+    socket.on("money-received-by-receiver",(data)=>{
+      setTransactionData((prev) => [
+        ...prev,
+        data.transaction,
+      ]);
+      toast.success(`₹${data?.transaction?.amount} received from  ${capitalize(data?.transaction?.senderId?.firstName)} ${capitalize(data?.transaction?.senderId?.lastName)}`);
+      getTransactions();
+    })
+  },[])
 
   useEffect(() => {
     if (transactionSuccess) {
       setTransactionSuccess(false);
       toast.success("Transaction successful");
       
-      speak("Transaction successful");
+      // speak("Transaction successful");
 
       getUserData();
     }
@@ -151,7 +163,7 @@ const UserDashboard = () => {
 
   useEffect(() => {
     getTransactions();
-  }, [transactionSuccess]);
+  }, []);
 
   return isLoading ? (
     <Loader />

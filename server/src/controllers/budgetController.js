@@ -201,7 +201,7 @@ const getBudgetByUserId = async (req, res) => {
 const updateBudgetSpending = async (req, res) => {
   try{
     const { userId, category, amount } = req.body;
-    console.log("updateBudgetSpending", req.body);
+    // console.log("updateBudgetSpending", req.body);
 
     // Validate required fields
     if (!userId || !category || !amount) {
@@ -257,7 +257,7 @@ const getAllBudgetsOfThisYearByUserId = async (req, res) => {
     });
 
 
-    console.log("budgets", budgets);
+    // console.log("budgets", budgets);
 
     if (!budgets || budgets.length === 0) {
       return res

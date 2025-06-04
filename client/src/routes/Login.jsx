@@ -5,14 +5,12 @@ import {
   PersonStanding,
   Phone,
   Lock,
-  Presentation,
   ArrowLeftIcon,
   Eye,
   EyeOff,
 } from "lucide-react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import Header from "../components/Header";
 import { auth } from "../firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import axios from "axios";
@@ -20,11 +18,13 @@ import { BACKEND_URL } from "../utils/constants";
 import { ToastContainer, toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
-// import Cookie from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 import { SignedIn } from "../redux/slices/isSignInSlice";
 import capitalize from "../utils/capitalize";
+import { createSocket } from "../utils/socket";
+import { socketConnected } from "../redux/slices/socketSlice";
+
 
 const Login = () => {
   const [firebaseError, setFirebaseError] = useState("");
@@ -109,7 +109,7 @@ const Login = () => {
           values
         );
         console.log("Response from server for password check:", response2);
-        if(!response2?.data?.success) {
+        if (!response2?.data?.success) {
           toast.error("Incorrect Password or Phone Number.");
           setSubmitting(false);
           return;
@@ -219,13 +219,18 @@ const Login = () => {
       const user = result.user;
 
       console.log("User verified successfully:", user);
-
+      const token=Cookies.get("token");
+      const decoded = jwtDecode(token);
+      const socket=createSocket(decoded.id);
+      dispatch(socketConnected());
+      console.log("Socket connected:", socket.id);
       toast.success("OTP verified successfully!");
       setTimeout(() => {
         dispatch(SignedIn());
         if (whatRole === "user") {
           navigate("/dashboard");
         } else if (whatRole === "agent") {
+          dispatch(SignedIn());
           navigate("/agentDashboard");
         } else {
           navigate("/adminDashboard");
@@ -368,7 +373,6 @@ const Login = () => {
 
   return (
     <div className="min-h-[90.8vh] bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col">
-
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 ">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
@@ -459,7 +463,10 @@ const Login = () => {
                         Password
                       </label>
                       <div className="relative rounded-md shadow-sm">
-                        <div onClick={()=>setShowPassword(!showPassword)} className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                        <div
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 left-0 pl-3 flex items-center"
+                        >
                           {showPassword ? (
                             <EyeOff className="h-5 w-5 text-gray-600 cursor-pointer" />
                           ) : (

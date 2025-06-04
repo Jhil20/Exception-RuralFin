@@ -125,19 +125,19 @@ const transferFunds = async (req, res) => {
       senderFinance.balance -= amount;
       await senderFinance.save({ session });
       isDebitSuccessful = true;
-      console.log("Debit successful");
+      // console.log("Debit successful");
       // Credit receiverFinance
       receiverFinance.balance += amount;
       await receiverFinance.save({ session });
       isCreditSuccessful = true;
-      console.log("Credit successful");
+      // console.log("Credit successful");
       // Mark transaction as completed
       transaction.status = "completed";
       await transaction.save({ session });
-      console.log("Transaction marked as completed");
+      // console.log("Transaction marked as completed");
       await session.commitTransaction();
       session.endSession();
-      console.log("Transaction committed successfully");
+      // console.log("Transaction committed successfully");
       return res
         .status(200)
         .json({ success: true, message: "Transaction completed successfully" });
@@ -148,14 +148,14 @@ const transferFunds = async (req, res) => {
       if (isDebitSuccessful) {
         senderFinance.balance += amount;
         await senderFinance.save({ session });
-        console.log("Debit rolled back");
+        // console.log("Debit rolled back");
       }
 
       // Rollback Credit
       if (isCreditSuccessful) {
         receiverFinance.balance -= amount;
         await receiverFinance.save({ session });
-        console.log("Credit rolled back");
+        // console.log("Credit rolled back");
       }
 
       throw innerError; // Propagate the error to the main catch block
@@ -261,7 +261,7 @@ const withdrawFunds = async (req, res) => {
 
   try {
     const { userId, amount, agentId, trId, commission } = req.body;
-    console.log("Withdraw Funds Request:", req.body);
+    // console.log("Withdraw Funds Request:", req.body);
     if (!userId || !amount) {
       return res
         .status(400)
@@ -269,7 +269,7 @@ const withdrawFunds = async (req, res) => {
     }
 
     const finance = await Finance.findOne({ userId }).session(session);
-    console.log("Finance record found:", finance);
+    // console.log("Finance record found:", finance);
     if (!finance) {
       return res
         .status(404)
@@ -285,7 +285,7 @@ const withdrawFunds = async (req, res) => {
 
     finance.balance -= val;
     await finance.save({ session });
-    console.log("Finance balance updated:", finance.balance);
+    // console.log("Finance balance updated:", finance.balance);
 
     const agentUpdate = await Agent.findByIdAndUpdate(
       agentId,
@@ -297,7 +297,7 @@ const withdrawFunds = async (req, res) => {
       },
       { new: true, session }
     );
-    console.log("Agent update:", agentUpdate);
+    // console.log("Agent update:", agentUpdate);
     if (!agentUpdate) {
       return res
         .status(404)
@@ -308,7 +308,7 @@ const withdrawFunds = async (req, res) => {
       { status: "completed", transactionDate: new Date() },
       { new: true, session }
     );
-    console.log("Transaction update:", transactionUpdate);
+    // console.log("Transaction update:", transactionUpdate);
 
     if (!transactionUpdate) {
       return res

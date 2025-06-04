@@ -67,14 +67,14 @@ const getUserById = async (req, res) => {
 const getFavouritesByUserId = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("Fetching favourites for user ID:", id);
+    // console.log("Fetching favourites for user ID:", id);
     const userFavoruites = await User.findById(id).populate("favourites");
     if (!userFavoruites) {
       return res
         .status(404)
         .json({ message: "User not found", success: false });
     }
-    console.log("User favourites found:", userFavoruites);
+    // console.log("User favourites found:", userFavoruites);
     return res.status(200).json({
       message: "Favourites fetched successfully",
       success: true,
@@ -88,9 +88,9 @@ const getFavouritesByUserId = async (req, res) => {
 const checkUserPassword = async (req, res) => {
   try {
     const { phoneNumber, role, password } = req.body;
-    console.log("userId", phoneNumber);
-    console.log("role", role);
-    console.log("password", password);
+    // console.log("userId", phoneNumber);
+    // console.log("role", role);
+    // console.log("password", password);
 
     const user = await User.findOne({ phone: phoneNumber, role: role });
     if (!user) {
@@ -144,9 +144,9 @@ const getUserByPhone = async (req, res) => {
 const checkValidRuralFinId = async (req, res) => {
   try {
     const id = req.params.id;
-    console.log("id", id);
+    // console.log("id", id);
     const user = await User.findOne({ ruralFinId: id });
-    console.log("user", user);
+    // console.log("user", user);
     if (!user) {
       return res
         .status(404)
@@ -163,8 +163,8 @@ const checkValidRuralFinId = async (req, res) => {
 const addFavouriteToUserById = async (req, res) => {
   try {
     const { userId, ruralFinId } = req.body;
-    console.log("userId", userId);
-    console.log("ruralFinId", ruralFinId);
+    // console.log("userId", userId);
+    // console.log("ruralFinId", ruralFinId);
 
     if (!userId) {
       return res
@@ -173,7 +173,7 @@ const addFavouriteToUserById = async (req, res) => {
     }
 
     const user = await User.findById(userId);
-    console.log("user", user);
+    // console.log("user", user);
 
     if (!user) {
       return res
@@ -189,7 +189,7 @@ const addFavouriteToUserById = async (req, res) => {
     }
 
     const userFavourites = user.favourites || [];
-    console.log("userFavourites", userFavourites);
+    // console.log("userFavourites", userFavourites);
 
     const isAlreadyFavourite = userFavourites.some((id) =>
       id.equals(favouriteUser._id)
@@ -204,7 +204,7 @@ const addFavouriteToUserById = async (req, res) => {
     user.favourites.push(favouriteUser._id);
     const updatedUser = await user.save();
 
-    console.log("updatedUser", updatedUser);
+    // console.log("updatedUser", updatedUser);
 
     return res.status(200).json({
       message: "User updated successfully",
@@ -275,7 +275,7 @@ const createUser = async (req, res) => {
       setTimeout(async () => {
         try {
           await allocateRuralFinId(user._id);
-          console.log("Retry allocation success");
+          // console.log("Retry allocation success");
         } catch (retryErr) {
           console.error("Retry allocation still failed:", retryErr);
           await User.findByIdAndDelete(user._id);

@@ -29,12 +29,18 @@ const createUserToUserTransaction = async (req, res) => {
         .json({ message: "Receiver not found", success: false });
     }
 
-    const transaction = await UserToUserTransaction.create({
+    const transactionCreated = await UserToUserTransaction.create({
       senderId,
       receiverId: receiver._id,
       amount,
       remarks,
     });
+
+    const transaction = await UserToUserTransaction.findById(
+      transactionCreated._id
+    )
+      .populate("senderId")
+      .populate("receiverId");
 
     if (!transaction) {
       return res
@@ -66,7 +72,7 @@ const updateStatus = async (req, res) => {
     }
     transaction.status = status;
     await transaction.save();
-    console.log("Transaction updated", transaction);
+    // console.log("Transaction updated", transaction);
     return res
       .status(200)
       .json({ message: "Transaction updated", success: true, transaction });
@@ -211,7 +217,14 @@ const getAllTransactionsByCategory = async (req, res) => {
     const selectedYear = req.body.selectedYear;
     const startOfMonth = new Date(selectedYear, selectedMonth, 1);
     const startOfNextMonth = new Date(selectedYear, selectedMonth + 1, 1);
-    console.log("startOfMonth", startOfMonth, "startOfNextMonth",userId, startOfNextMonth,selectedMonth);
+    // console.log(
+    //   "startOfMonth",
+    //   startOfMonth,
+    //   "startOfNextMonth",
+    //   userId,
+    //   startOfNextMonth,
+    //   selectedMonth
+    // );
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ error: "Invalid user ID" });
     }
@@ -221,7 +234,7 @@ const getAllTransactionsByCategory = async (req, res) => {
       transactionDate: { $gte: startOfMonth, $lt: startOfNextMonth },
       remarks: category,
     }).populate("receiverId");
-    console.log("transactions", transactions);
+    // console.log("transactions", transactions);
 
     if (!transactions) {
       return res

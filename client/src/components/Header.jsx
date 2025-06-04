@@ -6,6 +6,8 @@ import { useDispatch } from "react-redux";
 import { NotSignedIn, SignedIn } from "../redux/slices/isSignInSlice";
 import Cookies from "js-cookie";
 import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
+import { disconnectSocket, getSocket } from "../utils/socket";
+import { jwtDecode } from "jwt-decode";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -20,6 +22,7 @@ const Header = () => {
     if (Cookies.get("token")) {
       Cookies.remove("token");
     }
+    disconnectSocket();
     dispatch(NotSignedIn());
     navigate("/home");
     dispatch(hideLoader());

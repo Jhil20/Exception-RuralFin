@@ -17,6 +17,7 @@ import { toast, ToastContainer } from "react-toastify";
 import capitalize from "../utils/capitalize";
 import { auth } from "../firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { getSocket } from "../utils/socket";
 
 export const SendMoney = ({ showSend, user, finance, toastControl }) => {
   const [step, setStep] = useState("form");
@@ -295,6 +296,10 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
         );
         console.log("response of budget update", response2);
       }
+      const socket = getSocket(user._id);
+      socket.emit("money-sent-by-sender", {
+        transaction: transactionCreated,
+      });
       setTransactionSuccess(true);
       setStep("form");
       setSelectedUser(null);

@@ -32,9 +32,9 @@ const getAgentById = async (req, res) => {
 const checkAgentPassword = async (req, res) => {
   try {
     const { phoneNumber, role, password } = req.body;
-    console.log("userId", phoneNumber);
-    console.log("role", role);
-    console.log("password", password);
+    // console.log("userId", phoneNumber);
+    // console.log("role", role);
+    // console.log("password", password);
 
     const agent = await Agent.findOne({ phone: phoneNumber, role: role });
     if (!agent) {

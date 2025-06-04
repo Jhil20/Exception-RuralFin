@@ -138,7 +138,7 @@ const createSystemSettings = async (req, res) => {
     const system = await SystemSettings.create({
       updatedBy: "683c1fa1ba1ad62f40a22554",
     });
-    console.log("system settings created", system);
+    // console.log("system settings created", system);
     return res.status(201).json({
       success: true,
       data: system,
@@ -220,9 +220,9 @@ const createAdmin = async (req, res) => {
 const checkAdminPassword = async (req, res) => {
   try {
     const { phoneNumber, role, password } = req.body;
-    console.log("admin id", phoneNumber);
-    console.log("role", role);
-    console.log("password", password);
+    // console.log("admin id", phoneNumber);
+    // console.log("role", role);
+    // console.log("password", password);
 
     const admin = await Admin.findOne({ phone: phoneNumber, role: role });
     if (!admin) {

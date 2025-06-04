@@ -108,7 +108,7 @@ const createAgentToUserTransaction = async (req, res) => {
 const updateAgentToUserTransactionStatus = async (req, res) => {
   try {
     const { status, trId } = req.body;
-    console.log("Updating transaction status", { status, trId });
+    // console.log("Updating transaction status", { status, trId });
     const transaction = await AgentToUserTransaction.findByIdAndUpdate(
       trId,
       { status },
