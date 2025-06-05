@@ -27,6 +27,8 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { BACKEND_URL } from "../utils/constants";
 import { toast } from "react-toastify";
+import speak from "../utils/speak";
+import { getSocket } from "../utils/socket";
 
 const AgentDetails = ({
   showAgentDetails,
@@ -88,6 +90,74 @@ const AgentDetails = ({
     return masked;
   };
 
+  useEffect(() => {
+    const socket = getSocket();
+    const handler = (data) => {
+      if (data?.transaction?.agentId?._id === selectedAgent?._id) {
+        // console.log("New transaction received:", data.transaction);
+        setAllTransactions((prev) => [data.transaction, ...prev]);
+        setFilteredTransactions((prev) => [data.transaction, ...prev]);
+      }
+    };
+
+    const handler2 = (data) => {
+      // console.log(
+      //   "wwwwwwwwwwwwwwwwwwwwww",
+      //   data.agentId?._id,
+      //   selectedAgent?._id
+      // );
+      if (data?.agentId?._id === selectedAgent?._id) {
+        // console.log("Transaction accepted:", data);
+        setAllTransactions((prev) =>
+          prev.map((transaction) =>
+            transaction._id === data._id
+              ? { ...transaction, status: "accepted" }
+              : transaction
+          )
+        );
+        setFilteredTransactions((prev) =>
+          prev.map((transaction) =>
+            transaction._id === data._id
+              ? { ...transaction, status: "accepted" }
+              : transaction
+          )
+        );
+
+        getAllTransactions();
+      }
+    };
+
+    const handler3 = (data) => {
+      if (data?.agentId?._id === selectedAgent?._id) {
+        console.log("Transaction rejected:", data);
+        setAllTransactions((prev) =>
+          prev.map((transaction) =>
+            transaction._id === data._id
+              ? { ...transaction, status: "rejected" }
+              : transaction
+          )
+        );
+        setFilteredTransactions((prev) =>
+          prev.map((transaction) =>
+            transaction._id === data._id
+              ? { ...transaction, status: "rejected" }
+              : transaction
+          )
+        );
+
+        getAllTransactions();
+      }
+    };
+    socket.on("newUserAgentTransactionSent", handler);
+    socket.on("UserAgentRequestAcceptedBackend", handler2);
+    socket.on("UserAgentRequestRejectedBackend", handler3);
+    return () => {
+      socket.off("UserAgentRequestAcceptedBackend", handler2);
+      socket.off("newUserAgentTransactionSent", handler);
+      socket.off("UserAgentRequestRejectedBackend", handler3);
+    };
+  }, []);
+
   const getUser = async () => {
     try {
       console.log("Fetching user data for ID:", decoded.id);
@@ -123,7 +193,7 @@ const AgentDetails = ({
       agentId: selectedAgent._id,
       userId: decoded.id,
       amount: parseFloat(values.amount),
-      commission: calculateAgentCommission(values.amount,settings),
+      commission: calculateAgentCommission(values.amount, settings),
       conversionType:
         transactionType == "deposit" ? "cashToERupees" : "eRupeesToCash",
       notes: values.notes || "",
@@ -141,10 +211,18 @@ const AgentDetails = ({
       const result = await axios.get(
         `${BACKEND_URL}/api/user/getTodayAgentTransactionAmount/${decoded.id}`
       );
-      console.log("Today's agent transaction amount:", result.data,amount,settings);
+      // console.log(
+      //   "Today's agent transaction amount:",
+      //   result.data,
+      //   amount,
+      //   settings
+      // );
       const transactionsAmount = result.data.data.today || 0;
       if (transactionsAmount + values.amount > settings?.maxDailyLimit) {
         toast.error(
+          `You can only Deposit/Withdraw upto ₹${settings?.maxDailyLimit} per day`
+        );
+        speak(
           `You can only Deposit/Withdraw upto ₹${settings?.maxDailyLimit} per day`
         );
         return;
@@ -152,9 +230,15 @@ const AgentDetails = ({
         toast.error(
           `Minimum Deposit/WithDraw amount is ₹${settings?.minTransactionAmount}`
         );
+        speak(
+          `Minimum Deposit/WithDraw amount is ₹${settings?.minTransactionAmount}`
+        );
         return;
       } else if (values.amount > settings?.maxTransactionAmount) {
         toast.error(
+          `Maximum Deposit/Withdraw amount is ₹${settings?.maxTransactionAmount}`
+        );
+        speak(
           `Maximum Deposit/Withdraw amount is ₹${settings?.maxTransactionAmount}`
         );
         return;
@@ -165,12 +249,19 @@ const AgentDetails = ({
         toast.error(
           `You can only Deposit/Withdraw upto ₹${settings?.maxWeeklyLimit} per week`
         );
+        speak(
+          `You can only Deposit/Withdraw upto ₹${settings?.maxWeeklyLimit} per week`
+        );
         return;
       }
       const response = await axios.post(
         `${BACKEND_URL}/api/agentToUserTransaction/`,
         data
       );
+      const socket = getSocket();
+      socket.emit("newUserAgentTransactionRequest", {
+        transaction: response.data.transaction,
+      });
       console.log(
         "response of creating agent to user transactions",
         response.data
@@ -178,9 +269,11 @@ const AgentDetails = ({
       toast.success(
         `${
           transactionType === "deposit" ? "Deposit" : "Withdrawal"
-        } request successful!`
+        } request sent successful!`
       );
       resetForm();
+      setSelectedAgent(null);
+      setShowAgentDetails(false);
     } catch (error) {
       console.error("Error creating agent to user transaction:", error);
     }
@@ -628,7 +721,10 @@ const AgentDetails = ({
                               type="text"
                               name="commission"
                               id="commission"
-                              value={calculateAgentCommission(values.amount,settings)}
+                              value={calculateAgentCommission(
+                                values.amount,
+                                settings
+                              )}
                               className="block w-full text-gray-500 pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:border-black transition-all duration-200"
                               placeholder="0.00"
                               disabled

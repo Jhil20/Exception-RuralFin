@@ -18,6 +18,7 @@ import capitalize from "../utils/capitalize";
 import { auth } from "../firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { getSocket } from "../utils/socket";
+import speak from "../utils/speak";
 
 export const SendMoney = ({ showSend, user, finance, toastControl }) => {
   const [step, setStep] = useState("form");

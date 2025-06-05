@@ -1,19 +1,77 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import UserDashboard from "./routes/UserDashboard";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Loader from "./components/Loader";
 import ScrollToTop from "./components/ScrollToTop";
 import Header from "./components/Header";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import { jwtDecode } from "jwt-decode";
+import Cookies from "js-cookie";
+import { createSocket, getSocket } from "./utils/socket";
+import speak from "./utils/speak";
+import capitalize from "./utils/capitalize";
 
 function App() {
   const isLoading = useSelector((state) => state.loading.isLoading);
+  const dispatch = useDispatch();
+  const [decoded, setDecoded] = useState(null);
+  useEffect(() => {
+    const token = Cookies.get("token");
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      setDecoded(decodedToken);
+      const socket = createSocket(decodedToken.id);
+      console.log("Socket created for user:", decodedToken.id);
+    }
+  }, []);
 
-  // return <>{isLoading ? <Loader /> :<>
-  // <ScrollToTop />
-  // <Outlet />
-  // </> }</>;
+  useEffect(() => {
+    if (!decoded) return;
+    const socket = getSocket();
+    const handler1 = (data) => {
+      console.log("User Agent Request Accepted:", data);
+      if (data.userId._id == decoded.id) {
+        toast.success(
+          `Your ${
+            data.conversionType == "cashToERupees"
+              ? "cash to eRupees"
+              : "eRupees to cash"
+          } request has been accepted by ${capitalize(
+            data.agentId.firstName
+          )} ${capitalize(data.agentId.lastName)}`
+        );
+      }
+    };
+
+    const handler2 = (data) => {
+      console.log("User Agent Request Rejected:", data);
+      if (data.userId._id == decoded.id) {
+        toast.error(
+          `Your ${
+            data.conversionType == "cashToERupees"
+              ? "cash to eRupees"
+              : "eRupees to cash"
+          } request has been rejected by ${capitalize(
+            data.agentId.firstName
+          )} ${capitalize(data.agentId.lastName)}`
+        );
+      }
+      
+    }
+    if (socket) {
+      socket.on("UserAgentRequestAcceptedBackend", handler1);
+      socket.on("UserAgentRequestRejectedBackend",handler2)
+    }
+
+    return () => {
+      socket.off("UserAgentRequestAcceptedBackend", handler1);
+      socket.off("UserAgentRequestRejectedBackend", handler2);
+    };
+  }, [decoded]);
+
+ 
+
   return (
     <>
       <Header />

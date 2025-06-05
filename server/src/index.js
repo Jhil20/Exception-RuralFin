@@ -41,19 +41,50 @@ app.use(express.urlencoded({ extended: true }));
 let onlineUsers = {};
 
 io.on("connection", (socket) => {
-  // console.log("New client connected", socket.id);
   socket.on("join", (userId) => {
+    if (!userId) return console.error("User ID is required to join the socket");
     onlineUsers[userId] = socket.id;
     console.log(`User ${userId} connected with socket id: ${socket.id}`);
-    // console.log("Online users:", onlineUsers);
+    console.log("Online users after connection:", onlineUsers);
   });
 
-  socket.on("money-sent-by-sender",(data)=>{
-    const receiverId=data.transaction.receiverId._id;
-    console.log("Money sent by sender:",receiverId);
+  socket.on("money-sent-by-sender", (data) => {
+    const receiverId = data.transaction.receiverId._id;
+    const senderId = data.transaction.senderId._id;
+    // console.log("Money sent by sender:", receiverId, senderId);
     const receiverSocketId = onlineUsers[receiverId];
-    io.to(receiverSocketId).emit("money-received-by-receiver", data);
-  })
+    const senderSocketId = onlineUsers[senderId];
+    io.to([receiverSocketId, senderSocketId]).emit(
+      "money-received-by-receiver",
+      data
+    );
+  });
+
+  socket.on("newUserAgentTransactionRequest", (data) => {
+    const userIdSocketId = onlineUsers[data.transaction.userId._id];
+    const agentIdSocketId = onlineUsers[data.transaction.agentId._id];
+
+    io.to([userIdSocketId, agentIdSocketId]).emit(
+      "newUserAgentTransactionSent",
+      data
+    );
+  });
+
+  socket.on("UserAgentRequestAccepted", (data) => {
+    // console.log("User Agent Request Accepted:", data);
+    const userIdSocketId = onlineUsers[data.userId._id];
+    // console.log(
+    // "User Agent Request Accepted:",
+    // userIdSocketId
+    // );
+    io.to(userIdSocketId).emit("UserAgentRequestAcceptedBackend", data);
+  });
+
+  socket.on("UserAgentRequestRejected", (data) => {
+    const userIdSocketId = onlineUsers[data.userId._id];
+    console.log("User Agent Request Rejected:", data);
+    io.to(userIdSocketId).emit("UserAgentRequestRejectedBackend", data);
+  });
 
   socket.on("disconnect", () => {
     // console.log(`Client disconnected: ${socket.id}`);
@@ -66,9 +97,7 @@ io.on("connection", (socket) => {
     }
     console.log("Online users after disconnect:", onlineUsers);
   });
-})
-
-
+});
 
 app.use("/api/user", userRoutes);
 app.use("/api/agent", agentRoutes);

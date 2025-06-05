@@ -86,23 +86,48 @@ const UserDashboard = () => {
     if (token) return jwtDecode(token);
     return null;
   }, [token]);
-  const socket=getSocket(decoded?.id);
-  useEffect(()=>{
-    socket.on("money-received-by-receiver",(data)=>{
-      setTransactionData((prev) => [
-        ...prev,
-        data.transaction,
-      ]);
-      toast.success(`₹${data?.transaction?.amount} received from  ${capitalize(data?.transaction?.senderId?.firstName)} ${capitalize(data?.transaction?.senderId?.lastName)}`);
+  const socket = getSocket(decoded?.id);
+  useEffect(() => {
+    const handler = (data) => {
+      setTransactionData((prev) => [...prev, data.transaction]);
+      if (data?.transaction?.senderId._id === decoded.id) {
+        toast.success(
+          `₹${data?.transaction?.amount} sent to  ${capitalize(
+            data?.transaction?.receiverId?.firstName
+          )} ${capitalize(data?.transaction?.receiverId?.lastName)}`
+        );
+        speak(
+          `₹${data?.transaction?.amount} sent to  ${capitalize(
+            data?.transaction?.receiverId?.firstName
+          )} ${capitalize(data?.transaction?.receiverId?.lastName)}`
+        );
+      } else {
+        toast.success(
+          `₹${data?.transaction?.amount} received from  ${capitalize(
+            data?.transaction?.senderId?.firstName
+          )} ${capitalize(data?.transaction?.senderId?.lastName)}`
+        );
+        speak(
+          `₹${data?.transaction?.amount} received from  ${capitalize(
+            data?.transaction?.senderId?.firstName
+          )} ${capitalize(data?.transaction?.senderId?.lastName)}`
+        );
+      }
       getTransactions();
-    })
-  },[])
+    };
+
+    socket.on("money-received-by-receiver", handler);
+
+    return () => {
+      socket.off("money-received-by-receiver", handler);
+    };
+  }, []);
 
   useEffect(() => {
     if (transactionSuccess) {
       setTransactionSuccess(false);
       toast.success("Transaction successful");
-      
+
       // speak("Transaction successful");
 
       getUserData();

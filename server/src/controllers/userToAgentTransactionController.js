@@ -5,7 +5,7 @@ const getAllTransactionsByAgentId = async (req, res) => {
     const { id } = req.params;
     const transactions = await AgentToUserTransaction.find({
       agentId: id,
-    }).populate("userId");
+    }).populate("userId").populate("agentId");
     if (!transactions) {
       return res
         .status(404)
@@ -78,7 +78,7 @@ const createAgentToUserTransaction = async (req, res) => {
   try {
     const { agentId, userId, amount, commission, conversionType, notes } =
       req.body;
-    const transaction = await AgentToUserTransaction.create({
+    const transactionCreated = await AgentToUserTransaction.create({
       agentId,
       userId,
       amount,
@@ -86,6 +86,9 @@ const createAgentToUserTransaction = async (req, res) => {
       conversionType,
       notes,
     });
+    const transaction = await AgentToUserTransaction.findById(
+      transactionCreated._id
+    ).populate("agentId").populate("userId");
     if (!transaction) {
       return res
         .status(400)
@@ -108,12 +111,11 @@ const createAgentToUserTransaction = async (req, res) => {
 const updateAgentToUserTransactionStatus = async (req, res) => {
   try {
     const { status, trId } = req.body;
-    // console.log("Updating transaction status", { status, trId });
     const transaction = await AgentToUserTransaction.findByIdAndUpdate(
       trId,
       { status },
       { new: true }
-    );
+    ).populate("agentId").populate("userId");
     if (!transaction) {
       return res
         .status(404)

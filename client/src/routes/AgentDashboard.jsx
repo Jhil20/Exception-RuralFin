@@ -1,15 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Filter, BadgeCheck } from "lucide-react";
 import {
   IndianRupee,
-  Users,
   Clock,
   CheckCircle,
   XCircle,
-  Bell,
   Wallet,
-  ArrowUpRight,
-  ArrowDownRight,
   Info,
 } from "lucide-react";
 import axios from "axios";
@@ -18,6 +14,10 @@ import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import useAuth from "../utils/useAuth";
 import capitalize from "../utils/capitalize";
+import { getSocket } from "../utils/socket";
+import { toast } from "react-toastify";
+import speak from "../utils/speak";
+import { useDispatch } from "react-redux";
 
 const AgentDashboard = () => {
   useAuth();
@@ -26,16 +26,6 @@ const AgentDashboard = () => {
   const [agentData, setAgentData] = useState({});
   const [activeFilter, setActiveFilter] = useState("all");
   const [filteredTransactions, setFilteredTransactions] = useState([]);
-
-  const stats = {
-    availableBalance: 7500,
-    todaysTransactions: 24,
-    commissionEarned: 450,
-    securityBond: 10000,
-    bondCompletion: 35,
-    bondStartDate: "2024-10-15",
-    bondEndDate: "2025-04-15",
-  };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString("en-IN", {
@@ -47,12 +37,58 @@ const AgentDashboard = () => {
     });
   };
 
-  const calculateDaysRemaining = () => {
-    const endDate = new Date(stats.bondEndDate);
-    const today = new Date();
-    const diffTime = endDate.getTime() - today.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  };
+  const dispatch = useDispatch();
+
+  const socket = getSocket();
+  useEffect(() => {
+    const handler = (data) => {
+      setTransactionsDone((prevTransactions) => [
+        ...prevTransactions,
+        data.transaction,
+      ]);
+      console.log(
+        "New transaction receiveddddddddddddddddddddddd:",
+        data.transaction
+      );
+      if (activeFilter === "all") {
+        setFilteredTransactions((prevTransactions) => [
+          ...prevTransactions,
+          data.transaction,
+        ]);
+      } else {
+        if (data.transaction.status === activeFilter) {
+          setFilteredTransactions((prevTransactions) => [
+            ...prevTransactions,
+            data.transaction,
+          ]);
+        }
+      }
+      getTransactionsDone();
+      toast.success(
+        `New ${
+          data.transaction.conversionType === "cashToERupees"
+            ? "Deposit"
+            : "Withdrawal"
+        } request received from ${capitalize(
+          data.transaction.userId.firstName
+        )} ${capitalize(data.transaction.userId.lastName)}`
+      );
+      speak(
+        `New ${
+          data.transaction.conversionType === "cashToERupees"
+            ? "Deposit"
+            : "Withdrawal"
+        } request received from ${capitalize(
+          data.transaction.userId.firstName
+        )} ${capitalize(data.transaction.userId.lastName)}`
+      );
+    };
+
+    socket.on("newUserAgentTransactionSent", handler);
+    return () => {
+      socket.off("newUserAgentTransactionSent", handler);
+    };
+  }, []);
 
   const token = Cookies.get("token");
   const decoded = useMemo(() => {
@@ -69,11 +105,11 @@ const AgentDashboard = () => {
 
   const getAgentData = async () => {
     try {
-      console.log("Decoded token:", decoded, token);
+      // console.log("Decoded token:", decoded, token);
       const response = await axios.get(
         `${BACKEND_URL}/api/agent/${decoded.id}`
       );
-      console.log("Agent data:", response.data);
+      // console.log("Agent data:", response.data);
       setAgentData(response?.data?.agent);
     } catch (err) {
       console.error("Error fetching agent data:", err);
@@ -85,7 +121,7 @@ const AgentDashboard = () => {
       const response = await axios.get(
         `${BACKEND_URL}/api/agentToUserTransaction/${decoded.id}`
       );
-      console.log("Transactions data:", response.data);
+      // console.log("Transactions data:", response.data);
       setTransactionsDone(response?.data?.transactions);
       setFilteredTransactions(response?.data?.transactions);
     } catch (err) {
@@ -102,7 +138,38 @@ const AgentDashboard = () => {
           trId: transactionToReject?._id,
         }
       );
-      console.log("Transaction request rejected:", response.data);
+      const data = response.data.transaction;
+      console.log("Transaction request rejected:", data);
+
+      socket.emit("UserAgentRequestRejected", data);
+
+      // Update local transaction states
+      const updatedTransactions = transactionsDone.filter(
+        (tr) => tr._id !== data._id
+      );
+      setTransactionsDone([...updatedTransactions, data]);
+
+      const updatedFiltered = filteredTransactions.filter(
+        (tr) => tr._id !== data._id
+      );
+      if (activeFilter === "all" || data.status === activeFilter) {
+        setFilteredTransactions([...updatedFiltered, data]);
+      } else {
+        setFilteredTransactions(updatedFiltered);
+      }
+
+      // Show local toast
+      toast.success(
+        `${
+          transactionToReject?.conversionType == "cashToERupees"
+            ? "Deposit"
+            : "Withdrawal"
+        } request rejected for ${capitalize(
+          transactionToReject?.userId?.firstName
+        )} ${capitalize(transactionToReject?.userId?.lastName)}`
+      );
+
+      getTransactionsDone(); // Refresh
     } catch (err) {
       console.error("Error rejecting transaction request:", err);
     }
@@ -116,7 +183,39 @@ const AgentDashboard = () => {
           trId: transactionToAccept?._id,
         }
       );
-      console.log("Transaction request accepted:", response.data);
+
+      const data = response.data.transaction;
+      console.log("Transaction request accepted:", data);
+
+      socket.emit("UserAgentRequestAccepted", data);
+
+      // Update local transaction states
+      const updatedTransactions = transactionsDone.filter(
+        (tr) => tr._id !== data._id
+      );
+      setTransactionsDone([...updatedTransactions, data]);
+
+      const updatedFiltered = filteredTransactions.filter(
+        (tr) => tr._id !== data._id
+      );
+      if (activeFilter === "all" || data.status === activeFilter) {
+        setFilteredTransactions([...updatedFiltered, data]);
+      } else {
+        setFilteredTransactions(updatedFiltered);
+      }
+
+      // Show local toast
+      toast.success(
+        `${
+          transactionToAccept?.conversionType == "cashToERupees"
+            ? "Deposit"
+            : "Withdrawal"
+        } request accepted for ${capitalize(
+          transactionToAccept?.userId?.firstName
+        )} ${capitalize(transactionToAccept?.userId?.lastName)}`
+      );
+
+      getTransactionsDone(); // Refresh
     } catch (err) {
       console.error("Error accepting transaction request:", err);
     }
@@ -281,13 +380,14 @@ const AgentDashboard = () => {
                 <Wallet size={20} className="text-gray-800" />
               </div>
             </div>
-            
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md shadow-gray-300 hover:shadow-lg hover:shadow-black/40 transition-all duration-300">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-gray-600 font-normal">{monthsMapping[new Date().getMonth()+1]}'s Commission Earned</p>
+                <p className="text-gray-600 font-normal">
+                  {monthsMapping[new Date().getMonth() + 1]}'s Commission Earned
+                </p>
                 <p className="text-2xl font-bold mt-1">
                   ₹
                   {transactionsDone
@@ -307,7 +407,6 @@ const AgentDashboard = () => {
                 <IndianRupee size={20} className="text-gray-800" />
               </div>
             </div>
-            
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md shadow-gray-300 hover:shadow-lg hover:shadow-black/40 transition-all duration-300">
@@ -322,7 +421,6 @@ const AgentDashboard = () => {
                 <Clock size={20} className="text-gray-800" />
               </div>
             </div>
-            
           </div>
         </div>
 
@@ -441,8 +539,8 @@ const AgentDashboard = () => {
                           {transaction?.status === "accepted" && (
                             <span className="ml-4 text-sm bg-gray-100 border border-gray-200 font-medium flex text-gray-800 rounded-xl py-0.5 items-center px-4 ">
                               <Info size={16} className="mt-[0px] mr-1" /> Press
-                              the complete button only when the cash transaction
-                              with the user is successfull.
+                              complete button only when cash transaction with
+                              user is done.
                             </span>
                           )}
                         </div>
