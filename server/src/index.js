@@ -85,6 +85,12 @@ io.on("connection", (socket) => {
     console.log("User Agent Request Rejected:", data);
     io.to(userIdSocketId).emit("UserAgentRequestRejectedBackend", data);
   });
+  socket.on("UserAgentDepositCompleted", (data) => {
+    const userIdSocketId = onlineUsers[data.userId._id];
+    console.log("User Agent Deposit Completed:", data);
+    io.to(userIdSocketId).emit("UserAgentDepositCompletedBackend", data);
+    
+  });
 
   socket.on("disconnect", () => {
     // console.log(`Client disconnected: ${socket.id}`);

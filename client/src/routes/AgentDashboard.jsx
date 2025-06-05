@@ -236,6 +236,28 @@ const AgentDashboard = () => {
         }
       );
       console.log("Deposit transaction completed:", response.data);
+      const data = response.data.data;
+      socket.emit("UserAgentDepositCompleted", data);
+      setAgentData((prevData) => ({
+        ...prevData,
+        balance: prevData.balance + data.amount + data.commission,
+      }));
+      setTransactionsDone((prevTransactions) => {
+        const updatedTransactions = prevTransactions.filter(
+          (tr) => tr._id !== data._id
+        );
+        return [...updatedTransactions, data];
+      });
+      setFilteredTransactions((prevTransactions) => {
+        const updatedFiltered = prevTransactions.filter(
+          (tr) => tr._id !== data._id
+        );
+        if (activeFilter === "all" || data.status === activeFilter) {
+          return [...updatedFiltered, data];
+        } else {
+          return updatedFiltered;
+        }
+      });
     } catch (err) {
       console.error("Error completing deposit transaction request:", err);
     }

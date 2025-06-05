@@ -27,7 +27,7 @@ const getFinanceById = async (req, res) => {
 };
 
 const getfinanceByUserId = async (req, res) => {
-  try{
+  try {
     const { userId } = req.params;
     // console.log("Fetching finance record for userId:", userId);
     if (!userId) {
@@ -46,14 +46,14 @@ const getfinanceByUserId = async (req, res) => {
     return res
       .status(200)
       .json({ finance, message: "Finance record found", success: true });
-  }catch (error) {
+  } catch (error) {
     return res.status(500).json({
       message: "Error fetching finance record by userId",
       error,
       success: false,
     });
   }
-}
+};
 
 const transferFunds = async (req, res) => {
   const session = await mongoose.startSession();
@@ -221,6 +221,11 @@ const depositFunds = async (req, res) => {
         .status(404)
         .json({ message: "Transaction not found", success: false });
     }
+    const transaction = await userToAgentTransaction
+      .findById(trId)
+      .populate("userId")
+      .populate("agentId")
+      .session(session);
 
     const agentCommissionUpdate = await AgentCommission.updateOne(
       {
@@ -246,7 +251,11 @@ const depositFunds = async (req, res) => {
 
     return res
       .status(200)
-      .json({ success: true, message: "Funds deposited successfully" });
+      .json({
+        data: transaction,
+        success: true,
+        message: "Funds deposited successfully",
+      });
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -333,7 +342,6 @@ const withdrawFunds = async (req, res) => {
         .status(404)
         .json({ message: "Agent commission record not found", success: false });
     }
-
 
     await session.commitTransaction();
     session.endSession();

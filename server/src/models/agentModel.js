@@ -18,7 +18,6 @@ const agentSchema = new Schema(
     balance: { type: Number, default: 0 },
     ifscCode: { type: String, required: true },
     bankName: { type: String, required: true },
-    commissionEarned: { type: Number, default: 0 },
     transactionCount: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true },
     role: {

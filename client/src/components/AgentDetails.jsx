@@ -148,11 +148,34 @@ const AgentDetails = ({
         getAllTransactions();
       }
     };
+    const handler4 = (data) => {
+      if (data?.agentId?._id === selectedAgent?._id) {
+        console.log("Deposit completed:", data);
+        setAllTransactions((prev) =>
+          prev.map((transaction) =>
+            transaction._id === data._id
+              ? { ...transaction, status: "completed" }
+              : transaction
+          )
+        );
+        setFilteredTransactions((prev) =>
+          prev.map((transaction) =>
+            transaction._id === data._id
+              ? { ...transaction, status: "completed" }
+              : transaction
+          )
+        );
+
+        getAllTransactions();
+      }
+    };
     socket.on("newUserAgentTransactionSent", handler);
     socket.on("UserAgentRequestAcceptedBackend", handler2);
     socket.on("UserAgentRequestRejectedBackend", handler3);
+    socket.on("UserAgentDepositCompletedBackend", handler4);
     return () => {
       socket.off("UserAgentRequestAcceptedBackend", handler2);
+      socket.off("UserAgentDepositCompletedBackend", handler4);
       socket.off("newUserAgentTransactionSent", handler);
       socket.off("UserAgentRequestRejectedBackend", handler3);
     };
@@ -294,12 +317,6 @@ const AgentDetails = ({
     } catch (error) {
       console.error("Error fetching transactions:", error);
     }
-  };
-
-  const handleConfirm = () => {
-    console.log(`Processing ${transactionType} for amount: ₹${amount}`);
-    setAmount("");
-    setShowConfirmation(false);
   };
 
   const handleFilterChange = (filter) => {

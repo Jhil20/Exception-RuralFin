@@ -86,8 +86,9 @@ const UserDashboard = () => {
     if (token) return jwtDecode(token);
     return null;
   }, [token]);
-  const socket = getSocket(decoded?.id);
   useEffect(() => {
+    if (!decoded) return;
+    const socket = getSocket(decoded.id);
     const handler = (data) => {
       setTransactionData((prev) => [...prev, data.transaction]);
       if (data?.transaction?.senderId._id === decoded.id) {
@@ -116,12 +117,24 @@ const UserDashboard = () => {
       getTransactions();
     };
 
-    socket.on("money-received-by-receiver", handler);
+    const handler2 = (data) => {
+      console.log("deposit in user account user dahboard handler");
+      setUserFinance((prev) => ({
+        ...prev,
+        balance: data.amount - data.commission,
+      }));
+      setTransactionData((prev) => [...prev, data]);
+      getTransactions();
+      getUserData();
+    };
 
+    socket.on("money-received-by-receiver", handler);
+    socket.on("UserAgentDepositCompletedBackend", handler2);
     return () => {
+      socket.off("UserAgentDepositCompletedBackend", handler2);
       socket.off("money-received-by-receiver", handler);
     };
-  }, []);
+  }, [decoded]);
 
   useEffect(() => {
     if (transactionSuccess) {
