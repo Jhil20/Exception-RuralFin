@@ -62,6 +62,13 @@ io.on("connection", (socket) => {
         "money-received-by-receiver",
         data
       );
+      createNotification({
+        userType: "User",
+        userId: data.transaction.receiverId._id,
+        message: `You have received ₹${data.transaction.amount} from ${data.transaction.senderId.firstName} ${data.transaction.senderId.lastName}`,
+        type: "transaction",
+        read: true,
+      });
     } else {
       console.error("Receiver or Sender ID is missing in the transaction data");
       createNotification({
@@ -69,6 +76,7 @@ io.on("connection", (socket) => {
         userId: data.transaction.receiverId._id,
         message: `You have received ₹${data.transaction.amount} from ${data.transaction.senderId.firstName} ${data.transaction.senderId.lastName}`,
         type: "transaction",
+        read: false,
       });
     }
   });
@@ -81,6 +89,17 @@ io.on("connection", (socket) => {
         "newUserAgentTransactionSent",
         data
       );
+      createNotification({
+        userType: "Agent",
+        userId: data.transaction.agentId._id,
+        message: `You have received a new ${
+          data.conversionType == "cashToERupees" ? "deposit" : "withdrawal"
+        } request of ₹${data.transaction.amount} from ${
+          data.transaction.userId.firstName
+        } ${data.transaction.userId.lastName}`,
+        type: "transaction",
+        read: true,
+      });
     } else {
       console.error("User or Agent ID is missing in the transaction data");
       createNotification({
@@ -92,6 +111,7 @@ io.on("connection", (socket) => {
           data.transaction.userId.firstName
         } ${data.transaction.userId.lastName}`,
         type: "transaction",
+        read: false,
       });
     }
   });
@@ -106,6 +126,19 @@ io.on("connection", (socket) => {
     if (userIdSocketId) {
       io.to(userIdSocketId).emit("UserAgentRequestAcceptedBackend", data);
       console.log("io sent");
+      createNotification({
+        userType: "User",
+        userId: data.userId._id,
+        message: `Your ${
+          data.conversionType == "cashToERupees"
+            ? "cash to eRupees"
+            : "eRupees to cash"
+        } request of ₹${data.amount} has been accepted by ${
+          data.agentId.firstName
+        } ${data.agentId.lastName}`,
+        type: "transaction",
+        read: true,
+      });
     } else {
       console.error("User ID is missing in the request data");
       createNotification({
@@ -119,6 +152,7 @@ io.on("connection", (socket) => {
           data.agentId.firstName
         } ${data.agentId.lastName}`,
         type: "transaction",
+        read: false,
       });
     }
   });
@@ -128,6 +162,19 @@ io.on("connection", (socket) => {
     // console.log("User Agent Request Rejected:", data);
     if (userIdSocketId) {
       io.to(userIdSocketId).emit("UserAgentRequestRejectedBackend", data);
+      createNotification({
+        userType: "User",
+        userId: data.userId._id,
+        message: `Your ${
+          data.conversionType == "cashToERupees"
+            ? "cash to eRupees"
+            : "eRupees to cash"
+        } request of ₹${data.amount} has been rejected by ${
+          data.agentId.firstName
+        } ${data.agentId.lastName}`,
+        type: "transaction",
+        read: true,
+      });
     } else {
       console.error("User ID is missing in the request data");
       createNotification({
@@ -141,6 +188,7 @@ io.on("connection", (socket) => {
           data.agentId.firstName
         } ${data.agentId.lastName}`,
         type: "transaction",
+        read: false,
       });
     }
   });
@@ -150,7 +198,29 @@ io.on("connection", (socket) => {
     // console.log("User Agent Deposit Completed:", userIdSocketId);
     if (userIdSocketId) {
       io.to(userIdSocketId).emit("UserAgentDepositCompletedBackend", data);
-    }else{
+      createNotification({
+        userType: "User",
+        userId: data.userId._id,
+        message: `Your ${
+          data.conversionType == "cashToERupees"
+            ? "cash to eRupees"
+            : "eRupees to cash"
+        } request of ₹${data.amount} has been completed by ${
+          data.agentId.firstName
+        } ${data.agentId.lastName}`,
+        type: "transaction",
+        read: true,
+      });
+      createNotification({
+        userType: "User",
+        userId: data.userId._id,
+        message: `₹${
+          data.amount - data.commission
+        } has been deposited successfully`,
+        type: "transaction",
+        read: true,
+      });
+    } else {
       console.error("User ID is missing in the deposit data");
       createNotification({
         userType: "User",
@@ -163,12 +233,16 @@ io.on("connection", (socket) => {
           data.agentId.firstName
         } ${data.agentId.lastName}`,
         type: "transaction",
+        read: false,
       });
       createNotification({
         userType: "User",
         userId: data.userId._id,
-        message: `₹${data.amount - data.commission} has been deposited successfully`,
+        message: `₹${
+          data.amount - data.commission
+        } has been deposited successfully`,
         type: "transaction",
+        read: false,
       });
     }
     // console.log("io sent UserAgentDepositCompletedBackend");
@@ -177,10 +251,31 @@ io.on("connection", (socket) => {
   socket.on("UserAgentWithdrawCompleted", (data) => {
     const userIdSocketId = onlineUsers[data.userId._id];
     // console.log("User Agent Withdraw Completed:", userIdSocketId);
-    if( userIdSocketId){
-
+    if (userIdSocketId) {
       io.to(userIdSocketId).emit("UserAgentWithdrawCompletedBackend", data);
-    }else{
+      createNotification({
+        userType: "User",
+        userId: data.userId._id,
+        message: `Your ${
+          data.conversionType == "cashToERupees"
+            ? "cash to eRupees"
+            : "eRupees to cash"
+        } request of ₹${data.amount} has been completed by ${
+          data.agentId.firstName
+        } ${data.agentId.lastName}`,
+        type: "transaction",
+        read: true,
+      });
+      createNotification({
+        userType: "User",
+        userId: data.userId._id,
+        message: `₹${
+          data.amount + data.commission
+        } has been withdrawn successfully`,
+        type: "transaction",
+        read: true,
+      });
+    } else {
       console.error("User ID is missing in the withdraw data");
       createNotification({
         userType: "User",
@@ -193,12 +288,16 @@ io.on("connection", (socket) => {
           data.agentId.firstName
         } ${data.agentId.lastName}`,
         type: "transaction",
+        read: false,
       });
       createNotification({
         userType: "User",
         userId: data.userId._id,
-        message: `₹${data.amount + data.commission} has been withdrawn successfully`,
+        message: `₹${
+          data.amount + data.commission
+        } has been withdrawn successfully`,
         type: "transaction",
+        read: false,
       });
     }
     // console.log("io sent UserAgentWithdrawCompletedBackend");
@@ -224,7 +323,7 @@ app.use("/api/userToUserTransaction", userToUserTransactionRoutes);
 app.use("/api/budget", budgetRoutes);
 app.use("/api/agentToUserTransaction", agentToUserTransactionRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/notification",notificationRoutes)
+app.use("/api/notification", notificationRoutes);
 // server.js or app.js
 const serverStartTime = new Date();
 
