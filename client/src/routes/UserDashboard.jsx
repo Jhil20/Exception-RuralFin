@@ -24,7 +24,6 @@ import AgentDetails from "../components/AgentDetails";
 import AgentsViewMore from "../components/AgentsViewMore";
 import speak from "../utils/speak";
 import { getSocket } from "../utils/socket";
-
 const UserDashboard = () => {
   // const [isLoading, setIsLoading] = useState(true);
 
