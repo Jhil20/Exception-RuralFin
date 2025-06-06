@@ -3,7 +3,10 @@ import { io } from "socket.io-client";
 let socket = null;
 
 export const createSocket = (userId) => {
-  socket = io("http://localhost:5000", {
+  // socket = io("http://localhost:5000", {
+  //   transports: ["websocket"],
+  // });
+  socket = io("https://exception-ruralfin.onrender.com", {
     transports: ["websocket"],
   });
 
