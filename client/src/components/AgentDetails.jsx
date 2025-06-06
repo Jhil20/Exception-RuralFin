@@ -75,7 +75,7 @@ const AgentDetails = ({
   };
 
   const formatDateTime = (date) => {
-    return new Date(date).toLocaleString("en-US", {
+    return new Date(date)?.toLocaleString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -546,7 +546,7 @@ const AgentDetails = ({
                             Security Deposit
                           </label>
                           <p className="text-black font-medium">
-                            ₹{selectedAgent?.balance.toLocaleString("en-IN")}
+                            ₹{selectedAgent?.balance?.toLocaleString("en-IN")}
                           </p>
                         </div>
                       </div>
@@ -593,7 +593,7 @@ const AgentDetails = ({
                         </span>
                         <span className="text-black font-bold">
                           ₹
-                          {selectedAgent?.commissionEarned.toLocaleString(
+                          {selectedAgent?.commissionEarned?.toLocaleString(
                             "en-IN"
                           )}
                         </span>
@@ -613,7 +613,7 @@ const AgentDetails = ({
                         </span>
                         <span className="text-black font-bold">
                           ₹
-                          {selectedAgent?.balance.toLocaleString("en-IN") ||
+                          {selectedAgent?.balance?.toLocaleString("en-IN") ||
                             "0"}
                         </span>
                       </div>
@@ -626,7 +626,7 @@ const AgentDetails = ({
                         </span>
                         <span className="text-black font-bold">
                           ₹
-                          {selectedAgent?.securityDeposit.toLocaleString(
+                          {selectedAgent?.securityDeposit?.toLocaleString(
                             "en-IN"
                           ) || "0"}
                         </span>
@@ -999,7 +999,7 @@ const AgentDetails = ({
                               </div>
                               <div className="flex flex-col items-end">
                                 <span className="font-bold text-black">
-                                  ₹{transaction?.amount.toLocaleString("en-IN")}
+                                  ₹{transaction?.amount?.toLocaleString("en-IN")}
                                 </span>
                                 <span className="text-xs text-gray-500">
                                   Commission: ₹
@@ -1105,7 +1105,7 @@ const AgentDetails = ({
               <div className="flex justify-between mb-2">
                 <span className="text-gray-500">Amount:</span>
                 <span className="font-medium">
-                  ₹{parseFloat(amount || "0").toLocaleString("en-IN")}
+                  ₹{parseFloat(amount || "0")?.toLocaleString("en-IN")}
                 </span>
               </div>
               <div className="flex justify-between">
