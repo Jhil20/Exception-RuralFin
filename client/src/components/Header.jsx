@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Bell, Menu, Search, User, X } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Bell, BellIcon, Menu, Search, User, X } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
@@ -8,6 +8,9 @@ import Cookies from "js-cookie";
 import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
 import { disconnectSocket, getSocket } from "../utils/socket";
 import { jwtDecode } from "jwt-decode";
+import axios from "axios";
+import { BACKEND_URL } from "../utils/constants";
+
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -15,6 +18,8 @@ const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isSignedIn = useSelector((state) => state.signin.isSignedIn);
+  const [notifications, setNotifications] = useState([]);
+
   // console.log(location)
 
   const handleLogout = () => {
@@ -27,6 +32,28 @@ const Header = () => {
     navigate("/home");
     dispatch(hideLoader());
   };
+
+  const token = Cookies.get("token");
+  const decoded=jwtDecode(token);
+  const getNotifications=async()=>{
+    try{
+      if(decoded){
+        // console.log("IIIIIIIIIIIIIIIIII",decoded)
+        const type= location.pathname === "/dashboard" ? "User" : "Agent";
+        console.log("Fetching notifications for user:", decoded.id, "Type:", type);
+        const response=await axios.post(`${BACKEND_URL}/api/notification/getNotifications`,{
+          userId:decoded.id,
+          userType:type,
+        })
+        console.log("Notifications fetched:", response.data);
+      }
+    }catch(err){
+      console.error("Error fetching notifications:", err);
+    }
+  }
+  useEffect(()=>{
+    getNotifications();
+  },[decoded])
 
   return (
     <header className="bg-white border-b h-[9.1vh] border-gray-200 sticky w-full top-0 z-50 shadow-sm">
@@ -47,7 +74,7 @@ const Header = () => {
           {/* Desktop Navigation */}
           {location.pathname === "/dashboard" ||
           location.pathname === "/agentDashboard" ||
-          location.pathname==="/adminDashboard" ? (
+          location.pathname === "/adminDashboard" ? (
             <div></div>
           ) : (
             <nav className="hidden md:flex space-x-8">
@@ -132,20 +159,27 @@ const Header = () => {
 
           {/* Right Side Icons */}
           {isSignedIn ? (
-            <button
-              onClick={() => {
-                handleLogout();
-              }}
-              to={"/login"}
-              className="hidden md:flex items-center space-x-4"
-            >
-              <div className="flex cursor-pointer  hover:ring-2 hover:ring-gray-900 items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
-                <User size={18} />
-                <span className="text-sm font-medium text-gray-800">
-                  Logout
-                </span>
-              </div>
-            </button>
+            <div className="h-fit w-fit flex items-center space-x-6">
+              <button className="bg-gray-50 p-[6px] rounded-full text-gray-500 hover:ring-2 hover:ring-gray-600  hover:text-gray-700 hover:bg-gray-100 cursor-pointer focus:outline-none  transition-all duration-400">
+                
+                <div className=" absolute right-35 h-4 w-4 text-xs rounded-full bg-gray-600 text-white flex items-center justify-center top-3 ">
+                  {notifications.length}
+                </div>
+                <BellIcon size={24} className="pt-1" />
+              </button>
+              <button
+                onClick={() => {
+                  handleLogout();
+                }}
+                to={"/login"}
+                className="hidden md:flex items-center space-x-4"
+              >
+                <div className="flex cursor-pointer text-sm font-medium text-gray-600 hover:ring-2 hover:text-gray-700 hover:ring-gray-700 items-center space-x-2 bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
+                  <User size={18} />
+                  <span>Logout</span>
+                </div>
+              </button>
+            </div>
           ) : (
             <Link
               onClick={() => {

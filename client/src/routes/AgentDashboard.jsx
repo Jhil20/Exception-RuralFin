@@ -36,11 +36,17 @@ const AgentDashboard = () => {
       year: "numeric",
     });
   };
+  const token = Cookies.get("token");
+  const decoded = useMemo(() => {
+    if (token) {
+      return jwtDecode(token);
+    }
+    return null;
+  }, [token]);
 
-  const dispatch = useDispatch();
-
-  const socket = getSocket();
+  const socket = getSocket(decoded.id);
   useEffect(() => {
+    if (!decoded) return;
     const handler = (data) => {
       setTransactionsDone((prevTransactions) => [
         ...prevTransactions,
@@ -64,7 +70,7 @@ const AgentDashboard = () => {
         }
       }
       getTransactionsDone();
-      toast.success(
+      toast.info(
         `New ${
           data.transaction.conversionType === "cashToERupees"
             ? "Deposit"
@@ -84,19 +90,13 @@ const AgentDashboard = () => {
       );
     };
 
-    socket.on("newUserAgentTransactionSent", handler);
+    if (socket) {
+      socket.on("newUserAgentTransactionSent", handler);
+    }
     return () => {
       socket.off("newUserAgentTransactionSent", handler);
     };
   }, []);
-
-  const token = Cookies.get("token");
-  const decoded = useMemo(() => {
-    if (token) {
-      return jwtDecode(token);
-    }
-    return null;
-  }, [token]);
 
   useEffect(() => {
     getAgentData();
@@ -188,6 +188,7 @@ const AgentDashboard = () => {
       console.log("Transaction request accepted:", data);
 
       socket.emit("UserAgentRequestAccepted", data);
+      // console.log("Socket emitted UserAgentRequestAccepted");
 
       // Update local transaction states
       const updatedTransactions = transactionsDone.filter(
@@ -238,9 +239,10 @@ const AgentDashboard = () => {
       console.log("Deposit transaction completed:", response.data);
       const data = response.data.data;
       socket.emit("UserAgentDepositCompleted", data);
+      console.log("Socket emitted UserAgentDepositCompleted", data);
       setAgentData((prevData) => ({
         ...prevData,
-        balance: prevData.balance + data.amount + data.commission,
+        balance: prevData.balance - data.amount + data.commission,
       }));
       setTransactionsDone((prevTransactions) => {
         const updatedTransactions = prevTransactions.filter(
@@ -258,6 +260,11 @@ const AgentDashboard = () => {
           return updatedFiltered;
         }
       });
+      toast.success(
+        `Deposit request completed for ${capitalize(
+          data.userId.firstName
+        )} ${capitalize(data.userId.lastName)}`
+      );
     } catch (err) {
       console.error("Error completing deposit transaction request:", err);
     }
@@ -278,6 +285,34 @@ const AgentDashboard = () => {
         }
       );
       console.log("Withdrawal transaction completed:", response.data);
+      const data = response.data.data;
+      socket.emit("UserAgentWithdrawCompleted", data);
+      console.log("Socket emitted UserAgentWithdrawCompleted", data);
+      setAgentData((prevData) => ({
+        ...prevData,
+        balance: prevData.balance + data.amount + data.commission,
+      }));
+      setTransactionsDone((prevTransactions) => {
+        const updatedTransactions = prevTransactions.filter(
+          (tr) => tr._id !== data._id
+        );
+        return [...updatedTransactions, data];
+      });
+      setFilteredTransactions((prevTransactions) => {
+        const updatedFiltered = prevTransactions.filter(
+          (tr) => tr._id !== data._id
+        );
+        if (activeFilter === "all" || data.status === activeFilter) {
+          return [...updatedFiltered, data];
+        } else {
+          return updatedFiltered;
+        }
+      });
+      toast.success(
+        `Withdrawal request completed for ${capitalize(
+          data.userId.firstName
+        )} ${capitalize(data.userId.lastName)}`
+      );
     } catch (err) {
       console.error("Error completing withdrawal transaction request:", err);
     }

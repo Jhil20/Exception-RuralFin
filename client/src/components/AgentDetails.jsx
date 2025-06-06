@@ -91,12 +91,14 @@ const AgentDetails = ({
   };
 
   useEffect(() => {
-    const socket = getSocket();
+    if (!decoded) return;
+    const socket = getSocket(decoded?.id);
     const handler = (data) => {
       if (data?.transaction?.agentId?._id === selectedAgent?._id) {
         // console.log("New transaction received:", data.transaction);
         setAllTransactions((prev) => [data.transaction, ...prev]);
         setFilteredTransactions((prev) => [data.transaction, ...prev]);
+        getAllTransactions();
       }
     };
 
@@ -169,17 +171,19 @@ const AgentDetails = ({
         getAllTransactions();
       }
     };
-    socket.on("newUserAgentTransactionSent", handler);
-    socket.on("UserAgentRequestAcceptedBackend", handler2);
-    socket.on("UserAgentRequestRejectedBackend", handler3);
-    socket.on("UserAgentDepositCompletedBackend", handler4);
+    if (socket) {
+      socket.on("newUserAgentTransactionSent", handler);
+      socket.on("UserAgentRequestAcceptedBackend", handler2);
+      socket.on("UserAgentRequestRejectedBackend", handler3);
+      socket.on("UserAgentDepositCompletedBackend", handler4);
+    }
     return () => {
       socket.off("UserAgentRequestAcceptedBackend", handler2);
       socket.off("UserAgentDepositCompletedBackend", handler4);
       socket.off("newUserAgentTransactionSent", handler);
       socket.off("UserAgentRequestRejectedBackend", handler3);
     };
-  }, []);
+  }, [decoded]);
 
   const getUser = async () => {
     try {

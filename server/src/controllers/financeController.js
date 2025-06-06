@@ -249,13 +249,11 @@ const depositFunds = async (req, res) => {
     await session.commitTransaction();
     session.endSession();
 
-    return res
-      .status(200)
-      .json({
-        data: transaction,
-        success: true,
-        message: "Funds deposited successfully",
-      });
+    return res.status(200).json({
+      data: transaction,
+      success: true,
+      message: "Funds deposited successfully",
+    });
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -318,6 +316,11 @@ const withdrawFunds = async (req, res) => {
       { new: true, session }
     );
     // console.log("Transaction update:", transactionUpdate);
+    const transaction = await userToAgentTransaction
+      .findById(trId)
+      .populate("userId")
+      .populate("agentId")
+      .session(session);
 
     if (!transactionUpdate) {
       return res
@@ -348,7 +351,11 @@ const withdrawFunds = async (req, res) => {
 
     return res
       .status(200)
-      .json({ success: true, message: "Funds withdrawn successfully" });
+      .json({
+        data: transaction,
+        success: true,
+        message: "Funds withdrawn successfully",
+      });
   } catch (error) {
     await session.abortTransaction();
     session.endSession();

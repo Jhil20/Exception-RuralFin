@@ -119,9 +119,22 @@ const UserDashboard = () => {
 
     const handler2 = (data) => {
       console.log("deposit in user account user dahboard handler");
+      console.log("user finance data", userFinance);
       setUserFinance((prev) => ({
         ...prev,
-        balance: data.amount - data.commission,
+        balance: prev.balance + (data.amount - data.commission),
+      }));
+      setTransactionData((prev) => [...prev, data]);
+      getTransactions();
+      getUserData();
+    };
+
+    const handler3 = (data) => {
+      console.log("withdraw in user account user dahboard handler");
+      console.log("user finance data", userFinance);
+      setUserFinance((prev) => ({
+        ...prev,
+        balance: prev.balance + (data.amount - data.commission),
       }));
       setTransactionData((prev) => [...prev, data]);
       getTransactions();
@@ -130,7 +143,9 @@ const UserDashboard = () => {
 
     socket.on("money-received-by-receiver", handler);
     socket.on("UserAgentDepositCompletedBackend", handler2);
+    socket.on("UserAgentWithdrawCompletedBackend", handler3);
     return () => {
+      socket.off("UserAgentWithdrawCompletedBackend", handler3);
       socket.off("UserAgentDepositCompletedBackend", handler2);
       socket.off("money-received-by-receiver", handler);
     };

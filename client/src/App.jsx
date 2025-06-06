@@ -30,7 +30,7 @@ function App() {
     if (!decoded) return;
     const socket = getSocket(decoded.id);
     const handler1 = (data) => {
-      console.log("User Agent Request Accepted:", data);
+      console.log("User Agent Request Accepted :", data);
       if (data.userId._id == decoded.id) {
         toast.success(
           `Your ${
@@ -75,13 +75,32 @@ function App() {
         );
       }
     };
+
+    const handler4 = (data) => {
+      if (data.userId._id == decoded.id) {
+        toast.info(
+          `Your ${
+            data.conversionType == "cashToERupees"
+              ? "cash to eRupees"
+              : "eRupees to cash"
+          } request has been completed by ${capitalize(
+            data.agentId.firstName
+          )} ${capitalize(data.agentId.lastName)}`
+        );
+        toast.success(
+          `₹${data.amount + data.commission} has been withdrawn successfully`
+        );
+      }
+    };
     if (socket) {
       socket.on("UserAgentRequestAcceptedBackend", handler1);
       socket.on("UserAgentRequestRejectedBackend", handler2);
       socket.on("UserAgentDepositCompletedBackend", handler3);
+      socket.on("UserAgentWithdrawCompletedBackend", handler4);
     }
 
     return () => {
+      socket.off("UserAgentWithdrawCompletedBackend", handler4);
       socket.off("UserAgentRequestAcceptedBackend", handler1);
       socket.off("UserAgentRequestRejectedBackend", handler2);
       socket.off("UserAgentDepositCompletedBackend", handler3);
