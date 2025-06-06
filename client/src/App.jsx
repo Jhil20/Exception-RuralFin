@@ -22,7 +22,7 @@ function App() {
       const decodedToken = jwtDecode(token);
       setDecoded(decodedToken);
       const socket = createSocket(decodedToken.id);
-      console.log("Socket created for user:", decodedToken.id);
+      // console.log("Socket created for user:", decodedToken.id);
     }
   }, []);
 
@@ -30,7 +30,7 @@ function App() {
     if (!decoded) return;
     const socket = getSocket(decoded.id);
     const handler1 = (data) => {
-      console.log("User Agent Request Accepted :", data);
+      // console.log("User Agent Request Accepted :", data);
       if (data.userId._id == decoded.id) {
         toast.success(
           `Your ${
@@ -45,7 +45,7 @@ function App() {
     };
 
     const handler2 = (data) => {
-      console.log("User Agent Request Rejected:", data);
+      // console.log("User Agent Request Rejected:", data);
       if (data.userId._id == decoded.id) {
         toast.error(
           `Your ${
@@ -59,7 +59,7 @@ function App() {
       }
     };
     const handler3 = (data) => {
-      console.log("request completed deposit");
+      // console.log("request completed deposit");
       if (data.userId._id == decoded.id) {
         toast.info(
           `Your ${

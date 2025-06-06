@@ -31,6 +31,14 @@ const Header = () => {
   const isSignedIn = useSelector((state) => state.signin.isSignedIn);
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const token = Cookies.get("token");
+  const decoded = useMemo(() => {
+    if (token) {
+      return jwtDecode(token);
+    } else {
+      return null;
+    }
+  }, [token]);
 
   // console.log(location)
 
@@ -60,14 +68,6 @@ const Header = () => {
     }
   };
 
-  const token = Cookies.get("token");
-  const decoded = useMemo(() => {
-    if (token) {
-      return jwtDecode(token);
-    } else {
-      return null;
-    }
-  }, [token]);
   const getNotifications = async () => {
     try {
       if (decoded) {
@@ -95,10 +95,22 @@ const Header = () => {
   };
   useEffect(() => {
     getNotifications();
-  }, [decoded]);
-  const formatTime = (date) => {
-    // return formatDistanceToNow(new Date(date), { addSuffix: true });
-  };
+  }, [decoded,showNotifications]);
+
+  useEffect(() => {
+    if (!decoded) return;
+    const socket = getSocket(decoded.id);
+    const handler = (data) => {
+      console.log("SOCKET OF NOTIFIACTION CALLED IN FRONTEND ", data);
+      setNotifications((prev) => [...prev, ...data]);
+      getNotifications();
+    };
+    socket.on("newNotificationSend", handler);
+
+    return () => {
+      socket.off("newNotificationSend", handler);
+    };
+  }, [decoded,showNotifications]);
 
   const markAsRead = async (notificationId) => {
     try {
@@ -109,14 +121,14 @@ const Header = () => {
         }
       );
       console.log("Notification marked as read:", response.data);
-      setNotifications((prev)=>(
-        prev.filter((noti)=> {
-          if(noti._id === notificationId) {
-            return {...noti, read: true};
+      setNotifications((prev) =>
+        prev.filter((noti) => {
+          if (noti._id === notificationId) {
+            return { ...noti, read: true };
           }
           return noti;
         })
-      ));
+      );
       getNotifications();
     } catch (error) {
       console.error("Error marking notification as read:", error);
@@ -124,20 +136,21 @@ const Header = () => {
   };
 
   const markAllAsRead = async () => {
-    try{
-      const response = await axios.post(`${BACKEND_URL}/api/notification/markAllAsRead`, {
-        userId: decoded.id,
-        userType: location.pathname === "/dashboard" ? "User" : "Agent",
-      })
-      console.log("All notifications marked as read:", response.data);
-      setNotifications((prev) => 
-        prev.map((noti) => ({ ...noti, read: true }))
+    try {
+      const response = await axios.post(
+        `${BACKEND_URL}/api/notification/markAllAsRead`,
+        {
+          userId: decoded.id,
+          userType: location.pathname === "/dashboard" ? "User" : "Agent",
+        }
       );
+      console.log("All notifications marked as read:", response.data);
+      setNotifications((prev) => prev.map((noti) => ({ ...noti, read: true })));
       getNotifications();
-    }catch (error) {
+    } catch (error) {
       console.error("Error marking all notifications as read:", error);
     }
-  }
+  };
 
   return (
     <header className="bg-white border-b h-[9.1vh] border-gray-200 sticky w-full top-0 z-50 shadow-sm">

@@ -118,8 +118,8 @@ const UserDashboard = () => {
     };
 
     const handler2 = (data) => {
-      console.log("deposit in user account user dahboard handler");
-      console.log("user finance data", userFinance);
+      // console.log("deposit in user account user dahboard handler");
+      // console.log("user finance data", userFinance);
       setUserFinance((prev) => ({
         ...prev,
         balance: prev.balance + (data.amount - data.commission),
@@ -130,8 +130,8 @@ const UserDashboard = () => {
     };
 
     const handler3 = (data) => {
-      console.log("withdraw in user account user dahboard handler");
-      console.log("user finance data", userFinance);
+      // console.log("withdraw in user account user dahboard handler");
+      // console.log("user finance data", userFinance);
       setUserFinance((prev) => ({
         ...prev,
         balance: prev.balance + (data.amount - data.commission),
@@ -173,7 +173,7 @@ const UserDashboard = () => {
       const result = await axios.get(
         `${BACKEND_URL}/api/userToUserTransaction/getTransactions/${decoded.id}`
       );
-      console.log("result", result);
+      // console.log("result", result);
       setTransactionData(result?.data?.transactions);
     } catch (err) {
       console.log("error in fetching user-user transactions", err);
@@ -182,7 +182,7 @@ const UserDashboard = () => {
       const result2 = await axios.get(
         `${BACKEND_URL}/api/agentToUserTransaction/byUser/${decoded.id}`
       );
-      console.log("result2 ttttttttttttttttttttttt", result2);
+      // console.log("result2 ttttttttttttttttttttttt", result2);
       setTransactionData((prev) => [...prev, ...result2?.data?.transactions]);
     } catch (err) {
       console.log("error in fetching user-agent transactions", err);
@@ -194,13 +194,13 @@ const UserDashboard = () => {
     try {
       // console.log("hiiii");
       const response = await axios.get(`${BACKEND_URL}/api/user/${decoded.id}`);
-      console.log("response", response);
+      // console.log("response", response);
       setUserData(response?.data?.data);
       // console.log("FIDDDD", response?.data?.data?.finance);
       const response2 = await axios.get(
         `${BACKEND_URL}/api/finance/${response?.data?.data?.finance}`
       );
-      console.log("response fr", response2?.data?.finance);
+      // console.log("response fr", response2?.data?.finance);
       setUserFinance(response2?.data?.finance);
     } catch (err) {
       console.log(err);

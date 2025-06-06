@@ -17,7 +17,7 @@ const AgentList = ({
   const getAgents = async () => {
     try {
       const response = await axios.get(`${BACKEND_URL}/api/agent/`);
-      console.log("response of geting agents", response);
+      // console.log("response of geting agents", response);
       setAllAgents(response?.data?.agents);
     } catch (err) {
       console.log("error in fetching agents", err);

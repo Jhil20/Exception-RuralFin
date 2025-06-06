@@ -67,7 +67,7 @@ io.on("connection", (socket) => {
         userId: data.transaction.receiverId._id,
         message: `You have received ₹${data.transaction.amount} from ${data.transaction.senderId.firstName} ${data.transaction.senderId.lastName}`,
         type: "transaction",
-        read: true,
+        read: false,
       });
     } else {
       console.error("Receiver or Sender ID is missing in the transaction data");
@@ -98,7 +98,7 @@ io.on("connection", (socket) => {
           data.transaction.userId.firstName
         } ${data.transaction.userId.lastName}`,
         type: "transaction",
-        read: true,
+        read: false,
       });
     } else {
       console.error("User or Agent ID is missing in the transaction data");
@@ -137,7 +137,7 @@ io.on("connection", (socket) => {
           data.agentId.firstName
         } ${data.agentId.lastName}`,
         type: "transaction",
-        read: true,
+        read: false,
       });
     } else {
       console.error("User ID is missing in the request data");
@@ -157,12 +157,12 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("UserAgentRequestRejected", (data) => {
+  socket.on("UserAgentRequestRejected",async (data) => {
     const userIdSocketId = onlineUsers[data.userId._id];
     // console.log("User Agent Request Rejected:", data);
     if (userIdSocketId) {
       io.to(userIdSocketId).emit("UserAgentRequestRejectedBackend", data);
-      createNotification({
+      const notificationObj = await createNotification({
         userType: "User",
         userId: data.userId._id,
         message: `Your ${
@@ -173,8 +173,15 @@ io.on("connection", (socket) => {
           data.agentId.firstName
         } ${data.agentId.lastName}`,
         type: "transaction",
-        read: true,
+        read: false,
       });
+      console.log("notificationObj", notificationObj);
+      const socketToSend = onlineUsers[data.userId._id];
+      console.log("notifiaction socket called", socketToSend,data.userId._id);
+      if (socketToSend) {
+        io.to(socketToSend).emit("newNotificationSend", [notificationObj.data]);
+        console.log("io sent newNotificationSend");
+      }
     } else {
       console.error("User ID is missing in the request data");
       createNotification({
@@ -209,7 +216,7 @@ io.on("connection", (socket) => {
           data.agentId.firstName
         } ${data.agentId.lastName}`,
         type: "transaction",
-        read: true,
+        read: false,
       });
       createNotification({
         userType: "User",
@@ -218,7 +225,7 @@ io.on("connection", (socket) => {
           data.amount - data.commission
         } has been deposited successfully`,
         type: "transaction",
-        read: true,
+        read: false,
       });
     } else {
       console.error("User ID is missing in the deposit data");
@@ -264,7 +271,7 @@ io.on("connection", (socket) => {
           data.agentId.firstName
         } ${data.agentId.lastName}`,
         type: "transaction",
-        read: true,
+        read: false,
       });
       createNotification({
         userType: "User",
@@ -273,7 +280,7 @@ io.on("connection", (socket) => {
           data.amount + data.commission
         } has been withdrawn successfully`,
         type: "transaction",
-        read: true,
+        read: false,
       });
     } else {
       console.error("User ID is missing in the withdraw data");

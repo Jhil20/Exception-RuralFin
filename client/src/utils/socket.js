@@ -8,7 +8,7 @@ export const createSocket = (userId) => {
   });
 
   socket.on("connect", () => {
-    console.log("Socket connected:", socket.id);
+    // console.log("Socket connected:", socket.id);
     socket.emit("join", userId);
   });
 
@@ -24,7 +24,7 @@ export const getSocket = (userId) => {
 
 export const disconnectSocket = () => {
   if (socket) {
-    console.log("Socket disconnected:", socket.id);
+    // console.log("Socket disconnected:", socket.id);
     socket.disconnect();
     socket = null;
   }
