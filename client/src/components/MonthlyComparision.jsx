@@ -217,7 +217,7 @@ const MonthlyComparison = ({ allYearBudgets, totalSpent, decoded,selectedMonth }
                   <div className="w-full bg-gray-300 rounded-full h-1.5">
                     <div
                       className="h-1.5 rounded-full transition-all duration-500"
-                      style={{ width: `${percent}%`, backgroundColor: "black" }}
+                      style={{ width: `${percent}%`, backgroundColor: `${percent>=100?"red":"black"}` }}
                     ></div>
                   </div>
                 </div>

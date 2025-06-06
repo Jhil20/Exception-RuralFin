@@ -95,7 +95,7 @@ const Header = () => {
   };
   useEffect(() => {
     getNotifications();
-  }, [decoded,showNotifications]);
+  }, [decoded, showNotifications]);
 
   useEffect(() => {
     if (!decoded) return;
@@ -110,7 +110,7 @@ const Header = () => {
     return () => {
       socket.off("newNotificationSend", handler);
     };
-  }, [decoded,showNotifications]);
+  }, [decoded, showNotifications]);
 
   const markAsRead = async (notificationId) => {
     try {
@@ -359,15 +359,18 @@ const Header = () => {
           {/* Right Side Icons */}
           {isSignedIn ? (
             <div className="h-fit w-fit flex items-center space-x-6">
-              <button
-                onClick={() => setShowNotifications(true)}
-                className="bg-gray-50 p-[6px] rounded-full text-gray-500 hover:ring-2 hover:ring-gray-600  hover:text-gray-700 hover:bg-gray-100 cursor-pointer focus:outline-none  transition-all duration-400"
-              >
-                <div className=" absolute right-35 h-4 w-4 text-xs rounded-full bg-gray-600 text-white flex items-center justify-center top-3 ">
-                  {notifications.filter((noti) => noti.read == false).length}
-                </div>
-                <BellIcon size={24} className="pt-1" />
-              </button>
+              {location.pathname != "/adminDashboard" && (
+                <button
+                  onClick={() => setShowNotifications(true)}
+                  className="bg-gray-50 p-[6px] rounded-full text-gray-500 hover:ring-2 hover:ring-gray-600  hover:text-gray-700 hover:bg-gray-100 cursor-pointer focus:outline-none  transition-all duration-400"
+                >
+                  <div className=" absolute right-35 h-4 w-4 text-xs rounded-full bg-gray-600 text-white flex items-center justify-center top-3 ">
+                    {notifications.filter((noti) => noti.read == false).length}
+                  </div>
+                  <BellIcon size={24} className="pt-1" />
+                </button>
+              )}
+
               <button
                 onClick={() => {
                   handleLogout();

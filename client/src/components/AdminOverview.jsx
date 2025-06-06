@@ -18,6 +18,11 @@ import capitalize from "../utils/capitalize";
 import { Pie } from "react-chartjs-2";
 import { Chart, ArcElement, Tooltip, Legend } from "chart.js";
 import findChange from "../utils/findChange";
+import { useMemo } from "react";
+import { getSocket } from "../utils/socket";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
+import useAuth from "../utils/useAuth";
 
 Chart.register(ArcElement, Tooltip, Legend);
 
@@ -36,9 +41,30 @@ const StatCard = ({ title, value, icon }) => {
 };
 
 const AdminOverview = () => {
+  useAuth();
   const [overviewCardData, setOverviewCardData] = useState({});
   const [recentActivityData, setRecentActivityData] = useState([]);
   const [transactionVolumeData, setTransactionVolumeData] = useState();
+  const [activeUsers, setActiveUsers] = useState(0);
+  const token = Cookies.get("token");
+  const decoded = useMemo(() => {
+    if (!token) return null;
+    return jwtDecode(token);
+  }, [token]);
+
+  useEffect(() => {
+    if (!decoded) return;
+    const socket = getSocket(decoded.id);
+    const handler = (data) => {
+      setActiveUsers(data.length);
+    };
+    socket.on("activeUsers", handler);
+
+    return () => {
+      socket.off("activeUsers", handler);
+    };
+  }, [decoded]);
+
   const getOverviewCardData = async () => {
     try {
       const response = await axios.get(
@@ -97,7 +123,7 @@ const AdminOverview = () => {
   }, []);
 
   return (
-    <div className="space-y-6 h-10/12">
+    <div className="space-y-6 p-3 h-10/12">
       <div className="flex items-center mt-2 justify-between">
         <h1 className="text-2xl font-bold text-gray-800">
           Admin Dashboard Overview
@@ -116,13 +142,13 @@ const AdminOverview = () => {
           icon={<IndianRupee size={20} />}
         />
         <StatCard
-          title="Active Agents"
-          value={`${overviewCardData?.totalAgents || "0"}`}
+          title="Total Accounts"
+          value={`${overviewCardData?.totalAgents+overviewCardData?.totalUsers+1 || "0"}`}
           icon={<Users size={20} />}
         />
         <StatCard
-          title="Active Users"
-          value={`${overviewCardData?.totalUsers || "0"}`}
+          title="Active Accounts"
+          value={`${activeUsers}`}
           icon={<Users size={20} />}
         />
         <StatCard
@@ -144,7 +170,7 @@ const AdminOverview = () => {
                 className="flex items-start h-20 mb-1 pb-3 border-b border-gray-200 last:border-0 last:pb-0"
               >
                 <div
-                  className={`h-10 mt-3 w-10 rounded-full flex items-center justify-center text-black mr-4 bg-gray-200 ring-[1px] ring-gray-300 `}
+                  className={`h-10 mt-3 w-10 rounded-full flex items-center justify-center text-black mr-4 ml-1 bg-gray-200 ring-[1px] ring-gray-300 `}
                 >
                   {activity.type == "User Created" ? (
                     <User size={18} />

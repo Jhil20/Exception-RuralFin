@@ -46,11 +46,12 @@ io.on("connection", (socket) => {
   socket.on("join", (userId) => {
     if (!userId) return console.error("User ID is required to join the socket");
     onlineUsers[userId] = socket.id;
+    io.emit("activeUsers", Object.keys(onlineUsers));
     console.log(`User ${userId} connected with socket id: ${socket.id}`);
     console.log("Online users after connection:", onlineUsers);
   });
 
-  socket.on("money-sent-by-sender", (data) => {
+  socket.on("money-sent-by-sender", async (data) => {
     const receiverId = data.transaction.receiverId._id;
     const senderId = data.transaction.senderId._id;
     console.log("Money sent by sender:", receiverId, senderId);
@@ -62,13 +63,25 @@ io.on("connection", (socket) => {
         "money-received-by-receiver",
         data
       );
-      createNotification({
-        userType: "User",
-        userId: data.transaction.receiverId._id,
-        message: `You have received ₹${data.transaction.amount} from ${data.transaction.senderId.firstName} ${data.transaction.senderId.lastName}`,
-        type: "transaction",
-        read: false,
-      });
+      if (receiverSocketId) {
+        const notificationObj = await createNotification({
+          userType: "User",
+          userId: data.transaction.receiverId._id,
+          message: `You have received ₹${data.transaction.amount} from ${data.transaction.senderId.firstName} ${data.transaction.senderId.lastName}`,
+          type: "transaction",
+          read: false,
+        });
+
+        console.log("notificationObj", notificationObj);
+        const socketToSend = receiverSocketId;
+        console.log("notifiaction socket called", socketToSend);
+        if (socketToSend) {
+          io.to(socketToSend).emit("newNotificationSend", [
+            notificationObj.data,
+          ]);
+          console.log("io sent newNotificationSend");
+        }
+      }
     } else {
       console.error("Receiver or Sender ID is missing in the transaction data");
       createNotification({
@@ -81,7 +94,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("newUserAgentTransactionRequest", (data) => {
+  socket.on("newUserAgentTransactionRequest", async (data) => {
     const userIdSocketId = onlineUsers[data.transaction.userId._id];
     const agentIdSocketId = onlineUsers[data.transaction.agentId._id];
     if (agentIdSocketId && userIdSocketId) {
@@ -89,17 +102,29 @@ io.on("connection", (socket) => {
         "newUserAgentTransactionSent",
         data
       );
-      createNotification({
-        userType: "Agent",
-        userId: data.transaction.agentId._id,
-        message: `You have received a new ${
-          data.conversionType == "cashToERupees" ? "deposit" : "withdrawal"
-        } request of ₹${data.transaction.amount} from ${
-          data.transaction.userId.firstName
-        } ${data.transaction.userId.lastName}`,
-        type: "transaction",
-        read: false,
-      });
+      if (agentIdSocketId) {
+        const notificationObj = await createNotification({
+          userType: "Agent",
+          userId: data.transaction.agentId._id,
+          message: `You have received a new ${
+            data.conversionType == "cashToERupees" ? "deposit" : "withdrawal"
+          } request of ₹${data.transaction.amount} from ${
+            data.transaction.userId.firstName
+          } ${data.transaction.userId.lastName}`,
+          type: "transaction",
+          read: false,
+        });
+
+        console.log("notificationObj", notificationObj);
+        const socketToSend = agentIdSocketId;
+        console.log("notifiaction socket called", socketToSend);
+        if (socketToSend) {
+          io.to(socketToSend).emit("newNotificationSend", [
+            notificationObj.data,
+          ]);
+          console.log("io sent newNotificationSend");
+        }
+      }
     } else {
       console.error("User or Agent ID is missing in the transaction data");
       createNotification({
@@ -116,7 +141,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("UserAgentRequestAccepted", (data) => {
+  socket.on("UserAgentRequestAccepted", async (data) => {
     // console.log("User Agent Request Accepted:");
     const userIdSocketId = onlineUsers[data.userId._id];
     // console.log(
@@ -126,7 +151,7 @@ io.on("connection", (socket) => {
     if (userIdSocketId) {
       io.to(userIdSocketId).emit("UserAgentRequestAcceptedBackend", data);
       console.log("io sent");
-      createNotification({
+      const notificationObj = await createNotification({
         userType: "User",
         userId: data.userId._id,
         message: `Your ${
@@ -139,6 +164,13 @@ io.on("connection", (socket) => {
         type: "transaction",
         read: false,
       });
+      console.log("notificationObj", notificationObj);
+      const socketToSend = userIdSocketId;
+      console.log("notifiaction socket called", socketToSend);
+      if (socketToSend) {
+        io.to(socketToSend).emit("newNotificationSend", [notificationObj.data]);
+        console.log("io sent newNotificationSend");
+      }
     } else {
       console.error("User ID is missing in the request data");
       createNotification({
@@ -157,7 +189,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("UserAgentRequestRejected",async (data) => {
+  socket.on("UserAgentRequestRejected", async (data) => {
     const userIdSocketId = onlineUsers[data.userId._id];
     // console.log("User Agent Request Rejected:", data);
     if (userIdSocketId) {
@@ -177,7 +209,7 @@ io.on("connection", (socket) => {
       });
       console.log("notificationObj", notificationObj);
       const socketToSend = onlineUsers[data.userId._id];
-      console.log("notifiaction socket called", socketToSend,data.userId._id);
+      console.log("notifiaction socket called", socketToSend);
       if (socketToSend) {
         io.to(socketToSend).emit("newNotificationSend", [notificationObj.data]);
         console.log("io sent newNotificationSend");
@@ -199,13 +231,13 @@ io.on("connection", (socket) => {
       });
     }
   });
-  socket.on("UserAgentDepositCompleted", (data) => {
+  socket.on("UserAgentDepositCompleted", async (data) => {
     // console.log("in UserAgentDepositCompleted");
     const userIdSocketId = onlineUsers[data.userId._id];
     // console.log("User Agent Deposit Completed:", userIdSocketId);
     if (userIdSocketId) {
       io.to(userIdSocketId).emit("UserAgentDepositCompletedBackend", data);
-      createNotification({
+      const notificationObj = await createNotification({
         userType: "User",
         userId: data.userId._id,
         message: `Your ${
@@ -218,7 +250,8 @@ io.on("connection", (socket) => {
         type: "transaction",
         read: false,
       });
-      createNotification({
+
+      const notificationObj2 = await createNotification({
         userType: "User",
         userId: data.userId._id,
         message: `₹${
@@ -227,6 +260,17 @@ io.on("connection", (socket) => {
         type: "transaction",
         read: false,
       });
+
+      console.log("notificationObj", notificationObj, notificationObj2);
+      const socketToSend = userIdSocketId;
+      console.log("notifiaction socket called", socketToSend);
+      if (socketToSend) {
+        io.to(socketToSend).emit("newNotificationSend", [
+          notificationObj.data,
+          notificationObj2.data,
+        ]);
+        console.log("io sent newNotificationSend");
+      }
     } else {
       console.error("User ID is missing in the deposit data");
       createNotification({
@@ -255,12 +299,12 @@ io.on("connection", (socket) => {
     // console.log("io sent UserAgentDepositCompletedBackend");
   });
 
-  socket.on("UserAgentWithdrawCompleted", (data) => {
+  socket.on("UserAgentWithdrawCompleted", async (data) => {
     const userIdSocketId = onlineUsers[data.userId._id];
     // console.log("User Agent Withdraw Completed:", userIdSocketId);
     if (userIdSocketId) {
       io.to(userIdSocketId).emit("UserAgentWithdrawCompletedBackend", data);
-      createNotification({
+      const notificationObj = await createNotification({
         userType: "User",
         userId: data.userId._id,
         message: `Your ${
@@ -273,7 +317,8 @@ io.on("connection", (socket) => {
         type: "transaction",
         read: false,
       });
-      createNotification({
+
+      const notificationObj2 = await createNotification({
         userType: "User",
         userId: data.userId._id,
         message: `₹${
@@ -282,6 +327,17 @@ io.on("connection", (socket) => {
         type: "transaction",
         read: false,
       });
+
+      console.log("notificationObj", notificationObj, notificationObj2);
+      const socketToSend = userIdSocketId;
+      console.log("notifiaction socket called", socketToSend);
+      if (socketToSend) {
+        io.to(socketToSend).emit("newNotificationSend", [
+          notificationObj.data,
+          notificationObj2.data,
+        ]);
+        console.log("io sent newNotificationSend");
+      }
     } else {
       console.error("User ID is missing in the withdraw data");
       createNotification({
@@ -315,6 +371,7 @@ io.on("connection", (socket) => {
     for (const userId in onlineUsers) {
       if (onlineUsers[userId] === socket.id) {
         delete onlineUsers[userId];
+        io.emit("activeUsers", Object.keys(onlineUsers));
         console.log(`User ${userId} disconnected`);
         break;
       }

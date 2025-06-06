@@ -129,7 +129,7 @@ const ExpenseChart = ({ budgetData, categoryBudgets }) => {
                         width: '100%',
                       }}
                     >
-                      <div className="opacity-0 group-hover:opacity-100 relative -top-8 left-1/2  -translate-x-1/2 bg-gray-900 text-white text-xs py-1 px-2 rounded whitespace-nowrap transition-all duration-200">
+                      <div className="opacity-0 group-hover:opacity-100 relative w-fit -top-8 left-1/2  -translate-x-1/2 bg-gray-900 text-white text-xs py-1 px-2 rounded whitespace-nowrap transition-all duration-200">
                         {formatCurrency(spent)}
                       </div>
                     </div>
@@ -151,7 +151,7 @@ const ExpenseChart = ({ budgetData, categoryBudgets }) => {
         )}
       </div>
 
-      <div className="mt-0 grid grid-cols-3 gap-4 pt-6 border-t border-gray-100">
+      <div className="mt-0 grid grid-cols-3 justify-items-center gap-4 pt-6 border-t border-gray-100">
         <div>
           <p className="text-sm text-gray-500 mb-1">Total Budget</p>
           <p className="text-lg font-bold text-gray-900">{formatCurrency(totalBudget)}</p>

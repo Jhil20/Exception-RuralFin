@@ -203,7 +203,7 @@ const ExpenseCategoryDetails = ({
                       percentage > 90 ? "text-red-500 font-medium" : ""
                     }
                   >
-                    {percentage > 90 ? "Near limit" : "Within budget"}
+                    {percentage > 80 ? (percentage>=100?"Over Budget":"Near limit") : "Within budget"}
                   </span>
                 </div>
               </div>
