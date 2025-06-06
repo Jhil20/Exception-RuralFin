@@ -10,7 +10,6 @@ import {
 import Card from "../components/Card";
 import Button from "../components/Button";
 import UserDetailsModal from "./UserDetailsModal";
-import { mockUsers } from "../data/mockData";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import capitalize from "../utils/capitalize";

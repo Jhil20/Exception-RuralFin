@@ -1,8 +1,6 @@
 import { useState } from "react";
 import {
   Search,
-  Filter,
-  Eye,
   AlertTriangle,
   CheckCircle,
   Wallet,
@@ -10,7 +8,6 @@ import {
 import Card from "../components/Card";
 import Button from "../components/Button";
 import AgentDetailsModal from "./AgentDetailsModal";
-import { mockAgents } from "../data/mockData";
 import { BACKEND_URL } from "../utils/constants";
 import { useEffect } from "react";
 import axios from "axios";
