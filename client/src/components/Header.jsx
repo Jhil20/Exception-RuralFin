@@ -9,6 +9,7 @@ import {
   Search,
   Shield,
   User,
+  Wallet,
   X,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -56,7 +57,7 @@ const Header = () => {
   const getIcon = (type) => {
     switch (type) {
       case "budget":
-        return <DollarSign size={16} className="text-gray-900" />;
+        return <Wallet size={16} className="text-gray-900" />;
       case "security":
         return <Shield size={16} className="text-gray-900" />;
       case "transaction":
@@ -195,6 +196,10 @@ const Header = () => {
                         notification.read
                           ? "bg-gray-50"
                           : "bg-white border-l-4 border-gray-900 shadow-sm"
+                      } ${
+                        notification.type == "budget"
+                          ? "bg-white border-l-4 border-red-500 shadow-sm"
+                          : ""
                       }`}
                     >
                       <div className="flex items-start">

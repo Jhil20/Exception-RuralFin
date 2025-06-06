@@ -13,7 +13,6 @@ const userSchema = new Schema(
     phone: { type: String, required: true ,unique: true},
     aadhar: { type: String, required: true ,unique: true},
     password: { type: String, required: true },
-    budgetAlerts: { type: Boolean, default: false },
     role: {
       type: String,
       enum: ["user"],

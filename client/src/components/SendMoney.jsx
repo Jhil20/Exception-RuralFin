@@ -271,13 +271,13 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       //   }
       // );
 
-      console.log(
-        "before sending data to backend",
-        user._id,
-        transactionCreated?.receiverId,
-        transactionCreated?.amount,
-        transactionCreated?._id
-      );
+      // console.log(
+      //   "before sending data to backend",
+      //   user._id,
+      //   transactionCreated?.receiverId,
+      //   transactionCreated?.amount,
+      //   transactionCreated?._id
+      // );
 
       const response = await axios.post(`${BACKEND_URL}/api/finance/transfer`, {
         senderId: user._id,
@@ -285,7 +285,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
         amount: transactionCreated?.amount,
         transactionId: transactionCreated?._id,
       });
-      console.log("response of transaction complete", response);
+      // console.log("response of transaction complete", response);
       if (finance?.isBudgetPlanningEnabled) {
         const response2 = await axios.put(
           `${BACKEND_URL}/api/budget/updateBudgetSpending`,

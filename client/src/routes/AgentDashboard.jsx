@@ -96,7 +96,7 @@ const AgentDashboard = () => {
     return () => {
       socket.off("newUserAgentTransactionSent", handler);
     };
-  }, []);
+  }, [decoded]);
 
   useEffect(() => {
     getAgentData();
