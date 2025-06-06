@@ -4,7 +4,6 @@ import Footer from "../components/Footer";
 import BalanceCard from "../components/BalanceCard";
 import RecentTransactions from "../components/RecentTransactions";
 import ExpenseAnalytics from "../components/ExpenseAnalytics";
-import { expenseAnalytics } from "../data/mockData";
 import useAuth from "../utils/useAuth";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
@@ -16,7 +15,7 @@ import capitalize from "../utils/capitalize";
 import AgentList from "../components/AgentList";
 import Loader from "../components/Loader";
 import SendMoney from "../components/SendMoney";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import ViewAll from "../components/ViewAll";
 import BudgetPlanningForm from "../components/BudgetPlanningForm";
 import DetailedExpenseReport from "../components/DetailedExpenseReport";
@@ -327,8 +326,6 @@ const UserDashboard = () => {
           <div className="lg:col-span-1">
             {userFinance?.isBudgetPlanningEnabled || budgetPlanningEnabled ? (
               <ExpenseAnalytics
-                categories={expenseAnalytics.categories}
-                comparedToLastMonth={expenseAnalytics.comparedToLastMonth}
                 setBudgetPlanningForm={setBudgetPlanningForm}
                 setShowDetailedExpense={setShowDetailedExpense}
                 setIsReportOpen={setIsReportOpen}
