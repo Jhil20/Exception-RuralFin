@@ -176,6 +176,14 @@ const AgentDashboard = () => {
   };
   const handleTransactionRequestAccept = async (transactionToAccept) => {
     try {
+      if (
+        transactionToAccept?.conversionType == "cashToERupees" &&
+        transactionToAccept?.amount - transactionToAccept?.commission >
+          agentData?.balance
+      ) {
+        toast.error("Insufficient balance to accept this deposit request");
+        return;
+      }
       const response = await axios.post(
         `${BACKEND_URL}/api/agentToUserTransaction/updateStatus`,
         {
@@ -236,10 +244,13 @@ const AgentDashboard = () => {
           commission: transactionToComplete?.commission,
         }
       );
-      console.log("Deposit transaction completed:", response.data);
+      // console.log("Deposit transaction completed:", response.data);
       const data = response.data.data;
       socket.emit("UserAgentDepositCompleted", data);
-      console.log("Socket emitted UserAgentDepositCompleted", data);
+      console.log(
+        "SocketTTTTTTTTTTTTTTT emitted UserAgentDepositCompleted",
+        data
+      );
       setAgentData((prevData) => ({
         ...prevData,
         balance: prevData.balance - data.amount + data.commission,

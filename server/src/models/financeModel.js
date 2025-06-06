@@ -11,7 +11,6 @@ const financeSchema = new Schema({
   },
   // lastTransactionDate: { type: Date ,default:null},
   budgetAlerts: { type: Boolean, default: false },
-  budgetAlertsNotifications: [{ type: String, default: null }],
   isBudgetPlanningEnabled: { type: Boolean, default: false },
   budget: { type: Schema.Types.ObjectId, ref:'Budget',default: null },
 }, { timestamps: true });

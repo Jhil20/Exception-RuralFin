@@ -118,8 +118,8 @@ const UserDashboard = () => {
     };
 
     const handler2 = (data) => {
-      // console.log("deposit in user account user dahboard handler");
-      // console.log("user finance data", userFinance);
+      console.log("deposit in user account user dahboard handler");
+      console.log("user finance data", userFinance);
       setUserFinance((prev) => ({
         ...prev,
         balance: prev.balance + (data.amount - data.commission),
@@ -127,7 +127,7 @@ const UserDashboard = () => {
       setTransactionData((prev) => [...prev, data]);
       getTransactions();
       getUserData();
-    };
+    }
 
     const handler3 = (data) => {
       // console.log("withdraw in user account user dahboard handler");

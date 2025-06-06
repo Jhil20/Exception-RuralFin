@@ -232,11 +232,12 @@ io.on("connection", (socket) => {
     }
   });
   socket.on("UserAgentDepositCompleted", async (data) => {
-    // console.log("in UserAgentDepositCompleted");
+    console.log("in UserAgentDepositCompleted");
     const userIdSocketId = onlineUsers[data.userId._id];
-    // console.log("User Agent Deposit Completed:", userIdSocketId);
+    console.log("User Agent Deposit Completed:", userIdSocketId);
     if (userIdSocketId) {
       io.to(userIdSocketId).emit("UserAgentDepositCompletedBackend", data);
+      console.log("io emitted for data",data);
       const notificationObj = await createNotification({
         userType: "User",
         userId: data.userId._id,
