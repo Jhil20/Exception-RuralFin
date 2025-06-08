@@ -237,7 +237,7 @@ io.on("connection", (socket) => {
     console.log("User Agent Deposit Completed:", userIdSocketId);
     if (userIdSocketId) {
       io.to(userIdSocketId).emit("UserAgentDepositCompletedBackend", data);
-      console.log("io emitted for data",data);
+      console.log("io emitted for data", data);
       const notificationObj = await createNotification({
         userType: "User",
         userId: data.userId._id,
@@ -367,6 +367,21 @@ io.on("connection", (socket) => {
     // console.log("io sent UserAgentWithdrawCompletedBackend");
   });
 
+  socket.on("updateSystemSettings",async(data) => {
+    const notificationObj = await createNotification({
+      userType: "Admin",
+      userId: data,
+      message: `System settings have been updated`,
+      type: "system",
+      read: false,
+    });
+    socket.emit("updateSystemSettingsBackend", notificationObj);
+    console.log(
+      "System settings updated and notification sent to admin",
+      notificationObj
+    );
+  });
+
   socket.on("disconnect", () => {
     // console.log(`Client disconnected: ${socket.id}`);
     for (const userId in onlineUsers) {
@@ -380,7 +395,19 @@ io.on("connection", (socket) => {
     console.log("Online users after disconnect:", onlineUsers);
   });
 });
-
+app.get("/api/getActiveUsers", async (req, res) => {
+  try {
+    const activeUsers = Object.keys(onlineUsers);
+    console.log("Active users:", activeUsers);
+    res.status(200).json({
+      data: activeUsers,
+      message: "Active users fetched successfully",
+    });
+  } catch (error) {
+    console.error("Error fetching active users:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 app.use("/api/user", userRoutes);
 app.use("/api/agent", agentRoutes);
 app.use("/api/finance", financeRoutes);

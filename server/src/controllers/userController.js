@@ -6,6 +6,7 @@ const Finance = require("../models/financeModel");
 const UserToUserTransaction = require("../models/userToUserTransactionModel");
 const AgentToUserTransaction = require("../models/userToAgentTransactionModel");
 const moment = require("moment");
+const findAge = require("../utils/findAgeBackend");
 
 // Get all users
 const getAllUsers = async (req, res) => {
@@ -141,6 +142,20 @@ const getUserByPhone = async (req, res) => {
   }
 };
 
+
+const getUserByAadhar=async(req,res)=>{
+  try{
+    const {aadhar}=req.body;
+    const user =await User.findOne({aadhar});
+    if(user){
+      return res.status(200).json({success:true,data:user})
+    }
+    return res.status(401).json({success:false});
+  }catch(error){
+    res.status(500).json({success:false,message:"error fetching user by aadhar",error:error})
+  }
+}
+
 const checkValidRuralFinId = async (req, res) => {
   try {
     const id = req.params.id;
@@ -225,7 +240,6 @@ const createUser = async (req, res) => {
       "lastName",
       "phone",
       "password",
-      "age",
       "dob",
       "address",
       "gender",
@@ -249,12 +263,14 @@ const createUser = async (req, res) => {
       });
     }
 
+    const age=findAge(req.body.dob);
+
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const hashedPin = await bcrypt.hash(req.body.transactionPin, 10);
     const user = await User.create({
       firstName: req.body.firstName,
       lastName: req.body.lastName,
-      age: req.body.age,
+      age: age,
       dob: req.body.dob,
       gender: req.body.gender,
       address: req.body.address,
@@ -483,4 +499,5 @@ module.exports = {
   addFavouriteToUserById,
   getFavouritesByUserId,
   checkUserPassword,
+  getUserByAadhar,
 };

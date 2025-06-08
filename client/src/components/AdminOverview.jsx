@@ -55,6 +55,7 @@ const AdminOverview = () => {
   useEffect(() => {
     if (!decoded) return;
     const socket = getSocket(decoded.id);
+    getActiveUsers();
     const handler = (data) => {
       setActiveUsers(data.length);
     };
@@ -64,6 +65,17 @@ const AdminOverview = () => {
       socket.off("activeUsers", handler);
     };
   }, [decoded]);
+
+  const getActiveUsers = async () => {
+    try{
+      const response=await axios.get(`${BACKEND_URL}/api/getActiveUsers`);
+      console.log("Active Users Data:", response.data);
+      const length= response.data.data.length+1;
+      setActiveUsers(length);
+    }catch (error) {
+      console.error("Error fetching active users:", error);
+    }
+  }
 
   const getOverviewCardData = async () => {
     try {

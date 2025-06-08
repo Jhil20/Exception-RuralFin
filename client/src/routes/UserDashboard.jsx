@@ -116,7 +116,10 @@ const UserDashboard = () => {
     };
 
     const handler2 = (data) => {
-      console.log("deposit in user account user dahboard handler",data);
+      console.log(
+        "deposit in user account user dahboard handler TTTTTTTTTTTTTTTTTTT",
+        data
+      );
       console.log("user finance data", userFinance);
       setUserFinance((prev) => ({
         ...prev,
@@ -125,11 +128,11 @@ const UserDashboard = () => {
       setTransactionData((prev) => [...prev, data]);
       getTransactions();
       getUserData();
-    }
+      console.log("user set done finance data after deposit", userFinance);
+    };
 
     const handler3 = (data) => {
-      
-      console.log("withdraw in user account user dahboard handler",data);
+      console.log("withdraw in user account user dahboard handler", data);
       console.log("user finance data", userFinance);
       setUserFinance((prev) => ({
         ...prev,

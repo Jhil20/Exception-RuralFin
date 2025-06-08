@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { createUser, getUserByPhone, getUserById, checkValidRuralFinId, addFavouriteToUserById, getFavouritesByUserId, checkUserPassword, getAllUsers, getAllUsersWithFinanceData, getAllTransactionsAmountsByUserId, getAllAgentTransactionsAmountsByUserId } = require('../controllers/userController');
+const { createUser, getUserByPhone, getUserById, checkValidRuralFinId, addFavouriteToUserById, getFavouritesByUserId, checkUserPassword, getAllUsers, getAllUsersWithFinanceData, getAllTransactionsAmountsByUserId, getAllAgentTransactionsAmountsByUserId, getUserByAadhar } = require('../controllers/userController');
 
 router.get('/', getAllUsers); 
 router.get("/getAllUsersWithFinance",getAllUsersWithFinanceData)
 router.post('/register',createUser)
 router.post('/getUserByPhone',getUserByPhone);
+router.post('/getUserByAadhar',getUserByAadhar);
 router.post('/checkPassword',checkUserPassword);
 router.post('/addToFavourites',addFavouriteToUserById);
 router.get("/getTodayTransactionAmount/:id",getAllTransactionsAmountsByUserId);

@@ -1,7 +1,7 @@
 const Agent = require("../models/agentModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
+const findAge= require("../utils/findAgeBackend");
 // Get all agents
 const getAllAgents = async (req, res) => {
   try {
@@ -66,7 +66,6 @@ const createAgent = async (req, res) => {
       firstName,
       lastName,
       phone,
-      age,
       dob,
       gender,
       aadhar,
@@ -83,7 +82,6 @@ const createAgent = async (req, res) => {
       "lastName",
       "phone",
       "password",
-      "age",
       "dob",
       "address",
       "gender",
@@ -116,6 +114,7 @@ const createAgent = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create agent
+    const age=findAge(dob);
     const agent = Agent.create({
       firstName,
       lastName,

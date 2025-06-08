@@ -7,6 +7,7 @@ import {
   DollarSign,
   Menu,
   Search,
+  Server,
   Shield,
   User,
   Wallet,
@@ -58,14 +59,11 @@ const Header = () => {
     switch (type) {
       case "budget":
         return <Wallet size={16} className="text-gray-900" />;
-      case "security":
-        return <Shield size={16} className="text-gray-900" />;
       case "transaction":
         return <CreditCard size={16} className="text-gray-900" />;
-      case "lesson":
-        return <BookOpen size={16} className="text-gray-900" />;
-      default:
-        return <DollarSign size={16} className="text-gray-900" />;
+      case "system":
+        return <Server  size={16} className="text-gray-900" />;
+
     }
   };
 
@@ -106,10 +104,19 @@ const Header = () => {
       setNotifications((prev) => [...prev, ...data]);
       getNotifications();
     };
+
+    const handler2 = (data) => {
+      console.log("SOCKET OF SYSTEM SETTINGS CALLED IN FRONTEND ", data);
+      setNotifications((prev) => [...prev, ...data]);
+      getNotifications();
+    }
+
     socket.on("newNotificationSend", handler);
+    socket.on("updateSystemSettingsBackend",handler2)
 
     return () => {
       socket.off("newNotificationSend", handler);
+      socket.off("updateSystemSettingsBackend", handler2);
     };
   }, [decoded, showNotifications]);
 
@@ -364,6 +371,8 @@ const Header = () => {
           {/* Right Side Icons */}
           {isSignedIn ? (
             <div className="h-fit w-fit flex items-center space-x-6">
+              
+
               {location.pathname != "/adminDashboard" && (
                 <button
                   onClick={() => setShowNotifications(true)}

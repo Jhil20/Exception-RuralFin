@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Filter, BadgeCheck } from "lucide-react";
+import { Filter, BadgeCheck, User, Wallet2 } from "lucide-react";
 import {
   IndianRupee,
   Clock,
@@ -18,6 +18,7 @@ import { getSocket } from "../utils/socket";
 import { toast } from "react-toastify";
 import speak from "../utils/speak";
 import { useDispatch } from "react-redux";
+import SecurityDepositOverlay from "../components/SecurityDepositOverlay";
 
 const AgentDashboard = () => {
   useAuth();
@@ -26,6 +27,7 @@ const AgentDashboard = () => {
   const [agentData, setAgentData] = useState({});
   const [activeFilter, setActiveFilter] = useState("all");
   const [filteredTransactions, setFilteredTransactions] = useState([]);
+  const [isDepositOverlayOpen, setIsDepositOverlayOpen] = useState(false);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString("en-IN", {
@@ -370,11 +372,27 @@ const AgentDashboard = () => {
 
   return (
     <div className="min-h-[89.3vh] bg-gray-50">
-      {/* Header */}
+      <SecurityDepositOverlay
+        isOpen={isDepositOverlayOpen}
+        onClose={() => setIsDepositOverlayOpen(false)}
+        currentBalance={agentData.balance}
+        currentSecurityDeposit={agentData.securityDeposit}
+      />
       <header className="bg-white text-black shadow-md mx-4 mx rounded-md mt-3">
         <div className="container mx-auto p-4">
           <div className="flex justify-between items-center mb-4">
             <h1 className="ml-2 text-xl font-bold">Agent Dashboard</h1>
+            <button
+              onClick={() => {
+                setIsDepositOverlayOpen(true);
+              }}
+              className="hidden md:flex items-center space-x-4"
+            >
+              <div className="flex cursor-pointer text-sm font-medium text-gray-600 hover:ring-2 hover:text-gray-700 hover:ring-gray-700 items-center space-x-2 bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
+                <Wallet size={18} />
+                <span>Deposit more to increase balance</span>
+              </div>
+            </button>
           </div>
 
           {/* Quick stats bar */}

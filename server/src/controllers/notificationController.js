@@ -9,6 +9,8 @@ const createNotification = async (data) => {
       return { message: "All fields are required" };
     }
 
+    console.log("Creating notification for:", userType, userId, message, type, read);
+
     // Create a new notification
     const notification = new Notification({
       userType,
@@ -17,6 +19,8 @@ const createNotification = async (data) => {
       type,
       read,
     });
+
+    console.log("Notification object created:", notification);
 
     // Save the notification to the database
     await notification.save();

@@ -16,6 +16,7 @@ import { BACKEND_URL } from "../utils/constants";
 import { Formik } from "formik";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
+import { getSocket } from "../utils/socket";
 
 const PlatformSettings = () => {
   const [uptime, setUptime] = useState("Calculating...");
@@ -53,6 +54,8 @@ const PlatformSettings = () => {
     }
     return jwtDecode(token);
   }, [token]);
+
+  const socket=getSocket(decoded?.id);
   useEffect(() => {
     getUpTime();
     // createSystem();
@@ -61,6 +64,7 @@ const PlatformSettings = () => {
       clearInterval(upTimeInterval);
     }
   }, []);
+
 
   // const createSystem=async()=>{
   //   try{
@@ -117,6 +121,8 @@ const PlatformSettings = () => {
         values
       );
       console.log("Settings saved successfully:", response.data);
+      socket.emit("updateSystemSettings",decoded.id);
+
       if(response.data.success){
         toast.success("Settings saved successfully!");
         getSystemSettings();
