@@ -106,6 +106,9 @@ function App() {
       socket.off("UserAgentDepositCompletedBackend", handler3);
     };
   }, [decoded]);
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <>

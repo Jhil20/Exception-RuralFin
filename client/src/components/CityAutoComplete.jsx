@@ -62,6 +62,7 @@ const CityAutocomplete = () => {
 
   const handleInputChange = (e) => {
     setQuery(e.target.value);
+    setLoading(true);
     setValidCity(false);
   };
 

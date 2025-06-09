@@ -28,6 +28,11 @@ import { toast } from "react-toastify";
 import CityAutocomplete from "./CityAutoComplete";
 
 const AgentForm = ({ resetRole }) => {
+  const dispatch = useDispatch();
+  const isLoading = useSelector((state) => state.loading.isLoading);
+  const navigate = useNavigate();
+  const [step, setStep] = useState(1);
+  const [agentData, setAgentData] = useState(null);
   const initialValuesStep2 = {
     aadhar: "",
     password: "",
@@ -38,25 +43,20 @@ const AgentForm = ({ resetRole }) => {
     bankName: "",
   };
   const initialValuesStep1 = {
-    firstName:agentData?.firstname || "",
-    lastName: agentData?.lastname || "",
+    firstName: agentData?.firstName || "",
+    lastName: agentData?.lastName || "",
     phone: agentData?.phone || "",
-    dob:  agentData?.dob || "",
+    dob: agentData?.dob || "",
     gender: agentData?.gender || "",
     city: agentData?.city || "",
-    state : agentData?.state || "",
+    state: agentData?.state || "",
     country: agentData?.country || "",
     zipCode: agentData?.zipCode || "",
   };
-  const dispatch = useDispatch();
-  const isLoading = useSelector((state) => state.loading.isLoading);
-  const navigate = useNavigate();
-  const [step, setStep] = useState(1);
-  const [agentData, setAgentData] = useState(null);
   const handleSubmitStep1 = async (values) => {
     try {
       const response = await axios.post(
-        `${BACKEND_URL}/agent/getAgentByPhone`,
+        `${BACKEND_URL}/api/agent/getAgentByPhone`,
         { phoneNumber: values.phone, role: "agent" }
       );
       // console.log(response.data, "response in step 1");
@@ -66,7 +66,7 @@ const AgentForm = ({ resetRole }) => {
       }
       setStep(2);
       setAgentData(values);
-      setUserFormStep2(true);
+      // setUserFormStep2(true);
     } catch (error) {
       console.log("error in step 1", error);
     }

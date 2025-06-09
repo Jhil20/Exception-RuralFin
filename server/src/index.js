@@ -13,6 +13,7 @@ const { createServer } = require("http");
 const { Server } = require("socket.io");
 const { createNotification } = require("./controllers/notificationController");
 const notificationRoutes = require("./routes/notificationRoutes");
+const razorpayRoutes = require("./routes/razorpayRoutes");
 
 const app = express();
 connectMongo();
@@ -367,7 +368,7 @@ io.on("connection", (socket) => {
     // console.log("io sent UserAgentWithdrawCompletedBackend");
   });
 
-  socket.on("updateSystemSettings",async(data) => {
+  socket.on("updateSystemSettings", async (data) => {
     const notificationObj = await createNotification({
       userType: "Admin",
       userId: data,
@@ -395,6 +396,7 @@ io.on("connection", (socket) => {
     console.log("Online users after disconnect:", onlineUsers);
   });
 });
+
 app.get("/api/getActiveUsers", async (req, res) => {
   try {
     const activeUsers = Object.keys(onlineUsers);
@@ -408,6 +410,8 @@ app.get("/api/getActiveUsers", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+app.use("/api/razorpay", razorpayRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/agent", agentRoutes);
 app.use("/api/finance", financeRoutes);
