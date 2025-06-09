@@ -10,6 +10,8 @@ import {
   ScanLineIcon,
   Building2,
   ReceiptIndianRupee,
+  Globe,
+  Map,
 } from "lucide-react";
 import {
   agentValidationSchemaStep1,
@@ -22,8 +24,10 @@ import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
 import Loader from "./Loader";
+import { toast } from "react-toastify";
+import CityAutocomplete from "./CityAutoComplete";
 
-const AgentForm = ({  resetRole }) => {
+const AgentForm = ({ resetRole }) => {
   const initialValuesStep2 = {
     aadhar: "",
     password: "",
@@ -34,23 +38,38 @@ const AgentForm = ({  resetRole }) => {
     bankName: "",
   };
   const initialValuesStep1 = {
-    firstName: "",
-    lastName: "",
-    phone: "",
-    age: "",
-    dob: "",
-    gender: "",
-    address: "",
+    firstName:agentData?.firstname || "",
+    lastName: agentData?.lastname || "",
+    phone: agentData?.phone || "",
+    dob:  agentData?.dob || "",
+    gender: agentData?.gender || "",
+    city: agentData?.city || "",
+    state : agentData?.state || "",
+    country: agentData?.country || "",
+    zipCode: agentData?.zipCode || "",
   };
   const dispatch = useDispatch();
   const isLoading = useSelector((state) => state.loading.isLoading);
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [agentData, setAgentData] = useState(null);
-  const handleSubmitStep1 = (values) => {
-    setStep(2);
-    setAgentData(values);
-    setUserFormStep2(true);
+  const handleSubmitStep1 = async (values) => {
+    try {
+      const response = await axios.post(
+        `${BACKEND_URL}/agent/getAgentByPhone`,
+        { phoneNumber: values.phone, role: "agent" }
+      );
+      // console.log(response.data, "response in step 1");
+      if (response.data.success) {
+        toast.error("Agent with this phone number already exists.");
+        return;
+      }
+      setStep(2);
+      setAgentData(values);
+      setUserFormStep2(true);
+    } catch (error) {
+      console.log("error in step 1", error);
+    }
   };
 
   const handleSubmit = async (values) => {
@@ -58,8 +77,8 @@ const AgentForm = ({  resetRole }) => {
     console.log(data, "data");
     dispatch(showLoader());
     try {
-      navigate("/razorpay",{
-        state:{data:data}
+      navigate("/razorpay", {
+        state: { data: data },
       });
     } catch (error) {
       console.log("error in creating agent", error);
@@ -75,7 +94,7 @@ const AgentForm = ({  resetRole }) => {
       {step == 1 && (
         <Formik
           initialValues={initialValuesStep1}
-          // validationSchema={userValidationSchemaStep1}
+          validationSchema={userValidationSchemaStep1}
           onSubmit={handleSubmitStep1}
         >
           {({ isSubmitting, values }) => (
@@ -162,26 +181,6 @@ const AgentForm = ({  resetRole }) => {
               <div className="grid md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <label
-                    htmlFor="age"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Age
-                  </label>
-                  <Field
-                    type="number"
-                    id="age"
-                    name="age"
-                    className="block w-full px-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
-                    placeholder="Your age"
-                  />
-                  <ErrorMessage
-                    name="age"
-                    component="div"
-                    className="text-sm text-red-600 mt-1"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label
                     htmlFor="dob"
                     className="block text-sm font-medium text-gray-700"
                   >
@@ -246,30 +245,79 @@ const AgentForm = ({  resetRole }) => {
                     className="text-sm text-red-600 mt-1"
                   />
                 </div>
+
+                {/* City Autocomplete beside gender */}
+                <CityAutocomplete />
               </div>
 
-              <div className="grid md:grid-cols-1 gap-4">
-                <div className="space-y-2">
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="relative w-full">
                   <label
-                    htmlFor="address"
-                    className="block text-sm font-medium text-gray-700"
+                    htmlFor="state"
+                    className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    Address
+                    State
                   </label>
-                  <div className="relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <MapPin className="h-5 w-5 text-gray-600" />
-                    </div>
-                    <Field
-                      type="text"
-                      id="address"
-                      name="address"
-                      className="block w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
-                      placeholder="Address"
-                    />
+                  <div className="absolute inset-y-0 left-0 top-6 pl-3 flex items-center pointer-events-none">
+                    <Map className="h-5 w-5 text-gray-600" />
                   </div>
+                  <Field
+                    type="text"
+                    name="state"
+                    placeholder="State*"
+                    disabled
+                    className="block w-full cursor-not-allowed pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                  />
                   <ErrorMessage
-                    name="address"
+                    name="state"
+                    component="div"
+                    className="text-sm text-red-600 mt-1"
+                  />
+                </div>
+
+                <div className="relative w-full">
+                  <label
+                    htmlFor="country"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Country
+                  </label>
+                  <div className="absolute inset-y-0 left-0 top-6 pl-3 flex items-center pointer-events-none">
+                    <Globe className="h-5 w-5 text-gray-600" />
+                  </div>
+                  <Field
+                    type="text"
+                    name="country"
+                    placeholder="Country*"
+                    disabled
+                    className="block w-full cursor-not-allowed pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                  />
+                  <ErrorMessage
+                    name="country"
+                    component="div"
+                    className="text-sm text-red-600 mt-1"
+                  />
+                </div>
+
+                <div className="relative w-full">
+                  <label
+                    htmlFor="zipCode"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    ZIP Code
+                  </label>
+                  <div className="absolute inset-y-0 left-0 top-6 pl-3 flex items-center pointer-events-none">
+                    <MapPin className="h-5 w-5 text-gray-600" />
+                  </div>
+                  <Field
+                    type="text"
+                    name="zipCode"
+                    placeholder="ZIP Code*"
+                    disabled
+                    className="block w-full  cursor-not-allowed pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                  />
+                  <ErrorMessage
+                    name="zipCode"
                     component="div"
                     className="text-sm text-red-600 mt-1"
                   />

@@ -62,12 +62,12 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
         toast.error("User with the phone number already exists.");
         return;
       }
+      setStep(2);
+      setUserData(values);
+      setUserFormStep2(true);
     } catch (error) {
       console.log("error in checking for duplicate phone", error);
     }
-    setStep(2);
-    setUserData(values);
-    setUserFormStep2(true);
   };
 
   const [step, setStep] = useState(1);
@@ -80,13 +80,17 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
         ...userData,
         ...values,
       };
-      const response=await axios.post(`${BACKEND_URL}/api/user/getUserByAadhar`,{aadhar:values.aadhar});
-      console.log("response of fetching user by aadhar",response);
-      if(response.data.success){
+      const response = await axios.post(
+        `${BACKEND_URL}/api/user/getUserByAadhar`,
+        { aadhar: values.aadhar }
+      );
+      console.log("response of fetching user by aadhar", response);
+      if (response.data.success) {
         toast.error("User already present with the entered aadhar number");
         return;
       }
-      
+      // console.log("All Values to be submitted:", allValues);
+      // return;
       const result = await axios.post(
         `${BACKEND_URL}/api/user/register`,
         allValues
@@ -149,7 +153,7 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
         {step == 1 && (
           <Formik
             initialValues={initialValuesStep1}
-            // validationSchema={userValidationSchemaStep1}
+            validationSchema={userValidationSchemaStep1}
             onSubmit={handleSubmitStep1}
           >
             {({ isSubmitting, values }) => (
