@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { BACKEND_URL } from "../utils/constants";
@@ -12,9 +12,13 @@ const RazorPay = () => {
   const location = useLocation();
   const formData = location?.state?.data || null;
   const dispatch = useDispatch();
+  const [razorPayInstance, setRazorPayInstance] = useState(null);
   const navigate = useNavigate();
+  const hasInitiated = useRef(false);
+
   useEffect(() => {
-    if (formData) {
+    if (formData && !hasInitiated.current) {
+      hasInitiated.current = true;
       dispatch(showLoader());
       setTimeout(() => {
         initiatePayment();
@@ -78,9 +82,13 @@ const RazorPay = () => {
             `${BACKEND_URL}/api/razorpay/verify`,
             response
           );
+          console.log("Payment Verification Response:", verifyRes.data);
           if (verifyRes.data.success) {
+            console.log(
+              "Payment verified successfully: calling toast and create agent"
+            );
             createAgent();
-            toast.success("Payment verified successfully");
+            // toast.success("Payment verified successfully");
           } else {
             alert("Payment verification failed");
           }
@@ -93,10 +101,16 @@ const RazorPay = () => {
         modal: {
           escape: false,
           backdropclose: false,
+          ondismiss: () => {
+            console.log("Razorpay modal closed manually.");
+            dispatch(hideLoader());
+          },
         },
       };
       const razor = new window.Razorpay(options);
+      setRazorPayInstance(razor);
       razor.open();
+      // dispatch(hideLoader());
     } catch (error) {
       console.error("Payment initiation error:", error);
       alert("Payment failed to initiate");
@@ -104,30 +118,33 @@ const RazorPay = () => {
   };
 
   const createAgent = async () => {
-    toast.success("Creating agent account...");
-    return;
     try {
+      console.log("Creating agent with formData:", formData);
       const response = await axios.post(
         `${BACKEND_URL}/api/agent/register`,
         formData
       );
-      console.log("Response from server", response.data);
       const token = response?.data?.token;
+      console.log("Token received:", token);
       Cookies.set("token", token, { expires: 1 });
       toast.success("Agent account created successfully");
+      // razor.close();
+      console.log("Closing Razorpay instance");
       dispatch(SignedIn());
+      if (razorPayInstance) {
+        razorPayInstance.close();
+      }
+      dispatch(hideLoader());
       setTimeout(() => {
         navigate("/agentDashboard");
-      }, 3000);
+      }, 500);
     } catch (error) {
       console.error("Error creating agent:", error);
     }
   };
 
   return (
-    <div className="text-center text-3xl font-bold h-[90.7vh] w-full flex items-center justify-center">
-      HHHHHHHHHHHHHHHHHHHHHHHHHH
-    </div>
+    <div className="text-center bg-black text-white text-3xl font-bold h-[100vh] w-full flex items-center justify-center"></div>
   );
 };
 

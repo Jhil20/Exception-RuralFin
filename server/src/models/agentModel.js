@@ -10,7 +10,22 @@ const agentSchema = new Schema(
     age: { type: Number, required: true },
     dob: { type: Date, required: true },
     gender: { type: String, enum: ["male", "female", "other"], required: true },
-    address: { type: String, required: true },
+    city: {
+      type: String,
+      required: true,
+    },
+    state: {
+      type: String,
+      required: true,
+    },
+    country: {
+      type: String,
+      required: true,
+    },
+    zipCode: {
+      type: String,
+      required: true,
+    },
     aadhar: { type: String, required: true },
     accountNumber: { type: String, required: true },
     password: { type: String, required: true },

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import React, { useMemo, useState,useEffect } from "react";
+import debounce from "lodash.debounce";
+import { Formik, Form, Field, ErrorMessage, useFormikContext } from "formik";
 import {
   User,
   Phone,
@@ -72,7 +73,7 @@ const AgentForm = ({ resetRole }) => {
     }
   };
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values, { setErrors }) => {
     const data = { ...values, ...agentData };
     console.log(data, "data");
     dispatch(showLoader());
@@ -94,7 +95,7 @@ const AgentForm = ({ resetRole }) => {
       {step == 1 && (
         <Formik
           initialValues={initialValuesStep1}
-          validationSchema={userValidationSchemaStep1}
+          // validationSchema={userValidationSchemaStep1}
           onSubmit={handleSubmitStep1}
         >
           {({ isSubmitting, values }) => (
@@ -251,14 +252,14 @@ const AgentForm = ({ resetRole }) => {
               </div>
 
               <div className="grid md:grid-cols-3 gap-4">
-                <div className="relative w-full">
+                <div className="relative flex flex-wrap content-start justify-start w-full">
                   <label
                     htmlFor="state"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
                     State
                   </label>
-                  <div className="absolute inset-y-0 left-0 top-6 pl-3 flex items-center pointer-events-none">
+                  <div className=" relative -left-8 top-9 pl-3 flex items-center pointer-events-none">
                     <Map className="h-5 w-5 text-gray-600" />
                   </div>
                   <Field
@@ -275,14 +276,14 @@ const AgentForm = ({ resetRole }) => {
                   />
                 </div>
 
-                <div className="relative w-full">
+                <div className="relative flex flex-wrap content-start justify-start w-full">
                   <label
                     htmlFor="country"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
                     Country
                   </label>
-                  <div className="absolute inset-y-0 left-0 top-6 pl-3 flex items-center pointer-events-none">
+                  <div className="relative -left-13 top-9 pl-3 flex items-center pointer-events-none">
                     <Globe className="h-5 w-5 text-gray-600" />
                   </div>
                   <Field
@@ -299,14 +300,14 @@ const AgentForm = ({ resetRole }) => {
                   />
                 </div>
 
-                <div className="relative w-full">
+                <div className="relative flex flex-wrap content-start justify-start w-full">
                   <label
                     htmlFor="zipCode"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
                     ZIP Code
                   </label>
-                  <div className="absolute inset-y-0 left-0 top-6 pl-3 flex items-center pointer-events-none">
+                  <div className="relative -left-14 top-9 pl-3 flex items-center pointer-events-none">
                     <MapPin className="h-5 w-5 text-gray-600" />
                   </div>
                   <Field
@@ -350,211 +351,246 @@ const AgentForm = ({ resetRole }) => {
           initialValues={initialValuesStep2}
           validationSchema={agentValidationSchemaStep2}
           onSubmit={handleSubmit}
+          validateOnBlur={true}
+          validateOnChange={true}
         >
-          {({ isSubmitting, values }) => (
-            <Form className="space-y-5">
-              <div className=" p-0 pt-0 rounded-lg mb-0">
-                <div className="grid md:grid-cols-2 gap-4 mt-0">
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="aadhar"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Aadhar Number
-                    </label>
-                    <Field
-                      type="text"
-                      id="aadhar"
-                      name="aadhar"
-                      className="block w-full px-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 shadow-sm focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none text-gray-900"
-                      placeholder="12-digit Aadhar number"
-                    />
-                    <ErrorMessage
-                      name="aadhar"
-                      component="div"
-                      className="text-sm text-red-600 mt-1"
-                    />
-                  </div>
+          {({ isSubmitting, values,setFieldValue,setFieldError }) => {
 
+            const fetchIFSCInfo = useMemo(
+              () =>
+                debounce(async (ifsc) => {
+                  if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc)) return;
+                  try {
+                    const res = await fetch(
+                      `https://ifsc.razorpay.com/${ifsc}`
+                    );
+                    if (res.ok) {
+                      const data = await res.json();
+                      const formatted = `${data.BANK.toUpperCase()}, ${data.BRANCH}, ${data.CITY}`;
+                      setFieldValue("bankName", formatted);
+                    } else {
+                      setFieldValue("bankName", "");
+                    }
+                  } catch (e) {
+                    console.error("IFSC fetch failedddddddddddddddddd", e);
+                    setFieldValue("bankName", "");
+                  }
+                }, 800),
+              [setFieldValue]
+            );
+
+            useEffect(() => {
+              if (values.ifscCode) {
+                fetchIFSCInfo(values.ifscCode.toUpperCase());
+              }
+            }, [values.ifscCode]);
+
+            return (
+              <Form className="space-y-5">
+                <div className=" p-0 pt-0 rounded-lg mb-0">
+                  <div className="grid md:grid-cols-2 gap-4 mt-0">
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="aadhar"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Aadhar Number
+                      </label>
+                      <Field
+                        type="number"
+                        id="aadhar"
+                        name="aadhar"
+                        className="block w-full px-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 shadow-sm focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none text-gray-900"
+                        placeholder="12-digit Aadhar number"
+                      />
+                      <ErrorMessage
+                        name="aadhar"
+                        component="div"
+                        className="text-sm text-red-600 mt-1"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="accountNumber"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Account Number
+                      </label>
+                      <div className="relative rounded-md shadow-sm">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <CreditCardIcon className="h-5 w-5 text-gray-600" />
+                        </div>
+                        <Field
+                          type="number"
+                          id="accountNumber"
+                          name="accountNumber"
+                          className="block w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                          placeholder="Account number"
+                        />
+                      </div>
+                      <ErrorMessage
+                        name="accountNumber"
+                        component="div"
+                        className="text-sm text-red-600 mt-1"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Banking Information */}
+                <div className=" grid grid-cols-3 gap-4 p-0 pt-5 rounded-lg mb-0">
                   <div className="space-y-2">
                     <label
-                      htmlFor="accountNumber"
+                      htmlFor="password"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Account Number
+                      Password
                     </label>
                     <div className="relative rounded-md shadow-sm">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <CreditCardIcon className="h-5 w-5 text-gray-600" />
+                        <Lock className="h-5 w-5 text-gray-600" />
                       </div>
                       <Field
-                        type="text"
-                        id="accountNumber"
-                        name="accountNumber"
+                        type="password"
+                        id="password"
+                        name="password"
                         className="block w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
-                        placeholder="Account number"
+                        placeholder="Create a strong password"
                       />
                     </div>
                     <ErrorMessage
-                      name="accountNumber"
+                      name="password"
+                      component="div"
+                      className="text-sm text-red-600 mt-1"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="confirmPassword"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Confirm Password
+                    </label>
+                    <div className="relative rounded-md shadow-sm">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Lock className="h-5 w-5 text-gray-600" />
+                      </div>
+                      <Field
+                        type="password"
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        className="block w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                        placeholder="Confirm your password"
+                      />
+                    </div>
+                    <ErrorMessage
+                      name="confirmPassword"
+                      component="div"
+                      className="text-sm text-red-600 mt-1"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="securityDeposit"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Security Deposit
+                    </label>
+                    <div className="relative rounded-md shadow-sm">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <ReceiptIndianRupee className="h-5 w-5 text-gray-600" />
+                      </div>
+                      <Field
+                        type="number"
+                        id="securityDeposit"
+                        name="securityDeposit"
+                        className="block w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                        placeholder="Security Deposit"
+                      />
+                    </div>
+                    <ErrorMessage
+                      name="securityDeposit"
                       component="div"
                       className="text-sm text-red-600 mt-1"
                     />
                   </div>
                 </div>
-              </div>
-
-              {/* Banking Information */}
-              <div className=" grid grid-cols-3 gap-4 p-0 pt-5 rounded-lg mb-0">
-                <div className="space-y-2">
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Password
-                  </label>
-                  <div className="relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-gray-600" />
+                <div className="grid md:grid-cols-2 gap-4 p-0 pt-5 rounded-lg mb-5">
+                  <div className="space-y-2 ">
+                    <label
+                      htmlFor="ifscCode"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      IFSC Code
+                    </label>
+                    <div className="relative rounded-md shadow-sm">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <ScanLineIcon className="h-5 w-5 text-gray-600" />
+                      </div>
+                      <Field
+                        type="text"
+                        id="ifscCode"
+                        name="ifscCode"
+                        className="block w-full pl-10 pr-3 py-3 uppercase placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                        placeholder="IFSC code"
+                      />
                     </div>
-                    <Field
-                      type="password"
-                      id="password"
-                      name="password"
-                      className="block w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
-                      placeholder="Create a strong password"
-                    />
-                  </div>
-                  <ErrorMessage
-                    name="password"
-                    component="div"
-                    className="text-sm text-red-600 mt-1"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label
-                    htmlFor="confirmPassword"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Confirm Password
-                  </label>
-                  <div className="relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-gray-600" />
-                    </div>
-                    <Field
-                      type="password"
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      className="block w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
-                      placeholder="Confirm your password"
-                    />
-                  </div>
-                  <ErrorMessage
-                    name="confirmPassword"
-                    component="div"
-                    className="text-sm text-red-600 mt-1"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label
-                    htmlFor="securityDeposit"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Security Deposit
-                  </label>
-                  <div className="relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <ReceiptIndianRupee className="h-5 w-5 text-gray-600" />
-                    </div>
-                    <Field
-                      type="number"
-                      id="securityDeposit"
-                      name="securityDeposit"
-                      className="block w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
-                      placeholder="Security Deposit"
-                    />
-                  </div>
-                  <ErrorMessage
-                    name="securityDeposit"
-                    component="div"
-                    className="text-sm text-red-600 mt-1"
-                  />
-                </div>
-              </div>
-              <div className="grid md:grid-cols-2 gap-4 p-0 pt-5 rounded-lg mb-5">
-                <div className="space-y-2 ">
-                  <label
-                    htmlFor="ifscCode"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    IFSC Code
-                  </label>
-                  <div className="relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <ScanLineIcon className="h-5 w-5 text-gray-600" />
-                    </div>
-                    <Field
-                      type="text"
-                      id="ifscCode"
+                    <ErrorMessage
                       name="ifscCode"
-                      className="block w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
-                      placeholder="IFSC code"
+                      component="div"
+                      className="text-sm text-red-600 mt-1"
                     />
                   </div>
-                  <ErrorMessage
-                    name="ifscCode"
-                    component="div"
-                    className="text-sm text-red-600 mt-1"
-                  />
-                </div>
 
-                <div className="space-y-2 ">
-                  <label
-                    htmlFor="bankName"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Bank Name
-                  </label>
-                  <div className="relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Building2 className="h-5 w-5 text-gray-600" />
+                  <div className="space-y-2 ">
+                    <label
+                      htmlFor="bankName"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Bank Address
+                    </label>
+                    <div className="relative rounded-md shadow-sm">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Building2 className="h-5 w-5 text-gray-600" />
+                      </div>
+                      <Field
+                        type="text"
+                        id="bankName"
+                        name="bankName"
+                        className="block w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
+                        placeholder="Bank name"
+                        readOnly
+                      />
                     </div>
-                    <Field
-                      type="text"
-                      id="bankName"
+                    <ErrorMessage
                       name="bankName"
-                      className="block w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
-                      placeholder="Bank name"
+                      component="div"
+                      className="text-sm text-red-600 mt-1"
                     />
                   </div>
-                  <ErrorMessage
-                    name="bankName"
-                    component="div"
-                    className="text-sm text-red-600 mt-1"
-                  />
                 </div>
-              </div>
-              {/* Submit Button */}
-              <div className="mt-0 flex justify-between items-center">
-                <button
-                  onClick={() => setStep(1)}
-                  className="mt-4 flex justify-center items-center w-52 px-4 py-3 shadow-lg hover:shadow-black/50 bg-gray-400 text-white font-semibold rounded-lg transition-all duration-300 cursor-pointer hover:bg-gray-600 disabled:bg-gray-600"
-                >
-                  Back
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="mt-4 w-52 px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-black/50 hover:bg-blue-800 transition-all duration-300 cursor-pointer  disabled:bg-gray-400"
-                >
-                  Create Agent Account
-                </button>
-              </div>
-            </Form>
-          )}
+                {/* Submit Button */}
+                <div className="mt-0 flex justify-between items-center">
+                  <button
+                    onClick={() => setStep(1)}
+                    className="mt-4 flex justify-center items-center w-52 px-4 py-3 shadow-lg hover:shadow-black/50 bg-gray-400 text-white font-semibold rounded-lg transition-all duration-300 cursor-pointer hover:bg-gray-600 disabled:bg-gray-600"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="mt-4 w-52 px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-black/50 hover:bg-blue-800 transition-all duration-300 cursor-pointer  disabled:bg-gray-400"
+                  >
+                    Create Agent Account
+                  </button>
+                </div>
+              </Form>
+            );
+          }}
         </Formik>
       )}
     </div>

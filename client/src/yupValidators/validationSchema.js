@@ -123,6 +123,9 @@ export const agentValidationSchemaStep2 = Yup.object({
   aadhar: Yup.string()
     .matches(/^[0-9]{12}$/, "Aadhar number must be 12 digits")
     .required("Aadhar number is required"),
+    // .test("verhoeff-check", "Invalid Aadhar number", (value) =>
+    //   value ? isValidAadhaar(value) : false
+    // ),
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")
     .matches(
@@ -141,7 +144,24 @@ export const agentValidationSchemaStep2 = Yup.object({
     .required("Account number is required"),
   ifscCode: Yup.string()
     .matches(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Please enter a valid IFSC code")
-    .required("IFSC code is required"),
+    .required("IFSC code is required")
+    .test("correct-ifsc", "Invalid IFSC code", async function (value) {
+      if (!value) return false;
+      try {
+        const response = await fetch(`https://ifsc.razorpay.com/${value}`);
+        if (response.ok) {
+          const json = await response.json();
+          console.log("Valid IFSC:", json); 
+          return true;
+        } else {
+          console.log("Invalid IFSC response:", response.status);
+          return false;
+        }
+      } catch (e) {
+        console.error("Fetch error:", e);
+        return false;
+      }
+    }),
   bankName: Yup.string().required("Bank name is required"),
 });
 

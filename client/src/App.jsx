@@ -15,6 +15,7 @@ import capitalize from "./utils/capitalize";
 function App() {
   const isLoading = useSelector((state) => state.loading.isLoading);
   const dispatch = useDispatch();
+  const location = useLocation();
   const [decoded, setDecoded] = useState(null);
   useEffect(() => {
     const token = Cookies.get("token");
@@ -112,7 +113,7 @@ function App() {
 
   return (
     <>
-      <Header />
+      {location.pathname != "/razorpay" && <Header />}
       <ToastContainer
         className={"z-50"}
         position="top-right"

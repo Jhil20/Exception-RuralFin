@@ -107,7 +107,7 @@ const AgentDashboard = () => {
 
   const getAgentData = async () => {
     try {
-      // console.log("Decoded token:", decoded, token);
+      console.log("Decoded token:", decoded, token);
       const response = await axios.get(
         `${BACKEND_URL}/api/agent/${decoded.id}`
       );

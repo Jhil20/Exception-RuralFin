@@ -89,14 +89,14 @@ const CityAutocomplete = () => {
   };
 
   return (
-    <div className="relative w-full">
+    <div className="relative flex flex-wrap justify-start w-full">
       <label
         htmlFor="city"
         className="block text-sm font-medium text-gray-700 mb-1"
       >
         City
       </label>
-      <div className="absolute inset-y-0 left-0 top-5 pl-3 flex items-center pointer-events-none">
+      <div className="relative -left-6 top-9.5 pl-3 flex items-center pointer-events-none">
         <Building2 className="h-5 w-5 text-gray-600" />
       </div>
       <input
@@ -111,13 +111,13 @@ const CityAutocomplete = () => {
       />
       {/* ✅ Loader when fetching */}
       {loading && (
-        <div className="absolute z-10 w-full bg-white border rounded shadow-lg mt-1 px-3 py-2 text-sm text-gray-500">
+        <div className="relative z-10 w-full bg-white border rounded shadow-lg  px-3 py-2 text-sm text-gray-500">
           Fetching cities... please wait
         </div>
       )}
       {/* ✅ Suggestions after fetch */}
       {!loading && suggestions.length > 0 && (
-        <ul className="absolute z-10 w-full bg-white border rounded shadow-lg max-h-60 overflow-y-auto mt-1">
+        <ul className="relative z-10 w-full bg-white border rounded shadow-lg max-h-60 overflow-y-auto">
           {suggestions.map((city) => (
             <li
               key={city.place_id}

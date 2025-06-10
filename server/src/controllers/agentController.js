@@ -1,13 +1,12 @@
 const Agent = require("../models/agentModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const findAge= require("../utils/findAgeBackend");
+const findAge = require("../utils/findAgeBackend");
 // Get all agents
 const getAllAgents = async (req, res) => {
   try {
     const agents = await Agent.find();
-    res.json({ agents, message: "agents fetched successfully" ,success:true});
-    
+    res.json({ agents, message: "agents fetched successfully", success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -26,8 +25,6 @@ const getAgentById = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
-
 
 const checkAgentPassword = async (req, res) => {
   try {
@@ -69,7 +66,10 @@ const createAgent = async (req, res) => {
       dob,
       gender,
       aadhar,
-      address,
+      city,
+      state,
+      country,
+      zipCode,
       accountNumber,
       password,
       securityDeposit,
@@ -83,7 +83,10 @@ const createAgent = async (req, res) => {
       "phone",
       "password",
       "dob",
-      "address",
+      "city",
+      "country",
+      "state",
+      "zipCode",
       "gender",
       "aadhar",
       "accountNumber",
@@ -112,10 +115,9 @@ const createAgent = async (req, res) => {
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-
     // Create agent
-    const age=findAge(dob);
-    const agent = Agent.create({
+    const age = findAge(dob);
+    const agent = await Agent.create({
       firstName,
       lastName,
       age,
@@ -126,14 +128,18 @@ const createAgent = async (req, res) => {
       ifscCode,
       bankName,
       securityDeposit: securityDeposit,
-      balance: securityDeposit, 
+      balance: securityDeposit,
       password: hashedPassword,
       phone,
-      address,
+      city,
+      state,
+      country,
+      zipCode,
     });
 
     if (agent) {
       // Generate JWT
+      console.log("agent token creation", agent._id, agent.phone);
       const token = jwt.sign(
         { id: agent._id, phone: agent.phone },
         "harshp4114",
