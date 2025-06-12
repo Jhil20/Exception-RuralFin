@@ -115,7 +115,7 @@ const AgentModel = () => {
                 <div
                   key={index}
                   ref={(el) => (stepRefs.current[index] = el)}
-                  className="bg-white rounded-xl border-2 border-gray-300 hover:shadow-lg hover:shadow-gray-300 transition-shadow duration-300 p-6 shadow-sm"
+                  className="bg-white rounded-xl shadow-md shadow-black/10 hover:shadow-lg hover:shadow-gray-300 transition-shadow duration-300 p-6"
                 >
                   <div className="bg-gray-100 h-12 w-12 rounded-lg flex items-center justify-center mb-4 text-black">
                     {step.icon}

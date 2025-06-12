@@ -109,9 +109,9 @@ const FinancialLiteracy = () => {
               </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               {literacyModules.map((module, index) => (
-                <div key={index} className="bg-gray-50 p-4 rounded-xl">
+                <div key={index} className="bg-gray-50 shadow-md hover:shadow-lg hover:shadow-gray-300 transition-all duration-300   shadow-black/10 p-4 rounded-xl">
                   <div className="flex items-start mb-3">
                     <div className="bg-black text-white h-8 w-8 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
                       {module.icon}

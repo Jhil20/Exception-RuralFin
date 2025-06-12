@@ -322,7 +322,7 @@ const createUser = async (req, res) => {
     user.finance = finance._id;
     await user.save();
 
-    const token = jwt.sign({ id: user._id, phone: user.phone }, "harshp4114", {
+    const token =jwt.sign({ id: user._id, phone: user.phone }, "harshp4114", {
       expiresIn: "1h",
     });
 

@@ -98,7 +98,7 @@ const SecuritySection = () => {
               {securityFeatures.map((feature, index) => (
                 <div
                   key={index}
-                  className="security-feature h-fit rounded-xl border-2 border-gray-300 hover:shadow-lg hover:shadow-gray-300 transition-shadow duration-300  bg-gray-50 p-8 "
+                  className="security-feature h-full rounded-xl shadow-md shadow-black/10 hover:shadow-lg hover:shadow-gray-300 transition-shadow duration-300  bg-gray-50 p-8 "
                 >
                   <div className="flex items-center mb-4">
                     <div className="bg-black text-white h-14 w-14 rounded-lg flex items-center justify-center mr-3">

@@ -48,7 +48,7 @@ const BalanceCard = ({ showSend, balance, lastUpdated, user }) => {
         <p className="font-normal">{user?.ruralFinId}</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 mt-7 mb-4">
+      <div className="grid grid-cols-1 gap-4 mt-11 mb-4">
         <button
           onClick={() => setShowSend(true)}
           className="bg-gray-800 cursor-pointer hover:bg-gray-700 transition-colors duration-200 rounded-xl py-3 px-4 flex items-center justify-center"

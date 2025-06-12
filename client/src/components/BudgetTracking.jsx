@@ -197,7 +197,7 @@ const BudgetTracking = () => {
               {budgetFeatures.map((feature, index) => (
                 <div
                   key={index}
-                  className="budget-feature p-8 border-2 border-gray-300 hover:shadow-lg hover:shadow-gray-300 transition-shadow duration-300 bg-white  rounded-xl shadow-sm"
+                  className="budget-feature p-8 shadow-md shadow-black/10 hover:shadow-lg hover:shadow-gray-300 transition-shadow duration-300 bg-white  rounded-xl"
                 >
                   <div className="bg-black text-white h-12 w-12 rounded-lg flex items-center justify-center mb-4">
                     {feature.icon}

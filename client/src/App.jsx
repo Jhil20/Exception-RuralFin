@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import UserDashboard from "./routes/UserDashboard";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,24 +8,21 @@ import Header from "./components/Header";
 import { toast, ToastContainer } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
-import { createSocket, getSocket } from "./utils/socket";
+import {  getSocket } from "./utils/socket";
 import speak from "./utils/speak";
 import capitalize from "./utils/capitalize";
 
 function App() {
   const isLoading = useSelector((state) => state.loading.isLoading);
-  const dispatch = useDispatch();
   const location = useLocation();
-  const [decoded, setDecoded] = useState(null);
-  useEffect(() => {
-    const token = Cookies.get("token");
-    if (token) {
-      const decodedToken = jwtDecode(token);
-      setDecoded(decodedToken);
-      const socket = createSocket(decodedToken.id);
-      // console.log("Socket created for user:", decodedToken.id);
-    }
-  }, []);
+  // const [decoded, setDecoded] = useState(null);
+
+  const token = Cookies.get("token");
+  const decoded = useMemo(() => {
+    if (token) return jwtDecode(token);
+    return null;
+  }, [token]);
+
 
   useEffect(() => {
     if (!decoded) return;

@@ -28,7 +28,7 @@ const AgentList = ({
     <div className="bg-gray-50  h-full rounded-2xl p-8 shadow-md shadow-gray-300">
       <h3 className="text-xl font-semibold text-black mb-6">Select an Agent</h3>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid w-full grid-cols-3 gap-6">
         {allAgents.map((agent) => (
           <div
             key={agent?._id}
@@ -49,12 +49,18 @@ const AgentList = ({
                     capitalize(agent?.lastName)}
                 </span>
                 <span className="text-gray-700 text-sm my-1 font-normal">
-                  Amount: ₹{agent?.balance}
+                  Balance: ₹{agent?.balance}
                 </span>
                 <div className="text-gray-700 text-sm  ">
-                  Address : {agent?.address}
+                  City : {agent?.city || "Vadodara"}
                 </div>
-
+                <div className="text-gray-700 text-sm  ">
+                  State : {agent?.state || "Gujarat"}
+                </div>
+                <div className="text-gray-700 text-sm  ">
+                  Country : {agent?.country || "India"}
+                </div>
+                
                 {/* <div className="flex items-center text-gray-900 text-sm">
                   <Star className="w-4 h-4 text-yellow-500 mr-1" />
                   {agent?.rating}

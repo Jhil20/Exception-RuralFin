@@ -16,7 +16,7 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { NotSignedIn, SignedIn } from "../redux/slices/isSignInSlice";
+import { NotSignedIn } from "../redux/slices/isSignInSlice";
 import Cookies from "js-cookie";
 import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
 import { disconnectSocket, getSocket } from "../utils/socket";
@@ -35,14 +35,10 @@ const Header = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const token = Cookies.get("token");
   const decoded = useMemo(() => {
-    if (token) {
-      return jwtDecode(token);
-    } else {
-      return null;
-    }
-  }, [token]);
+    if (token) return jwtDecode(token);
+    return null;
+  }, []);
 
-  // console.log(location)
 
   const handleLogout = () => {
     dispatch(showLoader());
@@ -62,8 +58,7 @@ const Header = () => {
       case "transaction":
         return <CreditCard size={16} className="text-gray-900" />;
       case "system":
-        return <Server  size={16} className="text-gray-900" />;
-
+        return <Server size={16} className="text-gray-900" />;
     }
   };
 
@@ -72,12 +67,12 @@ const Header = () => {
       if (decoded) {
         // console.log("IIIIIIIIIIIIIIIIII",decoded)
         const type = location.pathname === "/dashboard" ? "User" : "Agent";
-        console.log(
-          "Fetching notifications for user:",
-          decoded?.id,
-          "Type:",
-          type
-        );
+        // console.log(
+        //   "Fetching notifications for user:",
+        //   decoded?.id,
+        //   "Type:",
+        //   type
+        // );
         const response = await axios.post(
           `${BACKEND_URL}/api/notification/getNotifications`,
           {
@@ -85,16 +80,18 @@ const Header = () => {
             userType: type,
           }
         );
-        console.log("Notifications fetched:", response.data);
+        // console.log("Notifications fetched:", response.data);
         setNotifications(response.data.data);
       }
     } catch (err) {
       console.error("Error fetching notifications:", err);
     }
   };
+
+
   useEffect(() => {
     getNotifications();
-  }, [decoded, showNotifications]);
+  },[]);
 
   useEffect(() => {
     if (!decoded) return;
@@ -109,10 +106,10 @@ const Header = () => {
       console.log("SOCKET OF SYSTEM SETTINGS CALLED IN FRONTEND ", data);
       setNotifications((prev) => [...prev, ...data]);
       getNotifications();
-    }
+    };
 
     socket.on("newNotificationSend", handler);
-    socket.on("updateSystemSettingsBackend",handler2)
+    socket.on("updateSystemSettingsBackend", handler2);
 
     return () => {
       socket.off("newNotificationSend", handler);
@@ -371,8 +368,6 @@ const Header = () => {
           {/* Right Side Icons */}
           {isSignedIn ? (
             <div className="h-fit w-fit flex items-center space-x-6">
-              
-
               {location.pathname != "/adminDashboard" && (
                 <button
                   onClick={() => setShowNotifications(true)}
@@ -415,74 +410,11 @@ const Header = () => {
             </Link>
           )}
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <button
-              type="button"
-              className="text-gray-500 hover:text-gray-700 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors duration-200"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
+          
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200 shadow-lg">
-          <div className="container mx-auto px-4 py-3 space-y-1">
-            <a
-              href="#dashboard"
-              className="block text-gray-900 px-3 py-2 text-base font-medium rounded-md hover:bg-gray-100 transition-colors duration-200"
-            >
-              AgentDashboard
-            </a>
-            <a
-              href="#transactions"
-              className="block text-gray-500 px-3 py-2 text-base font-medium rounded-md hover:bg-gray-100 transition-colors duration-200"
-            >
-              Transactions
-            </a>
-            <a
-              href="#cards"
-              className="block text-gray-500 px-3 py-2 text-base font-medium rounded-md hover:bg-gray-100 transition-colors duration-200"
-            >
-              Cards
-            </a>
-            <a
-              href="#payments"
-              className="block text-gray-500 px-3 py-2 text-base font-medium rounded-md hover:bg-gray-100 transition-colors duration-200"
-            >
-              Payments
-            </a>
-            <a
-              href="#settings"
-              className="block text-gray-500 px-3 py-2 text-base font-medium rounded-md hover:bg-gray-100 transition-colors duration-200"
-            >
-              Settings
-            </a>
-
-            <div className="pt-4 pb-3 border-t border-gray-200">
-              <div className="flex items-center space-x-4 px-3">
-                <div className="flex-shrink-0">
-                  <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                    <User size={20} className="text-gray-500" />
-                  </div>
-                </div>
-                <div>
-                  <div className="text-base font-medium text-gray-800">
-                    Sarah Johnson
-                  </div>
-                  <div className="text-sm font-medium text-gray-500">
-                    sarah@example.com
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      
     </header>
   );
 };

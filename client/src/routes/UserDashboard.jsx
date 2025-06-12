@@ -24,22 +24,7 @@ import AgentsViewMore from "../components/AgentsViewMore";
 import speak from "../utils/speak";
 import { getSocket } from "../utils/socket";
 const UserDashboard = () => {
-  // const [isLoading, setIsLoading] = useState(true);
-
-  // useEffect(() => {
-  //   // Simulate loading time
-  //   const timer = setTimeout(() => {
-  //     setIsLoading(false);
-  //   }, 2000);
-
-  //   return () => clearTimeout(timer);
-  // }, []);
-
-  // if (isLoading) {
-  //   return <LoadingScreen />;
-  // }
   useAuth();
-
   const isLoading = useSelector((state) => state.loading.isLoading);
   const dispatch = useDispatch();
   const [userData, setUserData] = useState(null);
@@ -84,12 +69,13 @@ const UserDashboard = () => {
     if (token) return jwtDecode(token);
     return null;
   }, [token]);
+
   useEffect(() => {
     if (!decoded) return;
-    const socket = getSocket(decoded.id);
+    const socket = getSocket(decoded?.id);
     const handler = (data) => {
       setTransactionData((prev) => [...prev, data.transaction]);
-      if (data?.transaction?.senderId._id === decoded.id) {
+      if (data?.transaction?.senderId._id === decoded?.id) {
         toast.success(
           `₹${data?.transaction?.amount} sent to  ${capitalize(
             data?.transaction?.receiverId?.firstName
@@ -174,7 +160,7 @@ const UserDashboard = () => {
   const getTransactions = async () => {
     try {
       const result = await axios.get(
-        `${BACKEND_URL}/api/userToUserTransaction/getTransactions/${decoded.id}`
+        `${BACKEND_URL}/api/userToUserTransaction/getTransactions/${decoded?.id}`
       );
       // console.log("result", result);
       setTransactionData(result?.data?.transactions);
@@ -183,7 +169,7 @@ const UserDashboard = () => {
     }
     try {
       const result2 = await axios.get(
-        `${BACKEND_URL}/api/agentToUserTransaction/byUser/${decoded.id}`
+        `${BACKEND_URL}/api/agentToUserTransaction/byUser/${decoded?.id}`
       );
       // console.log("result2 ttttttttttttttttttttttt", result2);
       setTransactionData((prev) => [...prev, ...result2?.data?.transactions]);
@@ -193,10 +179,12 @@ const UserDashboard = () => {
   };
 
   const getUserData = async () => {
-    dispatch(showLoader());
+    // dispatch(showLoader());
     try {
       // console.log("hiiii");
-      const response = await axios.get(`${BACKEND_URL}/api/user/${decoded.id}`);
+      const response = await axios.get(
+        `${BACKEND_URL}/api/user/${decoded?.id}`
+      );
       // console.log("response", response);
       setUserData(response?.data?.data);
       // console.log("FIDDDD", response?.data?.data?.finance);
@@ -208,18 +196,14 @@ const UserDashboard = () => {
     } catch (err) {
       console.log(err);
     } finally {
-      dispatch(hideLoader());
+      // dispatch(hideLoader());
     }
   };
 
   useEffect(() => {
-    // console.log("decoded", decoded);
     getUserData();
-  }, []);
-
-  useEffect(() => {
     getTransactions();
-  }, []);
+  }, [decoded]);
 
   return isLoading ? (
     <Loader />
@@ -306,7 +290,7 @@ const UserDashboard = () => {
             />
           </div>
 
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 h-full">
             <AgentList
               setShowAgentDetails={setShowAgentDetails}
               setSelectedAgent={setSelectedAgent}
