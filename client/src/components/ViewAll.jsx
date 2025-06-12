@@ -134,7 +134,7 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
         </div>
       )}
 
-      <div className="flex h-1/12 justify-start items-start mb-4">
+      <div className="flex h-1/12 justify-start items-start mb-0">
         <X
           size={32}
           onClick={() => setViewAll(false)}

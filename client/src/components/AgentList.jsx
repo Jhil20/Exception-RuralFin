@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { User, Star, ChevronRight } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { User, ChevronRight } from "lucide-react";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import capitalize from "../utils/capitalize";
+import { jwtDecode } from "jwt-decode";
+import Cookies from "js-cookie";
+import { getSocket } from "../utils/socket";
 
 const AgentList = ({
   setShowAgentDetails,
@@ -13,6 +16,55 @@ const AgentList = ({
   useEffect(() => {
     getAgents();
   }, []);
+
+  const token = Cookies.get("token");
+  const decoded = useMemo(() => {
+    if (token) return jwtDecode(token);
+    return null;
+  }, [token]);
+
+  useEffect(() => {
+    if (!decoded) return;
+    const socket = getSocket(decoded.id);
+    const handler1 = (data) => {
+      setAllAgents((prevAgents) => {
+        const updatedAgents = prevAgents?.map((agent) => {
+          if (agent._id === data.agentId._id) {
+            return {
+              ...agent,
+              balance: data.agentId.balance,
+            };
+          }
+          return agent;
+        });
+        return updatedAgents;
+      });
+    };
+
+    const handler2 = (data) => {
+      setAllAgents((prevAgents) => {
+        const updatedAgents = prevAgents?.map((agent) => {
+          if (agent._id === data.agentId._id) {
+            return {
+              ...agent,
+              balance: data.agentId.balance,
+            };
+          }
+          return agent;
+        });
+        return updatedAgents;
+      });
+    };
+
+    if (socket) {
+      socket.on("UserAgentDepositCompletedBackend", handler1);
+      socket.on("UserAgentWithdrawCompletedBackend", handler1);
+      return () => {
+        socket.off("UserAgentDepositCompletedBackend", handler1);
+        socket.off("UserAgentWithdrawCompletedBackend", handler1);
+      };
+    }
+  }, [decoded]);
 
   const getAgents = async () => {
     try {
@@ -60,7 +112,7 @@ const AgentList = ({
                 <div className="text-gray-700 text-sm  ">
                   Country : {agent?.country || "India"}
                 </div>
-                
+
                 {/* <div className="flex items-center text-gray-900 text-sm">
                   <Star className="w-4 h-4 text-yellow-500 mr-1" />
                   {agent?.rating}
