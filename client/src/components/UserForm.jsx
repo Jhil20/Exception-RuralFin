@@ -80,6 +80,8 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
         ...userData,
         ...values,
       };
+      console.log("User Data:", userData,values);
+      console.log("All Values to be submitted:", allValues);
       const response = await axios.post(
         `${BACKEND_URL}/api/user/getUserByAadhar`,
         { aadhar: values.aadhar }

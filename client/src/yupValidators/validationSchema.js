@@ -67,10 +67,10 @@ export const userValidationSchemaStep1 = Yup.object({
 export const userValidationSchemaStep2 = Yup.object({
   aadhar: Yup.string()
     .required("Aadhar number is required")
-    .matches(/^[0-9]{12}$/, "Aadhar number must be 12 digits")
-    .test("verhoeff-check", "Invalid Aadhar number", (value) =>
-      value ? isValidAadhaar(value) : false
-    ),
+    .matches(/^[0-9]{12}$/, "Aadhar number must be 12 digits"),
+    // .test("verhoeff-check", "Invalid Aadhar number", (value) =>
+    //   value ? isValidAadhaar(value) : false
+    // ),
 
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")

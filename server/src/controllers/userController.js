@@ -150,7 +150,7 @@ const getUserByAadhar=async(req,res)=>{
     if(user){
       return res.status(200).json({success:true,data:user})
     }
-    return res.status(401).json({success:false});
+    return res.status(200).json({success:false});
   }catch(error){
     res.status(500).json({success:false,message:"error fetching user by aadhar",error:error})
   }
@@ -241,10 +241,15 @@ const createUser = async (req, res) => {
       "phone",
       "password",
       "dob",
-      "address",
+      "city",
+      "state",
+      "country",
+      "zipCode",
       "gender",
       "aadhar",
     ];
+
+    console.log("req.body", req.body);
 
     for (const field of requiredFields) {
       if (!req.body[field]) {
@@ -273,7 +278,10 @@ const createUser = async (req, res) => {
       age: age,
       dob: req.body.dob,
       gender: req.body.gender,
-      address: req.body.address,
+      city: req.body.city,
+      state: req.body.state,
+      country: req.body.country,
+      zipCode: req.body.zipCode,
       phone: req.body.phone,
       aadhar: req.body.aadhar,
       password: hashedPassword,

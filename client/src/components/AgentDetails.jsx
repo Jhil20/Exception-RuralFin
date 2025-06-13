@@ -58,6 +58,8 @@ const AgentDetails = ({
   const [transactionFilter, setTransactionFilter] = useState("all");
   const [allTransactions, setAllTransactions] = useState([]);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
+  const [allAgentUserTransactions, setAllAgentUserTransactions] = useState([]);
+  const [thisMonthCommission, setThisMonthCommission] = useState(0);
   const [userData, setUserData] = useState(null);
   const [settings, setSettings] = useState(null);
   const token = Cookies.get("token");
@@ -306,8 +308,19 @@ const AgentDetails = ({
     }
   };
 
+  const getThisMonthCommission=async()=>{
+    try{
+      const response=await axios.post(`${BACKEND_URL}/api/agentCommission/getThisMonthCommission`,{agentId:selectedAgent._id});
+      console.log("This month's commission:", response.data);
+      setThisMonthCommission(response.data.data || 0);
+    }catch(error){
+      console.error("Error fetching this month's commission:", error);
+    }
+  }
+
   useEffect(() => {
     getAllTransactions();
+    getThisMonthCommission();
   }, []);
 
   const getAllTransactions = async () => {
@@ -316,8 +329,26 @@ const AgentDetails = ({
         `${BACKEND_URL}/api/agentToUserTransaction/${selectedAgent._id}`
       );
       console.log("Fetched transactions:", response.data);
-      setAllTransactions(response?.data?.transactions);
-      setFilteredTransactions(response?.data?.transactions);
+      const filtered = response?.data?.transactions?.filter((tr) => {
+        if (tr.userId._id === decoded.id) {
+          return tr;
+        }
+      });
+      const startOfMonth = new Date(
+        new Date().getFullYear(),
+        new Date().getMonth(),
+        1
+      );
+
+      const filterAllTransactions = response?.data?.transactions?.filter(
+        (tr) => {
+          const createdAtDate = new Date(tr.createdAt);
+          return tr.status === "completed" && createdAtDate >= startOfMonth;
+        }
+      );
+      setAllAgentUserTransactions(filterAllTransactions);
+      setAllTransactions(filtered);
+      setFilteredTransactions(filtered);
     } catch (error) {
       console.error("Error fetching transactions:", error);
     }
@@ -593,14 +624,14 @@ const AgentDetails = ({
                         </span>
                         <span className="text-black font-bold">
                           ₹
-                          {selectedAgent?.commissionEarned?.toLocaleString(
+                          {thisMonthCommission?.toLocaleString(
                             "en-IN"
                           )}
                         </span>
                       </div>
                       <div className="flex items-center text-xs text-gray-500">
                         <span className="w-28">
-                          From {48} transactions in{" "}
+                          From {allAgentUserTransactions.length} transactions in{" "}
                           {monthsMapping[new Date().getMonth() + 1]}
                         </span>
                       </div>
@@ -999,7 +1030,8 @@ const AgentDetails = ({
                               </div>
                               <div className="flex flex-col items-end">
                                 <span className="font-bold text-black">
-                                  ₹{transaction?.amount?.toLocaleString("en-IN")}
+                                  ₹
+                                  {transaction?.amount?.toLocaleString("en-IN")}
                                 </span>
                                 <span className="text-xs text-gray-500">
                                   Commission: ₹

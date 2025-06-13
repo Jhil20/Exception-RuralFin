@@ -14,6 +14,7 @@ const { Server } = require("socket.io");
 const { createNotification } = require("./controllers/notificationController");
 const notificationRoutes = require("./routes/notificationRoutes");
 const razorpayRoutes = require("./routes/razorpayRoutes");
+const agentCommissionRoutes = require("./routes/agentCommissionRoutes");
 
 const app = express();
 connectMongo();
@@ -37,9 +38,7 @@ const io = new Server(httpServer, {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json({ limit: "16kb" }));
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
 
 let onlineUsers = {};
 
@@ -420,7 +419,7 @@ app.use("/api/budget", budgetRoutes);
 app.use("/api/agentToUserTransaction", agentToUserTransactionRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/notification", notificationRoutes);
-// server.js or app.js
+app.use("/api/agentCommission", agentCommissionRoutes);
 const serverStartTime = new Date();
 
 app.use("/api/uptime", (req, res) => {

@@ -3,7 +3,6 @@ import { X, Shield, CreditCard, TrendingUp, AlertCircle } from 'lucide-react';
 
 const SecurityDepositOverlay = ({ isOpen, onClose, currentBalance , currentSecurityDeposit }) => {
   const [depositAmount, setDepositAmount] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('upi');
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleDeposit = async () => {
@@ -97,7 +96,7 @@ const SecurityDepositOverlay = ({ isOpen, onClose, currentBalance , currentSecur
                 value={depositAmount}
                 onChange={(e) => setDepositAmount(e.target.value)}
                 placeholder="Enter amount"
-                className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent no-spinner"
+                className="w-full pl-8 pr-4 py-3 border-2 hover:border-gray-700 transition-all duration-300 border-gray-300 rounded-lg focus:border-gray-700 no-spinner"
               />
             </div>
           </div>
@@ -110,7 +109,7 @@ const SecurityDepositOverlay = ({ isOpen, onClose, currentBalance , currentSecur
                 <button
                   key={amount}
                   onClick={() => setDepositAmount(amount.toString())}
-                  className="py-2 px-4 border border-gray-300 rounded-lg hover:bg-black hover:text-white transition-colors text-sm font-medium"
+                  className="py-2 px-4 border border-gray-300 rounded-lg hover:bg-black hover:text-white transition-all duration-100 cursor-pointer text-sm font-medium"
                 >
                   ₹{amount.toLocaleString()}
                 </button>
