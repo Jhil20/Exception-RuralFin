@@ -228,10 +228,11 @@ const updateBudgetSpending = async (req, res) => {
     }
 
     // Update the category spending
-    if(category == "Food & Dining") {
-      category = "Food";
+    if (category == "Food & Dining") {
+      budget.categorySpending["Food"] += amount;
+    } else {
+      budget.categorySpending[category] += amount;
     }
-    budget.categorySpending[category] += amount;
 
     if (
       budget.categorySpending[category] + amount >
