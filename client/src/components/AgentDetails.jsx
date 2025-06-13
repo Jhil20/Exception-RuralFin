@@ -59,6 +59,7 @@ const AgentDetails = ({
   const [allTransactions, setAllTransactions] = useState([]);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [allAgentUserTransactions, setAllAgentUserTransactions] = useState([]);
+  const [totalTransactions,setTotaltransactions]=useState([]);
   const [thisMonthCommission, setThisMonthCommission] = useState(0);
   const [userData, setUserData] = useState(null);
   const [settings, setSettings] = useState(null);
@@ -346,6 +347,12 @@ const AgentDetails = ({
           return tr.status === "completed" && createdAtDate >= startOfMonth;
         }
       );
+      const filterTotalTransactions=response?.data?.transactions.filter((tr)=>{
+        if(tr.status=="completed"){
+          return tr;
+        }
+      })
+      setTotaltransactions(filterTotalTransactions);
       setAllAgentUserTransactions(filterAllTransactions);
       setAllTransactions(filtered);
       setFilteredTransactions(filtered);
@@ -667,9 +674,9 @@ const AgentDetails = ({
                     <div className="bg-gray-50 border-gray-200 border rounded-lg p-4">
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium text-gray-500">
-                          Transactions
+                         Total Transactions
                         </span>
-                        <span className="text-black font-bold">{48}</span>
+                        <span className="text-black font-bold">{totalTransactions.length || 0}</span>
                       </div>
                     </div>
                   </div>

@@ -213,7 +213,7 @@ const ExpenseCategoryDetails = ({
                 className="w-full px-5 cursor-pointer py-3 bg-gray-200 text-sm font-medium text-gray-600 hover:text-black flex items-center justify-center transition-colors duration-200"
               >
                 <span>View Details</span>
-                <ArrowRight size={14} className="ml-1" />
+                <ArrowRight size={14} className="ml-1 mt-1" />
               </button>
             </div>
           );

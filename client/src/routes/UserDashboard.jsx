@@ -74,6 +74,13 @@ const UserDashboard = () => {
     if (!decoded) return;
     const socket = getSocket(decoded?.id);
     const handler = (data) => {
+      setUserFinance((prev)=>{
+        return {
+          ...prev,
+          balance: prev.balance + data.transaction.amount,
+        };
+      });
+
       setTransactionData((prev) => [...prev, data.transaction]);
       if (data?.transaction?.senderId._id === decoded?.id) {
         toast.success(
@@ -99,6 +106,7 @@ const UserDashboard = () => {
         );
       }
       getTransactions();
+      getUserData();
     };
 
     const handler2 = (data) => {

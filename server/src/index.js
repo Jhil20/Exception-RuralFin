@@ -61,7 +61,7 @@ io.on("connection", (socket) => {
     if (receiverSocketId && senderSocketId) {
       io.to([receiverSocketId, senderSocketId]).emit(
         "money-received-by-receiver",
-        data
+        data,
       );
       if (receiverSocketId) {
         const notificationObj = await createNotification({
