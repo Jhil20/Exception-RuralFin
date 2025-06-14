@@ -15,6 +15,7 @@ const { createNotification } = require("./controllers/notificationController");
 const notificationRoutes = require("./routes/notificationRoutes");
 const razorpayRoutes = require("./routes/razorpayRoutes");
 const agentCommissionRoutes = require("./routes/agentCommissionRoutes");
+const adminToAgentTransactionRoutes = require("./routes/adminToAgentTransactionRoutes");
 
 const app = express();
 connectMongo();
@@ -420,6 +421,7 @@ app.use("/api/agentToUserTransaction", agentToUserTransactionRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/notification", notificationRoutes);
 app.use("/api/agentCommission", agentCommissionRoutes);
+app.use("/api/adminToAgentTransaction",adminToAgentTransactionRoutes)
 const serverStartTime = new Date();
 
 app.use("/api/uptime", (req, res) => {

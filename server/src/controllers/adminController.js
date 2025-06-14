@@ -9,6 +9,7 @@ const jwt = require("jsonwebtoken");
 const moment = require("moment");
 const AgentCommission = require("../models/agentCommissionModel");
 const SystemSettings = require("../models/systemSettingsModel");
+const AdminToAgentTransaction = require("../models/adminToAgentTransactionModel");
 
 const getAdminOverviewCardData = async (req, res) => {
   try {
@@ -304,10 +305,18 @@ const getRecentActivityData = async (req, res) => {
         type: "User to Agent Transaction",
         _id: transaction._id,
       }));
+    const adminToAgentTransactionsActivity = await AdminToAgentTransaction.find(
+      {
+        status: "completed",
+      }
+    )
+      .populate("agentId")
+      .sort({ transactionDate: -1 });
     const allActivities = [
       ...userActivityRefined,
       ...agentActivityRefined,
       ...userToAgentTransactionsActivityRefined,
+      ...adminToAgentTransactionsActivity,
     ].sort(
       (a, b) =>
         new Date(b.createdAt || b.transactionDate) -
@@ -677,7 +686,6 @@ const updateSystemSettings = async (req, res) => {
       data: updatedSettings,
       message: "System settings updated successfully",
     });
-
   } catch (error) {
     res.status(500).json({ message: "Error updating system settings", error });
   }

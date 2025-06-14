@@ -67,15 +67,15 @@ const AdminOverview = () => {
   }, [decoded]);
 
   const getActiveUsers = async () => {
-    try{
-      const response=await axios.get(`${BACKEND_URL}/api/getActiveUsers`);
+    try {
+      const response = await axios.get(`${BACKEND_URL}/api/getActiveUsers`);
       console.log("Active Users Data:", response.data);
-      const length= response.data.data.length+1;
+      const length = response.data.data.length + 1;
       setActiveUsers(length);
-    }catch (error) {
+    } catch (error) {
       console.error("Error fetching active users:", error);
     }
-  }
+  };
 
   const getOverviewCardData = async () => {
     try {
@@ -155,7 +155,10 @@ const AdminOverview = () => {
         />
         <StatCard
           title="Total Accounts"
-          value={`${overviewCardData?.totalAgents+overviewCardData?.totalUsers+1 || "0"}`}
+          value={`${
+            overviewCardData?.totalAgents + overviewCardData?.totalUsers + 1 ||
+            "0"
+          }`}
           icon={<Users size={20} />}
         />
         <StatCard
@@ -199,6 +202,8 @@ const AdminOverview = () => {
                         ? `User created with ID #${activity._id}`
                         : activity.type == "Agent Created"
                         ? `Agent created with ID #${activity._id}`
+                        : activity.type == "adminToAgent"
+                        ? `Security Deposit of ₹${activity.amount} added to Agent`
                         : `Transaction of ₹${activity.amount} completed by Agent`}
                     </p>
                     <div className="text-xs text-gray-500 mt-[1px] mr-2">
@@ -231,6 +236,12 @@ const AdminOverview = () => {
                       ? `Name : ${capitalize(activity.firstName)} ${capitalize(
                           activity.lastName
                         )}`
+                      : activity.type == "adminToAgent"
+                      ? `Agent : ${capitalize(
+                          activity.agentId.firstName
+                        )} ${capitalize(activity.agentId.lastName)} | ${
+                          activity.agentId._id
+                        }`
                       : `User : ${capitalize(
                           activity.user.firstName
                         )} ${capitalize(activity.user.lastName)} | #${
@@ -242,6 +253,8 @@ const AdminOverview = () => {
                       ? `Phone : ${activity.phone}`
                       : activity.type == "Agent Created"
                       ? `Phone : ${activity.phone}`
+                      : activity.type == "adminToAgent"
+                      ? `Agent Phone : ${activity.agentId.phone}`
                       : `Agent : ${capitalize(
                           activity.agent.firstName
                         )} ${capitalize(activity.agent.lastName)} | ${

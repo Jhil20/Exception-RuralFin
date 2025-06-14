@@ -38,6 +38,15 @@ const RazorPay = () => {
           amount,
         }
       );
+      const response2 = await axios.post(
+        `${BACKEND_URL}/api/adminToAgentTransaction/`,
+        {
+          agentId,
+          amount,
+          conversionType: "cashToERupees",
+        }
+      );
+      console.log("Admin to Agent Transaction Response:", response2.data);
       console.log("Increase Security Deposit Response:", response.data);
       if (razorPayInstance) {
         console.log("Closing Razorpay instance after deposit");
@@ -157,6 +166,15 @@ const RazorPay = () => {
         `${BACKEND_URL}/api/agent/register`,
         formData
       );
+      const response2 = await axios.post(
+        `${BACKEND_URL}/api/adminToAgentTransaction/`,
+        {
+          agentId,
+          amount: formData?.securityDeposit,
+          conversionType: "cashToERupees",
+        }
+      );
+      console.log("Admin to Agent Transaction Response in create agent:", response2.data);
       const token = response?.data?.token;
       console.log("Token received:", token);
       Cookies.set("token", token, { expires: 1 });
