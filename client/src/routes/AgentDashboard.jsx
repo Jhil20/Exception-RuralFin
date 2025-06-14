@@ -249,6 +249,7 @@ const AgentDashboard = () => {
       // console.log("Deposit transaction completed:", response.data);
       const data = response.data.data;
       socket.emit("UserAgentDepositCompleted", data);
+      socket.emit("newRecentActivity",{...data,type:"User to Agent Transaction"});
       console.log(
         "SocketTTTTTTTTTTTTTTT emitted UserAgentDepositCompleted",
         data
@@ -300,6 +301,7 @@ const AgentDashboard = () => {
       console.log("Withdrawal transaction completed:", response.data);
       const data = response.data.data;
       socket.emit("UserAgentWithdrawCompleted", data);
+      socket.emit("newRecentActivity",{...data,type:"User to Agent Transaction"});
       console.log("Socket emitted UserAgentWithdrawCompleted", data);
       setAgentData((prevData) => ({
         ...prevData,

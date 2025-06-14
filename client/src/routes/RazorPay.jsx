@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { SignedIn } from "../redux/slices/isSignInSlice";
 import { toast } from "react-toastify";
 import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
+import { jwtDecode } from "jwt-decode";
+import { createSocket, getSocket } from "../utils/socket";
 
 const RazorPay = () => {
   const location = useLocation();
@@ -48,6 +50,8 @@ const RazorPay = () => {
       );
       console.log("Admin to Agent Transaction Response:", response2.data);
       console.log("Increase Security Deposit Response:", response.data);
+      const socket=getSocket(agentId);
+      socket.emit("newRecentActivity",{...response2?.data?.transaction,type:"adminToAgent"});
       if (razorPayInstance) {
         console.log("Closing Razorpay instance after deposit");
         razorPayInstance.close();
@@ -169,13 +173,19 @@ const RazorPay = () => {
       const response2 = await axios.post(
         `${BACKEND_URL}/api/adminToAgentTransaction/`,
         {
-          agentId,
+          agentId:response.data.agent._id,
           amount: formData?.securityDeposit,
           conversionType: "cashToERupees",
         }
       );
       console.log("Admin to Agent Transaction Response in create agent:", response2.data);
       const token = response?.data?.token;
+      const decoded=jwtDecode(token);
+      createSocket(decoded.id);
+      const socket=getSocket(decoded.id);
+      socket.emit("newAccountCreated",response?.data?.agent);
+      socket.emit("newRecentActivity",{...response?.data?.agent,type:"Agent Created"})
+      socket.emit("newRecentActivity",{...response2?.data?.transaction,type:"adminToAgent"});
       console.log("Token received:", token);
       Cookies.set("token", token, { expires: 1 });
       toast.success("Agent account created successfully");
@@ -188,6 +198,7 @@ const RazorPay = () => {
       dispatch(hideLoader());
       setTimeout(() => {
         navigate("/agentDashboard");
+        window.location.reload();
       }, 500);
     } catch (error) {
       console.error("Error creating agent:", error);

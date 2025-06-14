@@ -23,6 +23,7 @@ import { getSocket } from "../utils/socket";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import useAuth from "../utils/useAuth";
+import classifyDate from "../utils/classifyDate";
 
 Chart.register(ArcElement, Tooltip, Legend);
 
@@ -44,7 +45,7 @@ const AdminOverview = () => {
   useAuth();
   const [overviewCardData, setOverviewCardData] = useState({});
   const [recentActivityData, setRecentActivityData] = useState([]);
-  const [transactionVolumeData, setTransactionVolumeData] = useState();
+  const [transactionVolumeData, setTransactionVolumeData] = useState({});
   const [activeUsers, setActiveUsers] = useState(0);
   const token = Cookies.get("token");
   const decoded = useMemo(() => {
@@ -59,10 +60,64 @@ const AdminOverview = () => {
     const handler = (data) => {
       setActiveUsers(data.length);
     };
-    socket.on("activeUsers", handler);
+    const handler1 = (data) => {
+      console.log("New account created: sokceint in admin overview", data);
+      if (data?.role == "agent") {
+        setOverviewCardData((prevData) => ({
+          ...prevData,
+          totalAgents: prevData.totalAgents + 1,
+        }));
+      } else {
+        setOverviewCardData((prevData) => ({
+          ...prevData,
+          totalUsers: prevData.totalUsers + 1,
+        }));
+      }
+      getOverviewCardData();
+    };
+    const handler2 = (data) => {
+      setOverviewCardData((prevData) => ({
+        ...prevData,
+        thisMonthTransactions: prevData.thisMonthTransactions + 1,
+      }));
+      console.log(
+        "New transaction made: socket in admin overview",
+        transactionVolumeData,
+        data
+      );
+      setTransactionVolumeData((prevData) => ({
+        ...prevData,
+        todayTransactions: prevData.todayTransactions + data.transaction.amount,
+        thisWeekTransactions:
+          prevData.thisWeekTransactions + data.transaction.amount,
+        thisMonthTransactions:
+          prevData.thisMonthTransactions + data.transaction.amount,
+      }));
+      getTransationVolume();
+      getOverviewCardData();
+    };
 
+    const handler3 = (data) => {
+      console.log("New recent activity: socket in admin overview", data);
+      setRecentActivityData((prevData) => {
+        const newActivity = {
+          ...data,
+          createdAt: classifyDate(data.createdAt || data.transactionDate),
+        };
+        return [newActivity, ...prevData];
+      });
+      getRecentActivityData();
+    };
+
+    socket.on("activeUsers", handler);
+    socket.on("newAccountCreatedBackend", handler1);
+    socket.on("newTransactionMade", handler2);
+    socket.on("newRecentActivityBackend", handler3);
     return () => {
       socket.off("activeUsers", handler);
+      socket.off("newAccountCreatedBackend", handler1);
+      socket.off("newTransactionMade", handler2);
+      socket.off("newRecentActivityBackend", handler3);
     };
   }, [decoded]);
 
@@ -181,15 +236,19 @@ const AdminOverview = () => {
           <div className="space-y-4 h-11/12 overflow-y-auto">
             {recentActivityData.map((activity) => (
               <div
-                key={activity._id}
+                key={activity?._id}
                 className="flex items-start h-20 mb-1 pb-3 border-b border-gray-200 last:border-0 last:pb-0"
               >
+                {activity?.type == "User to Agent Transaction"
+                  ? console.log("DSFADFDSADS", activity)
+                  : ""}
+
                 <div
                   className={`h-10 mt-3 w-10 rounded-full flex items-center justify-center text-black mr-4 ml-1 bg-gray-200 ring-[1px] ring-gray-300 `}
                 >
-                  {activity.type == "User Created" ? (
+                  {activity?.type == "User Created" ? (
                     <User size={18} />
-                  ) : activity.type == "Agent Created" ? (
+                  ) : activity?.type == "Agent Created" ? (
                     <UserCheck size={18} />
                   ) : (
                     <BadgeDollarSign size={18} />
@@ -198,18 +257,18 @@ const AdminOverview = () => {
                 <div className="w-11/12">
                   <div className="font-medium flex items-center justify-between text-gray-800">
                     <p>
-                      {activity.type == "User Created"
-                        ? `User created with ID #${activity._id}`
-                        : activity.type == "Agent Created"
-                        ? `Agent created with ID #${activity._id}`
-                        : activity.type == "adminToAgent"
-                        ? `Security Deposit of ₹${activity.amount} added to Agent`
-                        : `Transaction of ₹${activity.amount} completed by Agent`}
+                      {activity?.type == "User Created"
+                        ? `User created with ID #${activity?._id}`
+                        : activity?.type == "Agent Created"
+                        ? `Agent created with ID #${activity?._id}`
+                        : activity?.type == "adminToAgent"
+                        ? `Security Deposit of ₹${activity?.amount} added to Agent`
+                        : `Transaction of ₹${activity?.amount} completed by Agent`}
                     </p>
                     <div className="text-xs text-gray-500 mt-[1px] mr-2">
                       <p className="text-xs text-end text-gray-500">
                         {new Date(
-                          activity.createdAt || activity.transactionDate
+                          activity?.createdAt || activity?.transactionDate
                         ).toLocaleDateString("en-US", {
                           year: "numeric",
                           month: "short",
@@ -218,7 +277,7 @@ const AdminOverview = () => {
                       </p>
                       <p className="text-xs text-end text-gray-500 ">
                         {new Date(
-                          activity.createdAt || activity.transactionDate
+                          activity?.createdAt || activity?.transactionDate
                         ).toLocaleTimeString("en-US", {
                           hour: "2-digit",
                           minute: "2-digit",
@@ -228,37 +287,37 @@ const AdminOverview = () => {
                     </div>
                   </div>
                   <p className="text-xs text-gray-500 ">
-                    {activity.type == "User Created"
-                      ? `Name : ${capitalize(activity.firstName)} ${capitalize(
-                          activity.lastName
+                    {activity?.type == "User Created"
+                      ? `Name : ${capitalize(activity?.firstName)} ${capitalize(
+                          activity?.lastName
                         )}`
-                      : activity.type == "Agent Created"
-                      ? `Name : ${capitalize(activity.firstName)} ${capitalize(
-                          activity.lastName
+                      : activity?.type == "Agent Created"
+                      ? `Name : ${capitalize(activity?.firstName)} ${capitalize(
+                          activity?.lastName
                         )}`
-                      : activity.type == "adminToAgent"
+                      : activity?.type == "adminToAgent"
                       ? `Agent : ${capitalize(
-                          activity.agentId.firstName
-                        )} ${capitalize(activity.agentId.lastName)} | ${
-                          activity.agentId._id
+                          activity?.agentId?.firstName
+                        )} ${capitalize(activity?.agentId?.lastName)} | ${
+                          activity?.agentId._id
                         }`
                       : `User : ${capitalize(
-                          activity.user.firstName
-                        )} ${capitalize(activity.user.lastName)} | #${
-                          activity.user._id
+                          activity?.userId?.firstName || activity?.user?.firstName
+                        )} ${capitalize(activity?.userId?.lastName || activity?.user?.lastName)} | #${
+                          activity?.userId?._id || activity?.user?._id
                         } `}
                   </p>
                   <p className="text-xs text-gray-500 mt-0">
-                    {activity.type == "User Created"
-                      ? `Phone : ${activity.phone}`
-                      : activity.type == "Agent Created"
-                      ? `Phone : ${activity.phone}`
-                      : activity.type == "adminToAgent"
-                      ? `Agent Phone : ${activity.agentId.phone}`
+                    {activity?.type == "User Created"
+                      ? `Phone : ${activity?.phone}`
+                      : activity?.type == "Agent Created"
+                      ? `Phone : ${activity?.phone}`
+                      : activity?.type == "adminToAgent"
+                      ? `Agent Phone : ${activity?.agentId.phone}`
                       : `Agent : ${capitalize(
-                          activity.agent.firstName
-                        )} ${capitalize(activity.agent.lastName)} | ${
-                          activity.agent._id
+                          activity?.agentId?.firstName || activity?.agent?.firstName
+                        )} ${capitalize(activity?.agentId?.lastName || activity?.agent?.lastName)} | ${
+                          activity?.agentId?._id || activity?.agent?._id
                         }`}
                   </p>
                   <p className="text-xs text-gray-500 mt-1"></p>

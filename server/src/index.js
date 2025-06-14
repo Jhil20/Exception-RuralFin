@@ -16,6 +16,7 @@ const notificationRoutes = require("./routes/notificationRoutes");
 const razorpayRoutes = require("./routes/razorpayRoutes");
 const agentCommissionRoutes = require("./routes/agentCommissionRoutes");
 const adminToAgentTransactionRoutes = require("./routes/adminToAgentTransactionRoutes");
+const { getAdminId } = require("./controllers/adminController");
 
 const app = express();
 connectMongo();
@@ -59,10 +60,15 @@ io.on("connection", (socket) => {
 
     const receiverSocketId = onlineUsers[receiverId];
     const senderSocketId = onlineUsers[senderId];
+    const adminId = await getAdminId();
+    const adminSocketId = onlineUsers[adminId];
+    if (adminSocketId) {
+      io.to(adminSocketId).emit("newTransactionMade", data);
+    }
     if (receiverSocketId && senderSocketId) {
       io.to([receiverSocketId, senderSocketId]).emit(
         "money-received-by-receiver",
-        data,
+        data
       );
       if (receiverSocketId) {
         const notificationObj = await createNotification({
@@ -330,15 +336,15 @@ io.on("connection", (socket) => {
         read: false,
       });
 
-      console.log("notificationObj", notificationObj, notificationObj2);
+      // console.log("notificationObj", notificationObj, notificationObj2);
       const socketToSend = userIdSocketId;
-      console.log("notifiaction socket called", socketToSend);
+      // console.log("notifiaction socket called", socketToSend);
       if (socketToSend) {
         io.to(socketToSend).emit("newNotificationSend", [
           notificationObj.data,
           notificationObj2.data,
         ]);
-        console.log("io sent newNotificationSend");
+        // console.log("io sent newNotificationSend");
       }
     } else {
       console.error("User ID is missing in the withdraw data");
@@ -377,10 +383,36 @@ io.on("connection", (socket) => {
       read: false,
     });
     socket.emit("updateSystemSettingsBackend", notificationObj);
+    // console.log(
+    //   "System settings updated and notification sent to admin",
+    //   notificationObj
+    // );
+  });
+
+  socket.on("newRecentActivity",async(data)=>{
+    console.log("newRecentActivity data:", data);
+    const adminId = await getAdminId();
+    const adminIdSocketId = onlineUsers[adminId];
+    if (adminIdSocketId) {
+      io.to(adminIdSocketId).emit("newRecentActivityBackend", data);
+      console.log("io sent newRecentActivityBackend to admin");
+    }
+  })
+
+  socket.on("newAccountCreated", async (data) => {
+    const adminId = await getAdminId();
+    const adminIdSocketId = onlineUsers[adminId];
     console.log(
-      "System settings updated and notification sent to admin",
-      notificationObj
+      "Admin ID: in admin create user socket",
+      adminId,
+      adminIdSocketId,
+      data
     );
+    if (adminIdSocketId) {
+      io.to(adminIdSocketId).emit("newAccountCreatedBackend", data);
+    } else {
+      console.error("Admin Socket is missing in the new account data");
+    }
   });
 
   socket.on("disconnect", () => {
@@ -421,7 +453,7 @@ app.use("/api/agentToUserTransaction", agentToUserTransactionRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/notification", notificationRoutes);
 app.use("/api/agentCommission", agentCommissionRoutes);
-app.use("/api/adminToAgentTransaction",adminToAgentTransactionRoutes)
+app.use("/api/adminToAgentTransaction", adminToAgentTransactionRoutes);
 const serverStartTime = new Date();
 
 app.use("/api/uptime", (req, res) => {

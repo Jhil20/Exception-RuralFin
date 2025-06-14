@@ -64,7 +64,7 @@ const Register = () => {
     }
 
     if (role === "user") {
-      return <UserForm isSubmitted={setIsSubmitted} setUserFormStep2={setUserFormStep2} resetRole={resetRole} />;
+      return <UserForm  setUserFormStep2={setUserFormStep2} resetRole={resetRole} />;
     }
 
     if (role === "agent") {

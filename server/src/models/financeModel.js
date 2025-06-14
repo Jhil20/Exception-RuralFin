@@ -4,15 +4,9 @@ const { Schema } = mongoose;
 const financeSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User'},
   balance: { type: Number, default: 0 },
-  financialStatus: {
-    type: String,
-    enum: ['stable', 'overBudget', 'underBudget'],
-    default: 'stable',
-  },
-  // lastTransactionDate: { type: Date ,default:null},
   budgetAlerts: { type: Boolean, default: false },
   isBudgetPlanningEnabled: { type: Boolean, default: false },
-  budget: { type: Schema.Types.ObjectId, ref:'Budget',default: null },
+  // budget: { type: Schema.Types.ObjectId, ref:'Budget',<defa></defa>ult: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Finance', financeSchema);

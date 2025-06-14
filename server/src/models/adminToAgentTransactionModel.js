@@ -17,6 +17,10 @@ const adminToAgentTransactionSchema = new Schema(
       enum: ["cashToERupees", "eRupeesToCash"],
       required: true,
     },
+    type: {
+      type: String,
+      default: "adminToAgent",
+    },
   },
   { timestamps: true }
 );

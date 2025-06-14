@@ -1,7 +1,5 @@
-import React, { useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import {
-  ArrowRight,
   User,
   Phone,
   Calendar,
@@ -22,11 +20,12 @@ import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
 import { BACKEND_URL } from "../utils/constants";
 import { SignedIn } from "../redux/slices/isSignInSlice";
 import Loader from "./Loader";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 import CityAutocomplete from "./CityAutoComplete";
-
-const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
+import { createSocket, getSocket } from "../utils/socket";
+import { jwtDecode } from "jwt-decode";
+const UserForm = ({ resetRole, setUserFormStep2 }) => {
   const initialValuesStep2 = {
     aadhar: "",
     password: "",
@@ -34,6 +33,7 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
     transactionPin: "",
     confirmTransactionPin: "",
   };
+
   const isLoading = useSelector((state) => state.loading.isLoading);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -80,7 +80,7 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
         ...userData,
         ...values,
       };
-      console.log("User Data:", userData,values);
+      console.log("User Data:", userData, values);
       console.log("All Values to be submitted:", allValues);
       const response = await axios.post(
         `${BACKEND_URL}/api/user/getUserByAadhar`,
@@ -99,11 +99,18 @@ const UserForm = ({ isSubmitted, resetRole, setUserFormStep2 }) => {
       );
       console.log("User created successfully:", result);
       console.log("Final Values:", allValues);
+      const decoded = jwtDecode(result.data.token);
       if (result?.data?.success) {
         toast.success("User created successfully");
+        createSocket(decoded.id);
         const token = result?.data?.token;
         Cookies.set("token", token, { expires: 1 });
       }
+      const socket = getSocket(decoded.id);
+      console.log("SOCKET CALLED IN USER FORM ",socket);
+      socket.emit("newAccountCreated", result?.data?.data);
+      socket.emit("newRecentActivity",{...result?.data?.data,type:"User Created"});
+
       setTimeout(() => {
         dispatch(SignedIn());
         navigate("/dashboard");

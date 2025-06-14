@@ -55,7 +55,7 @@ const PlatformSettings = () => {
     return jwtDecode(token);
   }, [token]);
 
-  const socket=getSocket(decoded?.id);
+  const socket = getSocket(decoded?.id);
   useEffect(() => {
     getUpTime();
     // createSystem();
@@ -64,7 +64,6 @@ const PlatformSettings = () => {
       clearInterval(upTimeInterval);
     }
   }, []);
-
 
   // const createSystem=async()=>{
   //   try{
@@ -91,9 +90,12 @@ const PlatformSettings = () => {
     { label: "System Uptime", value: uptime },
     {
       label: "Last Deployment",
-      value: new Date(deployTime).toLocaleDateString(),
+      value: new Date(deployTime).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        }),
     },
-    { label: "Active Users Today", value: "8,452" },
   ];
 
   const handleSaveSettings = async () => {
@@ -121,9 +123,9 @@ const PlatformSettings = () => {
         values
       );
       console.log("Settings saved successfully:", response.data);
-      socket.emit("updateSystemSettings",decoded.id);
+      socket.emit("updateSystemSettings", decoded.id);
 
-      if(response.data.success){
+      if (response.data.success) {
         toast.success("Settings saved successfully!");
         getSystemSettings();
       }
@@ -311,7 +313,7 @@ const PlatformSettings = () => {
         </Formik>
         <div className="flex items-center gap-3">
           <button
-          className="bg-white flex border-2 border-gray-300 items-center cursor-pointer px-4 py-2 text-black focus:ring-white hover:bg-gray-800 hover:text-white hover:ring-2 hover:ring-gray-600 font-semibold rounded-xl transition-all duration-300 focus:outline-none focus:ring-2  disabled:opacity-50 disabled:cursor-not-allowed "
+            className="bg-white flex border-2 border-gray-300 items-center cursor-pointer px-4 py-2 text-black focus:ring-white hover:bg-gray-800 hover:text-white hover:ring-2 hover:ring-gray-600 font-semibold rounded-xl transition-all duration-300 focus:outline-none focus:ring-2  disabled:opacity-50 disabled:cursor-not-allowed "
             onClick={handleSaveSettings}
           >
             <span className={`mr-2`}>{<Save size={18} />}</span>

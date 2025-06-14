@@ -66,7 +66,6 @@ const getAdminOverviewCardData = async (req, res) => {
         },
       },
     ]);
-    // console.log("this month user transactions", thisMonthUserTransactions);
     const thisMonthAgentTransactions = await UserToAgentTransaction.aggregate([
       {
         $match: {
@@ -333,6 +332,19 @@ const getRecentActivityData = async (req, res) => {
       .json({ message: "Error fetching recent activity data", error });
   }
 };
+
+const getAdminId=async()=>{
+  try{
+    const admin=await Admin.findOne({});
+    if(!admin){
+      console.error("No admin found in the database");
+      return null;
+    }
+    return admin._id;
+  }catch(error){
+    console.error("Error fetching admin ID:", error);
+  }
+}
 
 const getTransactionVolumeData = async (req, res) => {
   try {
@@ -744,4 +756,5 @@ module.exports = {
   getRecentActivityData,
   commissionData,
   updateSystemSettings,
+  getAdminId,
 };

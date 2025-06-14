@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import  { useEffect, useRef, useState } from "react";
 import {
   Search,
   Send,
@@ -13,12 +13,15 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import { SendMoneySchema } from "../yupValidators/validationSchema";
 import axios from "axios";
 import debounce from "lodash.debounce";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import capitalize from "../utils/capitalize";
 import { auth } from "../firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { getSocket } from "../utils/socket";
 import speak from "../utils/speak";
+import { useMemo } from "react";
+import { jwtDecode } from "jwt-decode";
+import Cookies from "js-cookie";
 
 export const SendMoney = ({ showSend, user, finance, toastControl }) => {
   const [step, setStep] = useState("form");

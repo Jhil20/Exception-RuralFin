@@ -19,10 +19,12 @@ const createAdminToAgentTransaction = async (req, res) => {
         .status(500)
         .json({ message: "Failed to create transaction", success: false });
     }
+    const transaction=await AdminToAgentTransaction.findById(newTransaction._id)
+      .populate("agentId"); 
     res.status(201).json({
       message: "Transaction created successfully",
       success: true,
-      transaction: newTransaction,
+      transaction: transaction,
     });
   } catch (error) {
     res.status(500).json({ message: "Internal server error", success: false });
