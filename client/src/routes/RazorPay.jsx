@@ -11,13 +11,16 @@ import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
 const RazorPay = () => {
   const location = useLocation();
   const formData = location?.state?.data || null;
+  const amount = location?.state?.amount || null;
+  const typeOfPayment = location?.state?.type || "FirstTimeDeposit";
+  const agentId = location?.state?.agentId || null;
   const dispatch = useDispatch();
   const [razorPayInstance, setRazorPayInstance] = useState(null);
   const navigate = useNavigate();
   const hasInitiated = useRef(false);
 
   useEffect(() => {
-    if (formData && !hasInitiated.current) {
+    if ((formData || amount || typeOfPayment) && !hasInitiated.current) {
       hasInitiated.current = true;
       dispatch(showLoader());
       setTimeout(() => {
@@ -25,6 +28,32 @@ const RazorPay = () => {
       }, 2000);
     }
   }, [formData]);
+
+  const increaseSecurityDeposit = async () => {
+    try {
+      const response = await axios.put(
+        `${BACKEND_URL}/api/agent/increaseSecurityDeposit`,
+        {
+          agentId,
+          amount,
+        }
+      );
+      console.log("Increase Security Deposit Response:", response.data);
+      if (razorPayInstance) {
+        console.log("Closing Razorpay instance after deposit");
+        razorPayInstance.close();
+      }
+      dispatch(hideLoader());
+      toast.success("Security deposit increased successfully by ₹" + amount);
+      setTimeout(() => {
+        navigate("/agentDashboard");
+        window.location.reload();
+      }, 500);
+    } catch (error) {
+      console.error("Error increasing security deposit:", error);
+      toast.error("Failed to increase security deposit");
+    }
+  };
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
@@ -59,7 +88,7 @@ const RazorPay = () => {
       const orderRes = await axios.post(
         `${BACKEND_URL}/api/razorpay/create-order`,
         {
-          amount: formData?.securityDeposit,
+          amount: formData?.securityDeposit || amount,
         }
       );
 
@@ -67,7 +96,7 @@ const RazorPay = () => {
 
       const options = {
         key: "rzp_test_rcMN4fKyf8uvKF",
-        amount: formData?.securityDeposit,
+        amount: formData?.securityDeposit || amount,
         currency: "INR",
         name: "RuralFin",
         description: "Agent Registration Security Deposit Fee",
@@ -87,7 +116,11 @@ const RazorPay = () => {
             console.log(
               "Payment verified successfully: calling toast and create agent"
             );
-            createAgent();
+            if (typeOfPayment === "FirstTimeDeposit") {
+              createAgent();
+            } else {
+              increaseSecurityDeposit();
+            }
             // toast.success("Payment verified successfully");
           } else {
             alert("Payment verification failed");

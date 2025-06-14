@@ -1,25 +1,47 @@
-import React, { useState } from 'react';
-import { X, Shield, CreditCard, TrendingUp, AlertCircle } from 'lucide-react';
+import React, { useState } from "react";
+import { X, Shield, CreditCard, TrendingUp, AlertCircle } from "lucide-react";
+import { toast } from "react-toastify";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const SecurityDepositOverlay = ({ isOpen, onClose, currentBalance , currentSecurityDeposit }) => {
-  const [depositAmount, setDepositAmount] = useState('');
+const SecurityDepositOverlay = ({
+  isOpen,
+  onClose,
+  currentBalance,
+  currentSecurityDeposit,
+  decoded,
+}) => {
+  const [depositAmount, setDepositAmount] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const navigate=useNavigate();
 
   const handleDeposit = async () => {
     if (!depositAmount || parseFloat(depositAmount) <= 0) {
-      alert('Please enter a valid amount');
+      toast.error("Please enter a valid amount");
       return;
+    }
+    try{
+      navigate("/razorpay",{
+        state:{
+          agentId:decoded.id,
+          amount:parseFloat(depositAmount),
+          type:"increaseSecurityDeposit",
+        }
+      })
+    }catch(error){
+      toast.error("An error occurred while processing your deposit");
+      console.error("Deposit Error:", error);
+      return;
+    }finally{
+      setIsProcessing(false);
     }
 
     setIsProcessing(true);
-    
+
+    setDepositAmount("");
+    onClose();
     // Simulate API call
-    setTimeout(() => {
-      setIsProcessing(false);
-      alert(`Successfully deposited ₹${depositAmount}`);
-      setDepositAmount('');
-      onClose();
-    }, 2000);
+    
   };
 
   const quickAmounts = [5000, 10000, 25000, 50000];
@@ -33,7 +55,9 @@ const SecurityDepositOverlay = ({ isOpen, onClose, currentBalance , currentSecur
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <Shield className="w-6 h-6 text-black" />
-            <h2 className="text-xl font-bold text-black">Increase Security Deposit</h2>
+            <h2 className="text-xl font-bold text-black">
+              Increase Security Deposit
+            </h2>
           </div>
           <button
             onClick={onClose}
@@ -48,11 +72,15 @@ const SecurityDepositOverlay = ({ isOpen, onClose, currentBalance , currentSecur
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-1">Current Balance</p>
-              <p className="text-2xl font-bold text-black">₹{currentBalance.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-black">
+                ₹{currentBalance.toLocaleString()}
+              </p>
             </div>
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-1">Security Deposit</p>
-              <p className="text-2xl font-bold text-black">₹{currentSecurityDeposit.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-black">
+                ₹{currentSecurityDeposit.toLocaleString()}
+              </p>
             </div>
           </div>
         </div>
@@ -61,7 +89,9 @@ const SecurityDepositOverlay = ({ isOpen, onClose, currentBalance , currentSecur
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center space-x-2 mb-3">
             <TrendingUp className="w-5 h-5 text-black" />
-            <h3 className="font-semibold text-black">Benefits of Higher Security Deposit</h3>
+            <h3 className="font-semibold text-black">
+              Benefits of Higher Security Deposit
+            </h3>
           </div>
           <ul className="space-y-2 text-sm text-gray-700">
             <li className="flex items-start space-x-2">
@@ -90,7 +120,9 @@ const SecurityDepositOverlay = ({ isOpen, onClose, currentBalance , currentSecur
               Deposit Amount
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">₹</span>
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">
+                ₹
+              </span>
               <input
                 type="number"
                 value={depositAmount}
@@ -117,22 +149,18 @@ const SecurityDepositOverlay = ({ isOpen, onClose, currentBalance , currentSecur
             </div>
           </div>
 
-          
-
-          
-
           {/* Action Buttons */}
           <div className="flex space-x-3">
             <button
               onClick={onClose}
-              className="flex-1 py-3 px-4 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              className="flex-1 py-3 px-4 border cursor-pointer border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleDeposit}
               disabled={isProcessing || !depositAmount}
-              className="flex-1 py-3 px-4 bg-black text-white rounded-lg font-medium hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
+              className="flex-1 py-3 px-4 bg-black cursor-pointer text-white rounded-lg font-medium hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
             >
               {isProcessing ? (
                 <>

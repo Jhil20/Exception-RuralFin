@@ -163,6 +163,43 @@ const createAgent = async (req, res) => {
   }
 };
 
+
+const increaseSecurityDeposit = async (req, res) => {
+  try{
+    const { agentId, amount } = req.body;
+
+    // Validate required fields
+    if (!agentId || !amount) {
+      return res.status(400).json({
+        message: "agentId and amount are required",
+        success: false,
+      });
+    }
+
+    // Find the agent
+    const agent = await Agent.findById(agentId);
+    if (!agent) {
+      return res.status(404).json({ message: "Agent not found", success: false });
+    }
+
+    // Update the security deposit and balance
+    agent.securityDeposit += amount;
+    agent.balance += amount;
+
+    // Save the updated agent
+    const updatedAgent = await agent.save();
+
+    res.status(200).json({
+      message: "Security deposit increased successfully",
+      success: true,
+      data: updatedAgent,
+    });
+
+  }catch(error){
+    res.status(500).json({ message: "Error increasing security deposit", error,success: false });
+  }
+}
+
 const getAgentByPhone = async (req, res) => {
   try {
     // console.log("getAgentByPhone called");
@@ -221,5 +258,6 @@ module.exports = {
   updateAgent,
   deleteAgent,
   getAgentByPhone,
+  increaseSecurityDeposit,
   checkAgentPassword,
 };

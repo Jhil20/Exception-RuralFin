@@ -377,6 +377,7 @@ const AgentDashboard = () => {
         onClose={() => setIsDepositOverlayOpen(false)}
         currentBalance={agentData.balance}
         currentSecurityDeposit={agentData.securityDeposit}
+        decoded={decoded}
       />
       <header className="bg-white text-black shadow-md mx-4 mx rounded-md mt-3">
         <div className="container mx-auto p-4">
