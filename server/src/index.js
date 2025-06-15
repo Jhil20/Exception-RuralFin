@@ -402,12 +402,12 @@ io.on("connection", (socket) => {
   socket.on("newAccountCreated", async (data) => {
     const adminId = await getAdminId();
     const adminIdSocketId = onlineUsers[adminId];
-    console.log(
-      "Admin ID: in admin create user socket",
-      adminId,
-      adminIdSocketId,
-      data
-    );
+    // console.log(
+    //   "Admin ID: in admin create user socket",
+    //   adminId,
+    //   adminIdSocketId,
+    //   data
+    // );
     if (adminIdSocketId) {
       io.to(adminIdSocketId).emit("newAccountCreatedBackend", data);
     } else {

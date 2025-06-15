@@ -1,17 +1,14 @@
-import { useState } from "react";
-import {
-  Search,
-  AlertTriangle,
-  CheckCircle,
-  Wallet,
-} from "lucide-react";
+import { useMemo, useState } from "react";
+import { Search, AlertTriangle, CheckCircle, Wallet } from "lucide-react";
 import Card from "../components/Card";
-import Button from "../components/Button";
 import AgentDetailsModal from "./AgentDetailsModal";
 import { BACKEND_URL } from "../utils/constants";
 import { useEffect } from "react";
 import axios from "axios";
 import capitalize from "../utils/capitalize";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
+import { getSocket } from "../utils/socket";
 
 const AgentManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,12 +16,29 @@ const AgentManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [agents, setAgents] = useState([]);
   const [filteredAgents, setFilteredAgents] = useState([]);
-  // const filteredAgents = mockAgents.filter(
-  //   (agent) =>
-  //     (agent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //       agent.id.toString().includes(searchTerm)) &&
-  //     (currentFilter === "all" || agent.status === currentFilter)
-  // );
+  const token = Cookies.get("token");
+  const decoded = useMemo(() => {
+    if (!token) return null;
+    return jwtDecode(token);
+  }, [token]);
+
+  useEffect(() => {
+    if (!decoded) return;
+    console.log("Decoded token: for socket in agent", decoded);
+
+    const socket = getSocket(decoded.id);
+    const handler1 = (data) => {
+      // console.log("New account created: handler1", data);
+      if (data?.role == "agent") {
+        setAgents((prevAgents) => [...prevAgents, data]);
+        setFilteredAgents((prevAgents) => [...prevAgents, data]);
+      }
+    };
+    socket.on("newAccountCreatedBackend", handler1);
+    return () => {
+      socket.off("newAccountCreatedBackend", handler1);
+    };
+  }, [decoded]);
 
   const handleViewDetails = (agent) => {
     setSelectedAgent(agent);
@@ -93,10 +107,10 @@ const AgentManagement = () => {
                 setSearchTerm(e.target.value);
                 const filter = agents.filter(
                   (agent) =>
-                    ((agent?.firstName + " " + agent?.lastName)
+                    (agent?.firstName + " " + agent?.lastName)
                       .toLowerCase()
                       .includes(searchTerm.toLowerCase()) ||
-                      agent._id.toString().includes(searchTerm)) 
+                    agent._id.toString().includes(searchTerm)
                 );
                 setFilteredAgents(filter);
               }}
@@ -112,7 +126,9 @@ const AgentManagement = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">Total Agents</p>
-                <p className="text-2xl font-bold text-gray-800">{agents?.length}</p>
+                <p className="text-2xl font-bold text-gray-800">
+                  {agents?.length}
+                </p>
               </div>
               <div className="p-3 bg-gray-200 rounded-lg text-gray-800">
                 <Wallet size={20} />
@@ -124,7 +140,9 @@ const AgentManagement = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">Active Agents</p>
-                <p className="text-2xl font-bold text-gray-800">{agents?.length}</p>
+                <p className="text-2xl font-bold text-gray-800">
+                  {agents?.length}
+                </p>
               </div>
               <div className="p-3 bg-gray-200 rounded-lg text-gray-800">
                 <CheckCircle size={20} />
@@ -155,7 +173,9 @@ const AgentManagement = () => {
                 </div>
 
                 <div className="px-1 py-3 flex items-center pl-2 justify-center font-medium text-gray-800">
-                  {capitalize(agent?.firstName)+" " + capitalize(agent?.lastName)}
+                  {capitalize(agent?.firstName) +
+                    " " +
+                    capitalize(agent?.lastName)}
                 </div>
 
                 <div className="px-1 flex items-center pl-4 justify-center py-3">

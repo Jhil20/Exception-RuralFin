@@ -1,18 +1,13 @@
-import { useEffect, useState } from "react";
-import {
-  Search,
-  Filter,
-  Eye,
-  AlertTriangle,
-  CheckCircle,
-  Wallet,
-} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Search, AlertTriangle, CheckCircle, Wallet } from "lucide-react";
 import Card from "../components/Card";
-import Button from "../components/Button";
 import UserDetailsModal from "./UserDetailsModal";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import capitalize from "../utils/capitalize";
+import { jwtDecode } from "jwt-decode";
+import Cookies from "js-cookie";
+import { getSocket } from "../utils/socket";
 
 const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,6 +23,32 @@ const UserManagement = () => {
     setSelectedUser(user);
     setIsModalOpen(true);
   };
+  const token = Cookies.get("token");
+  const decoded = useMemo(() => {
+    if (!token) return null;
+    return jwtDecode(token);
+  }, [token]);
+
+  useEffect(() => {
+    if (!decoded) return;
+    console.log("Decoded token: for socket in user", decoded);
+
+    const socket = getSocket(decoded.id);
+
+    const handler1 = (data) => {
+      console.log("New account user created: handler1", data);
+      if (data?.role === "user") {
+        setUsers((prevUsers) => [...prevUsers, data]);
+        setFilteredUsers((prevUsers) => [...prevUsers, data]);
+      }
+    };
+
+    socket.on("newAccountCreatedBackend", handler1);
+
+    return () => {
+      socket.off("newAccountCreatedBackend", handler1);
+    };
+  }, [decoded]);
 
   const getStatusBadge = (status) => {
     switch (status) {

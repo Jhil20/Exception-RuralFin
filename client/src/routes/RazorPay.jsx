@@ -183,6 +183,7 @@ const RazorPay = () => {
       const decoded=jwtDecode(token);
       createSocket(decoded.id);
       const socket=getSocket(decoded.id);
+      console.log("new user socket send",response?.data?.agent)
       socket.emit("newAccountCreated",response?.data?.agent);
       socket.emit("newRecentActivity",{...response?.data?.agent,type:"Agent Created"})
       socket.emit("newRecentActivity",{...response2?.data?.transaction,type:"adminToAgent"});

@@ -330,6 +330,8 @@ const createUser = async (req, res) => {
     user.finance = finance._id;
     await user.save();
 
+    const populatedUser = await User.findById(user._id).populate("finance");
+
     const token =jwt.sign({ id: user._id, phone: user.phone }, "harshp4114", {
       expiresIn: "1h",
     });
@@ -337,7 +339,7 @@ const createUser = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "User created successfully",
-      data: user,
+      data: populatedUser,
       token: token,
     });
   } catch (error) {

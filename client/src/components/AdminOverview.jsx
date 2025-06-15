@@ -299,7 +299,7 @@ const AdminOverview = () => {
                       ? `Agent : ${capitalize(
                           activity?.agentId?.firstName
                         )} ${capitalize(activity?.agentId?.lastName)} | ${
-                          activity?.agentId._id
+                          activity?.agentId?._id
                         }`
                       : `User : ${capitalize(
                           activity?.userId?.firstName || activity?.user?.firstName
@@ -313,7 +313,7 @@ const AdminOverview = () => {
                       : activity?.type == "Agent Created"
                       ? `Phone : ${activity?.phone}`
                       : activity?.type == "adminToAgent"
-                      ? `Agent Phone : ${activity?.agentId.phone}`
+                      ? `Agent Phone : ${activity?.agentId?.phone}`
                       : `Agent : ${capitalize(
                           activity?.agentId?.firstName || activity?.agent?.firstName
                         )} ${capitalize(activity?.agentId?.lastName || activity?.agent?.lastName)} | ${
