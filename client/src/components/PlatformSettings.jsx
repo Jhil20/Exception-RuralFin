@@ -94,7 +94,7 @@ const PlatformSettings = () => {
         year: "numeric",
         month: "short",
         day: "numeric",
-        }),
+      }),
     },
   ];
 

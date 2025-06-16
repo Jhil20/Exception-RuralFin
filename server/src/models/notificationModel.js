@@ -6,7 +6,7 @@ const notificationSchema = new Schema(
     userType: {
       type: String,
       required: true,
-      enum: ["User", "Agent", "Admin"], // must match the model names exactly
+      enum: ["User", "Agent"], 
     },
     userId: {
       type: Schema.Types.ObjectId,

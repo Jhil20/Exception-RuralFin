@@ -39,7 +39,6 @@ const Header = () => {
     return null;
   }, []);
 
-
   const handleLogout = () => {
     dispatch(showLoader());
     if (Cookies.get("token")) {
@@ -65,8 +64,12 @@ const Header = () => {
   const getNotifications = async () => {
     try {
       if (decoded) {
-        // console.log("IIIIIIIIIIIIIIIIII",decoded)
-        const type = location.pathname === "/dashboard" ? "User" : "Agent";
+        const type =
+          location.pathname === "/dashboard"
+            ? "User"
+            : location.pathname === "/agentDashboard"
+            ? "Agent"
+            : "Admin";
         // console.log(
         //   "Fetching notifications for user:",
         //   decoded?.id,
@@ -80,7 +83,7 @@ const Header = () => {
             userType: type,
           }
         );
-        // console.log("Notifications fetched:", response.data);
+        console.log("Notifications fetched:", response.data);
         setNotifications(response.data.data);
       }
     } catch (err) {
@@ -88,10 +91,9 @@ const Header = () => {
     }
   };
 
-
   useEffect(() => {
     getNotifications();
-  },[]);
+  }, []);
 
   useEffect(() => {
     if (!decoded) return;
@@ -104,8 +106,14 @@ const Header = () => {
 
     const handler2 = (data) => {
       console.log("SOCKET OF SYSTEM SETTINGS CALLED IN FRONTEND ", data);
-      setNotifications((prev) => [...prev, ...data]);
-      getNotifications();
+      if (location.pathname != "/adminDashboard") {
+        console.log(
+          "System settings updated, fetching notifications inside if"
+        );
+        const notification=data?.data?.filter((noti) => noti.userId === decoded.id);
+        setNotifications((prev) => [...prev, notification]);
+        getNotifications();
+      }
     };
 
     socket.on("newNotificationSend", handler);
@@ -115,17 +123,10 @@ const Header = () => {
       socket.off("newNotificationSend", handler);
       socket.off("updateSystemSettingsBackend", handler2);
     };
-  }, [decoded, showNotifications]);
+  }, [decoded]);
 
   const markAsRead = async (notificationId) => {
     try {
-      const response = await axios.post(
-        `${BACKEND_URL}/api/notification/updateNotificationRead`,
-        {
-          notificationId,
-        }
-      );
-      console.log("Notification marked as read:", response.data);
       setNotifications((prev) =>
         prev.filter((noti) => {
           if (noti._id === notificationId) {
@@ -134,6 +135,13 @@ const Header = () => {
           return noti;
         })
       );
+      const response = await axios.post(
+        `${BACKEND_URL}/api/notification/updateNotificationRead`,
+        {
+          notificationId,
+        }
+      );
+      // console.log("Notification marked as read:", response.data);
       getNotifications();
     } catch (error) {
       console.error("Error marking notification as read:", error);
@@ -142,6 +150,7 @@ const Header = () => {
 
   const markAllAsRead = async () => {
     try {
+      setNotifications((prev) => prev.map((noti) => ({ ...noti, read: true })));
       const response = await axios.post(
         `${BACKEND_URL}/api/notification/markAllAsRead`,
         {
@@ -150,7 +159,6 @@ const Header = () => {
         }
       );
       console.log("All notifications marked as read:", response.data);
-      setNotifications((prev) => prev.map((noti) => ({ ...noti, read: true })));
       getNotifications();
     } catch (error) {
       console.error("Error marking all notifications as read:", error);
@@ -409,12 +417,8 @@ const Header = () => {
               </button>
             </Link>
           )}
-
-          
         </div>
       </div>
-
-      
     </header>
   );
 };

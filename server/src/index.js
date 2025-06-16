@@ -11,7 +11,7 @@ const agentToUserTransactionRoutes = require("./routes/userToAgentTransactionRou
 const adminRoutes = require("./routes/adminRoutes");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
-const { createNotification } = require("./controllers/notificationController");
+const { createNotification, createAdminNotificationForAll } = require("./controllers/notificationController");
 const notificationRoutes = require("./routes/notificationRoutes");
 const razorpayRoutes = require("./routes/razorpayRoutes");
 const agentCommissionRoutes = require("./routes/agentCommissionRoutes");
@@ -391,18 +391,11 @@ io.on("connection", (socket) => {
   });
 
   socket.on("updateSystemSettings", async (data) => {
-    const notificationObj = await createNotification({
-      userType: "Admin",
-      userId: data,
-      message: `System settings have been updated`,
-      type: "system",
-      read: false,
-    });
-    socket.emit("updateSystemSettingsBackend", notificationObj);
-    // console.log(
-    //   "System settings updated and notification sent to admin",
-    //   notificationObj
-    // );
+    console.log("updateSystemSettings data:", data);
+
+    const notifications = await createAdminNotificationForAll();
+    io.emit("updateSystemSettingsBackend", notifications);
+    console.log("socket io sent updateSystemSettingsBackend");
   });
 
   socket.on("newRecentActivity", async (data) => {
