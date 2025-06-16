@@ -17,6 +17,9 @@ const razorpayRoutes = require("./routes/razorpayRoutes");
 const agentCommissionRoutes = require("./routes/agentCommissionRoutes");
 const adminToAgentTransactionRoutes = require("./routes/adminToAgentTransactionRoutes");
 const { getAdminId } = require("./controllers/adminController");
+const {
+  increaseAgentCommission,
+} = require("./controllers/agentCommissionsController");
 
 const app = express();
 connectMongo();
@@ -242,6 +245,19 @@ io.on("connection", (socket) => {
     console.log("in UserAgentDepositCompleted");
     const userIdSocketId = onlineUsers[data.userId._id];
     console.log("User Agent Deposit Completed:", userIdSocketId);
+    const adminId = await getAdminId();
+    const adminIdSocketId = onlineUsers[adminId];
+    if (adminIdSocketId) {
+      const agentId = data.agentId._id;
+      console.log("Admin ID:", adminId, "Agent ID:", agentId);
+      const updatedCommission = await increaseAgentCommission({
+        agentId,
+        amount: data.commission,
+      });
+      console.log("Updated Commission:", updatedCommission);
+      io.to(adminIdSocketId).emit("increaseAgentCommission", {updatedCommission,transaction:data});
+      console.log("io sent newTransactionMade to admin");
+    }
     if (userIdSocketId) {
       io.to(userIdSocketId).emit("UserAgentDepositCompletedBackend", data);
       console.log("io emitted for data", data);
@@ -389,7 +405,7 @@ io.on("connection", (socket) => {
     // );
   });
 
-  socket.on("newRecentActivity",async(data)=>{
+  socket.on("newRecentActivity", async (data) => {
     console.log("newRecentActivity data:", data);
     const adminId = await getAdminId();
     const adminIdSocketId = onlineUsers[adminId];
@@ -397,7 +413,7 @@ io.on("connection", (socket) => {
       io.to(adminIdSocketId).emit("newRecentActivityBackend", data);
       console.log("io sent newRecentActivityBackend to admin");
     }
-  })
+  });
 
   socket.on("newAccountCreated", async (data) => {
     const adminId = await getAdminId();

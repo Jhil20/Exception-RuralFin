@@ -9,4 +9,4 @@ const adminCommissionSchema = new Schema({
   lastUpdated: { type: Date, default: Date.now }
 }, { timestamps: true });
 
-module.exports = mongoose.model('AgentCommission', adminCommissionSchema);
+module.exports = mongoose.model('AdminCommission', adminCommissionSchema);

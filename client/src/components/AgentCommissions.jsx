@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Calendar, Download, Filter, Search, Award } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Search, Award } from "lucide-react";
 import Card from "../components/Card";
-import Button from "../components/Button";
-import { toast } from "react-toastify";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import capitalize from "../utils/capitalize";
+import { jwtDecode } from "jwt-decode";
+import Cookies from "js-cookie";
+import { getSocket } from "../utils/socket";
 
 const AgentCommissions = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,97 +23,6 @@ const AgentCommissions = () => {
   ).padStart(2, "0")}`;
   const [month, setMonth] = useState(formattedDate);
 
-  // const commissionData = [
-  //   {
-  //     id: 101,
-  //     name: "Rahul Sharma",
-  //     transactionCount: 245,
-  //     commissionRate: 2.5,
-  //     totalEarned: 24500,
-  //     performance: "excellent",
-  //   },
-  //   {
-  //     id: 102,
-  //     name: "Priya Patel",
-  //     transactionCount: 198,
-  //     commissionRate: 2.5,
-  //     totalEarned: 19800,
-  //     performance: "good",
-  //   },
-  //   {
-  //     id: 103,
-  //     name: "Amit Kumar",
-  //     transactionCount: 310,
-  //     commissionRate: 2.0,
-  //     totalEarned: 31000,
-  //     performance: "excellent",
-  //   },
-  //   {
-  //     id: 104,
-  //     name: "Neha Singh",
-  //     transactionCount: 145,
-  //     commissionRate: 2.0,
-  //     totalEarned: 14500,
-  //     performance: "average",
-  //   },
-  //   {
-  //     id: 105,
-  //     name: "Vikram Malhotra",
-  //     transactionCount: 95,
-  //     commissionRate: 2.0,
-  //     totalEarned: 9500,
-  //     performance: "poor",
-  //   },
-  //   {
-  //     id: 106,
-  //     name: "Ananya Desai",
-  //     transactionCount: 220,
-  //     commissionRate: 2.5,
-  //     totalEarned: 22000,
-  //     performance: "good",
-  //   },
-  //   {
-  //     id: 107,
-  //     name: "Rajesh Verma",
-  //     transactionCount: 178,
-  //     commissionRate: 2.0,
-  //     totalEarned: 17800,
-  //     performance: "average",
-  //   },
-  //   {
-  //     id: 108,
-  //     name: "Sunita Gupta",
-  //     transactionCount: 267,
-  //     commissionRate: 2.5,
-  //     totalEarned: 26700,
-  //     performance: "excellent",
-  //   },
-  //   {
-  //     id: 1081,
-  //     name: "Sunita Gupta",
-  //     transactionCount: 267,
-  //     commissionRate: 2.5,
-  //     totalEarned: 26700,
-  //     performance: "excellent",
-  //   },
-  //   {
-  //     id: 1082,
-  //     name: "Sunita Gupta",
-  //     transactionCount: 267,
-  //     commissionRate: 2.5,
-  //     totalEarned: 26700,
-  //     performance: "excellent",
-  //   },
-  //   {
-  //     id: 1010,
-  //     name: "Sunita Gupta",
-  //     transactionCount: 267,
-  //     commissionRate: 2.5,
-  //     totalEarned: 26700,
-  //     performance: "excellent",
-  //   },
-  // ];
-
   const monthsMapping = {
     "01": "January",
     "02": "February",
@@ -128,27 +38,55 @@ const AgentCommissions = () => {
     12: "December",
   };
 
-  const alla = commissionData;
-  // ?.filter(
-  //   (item) =>
-  //     item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //     item.id.toString().includes(searchTerm)
-  // )
-  // .sort((a, b) => {
-  //   if (sortBy === "name") {
-  //     return sortOrder === "asc"
-  //       ? a.name.localeCompare(b.name)
-  //       : b.name.localeCompare(a.name);
-  //   } else if (sortBy === "count") {
-  //     return sortOrder === "asc"
-  //       ? a.transactionCount - b.transactionCount
-  //       : b.transactionCount - a.transactionCount;
-  //   } else {
-  //     return sortOrder === "asc"
-  //       ? a.totalEarned - b.totalEarned
-  //       : b.totalEarned - a.totalEarned;
-  //   }
-  // });
+  const token = Cookies.get("token");
+  const decoded = useMemo(() => {
+    if (!token) return null;
+    return jwtDecode(token);
+  }, [token]);
+
+  useEffect(() => {
+    if (!decoded) return;
+    console.log("Decoded token: for socket in agent commission", decoded);
+    const socket = getSocket(decoded.id);
+    const handler1 = (data) => {
+      console.log("New account agent created: handler1", data);
+      if (data?.role === "agent") {
+        setAllAgents((prevAgents) => [...prevAgents, data]);
+        setFilteredAgents((prevAgents) => [...prevAgents, data]);
+      }
+    };
+    const handler2 = (data) => {
+      console.log("Increase agent commission: handler2", data);
+      const {updatedCommission,transaction} = data;
+      const updatedCommissionData = commissionData?.AllCommissions?.filter(
+        (item) => {
+          if (
+            item?.agentId === updatedCommission?.agentId &&
+            item?.month == updatedCommission?.month &&
+            item?.year == updatedCommission?.year
+          ) {
+            return updatedCommission;
+          } else {
+            return item;
+          }
+        }
+      );
+      console.log("Updated Commission Data:", updatedCommissionData);
+      setCommissionData((prevData) => ({
+        ...prevData,
+        AllCommissions: updatedCommissionData,
+      }));
+      setTransactionData((prevData) => [...prevData, transaction]);
+      getTransactionData();
+      getCommissions();
+    };
+    socket.on("increaseAgentCommission", handler2);
+    socket.on("newAccountCreatedBackend", handler1);
+    return () => {
+      socket.off("increaseAgentCommission", handler2);
+      socket.off("newAccountCreatedBackend", handler1);
+    };
+  }, [decoded]);
 
   const getCommissions = async () => {
     try {
@@ -263,7 +201,6 @@ const AgentCommissions = () => {
               max={new Date().toISOString().slice(0, 7)}
               onChange={(e) => {
                 setMonth(e.target.value);
-                // console.log(e.target.value);
                 handleMonthChange(e.target.value);
               }}
             />
@@ -323,27 +260,15 @@ const AgentCommissions = () => {
       {/* Table Container */}
       <div className="flex-1 bg-gray-100 rounded-2xl overflow-hidden hover:shadow-gray-300 hover:shadow-lg transition-all duration-300">
         <div className="flex flex-col h-full bg-white rounded-xl border-2 border-gray-300">
-          {/* Header Row */}
           <div className="grid grid-cols-5 p-3 justify-items-center bg-gray-200 text-sm font-semibold text-gray-700 text-center rounded-t-xl">
             <div>Agent ID</div>
-            <div
-              //   onClick={() => handleSort("name")}
-              className=" flex items-center"
-            >
-              Name
-            </div>
-            <div
-              //   onClick={() => handleSort("count")}
-              className="pl-2 flex items-center"
-            >
-              Transactions
-            </div>
+            <div className=" flex items-center">Name</div>
+            <div className="pl-2 flex items-center">Transactions</div>
 
             <div>Total Agent Commission</div>
             <div>Total Commission</div>
           </div>
 
-          {/* Scrollable Rows */}
           <div className="flex-1 overflow-y-auto max-h-[calc(100vh-320px)]">
             {filteredAgents.map((agent) => (
               <div
@@ -370,31 +295,35 @@ const AgentCommissions = () => {
 
                 <div className="flex justify-center ">
                   ₹
-                  {transactionData
-                    ?.filter((tr) => {
-                      if (
-                        tr.agentId._id == agent._id &&
-                        new Date(tr.transactionDate).getMonth() + 1 ==
-                          month.split("-")[1]
-                      ) {
-                        return tr;
-                      }
-                    })
-                    .reduce((acc, item) => acc + item?.commission, 0) / 2 || 0}
+                  {commissionData?.AllCommissions?.filter((data) => {
+                    if (
+                      data.agentId == agent._id &&
+                      data.month == month.split("-")[1] &&
+                      data.year == month.split("-")[0]
+                    ) {
+                      return true;
+                    }
+                    return false;
+                  }).reduce(
+                    (acc, item) => acc + item?.totalCommissionEarned,
+                    0
+                  ) || 0}
                 </div>
                 <div className="font-semibold text-gray-800 flex justify-center pl-3">
                   ₹
-                  {transactionData
-                    ?.filter((tr) => {
-                      if (
-                        tr.agentId._id == agent._id &&
-                        new Date(tr.transactionDate).getMonth() + 1 ==
-                          month.split("-")[1]
-                      ) {
-                        return tr;
-                      }
-                    })
-                    .reduce((acc, item) => acc + item?.commission, 0) || 0}
+                  {commissionData?.AllCommissions?.filter((data) => {
+                    if (
+                      data.agentId == agent._id &&
+                      data.month == month.split("-")[1] &&
+                      data.year == month.split("-")[0]
+                    ) {
+                      return true;
+                    }
+                    return false;
+                  }).reduce(
+                    (acc, item) => acc + item?.totalCommissionEarned,
+                    0
+                  ) || 0}
                 </div>
               </div>
             ))}

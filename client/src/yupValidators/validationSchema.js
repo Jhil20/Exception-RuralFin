@@ -143,7 +143,7 @@ export const agentValidationSchemaStep2 = Yup.object({
     .matches(/^[0-9]{9,18}$/, "Please enter a valid account number")
     .required("Account number is required"),
   ifscCode: Yup.string()
-    .matches(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Please enter a valid IFSC code")
+    .matches(/^[A-Z]{4}0[A-Z0-9]{6}$/i, "Please enter a valid IFSC code")
     .required("IFSC code is required")
     .test("correct-ifsc", "Invalid IFSC code", async function (value) {
       if (!value) return false;

@@ -359,7 +359,7 @@ const AgentForm = ({ resetRole }) => {
             const fetchIFSCInfo = useMemo(
               () =>
                 debounce(async (ifsc) => {
-                  if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc)) return;
+                  if (!/^[A-Z]{4}0[A-Z0-9]{6}$/i.test(ifsc)) return;
                   try {
                     const res = await fetch(
                       `https://ifsc.razorpay.com/${ifsc}`

@@ -239,9 +239,7 @@ const AdminOverview = () => {
                 key={activity?._id}
                 className="flex items-start h-20 mb-1 pb-3 border-b border-gray-200 last:border-0 last:pb-0"
               >
-                {activity?.type == "User to Agent Transaction"
-                  ? console.log("DSFADFDSADS", activity)
-                  : ""}
+               
 
                 <div
                   className={`h-10 mt-3 w-10 rounded-full flex items-center justify-center text-black mr-4 ml-1 bg-gray-200 ring-[1px] ring-gray-300 `}
