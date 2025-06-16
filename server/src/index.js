@@ -20,6 +20,7 @@ const { getAdminId } = require("./controllers/adminController");
 const {
   increaseAgentCommission,
 } = require("./controllers/agentCommissionsController");
+const ttsHandler = require("./utils/tts");
 
 const app = express();
 connectMongo();
@@ -463,6 +464,8 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/notification", notificationRoutes);
 app.use("/api/agentCommission", agentCommissionRoutes);
 app.use("/api/adminToAgentTransaction", adminToAgentTransactionRoutes);
+app.post("/tts", ttsHandler);
+
 const serverStartTime = new Date();
 
 app.use("/api/uptime", (req, res) => {

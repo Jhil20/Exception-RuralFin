@@ -92,7 +92,7 @@ const UserDashboard = () => {
           `₹${data?.transaction?.amount} sent to  ${capitalize(
             data?.transaction?.receiverId?.firstName
           )} ${capitalize(data?.transaction?.receiverId?.lastName)}`
-        );
+        ,"gu-In");
       } else {
         toast.success(
           `₹${data?.transaction?.amount} received from  ${capitalize(
@@ -103,7 +103,7 @@ const UserDashboard = () => {
           `₹${data?.transaction?.amount} received from  ${capitalize(
             data?.transaction?.senderId?.firstName
           )} ${capitalize(data?.transaction?.senderId?.lastName)}`
-        );
+        ,"gu-IN");
       }
       getTransactions();
       getUserData();
