@@ -21,8 +21,8 @@ import BudgetPlanningForm from "../components/BudgetPlanningForm";
 import DetailedExpenseReport from "../components/DetailedExpenseReport";
 import AgentDetails from "../components/AgentDetails";
 import AgentsViewMore from "../components/AgentsViewMore";
-import speak from "../utils/speak";
 import { getSocket } from "../utils/socket";
+import speak from "../utils/speak";
 const UserDashboard = () => {
   useAuth();
   const isLoading = useSelector((state) => state.loading.isLoading);
