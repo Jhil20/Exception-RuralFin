@@ -16,11 +16,13 @@ const notificationRoutes = require("./routes/notificationRoutes");
 const razorpayRoutes = require("./routes/razorpayRoutes");
 const agentCommissionRoutes = require("./routes/agentCommissionRoutes");
 const adminToAgentTransactionRoutes = require("./routes/adminToAgentTransactionRoutes");
+const adminCommissionRoutes = require("./routes/adminCommissionRoutes");
 const { getAdminId } = require("./controllers/adminController");
 const {
   increaseAgentCommission,
 } = require("./controllers/agentCommissionsController");
 const ttsHandler = require("./utils/tts");
+const { increaseAdminCommission } = require("./controllers/adminCommissionController");
 
 const app = express();
 connectMongo();
@@ -245,23 +247,31 @@ io.on("connection", (socket) => {
   socket.on("UserAgentDepositCompleted", async (data) => {
     console.log("in UserAgentDepositCompleted");
     const userIdSocketId = onlineUsers[data.userId._id];
+    const agentSocketId= onlineUsers[data.agentId._id];
     console.log("User Agent Deposit Completed:", userIdSocketId);
     const adminId = await getAdminId();
     const adminIdSocketId = onlineUsers[adminId];
+    const agentId = data.agentId._id;
+    // const updatedCommission = await increaseAgentCommission({
+    //   agentId,
+    //   amount: (data.commission)/2,
+    // });
     if (adminIdSocketId) {
-      const agentId = data.agentId._id;
       console.log("Admin ID:", adminId, "Agent ID:", agentId);
-      const updatedCommission = await increaseAgentCommission({
-        agentId,
-        amount: data.commission,
+      const adminCommission =await increaseAdminCommission({
+        adminId,
+        commission: (data.commission)/2,
       });
-      console.log("Updated Commission:", updatedCommission);
-      io.to(adminIdSocketId).emit("increaseAgentCommission", {updatedCommission,transaction:data});
+      console.log("Updated Commission:", "Admin Commission:", adminCommission);
+      io.to(adminIdSocketId).emit("increaseAgentCommission", {transaction:data, adminCommission});
       console.log("io sent newTransactionMade to admin");
+    }
+    if( agentSocketId) {
+      io.to(agentSocketId).emit("UserAgentDepositCompletedBackend", {transaction:data});
     }
     if (userIdSocketId) {
       io.to(userIdSocketId).emit("UserAgentDepositCompletedBackend", data);
-      console.log("io emitted for data", data);
+      // console.log("io emitted for data", data);
       const notificationObj = await createNotification({
         userType: "User",
         userId: data.userId._id,
@@ -286,15 +296,15 @@ io.on("connection", (socket) => {
         read: false,
       });
 
-      console.log("notificationObj", notificationObj, notificationObj2);
+      // console.log("notificationObj", notificationObj, notificationObj2);
       const socketToSend = userIdSocketId;
-      console.log("notifiaction socket called", socketToSend);
+      // console.log("notifiaction socket called", socketToSend);
       if (socketToSend) {
         io.to(socketToSend).emit("newNotificationSend", [
           notificationObj.data,
           notificationObj2.data,
         ]);
-        console.log("io sent newNotificationSend");
+        // console.log("io sent newNotificationSend");
       }
     } else {
       console.error("User ID is missing in the deposit data");
@@ -327,6 +337,23 @@ io.on("connection", (socket) => {
   socket.on("UserAgentWithdrawCompleted", async (data) => {
     const userIdSocketId = onlineUsers[data.userId._id];
     // console.log("User Agent Withdraw Completed:", userIdSocketId);
+    const adminId = await getAdminId();
+    const adminIdSocketId = onlineUsers[adminId];
+    if (adminIdSocketId) {
+      const agentId = data.agentId._id;
+      console.log("Admin ID:", adminId, "Agent ID:", agentId);
+      // const updatedCommission = await increaseAgentCommission({
+      //   agentId,
+      //   amount: (data.commission)/2,
+      // });
+      const adminCommission =await increaseAdminCommission({
+        adminId,
+        commission: (data.commission)/2,
+      });
+      console.log("Updated Commission:",  "Admin Commission:", adminCommission);
+      io.to(adminIdSocketId).emit("increaseAgentCommission", {transaction:data, adminCommission});
+      console.log("io sent newTransactionMade to admin");
+    }
     if (userIdSocketId) {
       io.to(userIdSocketId).emit("UserAgentWithdrawCompletedBackend", data);
       const notificationObj = await createNotification({
@@ -464,6 +491,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/notification", notificationRoutes);
 app.use("/api/agentCommission", agentCommissionRoutes);
 app.use("/api/adminToAgentTransaction", adminToAgentTransactionRoutes);
+app.use("/api/adminCommission",adminCommissionRoutes)
 app.post("/tts", ttsHandler);
 
 const serverStartTime = new Date();

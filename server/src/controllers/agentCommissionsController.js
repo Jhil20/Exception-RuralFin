@@ -72,7 +72,37 @@ const increaseAgentCommission=async(param)=>{
   }
 }
 
+const getAllCommissions = async (req, res) => {
+  try {
+    const {agentId} = req.body;
+    if (!agentId) {
+      return res.status(400).json({
+        message: "Agent ID is required",
+        success: false,
+      });
+    }
+
+    const commissions = await AgentCommission.find({agentId}).populate("agentId");
+    if (!commissions || commissions.length === 0) {
+      return res.status(404).json({
+        message: "No commissions found",
+        success: false,
+      });
+    }
+    return res.status(200).json({
+      message: "Commissions fetched successfully",
+      success: true,
+      data: commissions,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Internal server error", success: false });
+  }
+};
+
 module.exports = {
   getThisMonthCommission,
   increaseAgentCommission,
+  getAllCommissions,
 };

@@ -18,7 +18,6 @@ import capitalize from "../utils/capitalize";
 import { auth } from "../firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { getSocket } from "../utils/socket";
-import speak from "../utils/speak";
 import { useMemo } from "react";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";

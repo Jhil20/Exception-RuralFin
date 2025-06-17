@@ -88,22 +88,22 @@ const UserDashboard = () => {
             data?.transaction?.receiverId?.firstName
           )} ${capitalize(data?.transaction?.receiverId?.lastName)}`
         );
-        speak(
-          `₹${data?.transaction?.amount} sent to  ${capitalize(
-            data?.transaction?.receiverId?.firstName
-          )} ${capitalize(data?.transaction?.receiverId?.lastName)}`
-        ,"gu-In");
+        // speak(
+        //   `₹${data?.transaction?.amount} sent to  ${capitalize(
+        //     data?.transaction?.receiverId?.firstName
+        //   )} ${capitalize(data?.transaction?.receiverId?.lastName)}`
+        // ,"gu-In");
       } else {
         toast.success(
           `₹${data?.transaction?.amount} received from  ${capitalize(
             data?.transaction?.senderId?.firstName
           )} ${capitalize(data?.transaction?.senderId?.lastName)}`
         );
-        speak(
-          `₹${data?.transaction?.amount} received from  ${capitalize(
-            data?.transaction?.senderId?.firstName
-          )} ${capitalize(data?.transaction?.senderId?.lastName)}`
-        ,"gu-IN");
+        // speak(
+        //   `₹${data?.transaction?.amount} received from  ${capitalize(
+        //     data?.transaction?.senderId?.firstName
+        //   )} ${capitalize(data?.transaction?.senderId?.lastName)}`
+        // ,"gu-IN");
       }
       getTransactions();
       getUserData();

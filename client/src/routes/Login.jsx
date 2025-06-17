@@ -59,7 +59,7 @@ const Login = () => {
         auth,
         "recaptcha-container",
         {
-          size: "normal",
+          size: "invisible",
           callback: (response) => {
             console.log("reCAPTCHA solved:", response);
           },

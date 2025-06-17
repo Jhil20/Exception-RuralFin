@@ -252,25 +252,25 @@ const AgentDetails = ({
         toast.error(
           `You can only Deposit/Withdraw upto ₹${settings?.maxDailyLimit} per day`
         );
-        speak(
-          `You can only Deposit/Withdraw upto ₹${settings?.maxDailyLimit} per day`
-        );
+        // speak(
+        //   `You can only Deposit/Withdraw upto ₹${settings?.maxDailyLimit} per day`
+        // );
         return;
       } else if (values.amount < settings?.minTransactionAmount) {
         toast.error(
           `Minimum Deposit/WithDraw amount is ₹${settings?.minTransactionAmount}`
         );
-        speak(
-          `Minimum Deposit/WithDraw amount is ₹${settings?.minTransactionAmount}`
-        );
+        // speak(
+        //   `Minimum Deposit/WithDraw amount is ₹${settings?.minTransactionAmount}`
+        // );
         return;
       } else if (values.amount > settings?.maxTransactionAmount) {
         toast.error(
           `Maximum Deposit/Withdraw amount is ₹${settings?.maxTransactionAmount}`
         );
-        speak(
-          `Maximum Deposit/Withdraw amount is ₹${settings?.maxTransactionAmount}`
-        );
+        // speak(
+        //   `Maximum Deposit/Withdraw amount is ₹${settings?.maxTransactionAmount}`
+        // );
         return;
       } else if (
         values.amount + result?.data?.data?.thisWeek >
@@ -279,9 +279,9 @@ const AgentDetails = ({
         toast.error(
           `You can only Deposit/Withdraw upto ₹${settings?.maxWeeklyLimit} per week`
         );
-        speak(
-          `You can only Deposit/Withdraw upto ₹${settings?.maxWeeklyLimit} per week`
-        );
+        // speak(
+        //   `You can only Deposit/Withdraw upto ₹${settings?.maxWeeklyLimit} per week`
+        // );
         return;
       }
       const response = await axios.post(

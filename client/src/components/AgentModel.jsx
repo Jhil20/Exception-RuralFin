@@ -71,7 +71,7 @@ const AgentModel = () => {
       icon: <ShieldCheck size={24} />,
       title: "Security Deposit",
       description:
-        "Agents deposit ₹5,000-₹10,000 as security, ensuring transaction liquidity.",
+        "Agents deposit money as security, ensuring transaction liquidity.",
     },
     {
       icon: <Wallet size={24} />,
@@ -83,7 +83,7 @@ const AgentModel = () => {
       icon: <TrendingUp size={24} />,
       title: "Earnings-Based Model",
       description:
-        "Agents earn a percentage from each user transaction—similar to freelancing. Higher deposits unlock more earning potential.",
+        "Agents earn a percentage from each agent-user transaction—similar to freelancing. Higher deposits unlock more earning potential.",
     },
   ];
 

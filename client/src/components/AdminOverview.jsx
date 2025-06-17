@@ -46,6 +46,7 @@ const AdminOverview = () => {
   const [overviewCardData, setOverviewCardData] = useState({});
   const [recentActivityData, setRecentActivityData] = useState([]);
   const [transactionVolumeData, setTransactionVolumeData] = useState({});
+  const [allCommissions, setAllCommissions] = useState([]);
   const [activeUsers, setActiveUsers] = useState(0);
   const token = Cookies.get("token");
   const decoded = useMemo(() => {
@@ -121,6 +122,16 @@ const AdminOverview = () => {
     };
   }, [decoded]);
 
+  const getAllAdminCommissions = async () => {
+    try{
+      const response=await axios.get(`${BACKEND_URL}/api/adminCommission/allCommissions`);
+      setAllCommissions(response.data.data);
+      console.log("All Admin Commissions:", response.data.data);
+    }catch (error) {
+      console.error("Error fetching admin commissions:", error);
+    }
+  }
+
   const getActiveUsers = async () => {
     try {
       const response = await axios.get(`${BACKEND_URL}/api/getActiveUsers`);
@@ -187,6 +198,7 @@ const AdminOverview = () => {
     // adminInsert();
     getRecentActivityData();
     getTransationVolume();
+    getAllAdminCommissions();
   }, []);
 
   return (
@@ -200,7 +212,9 @@ const AdminOverview = () => {
       <div className="grid grid-cols-5 gap-6">
         <StatCard
           title="Profit Earned"
-          value={`₹${overviewCardData?.totalBalance || "0"}`}
+          value={`₹${allCommissions?.reduce((acc,item)=>{
+            return acc + item.totalCommissionEarned;
+          },0) || "0"}`}
           icon={<IndianRupee size={20} />}
         />
         <StatCard

@@ -9,7 +9,6 @@ import { toast, ToastContainer } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 import {  getSocket } from "./utils/socket";
-import speak from "./utils/speak";
 import capitalize from "./utils/capitalize";
 
 function App() {
@@ -58,7 +57,7 @@ function App() {
     };
     const handler3 = (data) => {
       // console.log("request completed deposit");
-      if (data.userId._id == decoded.id) {
+      if (data?.userId?._id == decoded?.id) {
         toast.info(
           `Your ${
             data.conversionType == "cashToERupees"

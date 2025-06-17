@@ -28,6 +28,7 @@ const AgentDashboard = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [isDepositOverlayOpen, setIsDepositOverlayOpen] = useState(false);
+  const [allCommissions, setAllCommissions] = useState([]);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString("en-IN", {
@@ -81,15 +82,15 @@ const AgentDashboard = () => {
           data.transaction.userId.firstName
         )} ${capitalize(data.transaction.userId.lastName)}`
       );
-      speak(
-        `New ${
-          data.transaction.conversionType === "cashToERupees"
-            ? "Deposit"
-            : "Withdrawal"
-        } request received from ${capitalize(
-          data.transaction.userId.firstName
-        )} ${capitalize(data.transaction.userId.lastName)}`
-      );
+      // speak(
+      //   `New ${
+      //     data.transaction.conversionType === "cashToERupees"
+      //       ? "Deposit"
+      //       : "Withdrawal"
+      //   } request received from ${capitalize(
+      //     data.transaction.userId.firstName
+      //   )} ${capitalize(data.transaction.userId.lastName)}`
+      // );
     };
 
     if (socket) {
@@ -103,6 +104,7 @@ const AgentDashboard = () => {
   useEffect(() => {
     getAgentData();
     getTransactionsDone();
+    getCommissionData();
   }, []);
 
   const getAgentData = async () => {
@@ -128,6 +130,21 @@ const AgentDashboard = () => {
       setFilteredTransactions(response?.data?.transactions);
     } catch (err) {
       console.error("Error fetching transactions:", err);
+    }
+  };
+
+  const getCommissionData = async () => {
+    try {
+      const response = await axios.post(
+        `${BACKEND_URL}/api/agentCommission/getAllCommissions`,
+        {
+          agentId: decoded.id,
+        }
+      );
+      console.log("Commission data:", response.data);
+      setAllCommissions(response.data.data);
+    } catch (err) {
+      console.error("Error fetching commission data:", err);
     }
   };
 
@@ -243,26 +260,49 @@ const AgentDashboard = () => {
           amount: transactionToComplete?.amount,
           agentId: decoded.id,
           userId: transactionToComplete?.userId?._id,
-          commission: transactionToComplete?.commission,
+          commission: transactionToComplete?.commission / 2,
         }
       );
       // console.log("Deposit transaction completed:", response.data);
       const data = response.data.data;
       socket.emit("UserAgentDepositCompleted", data);
-      socket.emit("newRecentActivity",{...data,type:"User to Agent Transaction"});
-      console.log(
-        "SocketTTTTTTTTTTTTTTT emitted UserAgentDepositCompleted",
-        data
-      );
+      socket.emit("newRecentActivity", {
+        ...data,
+        type: "User to Agent Transaction",
+      });
+      // console.log(
+      //   "SocketTTTTTTTTTTTTTTT emitted UserAgentDepositCompleted",
+      //   data
+      // );
       setAgentData((prevData) => ({
         ...prevData,
-        balance: prevData.balance - data.amount + data.commission,
+        balance: prevData.balance - data.amount + data.commission/2,
       }));
       setTransactionsDone((prevTransactions) => {
         const updatedTransactions = prevTransactions.filter(
           (tr) => tr._id !== data._id
         );
         return [...updatedTransactions, data];
+      });
+      setAllCommissions((prevCommissions) => {
+        const thisMonthCommission = prevCommissions.filter((commission) => {
+          return (
+            commission?.month === new Date().getMonth() + 1 &&
+            commission?.year === new Date().getFullYear()
+          );
+        });
+        if (thisMonthCommission.length > 0) {
+          return prevCommissions.map((commission) => {
+            if (commission._id === thisMonthCommission[0]._id) {
+              return {
+                ...commission,
+                totalCommissionEarned:
+                  commission.totalCommissionEarned + data.commission /2,
+              };
+            }
+            return commission;
+          });
+        }
       });
       setFilteredTransactions((prevTransactions) => {
         const updatedFiltered = prevTransactions.filter(
@@ -295,17 +335,20 @@ const AgentDashboard = () => {
           amount: transactionToComplete?.amount,
           agentId: decoded.id,
           userId: transactionToComplete?.userId?._id,
-          commission: transactionToComplete?.commission,
+          commission: transactionToComplete?.commission / 2,
         }
       );
       console.log("Withdrawal transaction completed:", response.data);
       const data = response.data.data;
       socket.emit("UserAgentWithdrawCompleted", data);
-      socket.emit("newRecentActivity",{...data,type:"User to Agent Transaction"});
+      socket.emit("newRecentActivity", {
+        ...data,
+        type: "User to Agent Transaction",
+      });
       console.log("Socket emitted UserAgentWithdrawCompleted", data);
       setAgentData((prevData) => ({
         ...prevData,
-        balance: prevData.balance + data.amount + data.commission,
+        balance: prevData.balance + data.amount + data.commission/2,
       }));
       setTransactionsDone((prevTransactions) => {
         const updatedTransactions = prevTransactions.filter(
@@ -313,6 +356,27 @@ const AgentDashboard = () => {
         );
         return [...updatedTransactions, data];
       });
+      setAllCommissions((prevCommissions) => {
+        const thisMonthCommission = prevCommissions.filter((commission) => {
+          return (
+            commission?.month === new Date().getMonth() + 1 &&
+            commission?.year === new Date().getFullYear()
+          );
+        });
+        if (thisMonthCommission.length > 0) {
+          return prevCommissions.map((commission) => {
+            if (commission._id === thisMonthCommission[0]._id) {
+              return {
+                ...commission,
+                totalCommissionEarned:
+                  commission.totalCommissionEarned + data.commission /2,
+              };
+            }
+            return commission;
+          });
+        }
+      }
+      );
       setFilteredTransactions((prevTransactions) => {
         const updatedFiltered = prevTransactions.filter(
           (tr) => tr._id !== data._id
@@ -384,18 +448,25 @@ const AgentDashboard = () => {
       <header className="bg-white text-black shadow-md mx-4 mx rounded-md mt-3">
         <div className="container mx-auto p-4">
           <div className="flex justify-between items-center mb-4">
-            <h1 className="ml-2 text-xl font-bold">Agent Dashboard</h1>
-            <button
-              onClick={() => {
-                setIsDepositOverlayOpen(true);
-              }}
-              className="hidden md:flex items-center space-x-4"
-            >
-              <div className="flex cursor-pointer text-sm font-medium text-gray-600 hover:ring-2 hover:text-gray-700 hover:ring-gray-700 items-center space-x-2 bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
-                <Wallet size={18} />
-                <span>Deposit more to increase balance</span>
-              </div>
-            </button>
+            <div className="">
+              <h1 className="ml-3 text-xl font-bold">Agent Dashboard</h1>
+              <h1 className="ml-2 text-md font-semibold text-gray-500 bg-gray-100 p-1 mt-2 border border-gray-200 shadow-sm shadow-gray-300 pr-4 rounded-r-full">
+                Note : 50% of the commission will be transfered to the admin
+              </h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => {
+                  setIsDepositOverlayOpen(true);
+                }}
+                className="hidden md:flex items-center space-x-4"
+              >
+                <div className="flex cursor-pointer text-sm font-medium text-gray-600 hover:ring-2 hover:text-gray-700 hover:ring-gray-700 items-center space-x-2 bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
+                  <Wallet size={18} />
+                  <span>Deposit more to increase balance</span>
+                </div>
+              </button>
+            </div>
           </div>
 
           {/* Quick stats bar */}
@@ -445,9 +516,9 @@ const AgentDashboard = () => {
               <p className="text-gray-300 text-md ">Total Commission Earned</p>
               <p className="text-lg font-semibold text-white">
                 ₹
-                {transactionsDone
-                  ?.filter((tr) => tr?.status == "completed")
-                  ?.reduce((acc, tr) => acc + (tr.commission || 0), 0)}
+                {allCommissions?.reduce((acc, commission) => {
+                  return acc + (commission?.totalCommissionEarned || 0);
+                }, 0) || 0}
               </p>
             </div>
           </div>
@@ -479,17 +550,14 @@ const AgentDashboard = () => {
                 </p>
                 <p className="text-2xl font-bold mt-1">
                   ₹
-                  {transactionsDone
-                    ?.filter((tr) => {
-                      const today = new Date();
-                      const transactionDate = new Date(tr.transactionDate);
+                  {allCommissions
+                    ?.filter((commission) => {
                       return (
-                        today.getMonth() === transactionDate.getMonth() &&
-                        today.getFullYear() === transactionDate.getFullYear() &&
-                        tr.status == "completed"
+                        commission?.month === new Date().getMonth() + 1 &&
+                        commission?.year === new Date().getFullYear()
                       );
                     })
-                    ?.reduce((acc, tr) => acc + (tr.commission || 0), 0) || "0"}
+                    .map((commission) => commission.totalCommissionEarned) || 0}
                 </p>
               </div>
               <div className="p-2 rounded-md bg-gray-200">

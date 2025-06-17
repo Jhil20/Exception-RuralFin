@@ -198,7 +198,6 @@ const depositFunds = async (req, res) => {
       {
         $inc: {
           balance: commission - amount,
-          commissionEarned: commission,
         },
       },
       { new: true, session }
