@@ -353,6 +353,7 @@ io.on("connection", (socket) => {
       console.log("Updated Commission:",  "Admin Commission:", adminCommission);
       io.to(adminIdSocketId).emit("increaseAgentCommission", {transaction:data, adminCommission});
       console.log("io sent newTransactionMade to admin");
+      
     }
     if (userIdSocketId) {
       io.to(userIdSocketId).emit("UserAgentWithdrawCompletedBackend", data);
@@ -495,6 +496,23 @@ app.use("/api/adminCommission",adminCommissionRoutes)
 app.post("/tts", ttsHandler);
 
 const serverStartTime = new Date();
+
+app.use("/api/checkOnline",async(req, res) => {
+  try{
+    const {accountId} = req.body;
+    if (!accountId) {
+      return res.status(400).json({ message: "Account ID is required", success: false });
+    }
+    const socketId = onlineUsers[accountId];
+    if (socketId) {
+      return res.status(200).json({ message: "User is online", success: true });
+    }else{
+      return res.status(200).json({ message: "User is offline", success: false });
+    }
+  }catch (error) {
+    res.status(500).json({ message: "Internal server error" ,success: false});
+  }
+})
 
 app.use("/api/uptime", (req, res) => {
   res.json({ startTime: serverStartTime });

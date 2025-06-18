@@ -1,5 +1,6 @@
 const Notification = require("../models/notificationModel");
 const User = require("../models/userModel");
+const Agent = require("../models/agentModel");
 const createNotification = async (data) => {
   try {
     const { userType, userId, message, type, read } = data;
@@ -64,7 +65,7 @@ const createAdminNotificationForAll = async () => {
         return createNotification(notificationData);
       })
     );
-    const allAgents = await User.find({ }, "_id");
+    const allAgents = await Agent.find({ }, "_id");
     const agentNotifications= await Promise.all(
       allAgents.map(async (agent) => {
         const notificationData = {
@@ -106,13 +107,13 @@ const getNotificationsById = async (req, res) => {
     }).sort({
       createdAt: -1,
     }); // Sort by creation date, most recent first
-    const adminNotifications = await Notification.find({
-      userType: "Admin",
-    }).sort({
-      createdAt: -1,
-    });
+      // const adminNotifications = await Notification.find({
+      //   userType: "Admin",
+      // }).sort({
+      //   createdAt: -1,
+      // });
 
-    const notifications = [...userNotifications, ...adminNotifications];
+    const notifications = [...userNotifications];
 
     notifications.sort((a, b) => {
       return new Date(b.createdAt) - new Date(a.createdAt);

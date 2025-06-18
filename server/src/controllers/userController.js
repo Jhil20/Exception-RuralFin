@@ -131,7 +131,7 @@ const getUserByPhone = async (req, res) => {
       );
       return res
         .status(200)
-        .json({ message: "User found", success: true, token: token });
+        .json({ message: "User found", success: true,data:user, token: token });
     } else {
       return res
         .status(200)

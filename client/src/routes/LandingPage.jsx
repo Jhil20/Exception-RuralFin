@@ -22,7 +22,7 @@ const LandingPage = () => {
         <AgentModel />
         <SecuritySection />
         <BudgetTracking />
-        <FinancialLiteracy />
+        {/* <FinancialLiteracy /> */}
       <LandingFooter />
     </div>
   );

@@ -216,7 +216,7 @@ const getAgentByPhone = async (req, res) => {
       );
       return res
         .status(200)
-        .json({ message: "Agent found", success: true, token: token });
+        .json({ message: "Agent found", success: true, data:agent, token: token });
     } else {
       return res
         .status(200)

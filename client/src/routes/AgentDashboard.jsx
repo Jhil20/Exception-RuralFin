@@ -450,7 +450,7 @@ const AgentDashboard = () => {
           <div className="flex justify-between items-center mb-4">
             <div className="">
               <h1 className="ml-3 text-xl font-bold">Agent Dashboard</h1>
-              <h1 className="ml-2 text-md font-semibold text-gray-500 bg-gray-100 p-1 mt-2 border border-gray-200 shadow-sm shadow-gray-300 pr-4 rounded-r-full">
+              <h1 className="ml-2 pl-2 text-md font-semibold text-gray-500 bg-gray-100 p-1 mt-2 border border-gray-200 shadow-sm shadow-gray-300 pr-4 rounded-r-full">
                 Note : 50% of the commission will be transfered to the admin
               </h1>
             </div>

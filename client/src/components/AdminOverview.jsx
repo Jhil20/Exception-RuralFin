@@ -110,15 +110,29 @@ const AdminOverview = () => {
       getRecentActivityData();
     };
 
+    const handler4 = (data) => {
+      console.log("Increase agent commission: socket in admin overview", data);
+
+      setAllCommissions((prevData)=>{
+        const updatedCommissions=prevData?.filter((item)=>{
+          return item._id !=data?.adminCommission?.data?._id
+        });
+        const newCommissions=[...updatedCommissions, data?.adminCommission?.data];
+        return newCommissions;
+      })
+    }
+
     socket.on("activeUsers", handler);
     socket.on("newAccountCreatedBackend", handler1);
     socket.on("newTransactionMade", handler2);
     socket.on("newRecentActivityBackend", handler3);
+    socket.on("increaseAgentCommission",handler4);
     return () => {
       socket.off("activeUsers", handler);
       socket.off("newAccountCreatedBackend", handler1);
       socket.off("newTransactionMade", handler2);
       socket.off("newRecentActivityBackend", handler3);
+      socket.off("increaseAgentCommission", handler4);
     };
   }, [decoded]);
 
@@ -231,8 +245,8 @@ const AdminOverview = () => {
           icon={<Users size={20} />}
         />
         <StatCard
-          title="Active Accounts"
-          value={`${activeUsers}`}
+          title="Online Accounts"
+          value={`${activeUsers-1}`}
           icon={<Users size={20} />}
         />
         <StatCard
@@ -391,7 +405,7 @@ const AdminOverview = () => {
               <div className="text-center border border-gray-200 bg-gray-50 shadow-lg hover:shadow-black/20 transition-all duration-300 shadow-black/10 rounded-lg p-4">
                 <p className="text-gray-500 text-sm">Today</p>
                 <p className="font-semibold text-gray-800 text-lg">
-                  ₹{transactionVolumeData?.todayTransactions || "0"}
+                  ₹{transactionVolumeData?.todayTransactions?.toLocaleString() || "0"}
                 </p>
 
                 {findChange(
@@ -428,7 +442,7 @@ const AdminOverview = () => {
               <div className="text-center border border-gray-200 bg-gray-50 shadow-lg hover:shadow-black/20 transition-all duration-300 shadow-black/10 rounded-lg p-4">
                 <p className="text-gray-500 text-sm">This Week</p>
                 <p className="font-semibold text-gray-800 text-lg">
-                  ₹{transactionVolumeData?.thisWeekTransactions || "0"}
+                  ₹{transactionVolumeData?.thisWeekTransactions?.toLocaleString() || "0"}
                 </p>
                 {findChange(
                   transactionVolumeData?.thisWeekTransactions,
@@ -464,7 +478,7 @@ const AdminOverview = () => {
               <div className="text-center border border-gray-200 bg-gray-50 shadow-lg hover:shadow-black/20 transition-all duration-300 shadow-black/10 rounded-lg p-4">
                 <p className="text-gray-500 text-sm">This Month</p>
                 <p className="font-semibold text-gray-800 text-lg">
-                  ₹{transactionVolumeData?.thisMonthTransactions || "0"}
+                  ₹{transactionVolumeData?.thisMonthTransactions?.toLocaleString() || "0"}
                 </p>
                 {findChange(
                   transactionVolumeData?.thisMonthTransactions,

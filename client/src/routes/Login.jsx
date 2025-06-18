@@ -25,7 +25,6 @@ import capitalize from "../utils/capitalize";
 import { createSocket } from "../utils/socket";
 import { socketConnected } from "../redux/slices/socketSlice";
 
-
 const Login = () => {
   const [firebaseError, setFirebaseError] = useState("");
   // const [isSignup, setIsSignup] = useState(false);
@@ -103,6 +102,16 @@ const Login = () => {
         setSubmitting(false);
       } else {
         console.log("in else");
+
+        const checkOnline = await axios.post(`${BACKEND_URL}/api/checkOnline`, {
+          accountId: response?.data?.data?._id,
+        });
+        console.log("Check Online Response:", checkOnline);
+        if (checkOnline?.data?.success) {
+          toast.error("This account is already logged in from another device.");
+          setSubmitting(false);
+          return;
+        }
 
         const response2 = await axios.post(
           `${BACKEND_URL}/api/${whichRole}/checkPassword`,
@@ -219,9 +228,9 @@ const Login = () => {
       const user = result.user;
 
       console.log("User verified successfully:", user);
-      const token=Cookies.get("token");
+      const token = Cookies.get("token");
       const decoded = jwtDecode(token);
-      const socket=createSocket(decoded.id);
+      const socket = createSocket(decoded.id);
       dispatch(socketConnected());
       console.log("Socket connected:", socket.id);
       toast.success("OTP verified successfully!");
@@ -235,13 +244,12 @@ const Login = () => {
         } else {
           navigate("/adminDashboard");
         }
+        setIsSubmitting(false);
       }, 2000);
     } catch (error) {
       console.error("Error verifying OTP:", error);
       toast.error("Invalid OTP. Please try again.");
     }
-
-    setIsSubmitting(false);
   };
 
   if (isOtpSent) {

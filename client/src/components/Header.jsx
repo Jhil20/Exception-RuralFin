@@ -64,18 +64,13 @@ const Header = () => {
   const getNotifications = async () => {
     try {
       if (decoded) {
-        const type =
-          location.pathname === "/dashboard"
-            ? "User"
-            : location.pathname === "/agentDashboard"
-            ? "Agent"
-            : "Admin";
-        // console.log(
-        //   "Fetching notifications for user:",
-        //   decoded?.id,
-        //   "Type:",
-        //   type
-        // );
+        const type = location.pathname === "/dashboard" ? "User" : "Agent";
+        console.log(
+          "Fetching notifications for user:",
+          decoded?.id,
+          "Type:",
+          type
+        );
         const response = await axios.post(
           `${BACKEND_URL}/api/notification/getNotifications`,
           {
@@ -110,7 +105,9 @@ const Header = () => {
         console.log(
           "System settings updated, fetching notifications inside if"
         );
-        const notification=data?.data?.filter((noti) => noti.userId === decoded.id);
+        const notification = data?.data?.filter(
+          (noti) => noti.userId === decoded.id
+        );
         setNotifications((prev) => [...prev, notification]);
         getNotifications();
       }
@@ -329,12 +326,12 @@ const Header = () => {
                   >
                     Budget Tracking
                   </Link>
-                  <Link
+                  {/* <Link
                     to="/home#financial-literacy"
                     className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
                   >
                     Financial Literacy
-                  </Link>
+                  </Link> */}
                 </>
               ) : (
                 <>

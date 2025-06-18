@@ -23,6 +23,7 @@ const PlatformSettings = () => {
   const [deployTime, setDeployTime] = useState(null);
   const [upTimeInterval, setUpTimeInterval] = useState(null);
   const [systemSettings, setSystemSettings] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const formikFormTransaction = useRef(null);
   const formikFormFee = useRef(null);
   const getUpTime = async () => {
@@ -31,15 +32,20 @@ const PlatformSettings = () => {
       // console.log("Uptime response:", response.data);
       const startTime = new Date(response.data.startTime);
       setDeployTime(startTime);
+      const now = new Date();
+      const diffMs = now - startTime;
+
+      const minutes = Math.floor((diffMs / 1000 / 60) % 60);
+      const hours = Math.floor((diffMs / (1000 * 60 * 60)) % 24);
+      const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      setUptime(`${days}d ${hours}h ${minutes}m`);
       const interval = setInterval(() => {
         const now = new Date();
         const diffMs = now - startTime;
 
-        const seconds = Math.floor((diffMs / 1000) % 60);
         const minutes = Math.floor((diffMs / 1000 / 60) % 60);
         const hours = Math.floor((diffMs / (1000 * 60 * 60)) % 24);
         const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-        // console.log("Uptime:", days, "days", hours, "hours", minutes, "minutes");
         setUptime(`${days}d ${hours}h ${minutes}m`);
       }, 60000);
       setUpTimeInterval(interval);
@@ -99,6 +105,7 @@ const PlatformSettings = () => {
   ];
 
   const handleSaveSettings = async () => {
+    setIsSubmitting(true);
     try {
       const values = {
         maxSingleTransaction:
@@ -118,6 +125,19 @@ const PlatformSettings = () => {
           formikFormFee.current.values["transaction-fee-10000"],
         updatedBy: decoded.id,
       };
+
+      if(systemSettings?.maxSingleTransaction === values.maxSingleTransaction &&
+         systemSettings?.maxDailyLimit === values.maxDailyLimit &&
+         systemSettings?.maxWeeklyLimit === values.maxWeeklyLimit &&
+         systemSettings?.minTransactionAmount === values.minTransactionAmount &&
+         systemSettings?.transactionFee500to999 === values.transactionFee500to999 &&
+         systemSettings?.transactionFee1000to4999 === values.transactionFee1000to4999 &&
+         systemSettings?.transactionFee5000to9999 === values.transactionFee5000to9999 &&
+         systemSettings?.transactionFee10000 === values.transactionFee10000) {
+          toast.info("Make some changes before saving!");
+          return;
+         }
+
       const response = await axios.post(
         `${BACKEND_URL}/api/admin/updateSystemSettings`,
         values
@@ -131,6 +151,8 @@ const PlatformSettings = () => {
       }
     } catch (error) {
       console.error("Error saving settings:", error);
+    }finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -315,6 +337,7 @@ const PlatformSettings = () => {
           <button
             className="bg-white flex border-2 border-gray-300 items-center cursor-pointer px-4 py-2 text-black focus:ring-white hover:bg-gray-800 hover:text-white hover:ring-2 hover:ring-gray-600 font-semibold rounded-xl transition-all duration-300 focus:outline-none focus:ring-2  disabled:opacity-50 disabled:cursor-not-allowed "
             onClick={handleSaveSettings}
+            disabled={isSubmitting}
           >
             <span className={`mr-2`}>{<Save size={18} />}</span>
             Save Changes

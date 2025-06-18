@@ -177,7 +177,7 @@ const getAdminByPhone = async (req, res) => {
       );
       return res
         .status(200)
-        .json({ message: "admin found", success: true, token: token });
+        .json({ message: "admin found", success: true,data:admin, token: token });
     } else {
       return res
         .status(200)
