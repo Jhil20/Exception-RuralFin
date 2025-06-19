@@ -278,7 +278,9 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                       {new Intl.NumberFormat("en-US", {
                         style: "currency",
                         currency: "INR",
-                      }).format(transaction?.amount)}
+                      }).format(transaction?.amount
+                        +transaction?.commission
+                      )}
                     </span>
 
                     <div className="ml-2">
