@@ -31,6 +31,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [favourites, setFavourites] = useState([]);
+  const [filteredFavourites, setFilteredFavourites] = useState([]);
   const [receiverUser, setReceiverUser] = useState(null);
   const [ruralfinValue, setRuralFinValue] = useState("");
   const [otpAmount, setOtpAmount] = useState("");
@@ -362,6 +363,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       );
       // console.log("response of get favourites", response?.data?.favourites);
       setFavourites(response?.data?.favourites);
+      setFilteredFavourites(response?.data?.favourites);
     } catch (err) {
       console.log("error in getting favourites", err);
       toast.error("Error fetching favourites. Please Refresh & Try Again.");
@@ -594,7 +596,19 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
                 disabled={favourites.length === 0}
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  const filtered = favourites.filter((user) => {
+                    const fullName =
+                      `${user?.firstName} ${user?.lastName}`.toLowerCase();
+                    const ruralFinId = user?.ruralFinId.toLowerCase();
+                    const query = e.target.value.toLowerCase();
+                    return (
+                      fullName.includes(query) || ruralFinId.includes(query)
+                    );
+                  });
+                  setFilteredFavourites(filtered);
+                }}
                 placeholder="Search Favourites by name or RuralFin ID"
                 className={`w-full pl-10 pr-4 py-2 border hover:border-gray-700 transition-all duration-300 ${
                   favourites.length === 0 ? "cursor-not-allowed" : "cursor-text"
@@ -608,8 +622,14 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
                     No Favourites Added
                   </h1>
                 </div>
+              ) : filteredFavourites.length == 0 ? (
+                <div className="w-full h-36 flex items-center justify-center">
+                  <h1 className="text-xl font-semibold text-gray-500">
+                    No Favourites Found
+                  </h1>
+                </div>
               ) : (
-                favourites.map((user) => (
+                filteredFavourites.map((user) => (
                   <div
                     key={user?._id}
                     onClick={() => {

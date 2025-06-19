@@ -92,7 +92,7 @@ const ExpenseChart = ({ budgetData, categoryBudgets }) => {
         <div className="flex bg-gray-100 rounded-lg p-1">
           <button
             onClick={() => setChartType('bar')}
-            className={`p-2 rounded-md text-sm flex items-center transition-all duration-200 ${
+            className={`p-2 rounded-md text-sm flex cursor-pointer items-center transition-all duration-200 ${
               chartType === 'bar' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
             }`}
           >
@@ -101,7 +101,7 @@ const ExpenseChart = ({ budgetData, categoryBudgets }) => {
           </button>
           <button
             onClick={() => setChartType('pie')}
-            className={`p-2 rounded-md text-sm flex items-center transition-all duration-200 ${
+            className={`p-2 rounded-md text-sm flex cursor-pointer items-center transition-all duration-200 ${
               chartType === 'pie' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
             }`}
           >

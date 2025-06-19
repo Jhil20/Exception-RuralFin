@@ -154,6 +154,7 @@ const Login = () => {
   //otp verification
 
   const handleOTPResend = async () => {
+    setIsSubmitting(true);
     try {
       if (!isRendered) {
         if (window.recaptchaVerifier) {
@@ -203,6 +204,8 @@ const Login = () => {
     } catch (error) {
       console.error("Error sending OTP:", error);
       toast.error("Error sending OTP. Please try again.");
+    }finally{
+      setIsSubmitting(false);
     }
   };
 
@@ -355,12 +358,14 @@ const Login = () => {
                         Didn't receive the code?{" "}
                       </p>
                       <div
-                        className="text-black font-semibold cursor-pointer"
+                        className={` ${isSubmitting?"text-gray-400 cursor-not-allowed":"text-black cursor-pointer"} font-semibold `}
                         onClick={() => {
-                          setFieldValue("otpNumber", "");
-                          setErrors(null);
-                          setTouched(false);
-                          handleOTPResend();
+                          if (!isSubmitting) {
+                            setFieldValue("otpNumber", "");
+                            setErrors(null);
+                            setTouched(false);
+                            handleOTPResend();
+                          }
                         }}
                       >
                         Resend OTP

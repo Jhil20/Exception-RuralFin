@@ -11,7 +11,10 @@ const agentToUserTransactionRoutes = require("./routes/userToAgentTransactionRou
 const adminRoutes = require("./routes/adminRoutes");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
-const { createNotification, createAdminNotificationForAll } = require("./controllers/notificationController");
+const {
+  createNotification,
+  createAdminNotificationForAll,
+} = require("./controllers/notificationController");
 const notificationRoutes = require("./routes/notificationRoutes");
 const razorpayRoutes = require("./routes/razorpayRoutes");
 const agentCommissionRoutes = require("./routes/agentCommissionRoutes");
@@ -22,7 +25,9 @@ const {
   increaseAgentCommission,
 } = require("./controllers/agentCommissionsController");
 const ttsHandler = require("./utils/tts");
-const { increaseAdminCommission } = require("./controllers/adminCommissionController");
+const {
+  increaseAdminCommission,
+} = require("./controllers/adminCommissionController");
 
 const app = express();
 connectMongo();
@@ -49,6 +54,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 let onlineUsers = {};
+
 
 io.on("connection", (socket) => {
   socket.on("join", (userId) => {
@@ -247,7 +253,7 @@ io.on("connection", (socket) => {
   socket.on("UserAgentDepositCompleted", async (data) => {
     console.log("in UserAgentDepositCompleted");
     const userIdSocketId = onlineUsers[data.userId._id];
-    const agentSocketId= onlineUsers[data.agentId._id];
+    const agentSocketId = onlineUsers[data.agentId._id];
     console.log("User Agent Deposit Completed:", userIdSocketId);
     const adminId = await getAdminId();
     const adminIdSocketId = onlineUsers[adminId];
@@ -258,16 +264,21 @@ io.on("connection", (socket) => {
     // });
     if (adminIdSocketId) {
       console.log("Admin ID:", adminId, "Agent ID:", agentId);
-      const adminCommission =await increaseAdminCommission({
+      const adminCommission = await increaseAdminCommission({
         adminId,
-        commission: (data.commission)/2,
+        commission: data.commission / 2,
       });
       console.log("Updated Commission:", "Admin Commission:", adminCommission);
-      io.to(adminIdSocketId).emit("increaseAgentCommission", {transaction:data, adminCommission});
+      io.to(adminIdSocketId).emit("increaseAgentCommission", {
+        transaction: data,
+        adminCommission,
+      });
       console.log("io sent newTransactionMade to admin");
     }
-    if( agentSocketId) {
-      io.to(agentSocketId).emit("UserAgentDepositCompletedBackend", {transaction:data});
+    if (agentSocketId) {
+      io.to(agentSocketId).emit("UserAgentDepositCompletedBackend", {
+        transaction: data,
+      });
     }
     if (userIdSocketId) {
       io.to(userIdSocketId).emit("UserAgentDepositCompletedBackend", data);
@@ -346,14 +357,16 @@ io.on("connection", (socket) => {
       //   agentId,
       //   amount: (data.commission)/2,
       // });
-      const adminCommission =await increaseAdminCommission({
+      const adminCommission = await increaseAdminCommission({
         adminId,
-        commission: (data.commission)/2,
+        commission: data.commission / 2,
       });
-      console.log("Updated Commission:",  "Admin Commission:", adminCommission);
-      io.to(adminIdSocketId).emit("increaseAgentCommission", {transaction:data, adminCommission});
+      console.log("Updated Commission:", "Admin Commission:", adminCommission);
+      io.to(adminIdSocketId).emit("increaseAgentCommission", {
+        transaction: data,
+        adminCommission,
+      });
       console.log("io sent newTransactionMade to admin");
-      
     }
     if (userIdSocketId) {
       io.to(userIdSocketId).emit("UserAgentWithdrawCompletedBackend", data);
@@ -492,27 +505,31 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/notification", notificationRoutes);
 app.use("/api/agentCommission", agentCommissionRoutes);
 app.use("/api/adminToAgentTransaction", adminToAgentTransactionRoutes);
-app.use("/api/adminCommission",adminCommissionRoutes)
+app.use("/api/adminCommission", adminCommissionRoutes);
 app.post("/tts", ttsHandler);
 
 const serverStartTime = new Date();
 
-app.use("/api/checkOnline",async(req, res) => {
-  try{
-    const {accountId} = req.body;
+app.use("/api/checkOnline", async (req, res) => {
+  try {
+    const { accountId } = req.body;
     if (!accountId) {
-      return res.status(400).json({ message: "Account ID is required", success: false });
+      return res
+        .status(400)
+        .json({ message: "Account ID is required", success: false });
     }
     const socketId = onlineUsers[accountId];
     if (socketId) {
       return res.status(200).json({ message: "User is online", success: true });
-    }else{
-      return res.status(200).json({ message: "User is offline", success: false });
+    } else {
+      return res
+        .status(200)
+        .json({ message: "User is offline", success: false });
     }
-  }catch (error) {
-    res.status(500).json({ message: "Internal server error" ,success: false});
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", success: false });
   }
-})
+});
 
 app.use("/api/uptime", (req, res) => {
   res.json({ startTime: serverStartTime });
@@ -525,3 +542,7 @@ httpServer.listen(5000, () => {
     console.log(`error in running`, error);
   }
 });
+module.exports = {
+  io,
+  onlineUsers,
+};

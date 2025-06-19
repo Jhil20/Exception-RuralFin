@@ -106,8 +106,8 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                 <>
                   <p>
                     <span className="font-medium">Receiver :</span>{" "}
-                    {transactionInfo?.receiverId?.firstName}{" "}
-                    {transactionInfo?.receiverId?.lastName}
+                    {capitalize(transactionInfo?.receiverId?.firstName)}{" "}
+                    {capitalize(transactionInfo?.receiverId?.lastName)}
                   </p>
 
                   <p>

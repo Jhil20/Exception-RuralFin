@@ -49,7 +49,7 @@ const ExpenseCategoryDetails = ({
           <div className="w-11/12 h-9/12 bg-white shadow-lg rounded-lg p-5 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
             <div className="flex justify-between h-1/12 items-center mb-4">
               <h2 className="text-xl font-semibold">
-                {whichCategory} Transactions Details
+                {whichCategory=="Food"?"Food & Dining":whichCategory=="Others"?"Other Category":whichCategory} Transactions Details
               </h2>
               <X
                 size={38}
@@ -59,7 +59,7 @@ const ExpenseCategoryDetails = ({
                 Close
               </X>
             </div>
-            <div className="h-11/12 overflow-y-auto px-4 py-2 bg-white text-black rounded-xl shadow-inner">
+            <div className="h-11/12 overflow-y-auto px-4 py-2 bg-white text-black rounded-xl">
               {detailsTransactions.length === 0 ? (
                 <div className="text-center h-full flex justify-center items-center pb-10 text-gray-400 text-sm">
                   <h1 className="text-2xl text-gray-500 font-semibold">No transactions found.</h1>

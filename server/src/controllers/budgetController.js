@@ -118,7 +118,7 @@ const createBudget = async (req, res) => {
 
     // console.log("categorySpending", categorySpending);
 
-    const newBudget = Budget.create({
+    const newBudget = await Budget.create({
       userId,
       income,
       budget,
@@ -144,7 +144,28 @@ const createBudget = async (req, res) => {
         .json({ message: "Failed to create budget", success: false });
     }
 
-    // console.log("newBudget", newBudget);
+    const categories = Object.keys(categorySpending);
+    categories.forEach((category) => {
+      if (
+        newBudget.categorySpending[category] >=
+          newBudget.categoryBudgets[category] &&
+        newBudget.alertsEnabled
+      ) {
+        const notification = createNotification({
+          userType: "User",
+          userId,
+          message: `Budget Alert: You've exceeded your ₹${
+            newBudget.categoryBudgets[category]
+          } budget for ${category == "Food" ? "Food & Dining" : category} by ₹${
+            newBudget.categorySpending[category] -
+            newBudget.categoryBudgets[category]
+          } this month. Consider reviewing your spending to stay on track.`,
+          type: "budget",
+          read: false,
+        });
+        
+      }
+    });
 
     const finance = await Finance.updateOne(
       { userId },
@@ -235,7 +256,7 @@ const updateBudgetSpending = async (req, res) => {
     }
 
     if (
-      budget.categorySpending[category] + amount >
+      budget.categorySpending[category] + amount >=
         budget.categoryBudgets[category] &&
       budget.alertsEnabled
     ) {

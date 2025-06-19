@@ -206,9 +206,9 @@ const Header = () => {
                           ? "bg-gray-50"
                           : "bg-white border-l-4 border-gray-900 shadow-sm"
                       } ${
-                        notification.type == "budget"
+                        notification.type == "budget" && notification.read==false
                           ? "bg-white border-l-4 border-red-500 shadow-sm"
-                          : ""
+                          : "bg-gray-50 border-l-4 border-red-300"
                       }`}
                     >
                       <div className="flex items-start">
@@ -244,7 +244,7 @@ const Header = () => {
                             {!notification.read && (
                               <button
                                 onClick={() => markAsRead(notification._id)}
-                                className="ml-2 py-2 px-2 cursor-pointer text-xs text-gray-700 hover:text-gray-900 p-1 hover:bg-gray-100 rounded transition-colors duration-300"
+                                className="ml-2 w-2/12 py-2 px-2 cursor-pointer text-xs text-gray-700 hover:text-gray-900 p-1 hover:bg-gray-100 rounded transition-colors duration-300"
                               >
                                 Mark as read
                               </button>
