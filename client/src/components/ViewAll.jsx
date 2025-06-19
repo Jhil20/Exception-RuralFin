@@ -55,7 +55,9 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                   style: "currency",
                   currency: "INR",
                 }).format(
-                   transactionInfo?.commission ? transactionInfo?.amount-transactionInfo?.commission : transactionInfo?.amount
+                  transactionInfo?.commission
+                    ? transactionInfo?.amount - transactionInfo?.commission
+                    : transactionInfo?.amount
                 )}
               </p>
               <p>
@@ -254,7 +256,11 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                       {new Intl.NumberFormat("en-US", {
                         style: "currency",
                         currency: "INR",
-                      }).format(transaction?.amount-transaction?.commission)}
+                      }).format(
+                        transaction?.conversionType === "cashToERupees"
+                          ? transaction?.amount - transaction?.commission
+                          : transaction?.amount + transaction?.commission
+                      )}
                     </span>
 
                     <div className="ml-2">
@@ -278,9 +284,7 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                       {new Intl.NumberFormat("en-US", {
                         style: "currency",
                         currency: "INR",
-                      }).format(transaction?.amount
-                        +transaction?.commission
-                      )}
+                      }).format(transaction?.amount)}
                     </span>
 
                     <div className="ml-2">
@@ -295,11 +299,11 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
               </div>
             );
           })}
-          {transactionData.length === 0 && (
-            <div className="flex items-center justify-center pb-20 h-full">
-              <p className="text-gray-500  text-xl">No transactions found</p>
-            </div>
-          )}
+        {transactionData.length === 0 && (
+          <div className="flex items-center justify-center pb-20 h-full">
+            <p className="text-gray-500  text-xl">No transactions found</p>
+          </div>
+        )}
       </div>
     </div>
   );
