@@ -139,7 +139,7 @@ const createAgent = async (req, res) => {
 
     if (agent) {
       // Generate JWT
-      console.log("agent token creation", agent._id, agent.phone);
+      // console.log("agent token creation", agent._id, agent.phone);
       const token = jwt.sign(
         { id: agent._id, phone: agent.phone },
         "harshp4114",

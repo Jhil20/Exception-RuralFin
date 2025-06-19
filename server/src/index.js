@@ -61,14 +61,14 @@ io.on("connection", (socket) => {
     if (!userId) return console.error("User ID is required to join the socket");
     onlineUsers[userId] = socket.id;
     io.emit("activeUsers", Object.keys(onlineUsers));
-    console.log(`User ${userId} connected with socket id: ${socket.id}`);
-    console.log("Online users after connection:", onlineUsers);
+    // console.log(`User ${userId} connected with socket id: ${socket.id}`);
+    // console.log("Online users after connection:", onlineUsers);
   });
 
   socket.on("money-sent-by-sender", async (data) => {
     const receiverId = data.transaction.receiverId._id;
     const senderId = data.transaction.senderId._id;
-    console.log("Money sent by sender:", receiverId, senderId);
+    // console.log("Money sent by sender:", receiverId, senderId);
 
     const receiverSocketId = onlineUsers[receiverId];
     const senderSocketId = onlineUsers[senderId];
@@ -91,14 +91,14 @@ io.on("connection", (socket) => {
           read: false,
         });
 
-        console.log("notificationObj", notificationObj);
+        // console.log("notificationObj", notificationObj);
         const socketToSend = receiverSocketId;
-        console.log("notifiaction socket called", socketToSend);
+        // console.log("notifiaction socket called", socketToSend);
         if (socketToSend) {
           io.to(socketToSend).emit("newNotificationSend", [
             notificationObj.data,
           ]);
-          console.log("io sent newNotificationSend");
+          // console.log("io sent newNotificationSend");
         }
       }
     } else {
@@ -134,14 +134,14 @@ io.on("connection", (socket) => {
           read: false,
         });
 
-        console.log("notificationObj", notificationObj);
+        // console.log("notificationObj", notificationObj);
         const socketToSend = agentIdSocketId;
-        console.log("notifiaction socket called", socketToSend);
+        // console.log("notifiaction socket called", socketToSend);
         if (socketToSend) {
           io.to(socketToSend).emit("newNotificationSend", [
             notificationObj.data,
           ]);
-          console.log("io sent newNotificationSend");
+          // console.log("io sent newNotificationSend");
         }
       }
     } else {
@@ -169,7 +169,7 @@ io.on("connection", (socket) => {
     // );
     if (userIdSocketId) {
       io.to(userIdSocketId).emit("UserAgentRequestAcceptedBackend", data);
-      console.log("io sent");
+      // console.log("io sent");
       const notificationObj = await createNotification({
         userType: "User",
         userId: data.userId._id,
@@ -183,12 +183,12 @@ io.on("connection", (socket) => {
         type: "transaction",
         read: false,
       });
-      console.log("notificationObj", notificationObj);
+      // console.log("notificationObj", notificationObj);
       const socketToSend = userIdSocketId;
-      console.log("notifiaction socket called", socketToSend);
+      // console.log("notifiaction socket called", socketToSend);
       if (socketToSend) {
         io.to(socketToSend).emit("newNotificationSend", [notificationObj.data]);
-        console.log("io sent newNotificationSend");
+        // console.log("io sent newNotificationSend");
       }
     } else {
       console.error("User ID is missing in the request data");
@@ -226,12 +226,12 @@ io.on("connection", (socket) => {
         type: "transaction",
         read: false,
       });
-      console.log("notificationObj", notificationObj);
+      // console.log("notificationObj", notificationObj);
       const socketToSend = onlineUsers[data.userId._id];
-      console.log("notifiaction socket called", socketToSend);
+      // console.log("notifiaction socket called", socketToSend);
       if (socketToSend) {
         io.to(socketToSend).emit("newNotificationSend", [notificationObj.data]);
-        console.log("io sent newNotificationSend");
+        // console.log("io sent newNotificationSend");
       }
     } else {
       console.error("User ID is missing in the request data");
@@ -251,10 +251,10 @@ io.on("connection", (socket) => {
     }
   });
   socket.on("UserAgentDepositCompleted", async (data) => {
-    console.log("in UserAgentDepositCompleted");
+    // console.log("in UserAgentDepositCompleted");
     const userIdSocketId = onlineUsers[data.userId._id];
     const agentSocketId = onlineUsers[data.agentId._id];
-    console.log("User Agent Deposit Completed:", userIdSocketId);
+    // console.log("User Agent Deposit Completed:", userIdSocketId);
     const adminId = await getAdminId();
     const adminIdSocketId = onlineUsers[adminId];
     const agentId = data.agentId._id;
@@ -263,17 +263,17 @@ io.on("connection", (socket) => {
     //   amount: (data.commission)/2,
     // });
     if (adminIdSocketId) {
-      console.log("Admin ID:", adminId, "Agent ID:", agentId);
+      // console.log("Admin ID:", adminId, "Agent ID:", agentId);
       const adminCommission = await increaseAdminCommission({
         adminId,
         commission: data.commission / 2,
       });
-      console.log("Updated Commission:", "Admin Commission:", adminCommission);
+      // console.log("Updated Commission:", "Admin Commission:", adminCommission);
       io.to(adminIdSocketId).emit("increaseAgentCommission", {
         transaction: data,
         adminCommission,
       });
-      console.log("io sent newTransactionMade to admin");
+      // console.log("io sent newTransactionMade to admin");
     }
     if (agentSocketId) {
       io.to(agentSocketId).emit("UserAgentDepositCompletedBackend", {
@@ -352,7 +352,7 @@ io.on("connection", (socket) => {
     const adminIdSocketId = onlineUsers[adminId];
     if (adminIdSocketId) {
       const agentId = data.agentId._id;
-      console.log("Admin ID:", adminId, "Agent ID:", agentId);
+      // console.log("Admin ID:", adminId, "Agent ID:", agentId);
       // const updatedCommission = await increaseAgentCommission({
       //   agentId,
       //   amount: (data.commission)/2,
@@ -361,12 +361,12 @@ io.on("connection", (socket) => {
         adminId,
         commission: data.commission / 2,
       });
-      console.log("Updated Commission:", "Admin Commission:", adminCommission);
+      // console.log("Updated Commission:", "Admin Commission:", adminCommission);
       io.to(adminIdSocketId).emit("increaseAgentCommission", {
         transaction: data,
         adminCommission,
       });
-      console.log("io sent newTransactionMade to admin");
+      // console.log("io sent newTransactionMade to admin");
     }
     if (userIdSocketId) {
       io.to(userIdSocketId).emit("UserAgentWithdrawCompletedBackend", data);
@@ -433,20 +433,20 @@ io.on("connection", (socket) => {
   });
 
   socket.on("updateSystemSettings", async (data) => {
-    console.log("updateSystemSettings data:", data);
+    // console.log("updateSystemSettings data:", data);
 
     const notifications = await createAdminNotificationForAll();
     io.emit("updateSystemSettingsBackend", notifications);
-    console.log("socket io sent updateSystemSettingsBackend");
+    // console.log("socket io sent updateSystemSettingsBackend");
   });
 
   socket.on("newRecentActivity", async (data) => {
-    console.log("newRecentActivity data:", data);
+    // console.log("newRecentActivity data:", data);
     const adminId = await getAdminId();
     const adminIdSocketId = onlineUsers[adminId];
     if (adminIdSocketId) {
       io.to(adminIdSocketId).emit("newRecentActivityBackend", data);
-      console.log("io sent newRecentActivityBackend to admin");
+      // console.log("io sent newRecentActivityBackend to admin");
     }
   });
 
@@ -472,18 +472,18 @@ io.on("connection", (socket) => {
       if (onlineUsers[userId] === socket.id) {
         delete onlineUsers[userId];
         io.emit("activeUsers", Object.keys(onlineUsers));
-        console.log(`User ${userId} disconnected`);
+        // console.log(`User ${userId} disconnected`);
         break;
       }
     }
-    console.log("Online users after disconnect:", onlineUsers);
+    // console.log("Online users after disconnect:", onlineUsers);
   });
 });
 
 app.get("/api/getActiveUsers", async (req, res) => {
   try {
     const activeUsers = Object.keys(onlineUsers);
-    console.log("Active users:", activeUsers);
+    // console.log("Active users:", activeUsers);
     res.status(200).json({
       data: activeUsers,
       message: "Active users fetched successfully",

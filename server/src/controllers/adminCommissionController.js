@@ -6,12 +6,12 @@ const increaseAdminCommission = async ({ adminId, commission }) => {
     const date = new Date();
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
-    console.log(
-      "Increasing commission for admin:",
-      adminId,
-      "by amount:",
-      commission
-    );
+    // console.log(
+    //   "Increasing commission for admin:",
+    //   adminId,
+    //   "by amount:",
+    //   commission
+    // );
 
     let adminCommission = await AdminCommission.findOne({
       adminId: adminId,
@@ -49,7 +49,7 @@ const increaseAdminCommission = async ({ adminId, commission }) => {
 const getAllAdminCommissions = async (req, res) => {
   try {
     const adminId = await getAdminId();
-    console.log("Fetching all commissions for admin:", adminId);
+    // console.log("Fetching all commissions for admin:", adminId);
     if (!adminId) {
       return res
         .status(400)

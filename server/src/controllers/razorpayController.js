@@ -25,7 +25,7 @@ const createRazorpayOrder = async (req, res) => {
 
 // Route 2: Verify Razorpay payment signature
 const verifyPayment = (req, res) => {
-    console.log("Verifying Razorpay payment signature...");
+    // console.log("Verifying Razorpay payment signature...");
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
       req.body;

@@ -34,11 +34,11 @@ const getThisMonthCommission = async (req, res) => {
 const increaseAgentCommission=async(param)=>{
   const { agentId, amount } = param;
   try {
-    console.log("Increasing commission for agent:", agentId, "by amount:", amount);
+    // console.log("Increasing commission for agent:", agentId, "by amount:", amount);
     const date = new Date();
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
-    console.log("Current Month:", month, "Year:", year);
+    // console.log("Current Month:", month, "Year:", year);
     
     let commission = await AgentCommission.findOne({
       agentId: agentId,

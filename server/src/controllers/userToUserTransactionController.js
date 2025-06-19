@@ -56,7 +56,7 @@ const createUserToUserTransaction = async (req, res) => {
       receiver,
     });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(500).json({ message: "Error creating transaction", error: err });
   }
 };
@@ -77,7 +77,7 @@ const updateStatus = async (req, res) => {
       .status(200)
       .json({ message: "Transaction updated", success: true, transaction });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(500).json({
       message: "Error updating transaction",
       error: err,
@@ -200,7 +200,7 @@ const getTotalTransactionsLastMonthByUserId = async (req, res) => {
     const totalSpent = result.length > 0 ? result[0].totalSpent : 0;
     return res.status(200).json({ totalSpent: totalSpent, success: true });
   } catch (err) {
-    console.log("error fetching last month transactions", err);
+    // console.log("error fetching last month transactions", err);
     res.status(500).json({
       message: "Error fetching transactions total",
       error: err,
@@ -247,7 +247,7 @@ const getAllTransactionsByCategory = async (req, res) => {
       .status(200)
       .json({ message: "Transactions fetched", success: true, transactions });
   } catch (err) {
-    console.log("error fetching transactions by category", err);
+    // console.log("error fetching transactions by category", err);
     res.status(500).json({
       message: "Error fetching transactions by category",
       error: err,
@@ -267,12 +267,12 @@ const deleteUserToUserTransaction = async (req, res) => {
         .status(400)
         .json({ message: "Transaction not found", success: false });
     }
-    console.log("Transaction deleted", transaction);
+    // console.log("Transaction deleted", transaction);
     return res
       .status(200)
       .json({ message: "Transaction deleted", success: true });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(500).json({
       message: "Error deleting transaction",
       error: err,

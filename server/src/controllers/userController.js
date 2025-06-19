@@ -249,7 +249,7 @@ const createUser = async (req, res) => {
       "aadhar",
     ];
 
-    console.log("req.body", req.body);
+    // console.log("req.body", req.body);
 
     for (const field of requiredFields) {
       if (!req.body[field]) {
