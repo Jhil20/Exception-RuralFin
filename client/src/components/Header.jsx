@@ -206,10 +206,16 @@ const Header = () => {
                           ? "bg-gray-50"
                           : "bg-white border-l-4 border-gray-900 shadow-sm"
                       } ${
-                        notification.type == "budget" && notification.read==false
-                          ? "bg-white border-l-4 border-red-500 shadow-sm"
-                          : "bg-gray-50 border-l-4 border-red-300"
-                      }`}
+                        notification.type == "budget"
+                          ? notification.read == false
+                            ? "bg-white border-l-4 border-red-500 shadow-sm"
+                            : "bg-gray-50 border-l-4 border-red-300"
+                          : notification.read == false
+                          ? "bg-white border-l-4 border-gray-900 shadow-sm"
+                          : "bg-gray-50"
+                      }
+                        
+                      `}
                     >
                       <div className="flex items-start">
                         <div

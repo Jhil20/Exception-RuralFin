@@ -28,6 +28,7 @@ const AgentDashboard = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [isDepositOverlayOpen, setIsDepositOverlayOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [allCommissions, setAllCommissions] = useState([]);
 
   const formatDate = (dateString) => {
@@ -149,6 +150,7 @@ const AgentDashboard = () => {
   };
 
   const handleTransactionRequestReject = async (transactionToReject) => {
+    setIsSubmitting(true);
     try {
       const response = await axios.post(
         `${BACKEND_URL}/api/agentToUserTransaction/updateStatus`,
@@ -191,15 +193,19 @@ const AgentDashboard = () => {
       getTransactionsDone(); // Refresh
     } catch (err) {
       console.error("Error rejecting transaction request:", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
   const handleTransactionRequestAccept = async (transactionToAccept) => {
+    setIsSubmitting(true);
     try {
       if (
         transactionToAccept?.conversionType == "cashToERupees" &&
         transactionToAccept?.amount - transactionToAccept?.commission >
           agentData?.balance
       ) {
+        setIsSubmitting(false);
         toast.error("Insufficient balance to accept this deposit request");
         return;
       }
@@ -246,12 +252,15 @@ const AgentDashboard = () => {
       getTransactionsDone(); // Refresh
     } catch (err) {
       console.error("Error accepting transaction request:", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDepositTransactionRequestComplete = async (
     transactionToComplete
   ) => {
+    setIsSubmitting(true);
     try {
       const response = await axios.post(
         `${BACKEND_URL}/api/finance/depositFunds`,
@@ -276,7 +285,7 @@ const AgentDashboard = () => {
       // );
       setAgentData((prevData) => ({
         ...prevData,
-        balance: prevData.balance - data.amount + data.commission/2,
+        balance: prevData.balance - data.amount + data.commission / 2,
       }));
       setTransactionsDone((prevTransactions) => {
         const updatedTransactions = prevTransactions.filter(
@@ -297,7 +306,7 @@ const AgentDashboard = () => {
               return {
                 ...commission,
                 totalCommissionEarned:
-                  commission.totalCommissionEarned + data.commission /2,
+                  commission.totalCommissionEarned + data.commission / 2,
               };
             }
             return commission;
@@ -321,12 +330,15 @@ const AgentDashboard = () => {
       );
     } catch (err) {
       console.error("Error completing deposit transaction request:", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleWithdrawalTransactionRequestComplete = async (
     transactionToComplete
   ) => {
+    setIsSubmitting(true);
     try {
       const response = await axios.post(
         `${BACKEND_URL}/api/finance/withdrawFunds`,
@@ -348,7 +360,7 @@ const AgentDashboard = () => {
       console.log("Socket emitted UserAgentWithdrawCompleted", data);
       setAgentData((prevData) => ({
         ...prevData,
-        balance: prevData.balance + data.amount + data.commission/2,
+        balance: prevData.balance + data.amount + data.commission / 2,
       }));
       setTransactionsDone((prevTransactions) => {
         const updatedTransactions = prevTransactions.filter(
@@ -369,14 +381,13 @@ const AgentDashboard = () => {
               return {
                 ...commission,
                 totalCommissionEarned:
-                  commission.totalCommissionEarned + data.commission /2,
+                  commission.totalCommissionEarned + data.commission / 2,
               };
             }
             return commission;
           });
         }
-      }
-      );
+      });
       setFilteredTransactions((prevTransactions) => {
         const updatedFiltered = prevTransactions.filter(
           (tr) => tr._id !== data._id
@@ -394,6 +405,8 @@ const AgentDashboard = () => {
       );
     } catch (err) {
       console.error("Error completing withdrawal transaction request:", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -719,6 +732,7 @@ const AgentDashboard = () => {
                       {transaction?.status == "pending" && (
                         <div className="flex space-x-2">
                           <button
+                            disabled={isSubmitting}
                             onClick={() => {
                               handleTransactionRequestAccept(transaction);
                             }}
@@ -728,6 +742,7 @@ const AgentDashboard = () => {
                             Accept
                           </button>
                           <button
+                            disabled={isSubmitting}
                             onClick={() => {
                               handleTransactionRequestReject(transaction);
                             }}
@@ -741,6 +756,7 @@ const AgentDashboard = () => {
                       {transaction?.status == "accepted" && (
                         <div className="flex space-x-2">
                           <button
+                            disabled={isSubmitting}
                             onClick={() => {
                               if (
                                 transaction?.conversionType === "cashToERupees"

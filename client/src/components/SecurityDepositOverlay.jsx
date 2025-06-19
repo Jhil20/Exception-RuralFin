@@ -13,35 +13,35 @@ const SecurityDepositOverlay = ({
 }) => {
   const [depositAmount, setDepositAmount] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
   const handleDeposit = async () => {
+    setIsProcessing(true);
+
     if (!depositAmount || parseFloat(depositAmount) <= 0) {
       toast.error("Please enter a valid amount");
+      setIsProcessing(false);
       return;
     }
-    try{
-      navigate("/razorpay",{
-        state:{
-          agentId:decoded.id,
-          amount:parseFloat(depositAmount),
-          type:"increaseSecurityDeposit",
-        }
-      })
-    }catch(error){
+    try {
+      navigate("/razorpay", {
+        state: {
+          agentId: decoded.id,
+          amount: parseFloat(depositAmount),
+          type: "increaseSecurityDeposit",
+        },
+      });
+    } catch (error) {
       toast.error("An error occurred while processing your deposit");
       console.error("Deposit Error:", error);
       return;
-    }finally{
+    } finally {
       setIsProcessing(false);
     }
-
-    setIsProcessing(true);
 
     setDepositAmount("");
     onClose();
     // Simulate API call
-    
   };
 
   const quickAmounts = [5000, 10000, 25000, 50000];
@@ -160,19 +160,16 @@ const SecurityDepositOverlay = ({
             <button
               onClick={handleDeposit}
               disabled={isProcessing || !depositAmount}
-              className="flex-1 py-3 px-4 bg-black cursor-pointer text-white rounded-lg font-medium hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
+              className={`flex-1 py-3 px-4 bg-black cursor-pointer  text-white rounded-lg font-medium hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2`}
             >
-              {isProcessing ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <>
+                <CreditCard className="w-4 h-4" />
+                {isProcessing ? (
                   <span>Processing...</span>
-                </>
-              ) : (
-                <>
-                  <CreditCard className="w-4 h-4" />
+                ) : (
                   <span>Deposit Now</span>
-                </>
-              )}
+                )}
+              </>
             </button>
           </div>
         </div>
