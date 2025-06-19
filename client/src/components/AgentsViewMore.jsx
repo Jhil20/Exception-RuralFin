@@ -1,4 +1,4 @@
-import { User, X } from "lucide-react";
+import { Search, User, X } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
@@ -47,31 +47,39 @@ const AgentsViewMore = ({
         </button>
       </div>
       <div className="w-full flex justify-center items-center mt-4 h-1/12 p-2">
-        <input
-          type="text"
-          placeholder="Search Agents..."
-          value={searchInput}
-          className="w-6/12 h-10 px-4 border border-gray-300 rounded-lg hover:border-black focus:border-black transition-all duration-300"
-          onChange={(e) => {
-            if (searchBy == "name") {
+        <div className="relative border border-gray-300 rounded-lg hover:border-black focus-within:border-black transition-all duration-300 w-6/12 h-10">
+          <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+
+          <input
+            type="text"
+            placeholder="Search Agents..."
+            value={searchInput}
+            className="w-full h-full pl-10 pr-4 rounded-lg outline-none"
+            onChange={(e) => {
+              const value = e.target.value.toLowerCase();
               setSearchInput(e.target.value);
-              setFilteredAgents(
-                allAgents.filter((agent) =>
-                  (agent?.firstName + " " + agent?.lastName)
-                    .toLowerCase()
-                    .includes(e.target.value.toLowerCase())
-                )
-              );
-            }else{
-                setSearchInput(e.target.value);
+              if (searchBy === "name") {
                 setFilteredAgents(
-                    allAgents.filter((agent) =>
-                    agent?.address.toLowerCase().includes(e.target.value.toLowerCase())
-                    )
+                  allAgents.filter((agent) =>
+                    (agent?.firstName + " " + agent?.lastName)
+                      .toLowerCase()
+                      .includes(value)
+                  )
                 );
-            }
-          }}
-        ></input>
+              } else {
+                setFilteredAgents(
+                  allAgents.filter((agent) =>
+                    (agent?.city.toLowerCase().includes(value) ||
+                    agent?.state.toLowerCase().includes(value) ||
+                    agent?.country.toLowerCase().includes(value) ||
+                    agent?.zipCode.toLowerCase().includes(value)) 
+                  )
+                );
+              }
+            }}
+          />
+        </div>
+
         <div className="flex h-full items-center ml-4 space-x-3">
           <button
             onClick={() => setSearchBy("name")}
@@ -97,7 +105,7 @@ const AgentsViewMore = ({
           </button>
         </div>
       </div>
-      <div className="h-9/12 overflow-y-auto p-4 px-8 grid grid-cols-4 grid-rows-3 gap-4 justify-items-center">
+      <div className="h-9/12 overflow-y-auto p-4 px-8 grid grid-cols-3 grid-rows-3 gap-6 justify-items-center">
         {filteredAgents?.map((agent) => (
           <div
             key={agent?._id}
@@ -105,7 +113,7 @@ const AgentsViewMore = ({
               setSelectedAgent(agent);
               setShowAgentDetails(true);
             }}
-            className="bg-white ring-1 ring-gray-300 h-46 mx-0.5 cursor-pointer p-5 rounded-lg shadow-md hover:shadow-lg shadow-black/30 transition-all duration-300 transform hover:scale-101"
+            className="bg-white ring-1 w-full ring-gray-300 h-fit mx-0.5 cursor-pointer p-5 rounded-lg shadow-md hover:shadow-lg shadow-black/30 transition-all duration-300 transform hover:scale-101"
           >
             <div className="flex items-center">
               <div className="bg-gray-900 p-2 rounded-full mr-4">
@@ -117,17 +125,21 @@ const AgentsViewMore = ({
                     " " +
                     capitalize(agent?.lastName)}
                 </span>
-                <span className="text-gray-700 text-sm my-1 font-normal">
+                <span className="text-gray-700 text-sm font-normal">
                   Amount: ₹{agent?.balance}
                 </span>
                 <div className="text-gray-700 text-sm  ">
-                  Address : {agent?.address}
+                  City : {agent?.city}
                 </div>
-
-                {/* <div className="flex items-center text-gray-900 text-sm">
-                  <Star className="w-4 h-4 text-yellow-500 mr-1" />
-                  {agent?.rating}
-                </div> */}
+                <div className="text-gray-700 text-sm  ">
+                  State : {agent?.state}
+                </div>
+                <div className="text-gray-700 text-sm  ">
+                  Country : {agent?.country} - {agent?.zipCode}
+                </div>
+                <div className="text-gray-700 text-sm">
+                  Phone : {agent?.phone}
+                </div>
               </div>
             </div>
           </div>

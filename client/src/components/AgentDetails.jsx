@@ -59,8 +59,9 @@ const AgentDetails = ({
   const [allTransactions, setAllTransactions] = useState([]);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [allAgentUserTransactions, setAllAgentUserTransactions] = useState([]);
-  const [totalTransactions,setTotaltransactions]=useState([]);
+  const [totalTransactions, setTotaltransactions] = useState([]);
   const [thisMonthCommission, setThisMonthCommission] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [userData, setUserData] = useState(null);
   const [settings, setSettings] = useState(null);
   const token = Cookies.get("token");
@@ -219,6 +220,7 @@ const AgentDetails = ({
   }, [decoded]);
 
   const handleAgentToUserSubmit = async (values, { resetForm }) => {
+    setIsSubmitting(true);
     const data = {
       agentId: selectedAgent._id,
       userId: decoded.id,
@@ -234,6 +236,7 @@ const AgentDetails = ({
       data.amount + data.commission > userData.balance
     ) {
       toast.error("Withdrawal amount exceeds available balance!");
+      setIsSubmitting(false);
       return;
     }
 
@@ -255,6 +258,7 @@ const AgentDetails = ({
         // speak(
         //   `You can only Deposit/Withdraw upto ₹${settings?.maxDailyLimit} per day`
         // );
+        setIsSubmitting(false);
         return;
       } else if (values.amount < settings?.minTransactionAmount) {
         toast.error(
@@ -263,6 +267,7 @@ const AgentDetails = ({
         // speak(
         //   `Minimum Deposit/WithDraw amount is ₹${settings?.minTransactionAmount}`
         // );
+        setIsSubmitting(false);
         return;
       } else if (values.amount > settings?.maxTransactionAmount) {
         toast.error(
@@ -271,6 +276,7 @@ const AgentDetails = ({
         // speak(
         //   `Maximum Deposit/Withdraw amount is ₹${settings?.maxTransactionAmount}`
         // );
+        setIsSubmitting(false);
         return;
       } else if (
         values.amount + result?.data?.data?.thisWeek >
@@ -282,6 +288,7 @@ const AgentDetails = ({
         // speak(
         //   `You can only Deposit/Withdraw upto ₹${settings?.maxWeeklyLimit} per week`
         // );
+        setIsSubmitting(false);
         return;
       }
       const response = await axios.post(
@@ -306,18 +313,23 @@ const AgentDetails = ({
       setShowAgentDetails(false);
     } catch (error) {
       console.error("Error creating agent to user transaction:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const getThisMonthCommission=async()=>{
-    try{
-      const response=await axios.post(`${BACKEND_URL}/api/agentCommission/getThisMonthCommission`,{agentId:selectedAgent._id});
+  const getThisMonthCommission = async () => {
+    try {
+      const response = await axios.post(
+        `${BACKEND_URL}/api/agentCommission/getThisMonthCommission`,
+        { agentId: selectedAgent._id }
+      );
       console.log("This month's commission:", response.data);
       setThisMonthCommission(response.data.data || 0);
-    }catch(error){
+    } catch (error) {
       console.error("Error fetching this month's commission:", error);
     }
-  }
+  };
 
   useEffect(() => {
     getAllTransactions();
@@ -347,11 +359,13 @@ const AgentDetails = ({
           return tr.status === "completed" && createdAtDate >= startOfMonth;
         }
       );
-      const filterTotalTransactions=response?.data?.transactions.filter((tr)=>{
-        if(tr.status=="completed"){
-          return tr;
+      const filterTotalTransactions = response?.data?.transactions.filter(
+        (tr) => {
+          if (tr.status == "completed") {
+            return tr;
+          }
         }
-      })
+      );
       setTotaltransactions(filterTotalTransactions);
       setAllAgentUserTransactions(filterAllTransactions);
       setAllTransactions(filtered);
@@ -528,7 +542,7 @@ const AgentDetails = ({
                           </span>
                         </label>
                         <p className="text-black font-medium">
-                          {selectedAgent?.address}
+                          {`${selectedAgent?.city}, ${selectedAgent?.state}, ${selectedAgent?.country} - ${selectedAgent?.zipCode}`}
                         </p>
                       </div>
                     </div>
@@ -584,7 +598,10 @@ const AgentDetails = ({
                             Security Deposit
                           </label>
                           <p className="text-black font-medium">
-                            ₹{selectedAgent?.balance?.toLocaleString("en-IN")}
+                            ₹
+                            {selectedAgent?.securityDeposit?.toLocaleString(
+                              "en-IN"
+                            )}
                           </p>
                         </div>
                       </div>
@@ -630,10 +647,7 @@ const AgentDetails = ({
                           Commission Earned
                         </span>
                         <span className="text-black font-bold">
-                          ₹
-                          {thisMonthCommission?.toLocaleString(
-                            "en-IN"
-                          )}
+                          ₹{thisMonthCommission?.toLocaleString("en-IN")}
                         </span>
                       </div>
                       <div className="flex items-center text-xs text-gray-500">
@@ -674,9 +688,11 @@ const AgentDetails = ({
                     <div className="bg-gray-50 border-gray-200 border rounded-lg p-4">
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium text-gray-500">
-                         Total Transactions
+                          Total Transactions
                         </span>
-                        <span className="text-black font-bold">{totalTransactions.length || 0}</span>
+                        <span className="text-black font-bold">
+                          {totalTransactions.length || 0}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -815,13 +831,20 @@ const AgentDetails = ({
 
                         <button
                           type="submit"
-                          className="w-full py-3 mt-9 px-4 cursor-pointer bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-200 transform hover:translate-y-[-2px] flex items-center justify-center"
+                          disabled={isSubmitting}
+                          className="w-full py-3 mt-9 px-4 cursor-pointer disabled:cursor-not-allowed bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-200 transform hover:translate-y-[-2px] flex items-center justify-center"
                         >
                           <CreditCard size={18} className="mr-2" />
-                          Process{" "}
-                          {transactionType === "deposit"
-                            ? "Deposit"
-                            : "Withdrawal"}
+                          {isSubmitting ? (
+                            <span>Processing...</span>
+                          ) : (
+                            <span>
+                              Process{" "}
+                              {transactionType === "deposit"
+                                ? "Deposit"
+                                : "Withdrawal"}
+                            </span>
+                          )}
                         </button>
                       </Form>
                     )}
@@ -984,7 +1007,7 @@ const AgentDetails = ({
                     <p className="text-gray-500">No transactions found</p>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-4 h-[50vh] overflow-y-auto">
                     {filteredTransactions
                       ?.sort((a, b) => {
                         return (

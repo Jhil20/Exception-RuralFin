@@ -71,7 +71,7 @@ io.on("connection", (socket) => {
     if (adminSocketId) {
       io.to(adminSocketId).emit("newTransactionMade", data);
     }
-    if (receiverSocketId && senderSocketId) {
+    if (receiverSocketId || senderSocketId) {
       io.to([receiverSocketId, senderSocketId]).emit(
         "money-received-by-receiver",
         data

@@ -344,7 +344,7 @@ const Login = () => {
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full cursor-pointer flex justify-center items-center px-4 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-black hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all duration-200"
+                        className="w-full cursor-pointer disabled:cursor-not-allowed flex justify-center items-center px-4 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-black hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all duration-200"
                       >
                         {isSubmitting ? "Verifying..." : "Verify OTP"}
                         <ArrowRight className="ml-2 h-5 w-5" />
@@ -509,10 +509,9 @@ const Login = () => {
                       type="submit"
                       id="submit-btn"
                       disabled={isSubmitting}
-                      className="w-full cursor-pointer flex justify-center items-center px-4 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-black hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all duration-200"
+                      className="w-full cursor-pointer disabled:cursor-not-allowed flex justify-center items-center px-4 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-black hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all duration-200"
                     >
                       {isSubmitting ? "Sending OTP..." : "Continue"}
-                      {/* <ArrowRight className="ml-2 h-5 w-5" /> */}
                     </button>
                   </div>
                 </Form>

@@ -1,4 +1,4 @@
-import  { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Search,
   Send,
@@ -24,6 +24,7 @@ import Cookies from "js-cookie";
 
 export const SendMoney = ({ showSend, user, finance, toastControl }) => {
   const [step, setStep] = useState("form");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [amount, setAmount] = useState("");
@@ -134,6 +135,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       toast.error("Insufficient balance");
       return;
     }
+    setIsSubmitting(true);
     try {
       const response2 = await axios.get(
         `${BACKEND_URL}/api/user/getTodayTransactionAmount/${user._id}`
@@ -144,16 +146,19 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
         toast.error(
           `You can only transfer upto ₹${settings?.maxDailyLimit} per day`
         );
+        setIsSubmitting(false);
         return;
       } else if (amount < settings?.minTransactionAmount) {
         toast.error(
           `Minimum transaction amount is ₹${settings?.minTransactionAmount}`
         );
+        setIsSubmitting(false);
         return;
       } else if (amount > settings?.maxTransactionAmount) {
         toast.error(
           `Maximum transaction amount is ₹${settings?.maxTransactionAmount}`
         );
+        setIsSubmitting(false);
         return;
       } else if (
         amount + response2?.data?.data?.thisWeek >
@@ -162,6 +167,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
         toast.error(
           `You can only transfer upto ₹${settings?.maxWeeklyLimit} per week`
         );
+        setIsSubmitting(false);
         return;
       }
       const response = await axios.post(
@@ -183,7 +189,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       const appVerifier = window.recaptchaVerifier;
       if (!appVerifier) {
         toast.error("reCAPTCHA not initialized. Please refresh the page.");
-        setSubmitting(false);
+        setIsSubmitting(false);
         return;
       }
 
@@ -225,7 +231,6 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
     } catch (err) {
       if (err?.response?.data?.message == "Transaction PIN is incorrect") {
         toast.error("Transaction PIN is incorrect");
-        setSubmitting(false);
         return;
       }
       // console.log("checking delete", transactionCreated._id);
@@ -238,17 +243,20 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       console.log("Error in transaction", err);
       toast.error("Transaction failed. please refresh & try again.");
       return;
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
-
+    setIsSubmitting(true);
     if (!window.confirmationResult) {
       toast.error("OTP session expired.");
       setTimeout(() => {
         window.location.reload();
       }, 3000);
+      setIsSubmitting(false);
       return;
     }
 
@@ -332,9 +340,11 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       setRuralFinId("");
       setTransactionCreated(null);
       setIsValidId(null);
+    } finally {
+      setIsSubmitting(false);
     }
 
-    console.log("Transfer completed");
+    // console.log("Transfer completed");
     // setStep("form");
     // setSelectedUser(null);
     // setAmount("");
@@ -449,7 +459,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
           <form onSubmit={handleVerifyOtp} className="space-y-6">
             <div className="bg-gray-50 p-4 rounded-lg">
               <p className="text-sm text-gray-600">
-                Sending to: {console.log("receiverUser", receiverUser)}
+                Sending to :
                 {receiverUser
                   ? capitalize(receiverUser?.firstName) +
                     " " +
@@ -478,9 +488,14 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
             </div>
             <button
               type="submit"
-              className="w-full cursor-pointer bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center space-x-2"
+              disabled={isSubmitting}
+              className="w-full cursor-pointer disabled:cursor-not-allowed bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center space-x-2"
             >
-              <span>Confirm Transfer</span>
+              {isSubmitting ? (
+                <span>Transfering Funds...</span>
+              ) : (
+                <span>Confirm Transfer</span>
+              )}
               <ArrowRight className="h-5 w-5" />
             </button>
           </form>
@@ -581,7 +596,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search Favourites by name or RuralFin ID"
-                className={`w-full pl-10 pr-4 py-2 border ${
+                className={`w-full pl-10 pr-4 py-2 border hover:border-gray-700 transition-all duration-300 ${
                   favourites.length === 0 ? "cursor-not-allowed" : "cursor-text"
                 } border-gray-200 rounded-lg focus:ring-black focus:border-transparent`}
               />
@@ -639,7 +654,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
               onSubmit={handleSendMoneySubmit}
               innerRef={formikRef}
             >
-              {({ isSubmitting, isValid, dirty }) => (
+              {() => (
                 <Form className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -735,11 +750,15 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
 
                   <button
                     type="submit"
-                    // disabled={isSubmitting || (isValid && !dirty)}
-                    className="w-full cursor-pointer bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center space-x-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    disabled={isSubmitting}
+                    className="w-full cursor-pointer bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center space-x-2 disabled:cursor-not-allowed"
                   >
                     <Send className="h-5 w-5" />
-                    <span>Send Money</span>
+                    {isSubmitting ? (
+                      <span>Sending...</span>
+                    ) : (
+                      <span>Send Money</span>
+                    )}
                   </button>
                 </Form>
               )}

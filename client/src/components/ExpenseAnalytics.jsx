@@ -136,7 +136,7 @@ const ExpenseAnalytics = ({ setIsReportOpen, setBudgetPlanningForm ,setShowDetai
                   backgroundColor:
                     (budgetData?.categorySpending[category] /
                       budgetData?.categoryBudgets[category]) *
-                      100 >
+                      100 >=
                     100
                       ? "red"
                       : "black",

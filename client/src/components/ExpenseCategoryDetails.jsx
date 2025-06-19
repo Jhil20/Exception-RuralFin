@@ -33,6 +33,7 @@ const ExpenseCategoryDetails = ({
       category: category,
       selectedYear: new Date().getFullYear(),
     };
+    console.log("values 22222222222222222", values);
     const response = await axios.post(
       `${BACKEND_URL}/api/userToUserTransaction/transactionsByCategory`,
       values
@@ -150,7 +151,7 @@ const ExpenseCategoryDetails = ({
           const spent = budgetData?.categorySpending[category] || 0;
           const budget = budgetData?.categoryBudgets[category] || 0;
           const percentage = (spent / budget) * 100;
-          const isOverBudget = spent > budget;
+          const isOverBudget = spent >= budget;
 
           return (
             <div
