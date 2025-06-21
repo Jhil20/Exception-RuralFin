@@ -51,7 +51,7 @@ const UserForm = ({ resetRole, setUserFormStep2 }) => {
   };
 
   const handleSubmitStep1 = async (values) => {
-    console.log("Step 1 submitted with values:", values);
+    // console.log("Step 1 submitted with values:", values);
     try {
       const response = await axios.post(
         `${BACKEND_URL}/api/user/getUserByPhone`,
@@ -73,20 +73,20 @@ const UserForm = ({ resetRole, setUserFormStep2 }) => {
   const [step, setStep] = useState(1);
 
   const handleSubmitStep2 = async (values) => {
-    console.log("Submitting form with values:", values);
+    // console.log("Submitting form with values:", values);
     dispatch(showLoader());
     try {
       const allValues = {
         ...userData,
         ...values,
       };
-      console.log("User Data:", userData, values);
-      console.log("All Values to be submitted:", allValues);
+      // console.log("User Data:", userData, values);
+      // console.log("All Values to be submitted:", allValues);
       const response = await axios.post(
         `${BACKEND_URL}/api/user/getUserByAadhar`,
         { aadhar: values.aadhar }
       );
-      console.log("response of fetching user by aadhar", response);
+      // console.log("response of fetching user by aadhar", response);
       if (response.data.success) {
         toast.error("User already present with the entered aadhar number");
         return;
@@ -97,8 +97,8 @@ const UserForm = ({ resetRole, setUserFormStep2 }) => {
         `${BACKEND_URL}/api/user/register`,
         allValues
       );
-      console.log("User created successfully:", result);
-      console.log("Final Values:", allValues);
+      // console.log("User created successfully:", result);
+      // console.log("Final Values:", allValues);
       const decoded = jwtDecode(result.data.token);
       if (result?.data?.success) {
         toast.success("User created successfully");
@@ -107,7 +107,7 @@ const UserForm = ({ resetRole, setUserFormStep2 }) => {
         Cookies.set("token", token, { expires: 1 });
       }
       const socket = getSocket(decoded.id);
-      console.log("SOCKET CALLED IN USER FORM ",socket);
+      // console.log("SOCKET CALLED IN USER FORM ",socket);
       socket.emit("newAccountCreated", result?.data?.data);
       socket.emit("newRecentActivity",{...result?.data?.data,type:"User Created"});
 

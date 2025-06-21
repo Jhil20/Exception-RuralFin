@@ -85,7 +85,7 @@ const PlatformSettings = () => {
       const response = await axios.get(
         `${BACKEND_URL}/api/admin/getSystemSettings`
       );
-      console.log("System settings fetched successfully:", response.data);
+      // console.log("System settings fetched successfully:", response.data);
       setSystemSettings(response.data.data);
     } catch (error) {
       console.error("Error fetching system settings:", error);
@@ -142,7 +142,7 @@ const PlatformSettings = () => {
         `${BACKEND_URL}/api/admin/updateSystemSettings`,
         values
       );
-      console.log("Settings saved successfully:", response.data);
+      // console.log("Settings saved successfully:", response.data);
       socket.emit("updateSystemSettings", decoded.id);
 
       if (response.data.success) {
@@ -190,7 +190,7 @@ const PlatformSettings = () => {
             "min-transaction": systemSettings?.minTransactionAmount ?? 1,
           }}
           onSubmit={(values) => {
-            console.log("Transaction Limits Submitted:", values);
+            // console.log("Transaction Limits Submitted:", values);
           }}
         >
           {({ values, handleChange, handleSubmit }) => (
@@ -268,7 +268,7 @@ const PlatformSettings = () => {
             "transaction-fee-10000": systemSettings?.transactionFee10000 ?? 0,
           }}
           onSubmit={(values) => {
-            console.log("Fee Configuration Submitted:", values);
+            // console.log("Fee Configuration Submitted:", values);
           }}
         >
           {({ values, handleChange, handleSubmit }) => (

@@ -56,10 +56,10 @@ const AgentDashboard = () => {
         ...prevTransactions,
         data.transaction,
       ]);
-      console.log(
-        "New transaction receiveddddddddddddddddddddddd:",
-        data.transaction
-      );
+      // console.log(
+      //   "New transaction receiveddddddddddddddddddddddd:",
+      //   data.transaction
+      // );
       if (activeFilter === "all") {
         setFilteredTransactions((prevTransactions) => [
           ...prevTransactions,
@@ -110,7 +110,7 @@ const AgentDashboard = () => {
 
   const getAgentData = async () => {
     try {
-      console.log("Decoded token:", decoded, token);
+      // console.log("Decoded token:", decoded, token);
       const response = await axios.get(
         `${BACKEND_URL}/api/agent/${decoded.id}`
       );
@@ -142,7 +142,7 @@ const AgentDashboard = () => {
           agentId: decoded.id,
         }
       );
-      console.log("Commission data:", response.data);
+      // console.log("Commission data:", response.data);
       setAllCommissions(response.data.data);
     } catch (err) {
       console.error("Error fetching commission data:", err);
@@ -160,7 +160,7 @@ const AgentDashboard = () => {
         }
       );
       const data = response.data.transaction;
-      console.log("Transaction request rejected:", data);
+      // console.log("Transaction request rejected:", data);
 
       socket.emit("UserAgentRequestRejected", data);
 
@@ -218,7 +218,7 @@ const AgentDashboard = () => {
       );
 
       const data = response.data.transaction;
-      console.log("Transaction request accepted:", data);
+      // console.log("Transaction request accepted:", data);
 
       socket.emit("UserAgentRequestAccepted", data);
       // console.log("Socket emitted UserAgentRequestAccepted");
@@ -350,14 +350,14 @@ const AgentDashboard = () => {
           commission: transactionToComplete?.commission / 2,
         }
       );
-      console.log("Withdrawal transaction completed:", response.data);
+      // console.log("Withdrawal transaction completed:", response.data);
       const data = response.data.data;
       socket.emit("UserAgentWithdrawCompleted", data);
       socket.emit("newRecentActivity", {
         ...data,
         type: "User to Agent Transaction",
       });
-      console.log("Socket emitted UserAgentWithdrawCompleted", data);
+      // console.log("Socket emitted UserAgentWithdrawCompleted", data);
       setAgentData((prevData) => ({
         ...prevData,
         balance: prevData.balance + data.amount + data.commission / 2,

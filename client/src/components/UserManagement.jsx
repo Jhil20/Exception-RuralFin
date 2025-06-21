@@ -31,12 +31,12 @@ const UserManagement = () => {
 
   useEffect(() => {
     if (!decoded) return;
-    console.log("Decoded token: for socket in user", decoded);
+    // console.log("Decoded token: for socket in user", decoded);
 
     const socket = getSocket(decoded.id);
 
     const handler1 = (data) => {
-      console.log("New account user created: handler1", data);
+      // console.log("New account user created: handler1", data);
       if (data?.role === "user") {
         setUsers((prevUsers) => [...prevUsers, data]);
         setFilteredUsers((prevUsers) => [...prevUsers, data]);
@@ -88,7 +88,7 @@ const UserManagement = () => {
       const response = await axios.get(
         `${BACKEND_URL}/api/user/getAllUsersWithFinance`
       );
-      console.log("User data fetched successfully:", response.data);
+      // console.log("User data fetched successfully:", response.data);
       setUsers(response?.data?.data);
       setFilteredUsers(response?.data?.data);
     } catch (error) {

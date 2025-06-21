@@ -135,7 +135,7 @@ const AgentDetails = ({
 
     const handler3 = (data) => {
       if (data?.agentId?._id === selectedAgent?._id) {
-        console.log("Transaction rejected:", data);
+        //console.log("Transaction rejected:", data);
         setAllTransactions((prev) =>
           prev.map((transaction) =>
             transaction._id === data._id
@@ -156,7 +156,7 @@ const AgentDetails = ({
     };
     const handler4 = (data) => {
       if (data?.agentId?._id === selectedAgent?._id) {
-        console.log("Deposit completed:", data);
+        //console.log("Deposit completed:", data);
         setAllTransactions((prev) =>
           prev.map((transaction) =>
             transaction._id === data._id
@@ -191,11 +191,11 @@ const AgentDetails = ({
 
   const getUser = async () => {
     try {
-      console.log("Fetching user data for ID:", decoded.id);
+      //console.log("Fetching user data for ID:", decoded.id);
       const response = await axios.get(
         `${BACKEND_URL}/api/finance/getFinance/${decoded.id}`
       );
-      console.log("User finance data fetched successfully:", response.data);
+      //console.log("User finance data fetched successfully:", response.data);
       setUserData(response.data.finance);
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -207,7 +207,7 @@ const AgentDetails = ({
       const response = await axios.get(
         `${BACKEND_URL}/api/admin/getSystemSettings`
       );
-      console.log("Settings response:", response);
+      //console.log("Settings response:", response);
       setSettings(response.data.data);
     } catch (error) {
       console.error("Error fetching settings:", error);
@@ -299,10 +299,10 @@ const AgentDetails = ({
       socket.emit("newUserAgentTransactionRequest", {
         transaction: response.data.transaction,
       });
-      console.log(
-        "response of creating agent to user transactions",
-        response.data
-      );
+      // console.log(
+      //   "response of creating agent to user transactions",
+      //   response.data
+      // );
       toast.success(
         `${
           transactionType === "deposit" ? "Deposit" : "Withdrawal"
@@ -324,7 +324,7 @@ const AgentDetails = ({
         `${BACKEND_URL}/api/agentCommission/getThisMonthCommission`,
         { agentId: selectedAgent._id }
       );
-      console.log("This month's commission:", response.data);
+      //console.log("This month's commission:", response.data);
       setThisMonthCommission(response.data.data || 0);
     } catch (error) {
       console.error("Error fetching this month's commission:", error);
@@ -341,7 +341,7 @@ const AgentDetails = ({
       const response = await axios.get(
         `${BACKEND_URL}/api/agentToUserTransaction/${selectedAgent._id}`
       );
-      console.log("Fetched transactions:", response.data);
+      //console.log("Fetched transactions:", response.data);
       const filtered = response?.data?.transactions?.filter((tr) => {
         if (tr.userId._id === decoded.id) {
           return tr;

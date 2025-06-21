@@ -6,7 +6,11 @@ import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import { useState } from "react";
 
-const ExpenseAnalytics = ({ setIsReportOpen, setBudgetPlanningForm ,setShowDetailedExpense}) => {
+const ExpenseAnalytics = ({
+  setIsReportOpen,
+  setBudgetPlanningForm,
+  setShowDetailedExpense,
+}) => {
   const [totalSpent, setTotalSpent] = useState(0);
   const [budgetData, setBudgetData] = useState({});
   const [categoryBudgets, setCategoryBudgets] = useState([]);
@@ -29,9 +33,10 @@ const ExpenseAnalytics = ({ setIsReportOpen, setBudgetPlanningForm ,setShowDetai
     try {
       const selectedMonth = new Date().getMonth() + 1;
       const response = await axios.post(
-        `${BACKEND_URL}/api/userToUserTransaction/transactionsTotal/${decoded.id}`,{selectedMonth:selectedMonth}
+        `${BACKEND_URL}/api/userToUserTransaction/transactionsTotal/${decoded.id}`,
+        { selectedMonth: selectedMonth }
       );
-      console.log("response result of total spent fetch in expense analytics", response);
+      //console.log("response result of total spent fetch in expense analytics", response);
       setTotalSpent(response?.data?.totalSpent);
     } catch (err) {
       console.log("error in fetching total spent", err);
@@ -43,10 +48,10 @@ const ExpenseAnalytics = ({ setIsReportOpen, setBudgetPlanningForm ,setShowDetai
       const response = await axios.get(
         `${BACKEND_URL}/api/budget/${decoded.id}`
       );
-      console.log(
-        "response result of budget fetch in expense analytics",
-        response
-      );
+      // console.log(
+      //   "response result of budget fetch in expense analytics",
+      //   response
+      // );
       setBudgetData(response?.data?.budget);
       const keys = Object.keys(response?.data?.budget?.categoryBudgets);
 
@@ -67,7 +72,10 @@ const ExpenseAnalytics = ({ setIsReportOpen, setBudgetPlanningForm ,setShowDetai
             <PieChart size={20} className="text-gray-700" />
           </div>
         </div>
-        <div onClick={()=>setBudgetPlanningForm(true)} className="hover:bg-gray-200 p-2  transition-all duration-300 cursor-pointer rounded-full">
+        <div
+          onClick={() => setBudgetPlanningForm(true)}
+          className="hover:bg-gray-200 p-2  transition-all duration-300 cursor-pointer rounded-full"
+        >
           <Settings size={22} className="text-gray-700" />
         </div>
       </div>
@@ -147,7 +155,13 @@ const ExpenseAnalytics = ({ setIsReportOpen, setBudgetPlanningForm ,setShowDetai
         ))}
       </div>
 
-      <button onClick={()=>{setShowDetailedExpense(true);setIsReportOpen(true)}} className="w-full  cursor-pointer mt-6 text-center py-2 text-sm font-medium text-gray-600 hover:text-black transition-colors duration-200">
+      <button
+        onClick={() => {
+          setShowDetailedExpense(true);
+          setIsReportOpen(true);
+        }}
+        className="w-full  cursor-pointer mt-6 text-center py-2 text-sm font-medium text-gray-600 hover:text-black transition-colors duration-200"
+      >
         View Detailed Report
       </button>
     </div>

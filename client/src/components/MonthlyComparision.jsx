@@ -5,7 +5,7 @@ import { BACKEND_URL } from "../utils/constants";
 
 const MonthlyComparison = ({ allYearBudgets, totalSpent, decoded,selectedMonth }) => {
   // Sample data for illustration
-  console.log("all year budgets", allYearBudgets);
+  // console.log("all year budgets", allYearBudgets);
   const [thisMonthStateData, setThisMonthStateData] = useState({});
   const [lastMonthStateData, setLastMonthStateData] = useState({});
   const [lastMonthTotalSpent, setLastMonthTotalSpent] = useState(0);
@@ -27,7 +27,7 @@ const MonthlyComparison = ({ allYearBudgets, totalSpent, decoded,selectedMonth }
         budget?.month == selectedMonth &&
         budget?.year == new Date().getFullYear()
     );
-    console.log("this month data", thisMonthData, allYearBudgets);
+    // console.log("this month data", thisMonthData, allYearBudgets);
     const prevMonth =
       thisMonthData?.month - 1 == 0 ? 12 : thisMonthData?.month - 1;
     const prevYear =
@@ -37,8 +37,8 @@ const MonthlyComparison = ({ allYearBudgets, totalSpent, decoded,selectedMonth }
     const lastMonthData = allYearBudgets?.find(
       (budget) => budget?.month == prevMonth && budget?.year == prevYear
     );
-    console.log("this month data", thisMonthData);
-    console.log("last month data", lastMonthData);
+    // console.log("this month data", thisMonthData);
+    // console.log("last month data", lastMonthData);
     setThisMonthStateData(thisMonthData);
     setLastMonthStateData(lastMonthData);
     // const keys = Object.keys(thisMonthData?.categoryBudgets);
@@ -58,7 +58,7 @@ const MonthlyComparison = ({ allYearBudgets, totalSpent, decoded,selectedMonth }
       const response1 = await axios.get(
         `${BACKEND_URL}/api/userToUserTransaction/lastMonthTransactionsTotal/${decoded.id}`
       );
-      console.log("last month total spent", response1.data.totalSpent);
+      // console.log("last month total spent", response1.data.totalSpent);
       setLastMonthTotalSpent(response1.data.totalSpent);
     } catch (err) {
       console.log("error fetching total spent", err);

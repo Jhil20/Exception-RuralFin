@@ -9,7 +9,10 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
-const BudgetPlanningForm = ({ setBudgetPlanningForm ,setBudgetPlanningEnabled}) => {
+const BudgetPlanningForm = ({
+  setBudgetPlanningForm,
+  setBudgetPlanningEnabled,
+}) => {
   const budgetPlanningInitialValuesStep1 = {
     budget: "",
     income: "",
@@ -38,13 +41,13 @@ const BudgetPlanningForm = ({ setBudgetPlanningForm ,setBudgetPlanningEnabled}) 
     if (budget + savingsGoal > income) {
       setBudgetStep1Error(true);
       return;
-    }else if(budget + savingsGoal < income){
+    } else if (budget + savingsGoal < income) {
       values.savingsGoal = income - budget;
     }
     setBudgetStep1Error(false);
     setStep1Data(values);
     setStep(2);
-    console.log("Step 1 Data", values);
+    //console.log("Step 1 Data", values);
     // console.log("Step 1 Data", step1Data);
   };
 
@@ -63,7 +66,7 @@ const BudgetPlanningForm = ({ setBudgetPlanningForm ,setBudgetPlanningEnabled}) 
       setBudgetStep2Error(true);
       return;
     }
-    console.log("step1Data aea",step1Data)
+    //console.log("step1Data aea", step1Data);
 
     if (
       values.CBHousing +
@@ -85,7 +88,7 @@ const BudgetPlanningForm = ({ setBudgetPlanningForm ,setBudgetPlanningEnabled}) 
           values.CBUtilities +
           values.CBEntertainment +
           values.CBTransport);
-          console.log("valeus of cbother",values.CBOthers)
+      //console.log("valeus of cbother", values.CBOthers);
     }
     setBudgetStep2Error(false);
     const token = Cookies.get("token");
@@ -93,14 +96,14 @@ const BudgetPlanningForm = ({ setBudgetPlanningForm ,setBudgetPlanningEnabled}) 
     const allvalues = { ...values, ...step1Data, userId: decoded.id };
     try {
       const result = await axios.post(`${BACKEND_URL}/api/budget/`, allvalues);
-      console.log("Budget Created", result);
+      //console.log("Budget Created", result);
       setStep(1);
       setBudgetPlanningForm(false);
       setBudgetPlanningEnabled(true);
       setStep1Data({});
       setBudgetStep1Error(false);
       setBudgetStep2Error(false);
-      console.log("Step 2 Data", values);
+      //console.log("Step 2 Data", values);
     } catch (err) {
       console.log("error in creating budget", err);
     }

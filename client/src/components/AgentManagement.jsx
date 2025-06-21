@@ -24,7 +24,7 @@ const AgentManagement = () => {
 
   useEffect(() => {
     if (!decoded) return;
-    console.log("Decoded token: for socket in agent", decoded);
+    //console.log("Decoded token: for socket in agent", decoded);
 
     const socket = getSocket(decoded.id);
     const handler1 = (data) => {
@@ -48,7 +48,7 @@ const AgentManagement = () => {
   const getAgentData = async () => {
     try {
       const response = await axios.get(`${BACKEND_URL}/api/agent/`);
-      console.log("Agent data fetched successfully:", response.data);
+      //console.log("Agent data fetched successfully:", response.data);
       setAgents(response.data.agents);
       setFilteredAgents(response.data.agents);
     } catch (error) {

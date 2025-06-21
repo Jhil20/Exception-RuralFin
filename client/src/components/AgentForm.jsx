@@ -1,4 +1,4 @@
-import React, { useMemo, useState,useEffect } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import debounce from "lodash.debounce";
 import { Formik, Form, Field, ErrorMessage, useFormikContext } from "formik";
 import {
@@ -75,7 +75,7 @@ const AgentForm = ({ resetRole }) => {
 
   const handleSubmit = async (values, { setErrors }) => {
     const data = { ...values, ...agentData };
-    console.log(data, "data");
+    //console.log(data, "data");
     dispatch(showLoader());
     try {
       navigate("/razorpay", {
@@ -354,8 +354,7 @@ const AgentForm = ({ resetRole }) => {
           validateOnBlur={true}
           validateOnChange={true}
         >
-          {({ isSubmitting, values,setFieldValue,setFieldError }) => {
-
+          {({ isSubmitting, values, setFieldValue, setFieldError }) => {
             const fetchIFSCInfo = useMemo(
               () =>
                 debounce(async (ifsc) => {
@@ -366,7 +365,9 @@ const AgentForm = ({ resetRole }) => {
                     );
                     if (res.ok) {
                       const data = await res.json();
-                      const formatted = `${data.BANK.toUpperCase()}, ${data.BRANCH}, ${data.CITY}`;
+                      const formatted = `${data.BANK.toUpperCase()}, ${
+                        data.BRANCH
+                      }, ${data.CITY}`;
                       setFieldValue("bankName", formatted);
                     } else {
                       setFieldValue("bankName", "");

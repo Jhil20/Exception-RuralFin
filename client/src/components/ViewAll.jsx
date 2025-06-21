@@ -8,7 +8,7 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
   const [transactionInfo, setTransactionInfo] = useState(null);
   const [showTransactionInfo, setShowTransactionInfo] = useState(false);
   const [isAgentTransaction, setIsAgentTransaction] = useState(false);
-  console.log("transactionData", transactionData);
+  // console.log("transactionData", transactionData);
   return (
     <div className="w-2/3 h-10/12 bg-white rounded-lg shadow-lg p-6">
       {transactionInfo != null && showTransactionInfo == true && (

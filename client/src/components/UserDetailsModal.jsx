@@ -34,7 +34,7 @@ const UserDetailsModal = ({ isOpen, onClose, user }) => {
       const response = await axios.get(
         `${BACKEND_URL}/api/admin/allTransactionsForUser/${user._id}`
       );
-      console.log("response user detail transactions", response);
+      // console.log("response user detail transactions", response);
       setTransactions(response?.data?.data || []);
     } catch (error) {
       console.error("Error fetching transactions:", error);

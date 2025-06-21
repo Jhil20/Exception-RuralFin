@@ -60,7 +60,7 @@ const Login = () => {
         {
           size: "invisible",
           callback: (response) => {
-            console.log("reCAPTCHA solved:", response);
+            // console.log("reCAPTCHA solved:", response);
           },
           "expired-callback": () => {
             console.warn("reCAPTCHA expired. Please try again.");
@@ -86,7 +86,7 @@ const Login = () => {
     // console.log("btn clicked");
 
     const fullPhone = `+91${values.phoneNumber}`;
-    console.log("Full Phone Number:", fullPhone);
+    // console.log("Full Phone Number:", fullPhone);
     setPhoneState(fullPhone);
     try {
       const whichRole = values.role;
@@ -101,12 +101,12 @@ const Login = () => {
         toast.error("User not found with given phone number & role");
         setSubmitting(false);
       } else {
-        console.log("in else");
+        // console.log("in else");
 
         const checkOnline = await axios.post(`${BACKEND_URL}/api/checkOnline`, {
           accountId: response?.data?.data?._id,
         });
-        console.log("Check Online Response:", checkOnline);
+        // console.log("Check Online Response:", checkOnline);
         if (checkOnline?.data?.success) {
           toast.error("This account is already logged in from another device.");
           setSubmitting(false);
@@ -117,7 +117,7 @@ const Login = () => {
           `${BACKEND_URL}/api/${whichRole}/checkPassword`,
           values
         );
-        console.log("Response from server for password check:", response2);
+        // console.log("Response from server for password check:", response2);
         if (!response2?.data?.success) {
           toast.error("Incorrect Password or Phone Number.");
           setSubmitting(false);
@@ -127,16 +127,16 @@ const Login = () => {
         Cookies.set("token", token, { expires: 1 });
         // const decodedToken = jwt(token);
         // appVerifier.verify().then(async ()=>{
-        console.log("reCAPTCHA verified");
+        // console.log("reCAPTCHA verified");
         const confirmationResult = await signInWithPhoneNumber(
           auth,
           fullPhone,
           appVerifier
         );
 
-        console.log("Confirmation Result:", confirmationResult);
+        // console.log("Confirmation Result:", confirmationResult);
 
-        console.log("SMS sent successfully:", confirmationResult);
+        // console.log("SMS sent successfully:", confirmationResult);
         window.confirmationResult = confirmationResult;
         // })
         setIsOtpSent(true);
@@ -158,7 +158,7 @@ const Login = () => {
     try {
       if (!isRendered) {
         if (window.recaptchaVerifier) {
-          console.log("Clearing previous reCAPTCHA instance...");
+          // console.log("Clearing previous reCAPTCHA instance...");
           await window.recaptchaVerifier.clear();
         }
 
@@ -175,7 +175,7 @@ const Login = () => {
           {
             size: "invisible",
             callback: (response) => {
-              console.log("reCAPTCHA solved:", response);
+              // console.log("reCAPTCHA solved:", response);
             },
             "expired-callback": () => {
               console.warn("reCAPTCHA expired. Please try again.");
@@ -197,9 +197,9 @@ const Login = () => {
       );
       toast.success("Resending OTP...");
 
-      console.log("Confirmation Result:", confirmationResult);
+      // console.log("Confirmation Result:", confirmationResult);
 
-      console.log("SMS sent successfully:", confirmationResult);
+      // console.log("SMS sent successfully:", confirmationResult);
       window.confirmationResult = confirmationResult;
     } catch (error) {
       console.error("Error sending OTP:", error);
@@ -230,12 +230,12 @@ const Login = () => {
       const result = await confirmationResult.confirm(otpNumber);
       const user = result.user;
 
-      console.log("User verified successfully:", user);
+      // console.log("User verified successfully:", user);
       const token = Cookies.get("token");
       const decoded = jwtDecode(token);
       const socket = createSocket(decoded.id);
       dispatch(socketConnected());
-      console.log("Socket connected:", socket.id);
+      // console.log("Socket connected:", socket.id);
       toast.success("OTP verified successfully!");
       setTimeout(() => {
         dispatch(SignedIn());
@@ -292,9 +292,9 @@ const Login = () => {
                         onClick={async () => {
                           setIsOtpSent(false);
                           if (window.recaptchaVerifier) {
-                            console.log(
-                              "Clearing previous reCAPTCHA instance..."
-                            );
+                            // console.log(
+                            //   "Clearing previous reCAPTCHA instance..."
+                            // );
                             await window.recaptchaVerifier.clear();
                           }
 

@@ -24,21 +24,22 @@ import axios from "axios";
 import { useState } from "react";
 
 const AgentDetailsModal = ({ isOpen, onClose, agent }) => {
-  const [transactions,setTransactions]=useState([]);
+  const [transactions, setTransactions] = useState([]);
 
- const getAlltransactions=async()=>{
-  try{
-    const response=await axios.get(`${BACKEND_URL}/api/agentToUserTransaction/${agent._id}`)
-    console.log("response agent detail transactions",response);
-    setTransactions(response?.data?.transactions);
-
-  }catch(error){
-    console.log("error in fetching transactions",error)
-  }
- }
- useEffect(()=>{
-  getAlltransactions();
- },[])
+  const getAlltransactions = async () => {
+    try {
+      const response = await axios.get(
+        `${BACKEND_URL}/api/agentToUserTransaction/${agent._id}`
+      );
+      //console.log("response agent detail transactions",response);
+      setTransactions(response?.data?.transactions);
+    } catch (error) {
+      console.log("error in fetching transactions", error);
+    }
+  };
+  useEffect(() => {
+    getAlltransactions();
+  }, []);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`Agent Details `} size="lg">
@@ -61,8 +62,14 @@ const AgentDetailsModal = ({ isOpen, onClose, agent }) => {
                   Agent #{agent._id.toLocaleString()}
                 </p>
 
-                <div className={`w-20 h-8 mb-3 ${agent?.isActive?"bg-green-100 border-2 border-green-200 text-green-800":"bg-red-100 border-2 border-red-200 text-red-900"}  rounded-3xl text-center flex items-center justify-center`}>
-                  {agent?.isActive?"Active":"Inactive"}
+                <div
+                  className={`w-20 h-8 mb-3 ${
+                    agent?.isActive
+                      ? "bg-green-100 border-2 border-green-200 text-green-800"
+                      : "bg-red-100 border-2 border-red-200 text-red-900"
+                  }  rounded-3xl text-center flex items-center justify-center`}
+                >
+                  {agent?.isActive ? "Active" : "Inactive"}
                 </div>
 
                 <div className="w-full space-y-4">
@@ -77,7 +84,9 @@ const AgentDetailsModal = ({ isOpen, onClose, agent }) => {
                   </div>
                   <div className="flex items-start">
                     <IdCard size={16} className="text-gray-500 mr-3 mt-1" />
-                    <span className="text-gray-700">{agent?.accountNumber}</span>
+                    <span className="text-gray-700">
+                      {agent?.accountNumber}
+                    </span>
                   </div>
                   <div className="flex items-start">
                     <KeyRound size={16} className="text-gray-500 mr-3 mt-1" />
@@ -161,43 +170,43 @@ const AgentDetailsModal = ({ isOpen, onClose, agent }) => {
                     </tr>
                   </thead>
                   <tbody className="divide-y h-10/12  overflow-y-auto divide-gray-200">
-                    {transactions.filter((tr)=>tr.status=="completed").map((transaction) => (
-                      <tr key={transaction?._id}>
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          {new Date(transaction?.transactionDate).toLocaleDateString()}
-                        </td>
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          <span 
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              transaction?.conversionType != "cashToERupees"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
-                            }`}
-                          >
-                            {capitalize(transaction?.conversionType)}
-                          </span>
-                        </td>
-                        <td className="px-4 text-center pr-7 py-3 whitespace-nowrap font-medium">
-                          ₹{transaction?.amount.toLocaleString()}
-                        </td>
-                        <td className="px-4 py-3 text-center pr-7 whitespace-nowrap font-medium">
-                          ₹{transaction?.commission.toLocaleString()}
-                        </td>
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          #{transaction?.userId._id.toLocaleString()}
-                        </td>
-                      </tr>
-                    ))}
+                    {transactions
+                      .filter((tr) => tr.status == "completed")
+                      .map((transaction) => (
+                        <tr key={transaction?._id}>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            {new Date(
+                              transaction?.transactionDate
+                            ).toLocaleDateString()}
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                transaction?.conversionType != "cashToERupees"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-800"
+                              }`}
+                            >
+                              {capitalize(transaction?.conversionType)}
+                            </span>
+                          </td>
+                          <td className="px-4 text-center pr-7 py-3 whitespace-nowrap font-medium">
+                            ₹{transaction?.amount.toLocaleString()}
+                          </td>
+                          <td className="px-4 py-3 text-center pr-7 whitespace-nowrap font-medium">
+                            ₹{transaction?.commission.toLocaleString()}
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            #{transaction?.userId._id.toLocaleString()}
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>
-
-              
             </Card>
           </div>
         </div>
-
-        
       </div>
     </Modal>
   );

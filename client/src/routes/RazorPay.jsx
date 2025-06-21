@@ -48,12 +48,12 @@ const RazorPay = () => {
           conversionType: "cashToERupees",
         }
       );
-      console.log("Admin to Agent Transaction Response:", response2.data);
-      console.log("Increase Security Deposit Response:", response.data);
+      // console.log("Admin to Agent Transaction Response:", response2.data);
+      // console.log("Increase Security Deposit Response:", response.data);
       const socket=getSocket(agentId);
       socket.emit("newRecentActivity",{...response2?.data?.transaction,type:"adminToAgent"});
       if (razorPayInstance) {
-        console.log("Closing Razorpay instance after deposit");
+        // console.log("Closing Razorpay instance after deposit");
         razorPayInstance.close();
       }
       dispatch(hideLoader());
@@ -85,7 +85,7 @@ const RazorPay = () => {
   };
 
   const initiatePayment = async () => {
-    console.log("Initiating payment with formData:", formData);
+    // console.log("Initiating payment with formData:", formData);
     const scriptLoaded = await loadRazorpayScript();
 
     if (!scriptLoaded) {
@@ -94,10 +94,10 @@ const RazorPay = () => {
     }
 
     try {
-      console.log(
-        "Creating order on backend with amount:",
-        formData?.securityDeposit
-      );
+      // console.log(
+      //   "Creating order on backend with amount:",
+      //   formData?.securityDeposit
+      // );
       const orderRes = await axios.post(
         `${BACKEND_URL}/api/razorpay/create-order`,
         {
@@ -118,17 +118,17 @@ const RazorPay = () => {
           color: "#000000",
         },
         handler: async (response) => {
-          console.log("Payment Success:", response);
+          // console.log("Payment Success:", response);
 
           const verifyRes = await axios.post(
             `${BACKEND_URL}/api/razorpay/verify`,
             response
           );
-          console.log("Payment Verification Response:", verifyRes.data);
+          // console.log("Payment Verification Response:", verifyRes.data);
           if (verifyRes.data.success) {
-            console.log(
-              "Payment verified successfully: calling toast and create agent"
-            );
+            // console.log(
+            //   "Payment verified successfully: calling toast and create agent"
+            // );
             if (typeOfPayment === "FirstTimeDeposit") {
               createAgent();
             } else {
@@ -148,7 +148,7 @@ const RazorPay = () => {
           escape: false,
           backdropclose: false,
           ondismiss: () => {
-            console.log("Razorpay modal closed manually.");
+            // console.log("Razorpay modal closed manually.");
             dispatch(hideLoader());
           },
         },
@@ -165,7 +165,7 @@ const RazorPay = () => {
 
   const createAgent = async () => {
     try {
-      console.log("Creating agent with formData:", formData);
+      // console.log("Creating agent with formData:", formData);
       const response = await axios.post(
         `${BACKEND_URL}/api/agent/register`,
         formData
@@ -178,20 +178,20 @@ const RazorPay = () => {
           conversionType: "cashToERupees",
         }
       );
-      console.log("Admin to Agent Transaction Response in create agent:", response2.data);
+      // console.log("Admin to Agent Transaction Response in create agent:", response2.data);
       const token = response?.data?.token;
       const decoded=jwtDecode(token);
       createSocket(decoded.id);
       const socket=getSocket(decoded.id);
-      console.log("new user socket send",response?.data?.agent)
+      // console.log("new user socket send",response?.data?.agent)
       socket.emit("newAccountCreated",response?.data?.agent);
       socket.emit("newRecentActivity",{...response?.data?.agent,type:"Agent Created"})
       socket.emit("newRecentActivity",{...response2?.data?.transaction,type:"adminToAgent"});
-      console.log("Token received:", token);
+      // console.log("Token received:", token);
       Cookies.set("token", token, { expires: 1 });
       toast.success("Agent account created successfully");
       // razor.close();
-      console.log("Closing Razorpay instance");
+      // console.log("Closing Razorpay instance");
       dispatch(SignedIn());
       if (razorPayInstance) {
         razorPayInstance.close();

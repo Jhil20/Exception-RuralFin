@@ -54,7 +54,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       const response = await axios.get(
         `${BACKEND_URL}/api/admin/getSystemSettings`
       );
-      console.log("Settings response:", response);
+      // console.log("Settings response:", response);
       setSettings(response.data.data);
     } catch (error) {
       console.error("Error fetching settings:", error);
@@ -75,7 +75,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
         {
           size: "invisible",
           callback: (response) => {
-            console.log("reCAPTCHA solved:", response);
+            // console.log("reCAPTCHA solved:", response);
           },
           "expired-callback": () => {
             console.warn("reCAPTCHA expired. Please try again.");
@@ -142,7 +142,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
         `${BACKEND_URL}/api/user/getTodayTransactionAmount/${user._id}`
       );
       const transactionsAmount = response2?.data?.data?.today;
-      console.log("transactionsAmount", transactionsAmount);
+      // console.log("transactionsAmount", transactionsAmount);
       if (transactionsAmount + amount > settings?.maxDailyLimit) {
         toast.error(
           `You can only transfer upto ₹${settings?.maxDailyLimit} per day`
@@ -181,7 +181,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
           password,
         }
       );
-      console.log("response", response);
+      // console.log("response", response);
       setTransactionCreated(response?.data?.transaction);
       setReceiverUser(response?.data?.receiver);
       setOtpAmount(amount);
@@ -198,7 +198,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
 
       const fullPhone = `+91${user.phone}`;
       // const fullPhone="+919998076910"
-      console.log("Full Phone Number:", fullPhone);
+      // console.log("Full Phone Number:", fullPhone);
       // setPhoneState(fullPhone);
       // try {
       //   const response = await axios.post(
@@ -211,12 +211,12 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       //     toast.error("User not found with given phone number & role");
       //     setSubmitting(false);
       //   } else {
-      console.log("in else");
+      // console.log("in else");
       // const token = response?.data?.token;
       // Cookies.set("token", token, { expires: 1 });
       // const decodedToken = jwt(token);
       // appVerifier.verify().then(async ()=>{
-      console.log("reCAPTCHA verified");
+      // console.log("reCAPTCHA verified");
 
       const confirmationResult = await signInWithPhoneNumber(
         auth,
@@ -224,9 +224,9 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
         appVerifier
       );
 
-      console.log("Confirmation Result:", confirmationResult);
+      // console.log("Confirmation Result:", confirmationResult);
 
-      console.log("SMS sent successfully:", confirmationResult);
+      // console.log("SMS sent successfully:", confirmationResult);
       window.confirmationResult = confirmationResult;
       setStep("otp");
     } catch (err) {
@@ -239,7 +239,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
         const response = await axios.delete(
           `${BACKEND_URL}/api/userToUserTransaction/${transactionCreated?._id}`
         );
-        console.log("response of transactiopn update", response);
+        // console.log("response of transactiopn update", response);
       }
       console.log("Error in transaction", err);
       toast.error("Transaction failed. please refresh & try again.");
@@ -270,7 +270,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       const result = await confirmationResult.confirm(otpNumber);
       const userVerified = result.user;
 
-      console.log("User verified successfully:", userVerified);
+      // console.log("User verified successfully:", userVerified);
 
       // toast.success("OTP verified successfully!");
       setOtpVerified(true);
@@ -306,7 +306,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
             category: transactionCreated?.remarks,
           }
         );
-        console.log("response of budget update", response2);
+        // console.log("response of budget update", response2);
       }
       const socket = getSocket(user._id);
       socket.emit("money-sent-by-sender", {
@@ -331,7 +331,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       const response = await axios.delete(
         `${BACKEND_URL}/api/userToUserTransaction/${transactionCreated?._id}`
       );
-      console.log("response of transactiopn update", response);
+      // console.log("response of transactiopn update", response);
       setStep("form");
       setSelectedUser(null);
       setAmount("");
@@ -385,7 +385,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
         `${BACKEND_URL}/api/user/addToFavourites`,
         { userId: user._id, ruralFinId: ruralfinValue }
       );
-      console.log("response of add fav", response);
+      // console.log("response of add fav", response);
       if (response?.data?.success) {
         getFavourites();
         toast.success("User added to favourites");
@@ -417,7 +417,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       const response = await axios.delete(
         `${BACKEND_URL}/api/userToUserTransaction/${transactionCreated?._id}`
       );
-      console.log("response of transactiopn update", response);
+      // console.log("response of transactiopn update", response);
       setStep("form");
       setSelectedUser(null);
       setAmount("");
@@ -647,7 +647,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
                         : "hover:bg-gray-50"
                     }`}
                   >
-                    {console.log("user selected", selectedUser, user?.id)}
+                    {/* {console.log("user selected", selectedUser, user?.id)} */}
                     <div className="bg-gray-200 h-10 w-10 rounded-full flex items-center justify-center">
                       <span className="text-sm font-medium text-gray-600">
                         {user?.firstName[0].toUpperCase() +

@@ -151,10 +151,10 @@ export const agentValidationSchemaStep2 = Yup.object({
         const response = await fetch(`https://ifsc.razorpay.com/${value}`);
         if (response.ok) {
           const json = await response.json();
-          console.log("Valid IFSC:", json); 
+          // console.log("Valid IFSC:", json); 
           return true;
         } else {
-          console.log("Invalid IFSC response:", response.status);
+          // console.log("Invalid IFSC response:", response.status);
           return false;
         }
       } catch (e) {

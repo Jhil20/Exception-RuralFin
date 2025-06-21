@@ -10,7 +10,7 @@ const OtpVerification = ({ fullPhone,auth }) => {
       window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
         size: "invisible",
         callback: (response) => {
-          console.log("reCAPTCHA solved:", response);
+          // console.log("reCAPTCHA solved:", response);
         },
         "expired-callback": () => {
           console.warn("reCAPTCHA expired. Please try again.");

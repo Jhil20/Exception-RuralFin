@@ -188,7 +188,6 @@ const LessonModal = ({ lesson, onClose, onComplete }) => {
           </motion.div>
         </div>
 
-        {/* Footer */}
         <div className="bg-gray-50 px-8 py-6 flex items-center justify-between">
           <button
             onClick={handlePrevious}

@@ -10,7 +10,7 @@ const Register = () => {
   const [submittedData, setSubmittedData] = useState(null);
   const [userFormStep2, setUserFormStep2] = useState(false);
   const handleFormSubmit = (values) => {
-    console.log("Form submitted with values:", values);
+    // console.log("Form submitted with values:", values);
     setSubmittedData({
       ...values,
       role: role,

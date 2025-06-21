@@ -46,18 +46,18 @@ const AgentCommissions = () => {
 
   useEffect(() => {
     if (!decoded) return;
-    console.log("Decoded token: for socket in agent commission", decoded);
+    //console.log("Decoded token: for socket in agent commission", decoded);
     const socket = getSocket(decoded.id);
     const handler1 = (data) => {
-      console.log("New account agent created: handler1", data);
+      //console.log("New account agent created: handler1", data);
       if (data?.role === "agent") {
         setAllAgents((prevAgents) => [...prevAgents, data]);
         setFilteredAgents((prevAgents) => [...prevAgents, data]);
       }
     };
     const handler2 = (data) => {
-      console.log("Increase agent commission: handler2", data);
-      const {updatedCommission,transaction} = data;
+      //console.log("Increase agent commission: handler2", data);
+      const { updatedCommission, transaction } = data;
       const updatedCommissionData = commissionData?.AllCommissions?.filter(
         (item) => {
           if (
@@ -71,7 +71,7 @@ const AgentCommissions = () => {
           }
         }
       );
-      console.log("Updated Commission Data:", updatedCommissionData);
+      //console.log("Updated Commission Data:", updatedCommissionData);
       setCommissionData((prevData) => ({
         ...prevData,
         AllCommissions: updatedCommissionData,
@@ -93,7 +93,7 @@ const AgentCommissions = () => {
       const response = await axios.get(
         `${BACKEND_URL}/api/admin/commssionData`
       );
-      console.log("response commission data", response);
+      //console.log("response commission data", response);
       setCommissionData(response?.data?.data || {});
       handleMonthChange(formattedDate, response?.data?.data);
     } catch (err) {
@@ -104,7 +104,7 @@ const AgentCommissions = () => {
   const getAllAgents = async () => {
     try {
       const response = await axios.get(`${BACKEND_URL}/api/agent/`);
-      console.log("response all agents", response);
+      //console.log("response all agents", response);
       setAllAgents(response?.data?.agents || []);
       setFilteredAgents(response?.data?.agents || []);
     } catch (err) {
@@ -140,7 +140,7 @@ const AgentCommissions = () => {
       const response = await axios.get(
         `${BACKEND_URL}/api/agentToUserTransaction/getAllTransactions`
       );
-      console.log("response transaction data user to agent", response);
+      //console.log("response transaction data user to agent", response);
       setTransactionData(response?.data?.data || []);
     } catch (err) {
       console.error("Error fetching transaction data:", err);
@@ -185,7 +185,7 @@ const AgentCommissions = () => {
                     );
                   });
                   setFilteredAgents(filtered);
-                  console.log("Filtered Agents:", filtered);
+                  //console.log("Filtered Agents:", filtered);
                 }}
               />
               <Search

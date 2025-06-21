@@ -20,7 +20,7 @@ const AgentsViewMore = ({
   const getAgents = async () => {
     try {
       const response = await axios.get(`${BACKEND_URL}/api/agent/`);
-      console.log("response of geting agents", response);
+      //console.log("response of geting agents", response);
       setAllAgents(response?.data?.agents);
       setFilteredAgents(response?.data?.agents);
     } catch (err) {
@@ -48,7 +48,10 @@ const AgentsViewMore = ({
       </div>
       <div className="w-full flex justify-center items-center mt-4 h-1/12 p-2">
         <div className="relative border border-gray-300 rounded-lg hover:border-black focus-within:border-black transition-all duration-300 w-6/12 h-10">
-          <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Search
+            size={20}
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+          />
 
           <input
             type="text"
@@ -68,11 +71,12 @@ const AgentsViewMore = ({
                 );
               } else {
                 setFilteredAgents(
-                  allAgents.filter((agent) =>
-                    (agent?.city.toLowerCase().includes(value) ||
-                    agent?.state.toLowerCase().includes(value) ||
-                    agent?.country.toLowerCase().includes(value) ||
-                    agent?.zipCode.toLowerCase().includes(value)) 
+                  allAgents.filter(
+                    (agent) =>
+                      agent?.city.toLowerCase().includes(value) ||
+                      agent?.state.toLowerCase().includes(value) ||
+                      agent?.country.toLowerCase().includes(value) ||
+                      agent?.zipCode.toLowerCase().includes(value)
                   )
                 );
               }

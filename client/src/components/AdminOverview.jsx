@@ -62,7 +62,7 @@ const AdminOverview = () => {
       setActiveUsers(data.length);
     };
     const handler1 = (data) => {
-      console.log("New account created: sokceint in admin overview", data);
+      // console.log("New account created: sokceint in admin overview", data);
       if (data?.role == "agent") {
         setOverviewCardData((prevData) => ({
           ...prevData,
@@ -81,11 +81,11 @@ const AdminOverview = () => {
         ...prevData,
         thisMonthTransactions: prevData.thisMonthTransactions + 1,
       }));
-      console.log(
-        "New transaction made: socket in admin overview",
-        transactionVolumeData,
-        data
-      );
+      // console.log(
+      //   "New transaction made: socket in admin overview",
+      //   transactionVolumeData,
+      //   data
+      // );
       setTransactionVolumeData((prevData) => ({
         ...prevData,
         todayTransactions: prevData.todayTransactions + data.transaction.amount,
@@ -99,7 +99,7 @@ const AdminOverview = () => {
     };
 
     const handler3 = (data) => {
-      console.log("New recent activity: socket in admin overview", data);
+      // console.log("New recent activity: socket in admin overview", data);
       setRecentActivityData((prevData) => {
         const newActivity = {
           ...data,
@@ -111,22 +111,25 @@ const AdminOverview = () => {
     };
 
     const handler4 = (data) => {
-      console.log("Increase agent commission: socket in admin overview", data);
+      // console.log("Increase agent commission: socket in admin overview", data);
 
-      setAllCommissions((prevData)=>{
-        const updatedCommissions=prevData?.filter((item)=>{
-          return item._id !=data?.adminCommission?.data?._id
+      setAllCommissions((prevData) => {
+        const updatedCommissions = prevData?.filter((item) => {
+          return item._id != data?.adminCommission?.data?._id;
         });
-        const newCommissions=[...updatedCommissions, data?.adminCommission?.data];
+        const newCommissions = [
+          ...updatedCommissions,
+          data?.adminCommission?.data,
+        ];
         return newCommissions;
-      })
-    }
+      });
+    };
 
     socket.on("activeUsers", handler);
     socket.on("newAccountCreatedBackend", handler1);
     socket.on("newTransactionMade", handler2);
     socket.on("newRecentActivityBackend", handler3);
-    socket.on("increaseAgentCommission",handler4);
+    socket.on("increaseAgentCommission", handler4);
     return () => {
       socket.off("activeUsers", handler);
       socket.off("newAccountCreatedBackend", handler1);
@@ -137,19 +140,21 @@ const AdminOverview = () => {
   }, [decoded]);
 
   const getAllAdminCommissions = async () => {
-    try{
-      const response=await axios.get(`${BACKEND_URL}/api/adminCommission/allCommissions`);
+    try {
+      const response = await axios.get(
+        `${BACKEND_URL}/api/adminCommission/allCommissions`
+      );
       setAllCommissions(response.data.data);
-      console.log("All Admin Commissions:", response.data.data);
-    }catch (error) {
+      //console.log("All Admin Commissions:", response.data.data);
+    } catch (error) {
       console.error("Error fetching admin commissions:", error);
     }
-  }
+  };
 
   const getActiveUsers = async () => {
     try {
       const response = await axios.get(`${BACKEND_URL}/api/getActiveUsers`);
-      console.log("Active Users Data:", response.data);
+      //console.log("Active Users Data:", response.data);
       const length = response.data.data.length + 1;
       setActiveUsers(length);
     } catch (error) {
@@ -162,7 +167,7 @@ const AdminOverview = () => {
       const response = await axios.get(
         `${BACKEND_URL}/api/admin/OverviewCardData`
       );
-      console.log("Overview Card Data:", response.data);
+      //console.log("Overview Card Data:", response.data);
       setOverviewCardData(response.data.data);
     } catch (error) {
       console.error("Error fetching overview card data:", error);
@@ -174,7 +179,7 @@ const AdminOverview = () => {
       const response = await axios.get(
         `${BACKEND_URL}/api/admin/recentActivity`
       );
-      console.log("Recent Activity Data:", response.data);
+      //console.log("Recent Activity Data:", response.data);
       // Process and display recent activity data as needed
       setRecentActivityData(response?.data?.data);
     } catch (error) {
@@ -187,7 +192,7 @@ const AdminOverview = () => {
       const response = await axios.get(
         `${BACKEND_URL}/api/admin/transactionVolume`
       );
-      console.log("Transaction Volume Data:", response.data);
+      //console.log("Transaction Volume Data:", response.data);
       setTransactionVolumeData(response.data.data);
     } catch (error) {
       console.error("Error fetching transaction volume data:", error);
@@ -226,9 +231,11 @@ const AdminOverview = () => {
       <div className="grid grid-cols-5 gap-6">
         <StatCard
           title="Profit Earned"
-          value={`₹${allCommissions?.reduce((acc,item)=>{
-            return acc + item.totalCommissionEarned;
-          },0) || "0"}`}
+          value={`₹${
+            allCommissions?.reduce((acc, item) => {
+              return acc + item.totalCommissionEarned;
+            }, 0) || "0"
+          }`}
           icon={<IndianRupee size={20} />}
         />
         <StatCard
@@ -246,7 +253,7 @@ const AdminOverview = () => {
         />
         <StatCard
           title="Online Accounts"
-          value={`${activeUsers-1}`}
+          value={`${activeUsers - 1}`}
           icon={<Users size={20} />}
         />
         <StatCard
@@ -267,8 +274,6 @@ const AdminOverview = () => {
                 key={activity?._id}
                 className="flex items-start h-20 mb-1 pb-3 border-b border-gray-200 last:border-0 last:pb-0"
               >
-               
-
                 <div
                   className={`h-10 mt-3 w-10 rounded-full flex items-center justify-center text-black mr-4 ml-1 bg-gray-200 ring-[1px] ring-gray-300 `}
                 >
@@ -328,10 +333,11 @@ const AdminOverview = () => {
                           activity?.agentId?._id
                         }`
                       : `User : ${capitalize(
-                          activity?.userId?.firstName || activity?.user?.firstName
-                        )} ${capitalize(activity?.userId?.lastName || activity?.user?.lastName)} | #${
-                          activity?.userId?._id || activity?.user?._id
-                        } `}
+                          activity?.userId?.firstName ||
+                            activity?.user?.firstName
+                        )} ${capitalize(
+                          activity?.userId?.lastName || activity?.user?.lastName
+                        )} | #${activity?.userId?._id || activity?.user?._id} `}
                   </p>
                   <p className="text-xs text-gray-500 mt-0">
                     {activity?.type == "User Created"
@@ -341,10 +347,12 @@ const AdminOverview = () => {
                       : activity?.type == "adminToAgent"
                       ? `Agent Phone : ${activity?.agentId?.phone}`
                       : `Agent : ${capitalize(
-                          activity?.agentId?.firstName || activity?.agent?.firstName
-                        )} ${capitalize(activity?.agentId?.lastName || activity?.agent?.lastName)} | ${
-                          activity?.agentId?._id || activity?.agent?._id
-                        }`}
+                          activity?.agentId?.firstName ||
+                            activity?.agent?.firstName
+                        )} ${capitalize(
+                          activity?.agentId?.lastName ||
+                            activity?.agent?.lastName
+                        )} | ${activity?.agentId?._id || activity?.agent?._id}`}
                   </p>
                   <p className="text-xs text-gray-500 mt-1"></p>
                 </div>
@@ -405,7 +413,9 @@ const AdminOverview = () => {
               <div className="text-center border border-gray-200 bg-gray-50 shadow-lg hover:shadow-black/20 transition-all duration-300 shadow-black/10 rounded-lg p-4">
                 <p className="text-gray-500 text-sm">Today</p>
                 <p className="font-semibold text-gray-800 text-lg">
-                  ₹{transactionVolumeData?.todayTransactions?.toLocaleString() || "0"}
+                  ₹
+                  {transactionVolumeData?.todayTransactions?.toLocaleString() ||
+                    "0"}
                 </p>
 
                 {findChange(
@@ -442,7 +452,9 @@ const AdminOverview = () => {
               <div className="text-center border border-gray-200 bg-gray-50 shadow-lg hover:shadow-black/20 transition-all duration-300 shadow-black/10 rounded-lg p-4">
                 <p className="text-gray-500 text-sm">This Week</p>
                 <p className="font-semibold text-gray-800 text-lg">
-                  ₹{transactionVolumeData?.thisWeekTransactions?.toLocaleString() || "0"}
+                  ₹
+                  {transactionVolumeData?.thisWeekTransactions?.toLocaleString() ||
+                    "0"}
                 </p>
                 {findChange(
                   transactionVolumeData?.thisWeekTransactions,
@@ -478,7 +490,9 @@ const AdminOverview = () => {
               <div className="text-center border border-gray-200 bg-gray-50 shadow-lg hover:shadow-black/20 transition-all duration-300 shadow-black/10 rounded-lg p-4">
                 <p className="text-gray-500 text-sm">This Month</p>
                 <p className="font-semibold text-gray-800 text-lg">
-                  ₹{transactionVolumeData?.thisMonthTransactions?.toLocaleString() || "0"}
+                  ₹
+                  {transactionVolumeData?.thisMonthTransactions?.toLocaleString() ||
+                    "0"}
                 </p>
                 {findChange(
                   transactionVolumeData?.thisMonthTransactions,

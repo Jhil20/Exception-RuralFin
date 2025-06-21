@@ -18,7 +18,7 @@ import { jwtDecode } from "jwt-decode";
 
 const DetailedExpenseReport = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState("overview");
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth()+1);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [budgetData, setBudgetData] = useState({});
   const [categoryBudgets, setCategoryBudgets] = useState([]);
@@ -47,10 +47,10 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
       const response = await axios.get(
         `${BACKEND_URL}/api/budget/${decoded.id}`
       );
-      console.log(
-        "response result of budget fetch in expense analytics",
-        response
-      );
+      // console.log(
+      //   "response result of budget fetch in expense analytics",
+      //   response
+      // );
       setBudgetData(response?.data?.budget);
       const keys = Object.keys(response?.data?.budget?.categoryBudgets);
 
@@ -63,7 +63,8 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
   const getTotalSpent = async () => {
     try {
       const response = await axios.post(
-        `${BACKEND_URL}/api/userToUserTransaction/transactionsTotal/${decoded.id}`,{selectedMonth:selectedMonth}
+        `${BACKEND_URL}/api/userToUserTransaction/transactionsTotal/${decoded.id}`,
+        { selectedMonth: selectedMonth }
       );
       setTotalSpent(response?.data?.totalSpent);
     } catch (err) {
@@ -85,7 +86,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
       const response = await axios.get(
         `${BACKEND_URL}/api/budget/allBudgetsOfThisYear/${decoded.id}`
       );
-      console.log("response result of all budgets of this year", response);
+      //console.log("response result of all budgets of this year", response);
       setAllYearBudgets(response?.data?.budgets);
     } catch (err) {
       console.log("error in fetching all budgets of this year", err);
@@ -93,8 +94,6 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
   };
 
   if (!isOpen) return null;
-
- 
 
   const months = [
     "January",

@@ -33,12 +33,12 @@ const ExpenseCategoryDetails = ({
       category: category,
       selectedYear: new Date().getFullYear(),
     };
-    console.log("values 22222222222222222", values);
+    // console.log("values 22222222222222222", values);
     const response = await axios.post(
       `${BACKEND_URL}/api/userToUserTransaction/transactionsByCategory`,
       values
     );
-    console.log("response 22222222222222222", response);
+    // console.log("response 22222222222222222", response);
     setDetailsTransactions(response?.data?.transactions);
   };
 

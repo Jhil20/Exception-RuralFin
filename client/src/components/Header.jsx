@@ -65,12 +65,12 @@ const Header = () => {
     try {
       if (decoded) {
         const type = location.pathname === "/dashboard" ? "User" : "Agent";
-        console.log(
-          "Fetching notifications for user:",
-          decoded?.id,
-          "Type:",
-          type
-        );
+        // console.log(
+        //   "Fetching notifications for user:",
+        //   decoded?.id,
+        //   "Type:",
+        //   type
+        // );
         const response = await axios.post(
           `${BACKEND_URL}/api/notification/getNotifications`,
           {
@@ -78,7 +78,7 @@ const Header = () => {
             userType: type,
           }
         );
-        console.log("Notifications fetched:", response.data);
+        // console.log("Notifications fetched:", response.data);
         setNotifications(response.data.data);
       }
     } catch (err) {
@@ -94,17 +94,17 @@ const Header = () => {
     if (!decoded) return;
     const socket = getSocket(decoded.id);
     const handler = (data) => {
-      console.log("SOCKET OF NOTIFIACTION CALLED IN FRONTEND ", data);
+      // console.log("SOCKET OF NOTIFIACTION CALLED IN FRONTEND ", data);
       setNotifications((prev) => [...prev, ...data]);
       getNotifications();
     };
 
     const handler2 = (data) => {
-      console.log("SOCKET OF SYSTEM SETTINGS CALLED IN FRONTEND ", data);
+      // console.log("SOCKET OF SYSTEM SETTINGS CALLED IN FRONTEND ", data);
       if (location.pathname != "/adminDashboard") {
-        console.log(
-          "System settings updated, fetching notifications inside if"
-        );
+        // console.log(
+        //   "System settings updated, fetching notifications inside if"
+        // );
         const notification = data?.data?.filter(
           (noti) => noti.userId === decoded.id
         );
@@ -155,7 +155,7 @@ const Header = () => {
           userType: location.pathname === "/dashboard" ? "User" : "Agent",
         }
       );
-      console.log("All notifications marked as read:", response.data);
+      // console.log("All notifications marked as read:", response.data);
       getNotifications();
     } catch (error) {
       console.error("Error marking all notifications as read:", error);
