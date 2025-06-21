@@ -51,7 +51,7 @@ const AgentDashboard = () => {
   const socket = getSocket(decoded.id);
   useEffect(() => {
     if (!decoded) return;
-    const handler = (data) => {
+    const handler =async (data) => {
       setTransactionsDone((prevTransactions) => [
         ...prevTransactions,
         data.transaction,
@@ -83,15 +83,15 @@ const AgentDashboard = () => {
           data.transaction.userId.firstName
         )} ${capitalize(data.transaction.userId.lastName)}`
       );
-      // speak(
-      //   `New ${
-      //     data.transaction.conversionType === "cashToERupees"
-      //       ? "Deposit"
-      //       : "Withdrawal"
-      //   } request received from ${capitalize(
-      //     data.transaction.userId.firstName
-      //   )} ${capitalize(data.transaction.userId.lastName)}`
-      // );
+      await speak(
+        `New ${
+          data.transaction.conversionType === "cashToERupees"
+            ? "Deposit"
+            : "Withdrawal"
+        } request received from ${capitalize(
+          data.transaction.userId.firstName
+        )} ${capitalize(data.transaction.userId.lastName)}`
+      );
     };
 
     if (socket) {
@@ -249,6 +249,15 @@ const AgentDashboard = () => {
         )} ${capitalize(transactionToAccept?.userId?.lastName)}`
       );
 
+      await speak(
+        `${transactionToAccept?.conversionType == "cashToERupees"
+          ? "Deposit"
+          : "Withdrawal"
+        } request accepted for ${capitalize(
+          transactionToAccept?.userId?.firstName
+        )} ${capitalize(transactionToAccept?.userId?.lastName)}`
+      );
+
       getTransactionsDone(); // Refresh
     } catch (err) {
       console.error("Error accepting transaction request:", err);
@@ -328,6 +337,11 @@ const AgentDashboard = () => {
           data.userId.firstName
         )} ${capitalize(data.userId.lastName)}`
       );
+      await speak(
+        `Deposit request completed for ${capitalize(
+          data.userId.firstName
+        )} ${capitalize(data.userId.lastName)}`
+      );
     } catch (err) {
       console.error("Error completing deposit transaction request:", err);
     } finally {
@@ -399,6 +413,11 @@ const AgentDashboard = () => {
         }
       });
       toast.success(
+        `Withdrawal request completed for ${capitalize(
+          data.userId.firstName
+        )} ${capitalize(data.userId.lastName)}`
+      );
+      await speak(
         `Withdrawal request completed for ${capitalize(
           data.userId.firstName
         )} ${capitalize(data.userId.lastName)}`

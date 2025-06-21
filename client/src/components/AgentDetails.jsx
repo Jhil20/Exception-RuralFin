@@ -308,6 +308,11 @@ const AgentDetails = ({
           transactionType === "deposit" ? "Deposit" : "Withdrawal"
         } request sent successful!`
       );
+      await speak(
+        `${
+          transactionType === "deposit" ? "Deposit" : "Withdrawal"
+        } request sent successful!`
+      );
       resetForm();
       setSelectedAgent(null);
       setShowAgentDetails(false);

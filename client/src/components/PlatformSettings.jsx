@@ -17,6 +17,7 @@ import { Formik } from "formik";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { getSocket } from "../utils/socket";
+import speak from "../utils/speak";
 
 const PlatformSettings = () => {
   const [uptime, setUptime] = useState("Calculating...");
@@ -147,6 +148,7 @@ const PlatformSettings = () => {
 
       if (response.data.success) {
         toast.success("Settings saved successfully!");
+        await speak("Settings saved successfully!");
         getSystemSettings();
       }
     } catch (error) {

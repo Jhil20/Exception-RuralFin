@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
 import { jwtDecode } from "jwt-decode";
 import { createSocket, getSocket } from "../utils/socket";
+import speak from "../utils/speak";
 
 const RazorPay = () => {
   const location = useLocation();
@@ -58,6 +59,9 @@ const RazorPay = () => {
       }
       dispatch(hideLoader());
       toast.success("Security deposit increased successfully by ₹" + amount);
+      await speak(
+        `Security deposit increased successfully by ₹${amount}`
+      );
       setTimeout(() => {
         navigate("/agentDashboard");
         window.location.reload();

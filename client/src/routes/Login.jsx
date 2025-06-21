@@ -139,6 +139,7 @@ const Login = () => {
         // console.log("SMS sent successfully:", confirmationResult);
         window.confirmationResult = confirmationResult;
         // })
+        toast.success("OTP sent successfully to " + "+91 "+values.phoneNumber);
         setIsOtpSent(true);
       }
     } catch (error) {

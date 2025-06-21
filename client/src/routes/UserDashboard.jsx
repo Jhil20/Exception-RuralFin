@@ -73,8 +73,8 @@ const UserDashboard = () => {
   useEffect(() => {
     if (!decoded) return;
     const socket = getSocket(decoded?.id);
-    const handler = (data) => {
-      setUserFinance((prev)=>{
+    const handler = async (data) => {
+      setUserFinance((prev) => {
         return {
           ...prev,
           balance: prev.balance + data.transaction.amount,
@@ -88,22 +88,22 @@ const UserDashboard = () => {
             data?.transaction?.receiverId?.firstName
           )} ${capitalize(data?.transaction?.receiverId?.lastName)}`
         );
-        // speak(
-        //   `₹${data?.transaction?.amount} sent to  ${capitalize(
-        //     data?.transaction?.receiverId?.firstName
-        //   )} ${capitalize(data?.transaction?.receiverId?.lastName)}`
-        // ,"gu-In");
+        await speak(
+          `₹${data?.transaction?.amount} sent to  ${capitalize(
+            data?.transaction?.receiverId?.firstName
+          )} ${capitalize(data?.transaction?.receiverId?.lastName)}`
+        );
       } else {
         toast.success(
           `₹${data?.transaction?.amount} received from  ${capitalize(
             data?.transaction?.senderId?.firstName
           )} ${capitalize(data?.transaction?.senderId?.lastName)}`
         );
-        // speak(
-        //   `₹${data?.transaction?.amount} received from  ${capitalize(
-        //     data?.transaction?.senderId?.firstName
-        //   )} ${capitalize(data?.transaction?.senderId?.lastName)}`
-        // ,"gu-IN");
+        await speak(
+          `₹${data?.transaction?.amount} received from  ${capitalize(
+            data?.transaction?.senderId?.firstName
+          )} ${capitalize(data?.transaction?.senderId?.lastName)}`
+        );
       }
       getTransactions();
       getUserData();

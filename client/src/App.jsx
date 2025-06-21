@@ -8,8 +8,9 @@ import Header from "./components/Header";
 import { toast, ToastContainer } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
-import {  getSocket } from "./utils/socket";
+import { getSocket } from "./utils/socket";
 import capitalize from "./utils/capitalize";
+import speak from "./utils/speak";
 
 function App() {
   const isLoading = useSelector((state) => state.loading.isLoading);
@@ -22,11 +23,10 @@ function App() {
     return null;
   }, [token]);
 
-
   useEffect(() => {
     if (!decoded) return;
     const socket = getSocket(decoded.id);
-    const handler1 = (data) => {
+    const handler1 =async (data) => {
       // console.log("User Agent Request Accepted :", data);
       if (data.userId._id == decoded.id) {
         toast.success(
@@ -38,10 +38,19 @@ function App() {
             data.agentId.firstName
           )} ${capitalize(data.agentId.lastName)}`
         );
+        await speak(
+          `Your ${
+            data.conversionType == "cashToERupees"
+              ? "cash to eRupees"
+              : "eRupees to cash"
+          } request has been accepted by ${capitalize(
+            data.agentId.firstName
+          )} ${capitalize(data.agentId.lastName)}`
+        );
       }
     };
 
-    const handler2 = (data) => {
+    const handler2 =async (data) => {
       // console.log("User Agent Request Rejected:", data);
       if (data.userId._id == decoded.id) {
         toast.error(
@@ -53,9 +62,18 @@ function App() {
             data.agentId.firstName
           )} ${capitalize(data.agentId.lastName)}`
         );
+        await speak(
+          `Your ${
+            data.conversionType == "cashToERupees"
+              ? "cash to eRupees"
+              : "eRupees to cash"
+          } request has been rejected by ${capitalize(
+            data.agentId.firstName
+          )} ${capitalize(data.agentId.lastName)}`
+        );
       }
     };
-    const handler3 = (data) => {
+    const handler3 =async  (data) => {
       // console.log("request completed deposit");
       if (data?.userId?._id == decoded?.id) {
         toast.info(
@@ -70,10 +88,18 @@ function App() {
         toast.success(
           `₹${data.amount - data.commission} has been deposited successfully`
         );
+        await speak(`
+          Your ${
+            data.conversionType == "cashToERupees"
+              ? "cash to eRupees"
+              : "eRupees to cash"
+          } request has been completed by ${capitalize(
+            data.agentId.firstName
+          )}  ${capitalize(data.agentId.lastName)} and ₹${data.amount - data.commission} has been deposited successfully`)
       }
     };
 
-    const handler4 = (data) => {
+    const handler4 =async (data) => {
       if (data.userId._id == decoded.id) {
         toast.info(
           `Your ${
@@ -87,6 +113,14 @@ function App() {
         toast.success(
           `₹${data.amount + data.commission} has been withdrawn successfully`
         );
+        await speak(`
+          Your ${
+            data.conversionType == "cashToERupees"
+              ? "cash to eRupees"
+              : "eRupees to cash"
+          } request has been completed by ${capitalize(
+            data.agentId.firstName
+          )} ${capitalize(data.agentId.lastName)} and ₹${data.amount + data.commission} has been withdrawn successfully`)
       }
     };
     if (socket) {

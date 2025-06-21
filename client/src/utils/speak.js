@@ -1,16 +1,25 @@
-import { BACKEND_URL } from "./constants";
+function speak(text, lang = "en-IN") {
+  return new Promise((resolve, reject) => {
+    if (!window.speechSynthesis) {
+      reject("Speech Synthesis not supported in this browser.");
+      return;
+    }
 
-const speak = async (text, langCode = 'gu-IN') => {
-  const response = await fetch(`${BACKEND_URL}/tts`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, langCode }),
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang;
+
+    const voices = window.speechSynthesis.getVoices();
+    const matchingVoice = voices.find((voice) => voice.lang === lang);
+    if (matchingVoice) {
+      utterance.voice = matchingVoice;
+    }
+
+    utterance.onend = () => resolve();      // resolves after speaking
+    utterance.onerror = (e) => reject(e);   // reject on error
+
+    window.speechSynthesis.speak(utterance);
   });
+}
 
-  const audioBlob = await response.blob();
-  const audioUrl = URL.createObjectURL(audioBlob);
-  const audio = new Audio(audioUrl);
-  audio.play();
-};
 
 export default speak;
