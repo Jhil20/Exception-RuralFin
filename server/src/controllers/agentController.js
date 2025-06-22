@@ -142,7 +142,7 @@ const createAgent = async (req, res) => {
       // console.log("agent token creation", agent._id, agent.phone);
       const token = jwt.sign(
         { id: agent._id, phone: agent.phone },
-        "harshp4114",
+        process.env.JWT_SECRET ,
         { expiresIn: "1h" }
       );
 
@@ -211,7 +211,7 @@ const getAgentByPhone = async (req, res) => {
     if (agent) {
       const token = jwt.sign(
         { id: agent._id, phone: agent.phone },
-        "harshp4114",
+        process.env.JWT_SECRET,
         { expiresIn: "1h" }
       );
       return res

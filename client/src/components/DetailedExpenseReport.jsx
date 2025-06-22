@@ -45,7 +45,11 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
   const getBudget = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/budget/${decoded.id}`
+        `${BACKEND_URL}/api/budget/${decoded.id}`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       // console.log(
       //   "response result of budget fetch in expense analytics",
@@ -64,7 +68,11 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
     try {
       const response = await axios.post(
         `${BACKEND_URL}/api/userToUserTransaction/transactionsTotal/${decoded.id}`,
-        { selectedMonth: selectedMonth }
+        { selectedMonth: selectedMonth },{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       setTotalSpent(response?.data?.totalSpent);
     } catch (err) {
@@ -84,7 +92,11 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
   const getAllbudgetsOfThisYear = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/budget/allBudgetsOfThisYear/${decoded.id}`
+        `${BACKEND_URL}/api/budget/allBudgetsOfThisYear/${decoded.id}`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       //console.log("response result of all budgets of this year", response);
       setAllYearBudgets(response?.data?.budgets);

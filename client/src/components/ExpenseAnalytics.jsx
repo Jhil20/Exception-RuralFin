@@ -34,7 +34,11 @@ const ExpenseAnalytics = ({
       const selectedMonth = new Date().getMonth() + 1;
       const response = await axios.post(
         `${BACKEND_URL}/api/userToUserTransaction/transactionsTotal/${decoded.id}`,
-        { selectedMonth: selectedMonth }
+        { selectedMonth: selectedMonth },{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       //console.log("response result of total spent fetch in expense analytics", response);
       setTotalSpent(response?.data?.totalSpent);
@@ -46,7 +50,11 @@ const ExpenseAnalytics = ({
   const getBudget = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/budget/${decoded.id}`
+        `${BACKEND_URL}/api/budget/${decoded.id}`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       // console.log(
       //   "response result of budget fetch in expense analytics",

@@ -172,7 +172,7 @@ const getAdminByPhone = async (req, res) => {
     if (admin) {
       const token = jwt.sign(
         { id: admin._id, phone: admin.phone },
-        "harshp4114",
+        process.env.JWT_SECRET,
         { expiresIn: "1h" }
       );
       return res

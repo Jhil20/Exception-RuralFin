@@ -126,7 +126,7 @@ const getUserByPhone = async (req, res) => {
     if (user) {
       const token = jwt.sign(
         { id: user._id, phone: user.phone },
-        "harshp4114",
+        process.env.JWT_SECRET,
         { expiresIn: "1h" }
       );
       return res
@@ -332,7 +332,7 @@ const createUser = async (req, res) => {
 
     const populatedUser = await User.findById(user._id).populate("finance");
 
-    const token =jwt.sign({ id: user._id, phone: user.phone }, "harshp4114", {
+    const token =jwt.sign({ id: user._id, phone: user.phone }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
 

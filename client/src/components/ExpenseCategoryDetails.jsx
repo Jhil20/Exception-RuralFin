@@ -4,6 +4,7 @@ import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import capitalize from "../utils/capitalize";
 import TransactionIcon from "../utils/TransactionIcon";
+import Cookies from "js-cookie";
 
 const ExpenseCategoryDetails = ({
   budgetData,
@@ -20,7 +21,7 @@ const ExpenseCategoryDetails = ({
   const [detailsTransactions, setDetailsTransactions] = useState([]);
   const [showViewDetails, setShowViewDetails] = useState(false);
   const [whichCategory, setWhichCategory] = useState("");
-
+  const token = Cookies.get("token");
   const handleViewDetails = async (category) => {
     if(category =="Food"){
       category = "Food & Dining";
@@ -36,7 +37,11 @@ const ExpenseCategoryDetails = ({
     // console.log("values 22222222222222222", values);
     const response = await axios.post(
       `${BACKEND_URL}/api/userToUserTransaction/transactionsByCategory`,
-      values
+      values,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
     );
     // console.log("response 22222222222222222", response);
     setDetailsTransactions(response?.data?.transactions);

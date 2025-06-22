@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ArrowUpRight, ArrowDownRight, BarChart2 } from "lucide-react";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
+import Cookies from "js-cookie";
 
 const MonthlyComparison = ({ allYearBudgets, totalSpent, decoded,selectedMonth }) => {
   // Sample data for illustration
@@ -19,6 +20,7 @@ const MonthlyComparison = ({ allYearBudgets, totalSpent, decoded,selectedMonth }
     "Transport",
     "Others",
   ];
+  const token=Cookies.get("token");
 
   useEffect(() => {
     getTotalspent();
@@ -56,7 +58,11 @@ const MonthlyComparison = ({ allYearBudgets, totalSpent, decoded,selectedMonth }
   const getTotalspent = async () => {
     try {
       const response1 = await axios.get(
-        `${BACKEND_URL}/api/userToUserTransaction/lastMonthTransactionsTotal/${decoded.id}`
+        `${BACKEND_URL}/api/userToUserTransaction/lastMonthTransactionsTotal/${decoded.id}`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       // console.log("last month total spent", response1.data.totalSpent);
       setLastMonthTotalSpent(response1.data.totalSpent);

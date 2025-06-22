@@ -76,7 +76,11 @@ const Header = () => {
           {
             userId: decoded.id,
             userType: type,
-          }
+          },{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
         );
         // console.log("Notifications fetched:", response.data);
         setNotifications(response.data.data);
@@ -136,6 +140,10 @@ const Header = () => {
         `${BACKEND_URL}/api/notification/updateNotificationRead`,
         {
           notificationId,
+        },{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       // console.log("Notification marked as read:", response.data);
@@ -153,6 +161,10 @@ const Header = () => {
         {
           userId: decoded.id,
           userType: location.pathname === "/dashboard" ? "User" : "Agent",
+        },{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       // console.log("All notifications marked as read:", response.data);

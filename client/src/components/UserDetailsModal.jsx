@@ -18,21 +18,21 @@ import { toast } from "react-toastify";
 import capitalize from "../utils/capitalize";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
+import Cookies from "js-cookie";
 
 const UserDetailsModal = ({ isOpen, onClose, user }) => {
-  // const transactions = [
-  //   { id: 1, date: '2025-04-10', type: 'deposit', amount: 5000, agent: 'Agent #123' },
-  //   { id: 2, date: '2025-04-09', type: 'withdrawal', amount: 2000, agent: 'Agent #456' },
-  //   { id: 3, date: '2025-04-08', type: 'deposit', amount: 3000, agent: 'Agent #123' },
-  //   { id: 4, date: '2025-04-07', type: 'deposit', amount: 1500, agent: 'Agent #789' },
-  //   { id: 5, date: '2025-04-06', type: 'withdrawal', amount: 1000, agent: 'Agent #456' },
-  // ];
+const token=Cookies.get("token");
   const [transactions, setTransactions] = useState([]);
 
   const getAllTransactions = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/admin/allTransactionsForUser/${user._id}`
+        `${BACKEND_URL}/api/admin/allTransactionsForUser/${user._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       // console.log("response user detail transactions", response);
       setTransactions(response?.data?.data || []);

@@ -22,14 +22,19 @@ import { BACKEND_URL } from "../utils/constants";
 import { useEffect } from "react";
 import axios from "axios";
 import { useState } from "react";
+import Cookies from "js-cookie";
 
 const AgentDetailsModal = ({ isOpen, onClose, agent }) => {
   const [transactions, setTransactions] = useState([]);
-
+  const token=Cookies.get("token");
   const getAlltransactions = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/agentToUserTransaction/${agent._id}`
+        `${BACKEND_URL}/api/agentToUserTransaction/${agent._id}`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       //console.log("response agent detail transactions",response);
       setTransactions(response?.data?.transactions);

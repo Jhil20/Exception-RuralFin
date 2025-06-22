@@ -193,7 +193,11 @@ const AgentDetails = ({
     try {
       //console.log("Fetching user data for ID:", decoded.id);
       const response = await axios.get(
-        `${BACKEND_URL}/api/finance/getFinance/${decoded.id}`
+        `${BACKEND_URL}/api/finance/getFinance/${decoded.id}`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       //console.log("User finance data fetched successfully:", response.data);
       setUserData(response.data.finance);
@@ -205,7 +209,12 @@ const AgentDetails = ({
   const getSettings = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/admin/getSystemSettings`
+        `${BACKEND_URL}/api/admin/getSystemSettings`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       //console.log("Settings response:", response);
       setSettings(response.data.data);
@@ -242,7 +251,11 @@ const AgentDetails = ({
 
     try {
       const result = await axios.get(
-        `${BACKEND_URL}/api/user/getTodayAgentTransactionAmount/${decoded.id}`
+        `${BACKEND_URL}/api/user/getTodayAgentTransactionAmount/${decoded.id}`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       // console.log(
       //   "Today's agent transaction amount:",
@@ -293,7 +306,11 @@ const AgentDetails = ({
       }
       const response = await axios.post(
         `${BACKEND_URL}/api/agentToUserTransaction/`,
-        data
+        data,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       const socket = getSocket();
       socket.emit("newUserAgentTransactionRequest", {
@@ -327,7 +344,12 @@ const AgentDetails = ({
     try {
       const response = await axios.post(
         `${BACKEND_URL}/api/agentCommission/getThisMonthCommission`,
-        { agentId: selectedAgent._id }
+        { agentId: selectedAgent._id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       //console.log("This month's commission:", response.data);
       setThisMonthCommission(response.data.data || 0);
@@ -344,7 +366,11 @@ const AgentDetails = ({
   const getAllTransactions = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/agentToUserTransaction/${selectedAgent._id}`
+        `${BACKEND_URL}/api/agentToUserTransaction/${selectedAgent._id}`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       //console.log("Fetched transactions:", response.data);
       const filtered = response?.data?.transactions?.filter((tr) => {

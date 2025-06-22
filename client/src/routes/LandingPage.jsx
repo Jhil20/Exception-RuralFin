@@ -82,7 +82,6 @@ const LandingPage = () => {
       <AgentModel />
       <SecuritySection />
       <BudgetTracking />
-      {/* <FinancialLiteracy /> */}
       <LandingFooter
         setShowAboutUs={setShowAboutUs}
         setShowTermsOfService={setShowTermsOfService}

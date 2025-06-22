@@ -86,7 +86,11 @@ const UserManagement = () => {
   const getUsers = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/user/getAllUsersWithFinance`
+        `${BACKEND_URL}/api/user/getAllUsersWithFinance`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       // console.log("User data fetched successfully:", response.data);
       setUsers(response?.data?.data);

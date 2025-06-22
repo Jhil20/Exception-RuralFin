@@ -74,7 +74,11 @@ const PlatformSettings = () => {
 
   // const createSystem=async()=>{
   //   try{
-  //     const response=await axios.post(`${BACKEND_URL}/api/admin/createSystem`);
+  //     const response=await axios.post(`${BACKEND_URL}/api/admin/createSystem`,{
+        //   headers: {
+        //     Authorization: `Bearer ${token}`,
+        //   },
+        // });
   //     console.log("System created successfully:", response.data);
   //   }catch(error){
   //     console.error("Error creating system:", error);
@@ -84,7 +88,12 @@ const PlatformSettings = () => {
   const getSystemSettings = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/admin/getSystemSettings`
+        `${BACKEND_URL}/api/admin/getSystemSettings`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       // console.log("System settings fetched successfully:", response.data);
       setSystemSettings(response.data.data);
@@ -127,21 +136,31 @@ const PlatformSettings = () => {
         updatedBy: decoded.id,
       };
 
-      if(systemSettings?.maxSingleTransaction === values.maxSingleTransaction &&
-         systemSettings?.maxDailyLimit === values.maxDailyLimit &&
-         systemSettings?.maxWeeklyLimit === values.maxWeeklyLimit &&
-         systemSettings?.minTransactionAmount === values.minTransactionAmount &&
-         systemSettings?.transactionFee500to999 === values.transactionFee500to999 &&
-         systemSettings?.transactionFee1000to4999 === values.transactionFee1000to4999 &&
-         systemSettings?.transactionFee5000to9999 === values.transactionFee5000to9999 &&
-         systemSettings?.transactionFee10000 === values.transactionFee10000) {
-          toast.info("Make some changes before saving!");
-          return;
-         }
+      if (
+        systemSettings?.maxSingleTransaction === values.maxSingleTransaction &&
+        systemSettings?.maxDailyLimit === values.maxDailyLimit &&
+        systemSettings?.maxWeeklyLimit === values.maxWeeklyLimit &&
+        systemSettings?.minTransactionAmount === values.minTransactionAmount &&
+        systemSettings?.transactionFee500to999 ===
+          values.transactionFee500to999 &&
+        systemSettings?.transactionFee1000to4999 ===
+          values.transactionFee1000to4999 &&
+        systemSettings?.transactionFee5000to9999 ===
+          values.transactionFee5000to9999 &&
+        systemSettings?.transactionFee10000 === values.transactionFee10000
+      ) {
+        toast.info("Make some changes before saving!");
+        return;
+      }
 
       const response = await axios.post(
         `${BACKEND_URL}/api/admin/updateSystemSettings`,
-        values
+        values,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       // console.log("Settings saved successfully:", response.data);
       socket.emit("updateSystemSettings", decoded.id);
@@ -153,7 +172,7 @@ const PlatformSettings = () => {
       }
     } catch (error) {
       console.error("Error saving settings:", error);
-    }finally {
+    } finally {
       setIsSubmitting(false);
     }
   };

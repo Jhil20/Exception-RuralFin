@@ -91,7 +91,12 @@ const AgentCommissions = () => {
   const getCommissions = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/admin/commssionData`
+        `${BACKEND_URL}/api/admin/commssionData`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       //console.log("response commission data", response);
       setCommissionData(response?.data?.data || {});
@@ -103,7 +108,11 @@ const AgentCommissions = () => {
 
   const getAllAgents = async () => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/api/agent/`);
+      const response = await axios.get(`${BACKEND_URL}/api/agent/`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
       //console.log("response all agents", response);
       setAllAgents(response?.data?.agents || []);
       setFilteredAgents(response?.data?.agents || []);
@@ -138,7 +147,11 @@ const AgentCommissions = () => {
   const getTransactionData = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/agentToUserTransaction/getAllTransactions`
+        `${BACKEND_URL}/api/agentToUserTransaction/getAllTransactions`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       //console.log("response transaction data user to agent", response);
       setTransactionData(response?.data?.data || []);

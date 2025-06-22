@@ -95,7 +95,11 @@ const BudgetPlanningForm = ({
     const decoded = jwtDecode(token);
     const allvalues = { ...values, ...step1Data, userId: decoded.id };
     try {
-      const result = await axios.post(`${BACKEND_URL}/api/budget/`, allvalues);
+      const result = await axios.post(`${BACKEND_URL}/api/budget/`, allvalues, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       //console.log("Budget Created", result);
       setStep(1);
       setBudgetPlanningForm(false);

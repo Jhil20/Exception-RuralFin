@@ -10,8 +10,11 @@ import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
 import { jwtDecode } from "jwt-decode";
 import { createSocket, getSocket } from "../utils/socket";
 import speak from "../utils/speak";
+import useAuth from "../utils/useAuth";
+
 
 const RazorPay = () => {
+  useAuth();
   const location = useLocation();
   const formData = location?.state?.data || null;
   const amount = location?.state?.amount || null;
@@ -31,6 +34,7 @@ const RazorPay = () => {
       }, 2000);
     }
   }, [formData]);
+  const token = Cookies.get("token");
 
   const increaseSecurityDeposit = async () => {
     try {
@@ -39,6 +43,10 @@ const RazorPay = () => {
         {
           agentId,
           amount,
+        },{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       const response2 = await axios.post(
@@ -47,21 +55,27 @@ const RazorPay = () => {
           agentId,
           amount,
           conversionType: "cashToERupees",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       // console.log("Admin to Agent Transaction Response:", response2.data);
       // console.log("Increase Security Deposit Response:", response.data);
-      const socket=getSocket(agentId);
-      socket.emit("newRecentActivity",{...response2?.data?.transaction,type:"adminToAgent"});
+      const socket = getSocket(agentId);
+      socket.emit("newRecentActivity", {
+        ...response2?.data?.transaction,
+        type: "adminToAgent",
+      });
       if (razorPayInstance) {
         // console.log("Closing Razorpay instance after deposit");
         razorPayInstance.close();
       }
       dispatch(hideLoader());
       toast.success("Security deposit increased successfully by ₹" + amount);
-      await speak(
-        `Security deposit increased successfully by ₹${amount}`
-      );
+      await speak(`Security deposit increased successfully by ₹${amount}`);
       setTimeout(() => {
         navigate("/agentDashboard");
         window.location.reload();
@@ -177,20 +191,26 @@ const RazorPay = () => {
       const response2 = await axios.post(
         `${BACKEND_URL}/api/adminToAgentTransaction/`,
         {
-          agentId:response.data.agent._id,
+          agentId: response.data.agent._id,
           amount: formData?.securityDeposit,
           conversionType: "cashToERupees",
         }
       );
       // console.log("Admin to Agent Transaction Response in create agent:", response2.data);
       const token = response?.data?.token;
-      const decoded=jwtDecode(token);
+      const decoded = jwtDecode(token);
       createSocket(decoded.id);
-      const socket=getSocket(decoded.id);
+      const socket = getSocket(decoded.id);
       // console.log("new user socket send",response?.data?.agent)
-      socket.emit("newAccountCreated",response?.data?.agent);
-      socket.emit("newRecentActivity",{...response?.data?.agent,type:"Agent Created"})
-      socket.emit("newRecentActivity",{...response2?.data?.transaction,type:"adminToAgent"});
+      socket.emit("newAccountCreated", response?.data?.agent);
+      socket.emit("newRecentActivity", {
+        ...response?.data?.agent,
+        type: "Agent Created",
+      });
+      socket.emit("newRecentActivity", {
+        ...response2?.data?.transaction,
+        type: "adminToAgent",
+      });
       // console.log("Token received:", token);
       Cookies.set("token", token, { expires: 1 });
       toast.success("Agent account created successfully");

@@ -142,7 +142,12 @@ const AdminOverview = () => {
   const getAllAdminCommissions = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/adminCommission/allCommissions`
+        `${BACKEND_URL}/api/adminCommission/allCommissions`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       setAllCommissions(response.data.data);
       //console.log("All Admin Commissions:", response.data.data);
@@ -165,7 +170,12 @@ const AdminOverview = () => {
   const getOverviewCardData = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/admin/OverviewCardData`
+        `${BACKEND_URL}/api/admin/OverviewCardData`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       //console.log("Overview Card Data:", response.data);
       setOverviewCardData(response.data.data);
@@ -177,7 +187,12 @@ const AdminOverview = () => {
   const getRecentActivityData = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/admin/recentActivity`
+        `${BACKEND_URL}/api/admin/recentActivity`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       //console.log("Recent Activity Data:", response.data);
       // Process and display recent activity data as needed
@@ -190,7 +205,12 @@ const AdminOverview = () => {
   const getTransationVolume = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/admin/transactionVolume`
+        `${BACKEND_URL}/api/admin/transactionVolume`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       //console.log("Transaction Volume Data:", response.data);
       setTransactionVolumeData(response.data.data);

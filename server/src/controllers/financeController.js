@@ -189,7 +189,7 @@ const depositFunds = async (req, res) => {
         .json({ message: "Finance record not found", success: false });
     }
 
-    finance.balance += amount - commission;
+    finance.balance += amount - commission-commission;
     await finance.save({ session });
     // console.log("Finance balance updated:", finance.balance);
 

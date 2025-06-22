@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import capitalize from "../utils/capitalize";
+import Cookies from "js-cookie";
 
 const AgentsViewMore = ({
   setShowAgentsViewMore,
@@ -16,10 +17,15 @@ const AgentsViewMore = ({
   useEffect(() => {
     getAgents();
   }, []);
+  const token=Cookies.get("token");
 
   const getAgents = async () => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/api/agent/`);
+      const response = await axios.get(`${BACKEND_URL}/api/agent/`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
       //console.log("response of geting agents", response);
       setAllAgents(response?.data?.agents);
       setFilteredAgents(response?.data?.agents);

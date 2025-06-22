@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -542,7 +543,3 @@ httpServer.listen(5000, () => {
     console.log(`error in running`, error);
   }
 });
-module.exports = {
-  io,
-  onlineUsers,
-};

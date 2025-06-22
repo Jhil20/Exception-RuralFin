@@ -47,7 +47,11 @@ const AgentManagement = () => {
 
   const getAgentData = async () => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/api/agent/`);
+      const response = await axios.get(`${BACKEND_URL}/api/agent/`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
       //console.log("Agent data fetched successfully:", response.data);
       setAgents(response.data.agents);
       setFilteredAgents(response.data.agents);

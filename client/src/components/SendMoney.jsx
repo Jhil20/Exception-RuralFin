@@ -18,8 +18,6 @@ import capitalize from "../utils/capitalize";
 import { auth } from "../firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { getSocket } from "../utils/socket";
-import { useMemo } from "react";
-import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 
 export const SendMoney = ({ showSend, user, finance, toastControl }) => {
@@ -48,11 +46,16 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
   const setTransactionSuccess = toastControl.setTransactionSuccess;
   const setOtpVerified = toastControl.setOtpVerified;
   const showSendVar = showSend.showSend;
-
+  const token = Cookies.get("token");
   const getSettings = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/admin/getSystemSettings`
+        `${BACKEND_URL}/api/admin/getSystemSettings`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       // console.log("Settings response:", response);
       setSettings(response.data.data);
@@ -93,7 +96,12 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
     if (id.endsWith("@RURALFIN")) {
       try {
         const response = await axios.get(
-          `${BACKEND_URL}/api/user/validate/${id}`
+          `${BACKEND_URL}/api/user/validate/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         const found = response?.data?.found;
         setIsValidId(found);
@@ -139,7 +147,12 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
     setIsSubmitting(true);
     try {
       const response2 = await axios.get(
-        `${BACKEND_URL}/api/user/getTodayTransactionAmount/${user._id}`
+        `${BACKEND_URL}/api/user/getTodayTransactionAmount/${user._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       const transactionsAmount = response2?.data?.data?.today;
       // console.log("transactionsAmount", transactionsAmount);
@@ -179,6 +192,10 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
           amount,
           remarks,
           password,
+        },{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       // console.log("response", response);
@@ -237,7 +254,11 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       // console.log("checking delete", transactionCreated._id);
       if (transactionCreated?._id) {
         const response = await axios.delete(
-          `${BACKEND_URL}/api/userToUserTransaction/${transactionCreated?._id}`
+          `${BACKEND_URL}/api/userToUserTransaction/${transactionCreated?._id}`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
         );
         // console.log("response of transactiopn update", response);
       }
@@ -290,12 +311,20 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       //   transactionCreated?._id
       // );
 
-      const response = await axios.post(`${BACKEND_URL}/api/finance/transfer`, {
-        senderId: user._id,
-        receiverId: transactionCreated?.receiverId,
-        amount: transactionCreated?.amount,
-        transactionId: transactionCreated?._id,
-      });
+      const response = await axios.post(
+        `${BACKEND_URL}/api/finance/transfer`,
+        {
+          senderId: user._id,
+          receiverId: transactionCreated?.receiverId,
+          amount: transactionCreated?.amount,
+          transactionId: transactionCreated?._id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       // console.log("response of transaction complete", response);
       if (finance?.isBudgetPlanningEnabled) {
         const response2 = await axios.put(
@@ -304,6 +333,11 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
             userId: user._id,
             amount: transactionCreated?.amount,
             category: transactionCreated?.remarks,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
         // console.log("response of budget update", response2);
@@ -329,7 +363,11 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       toast.error("Error occured. Transaction failed");
 
       const response = await axios.delete(
-        `${BACKEND_URL}/api/userToUserTransaction/${transactionCreated?._id}`
+        `${BACKEND_URL}/api/userToUserTransaction/${transactionCreated?._id}`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       // console.log("response of transactiopn update", response);
       setStep("form");
@@ -359,7 +397,12 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
     const fav = user?.favourites || [];
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/user/getFavourites/${user?._id}`
+        `${BACKEND_URL}/api/user/getFavourites/${user?._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       // console.log("response of get favourites", response?.data?.favourites);
       setFavourites(response?.data?.favourites);
@@ -383,7 +426,12 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
     try {
       const response = await axios.post(
         `${BACKEND_URL}/api/user/addToFavourites`,
-        { userId: user._id, ruralFinId: ruralfinValue }
+        { userId: user._id, ruralFinId: ruralfinValue },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       // console.log("response of add fav", response);
       if (response?.data?.success) {
@@ -415,7 +463,11 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
   const handleBackForm = async () => {
     try {
       const response = await axios.delete(
-        `${BACKEND_URL}/api/userToUserTransaction/${transactionCreated?._id}`
+        `${BACKEND_URL}/api/userToUserTransaction/${transactionCreated?._id}`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       // console.log("response of transactiopn update", response);
       setStep("form");

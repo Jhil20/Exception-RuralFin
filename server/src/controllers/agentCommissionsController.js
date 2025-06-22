@@ -84,7 +84,7 @@ const getAllCommissions = async (req, res) => {
 
     const commissions = await AgentCommission.find({agentId}).populate("agentId");
     if (!commissions || commissions.length === 0) {
-      return res.status(404).json({
+      return res.status(200).json({
         message: "No commissions found",
         success: false,
       });

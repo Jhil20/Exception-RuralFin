@@ -19,6 +19,7 @@ import { toast } from "react-toastify";
 import speak from "../utils/speak";
 import { useDispatch } from "react-redux";
 import SecurityDepositOverlay from "../components/SecurityDepositOverlay";
+import Footer from "../components/Footer";
 
 const AgentDashboard = () => {
   useAuth();
@@ -51,7 +52,7 @@ const AgentDashboard = () => {
   const socket = getSocket(decoded.id);
   useEffect(() => {
     if (!decoded) return;
-    const handler =async (data) => {
+    const handler = async (data) => {
       setTransactionsDone((prevTransactions) => [
         ...prevTransactions,
         data.transaction,
@@ -112,7 +113,12 @@ const AgentDashboard = () => {
     try {
       // console.log("Decoded token:", decoded, token);
       const response = await axios.get(
-        `${BACKEND_URL}/api/agent/${decoded.id}`
+        `${BACKEND_URL}/api/agent/${decoded.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       // console.log("Agent data:", response.data);
       setAgentData(response?.data?.agent);
@@ -124,7 +130,11 @@ const AgentDashboard = () => {
   const getTransactionsDone = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/agentToUserTransaction/${decoded.id}`
+        `${BACKEND_URL}/api/agentToUserTransaction/${decoded.id}`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       // console.log("Transactions data:", response.data);
       setTransactionsDone(response?.data?.transactions);
@@ -140,10 +150,15 @@ const AgentDashboard = () => {
         `${BACKEND_URL}/api/agentCommission/getAllCommissions`,
         {
           agentId: decoded.id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       // console.log("Commission data:", response.data);
-      setAllCommissions(response.data.data);
+      setAllCommissions(response?.data?.data);
     } catch (err) {
       console.error("Error fetching commission data:", err);
     }
@@ -157,6 +172,10 @@ const AgentDashboard = () => {
         {
           status: "rejected",
           trId: transactionToReject?._id,
+        },{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       const data = response.data.transaction;
@@ -165,12 +184,12 @@ const AgentDashboard = () => {
       socket.emit("UserAgentRequestRejected", data);
 
       // Update local transaction states
-      const updatedTransactions = transactionsDone.filter(
+      const updatedTransactions = transactionsDone?.filter(
         (tr) => tr._id !== data._id
       );
       setTransactionsDone([...updatedTransactions, data]);
 
-      const updatedFiltered = filteredTransactions.filter(
+      const updatedFiltered = filteredTransactions?.filter(
         (tr) => tr._id !== data._id
       );
       if (activeFilter === "all" || data.status === activeFilter) {
@@ -214,6 +233,10 @@ const AgentDashboard = () => {
         {
           status: "accepted",
           trId: transactionToAccept?._id,
+        },{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -224,12 +247,12 @@ const AgentDashboard = () => {
       // console.log("Socket emitted UserAgentRequestAccepted");
 
       // Update local transaction states
-      const updatedTransactions = transactionsDone.filter(
+      const updatedTransactions = transactionsDone?.filter(
         (tr) => tr._id !== data._id
       );
       setTransactionsDone([...updatedTransactions, data]);
 
-      const updatedFiltered = filteredTransactions.filter(
+      const updatedFiltered = filteredTransactions?.filter(
         (tr) => tr._id !== data._id
       );
       if (activeFilter === "all" || data.status === activeFilter) {
@@ -250,9 +273,10 @@ const AgentDashboard = () => {
       );
 
       await speak(
-        `${transactionToAccept?.conversionType == "cashToERupees"
-          ? "Deposit"
-          : "Withdrawal"
+        `${
+          transactionToAccept?.conversionType == "cashToERupees"
+            ? "Deposit"
+            : "Withdrawal"
         } request accepted for ${capitalize(
           transactionToAccept?.userId?.firstName
         )} ${capitalize(transactionToAccept?.userId?.lastName)}`
@@ -279,6 +303,10 @@ const AgentDashboard = () => {
           agentId: decoded.id,
           userId: transactionToComplete?.userId?._id,
           commission: transactionToComplete?.commission / 2,
+        },{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       // console.log("Deposit transaction completed:", response.data);
@@ -297,13 +325,13 @@ const AgentDashboard = () => {
         balance: prevData.balance - data.amount + data.commission / 2,
       }));
       setTransactionsDone((prevTransactions) => {
-        const updatedTransactions = prevTransactions.filter(
+        const updatedTransactions = prevTransactions?.filter(
           (tr) => tr._id !== data._id
         );
         return [...updatedTransactions, data];
       });
       setAllCommissions((prevCommissions) => {
-        const thisMonthCommission = prevCommissions.filter((commission) => {
+        const thisMonthCommission = prevCommissions?.filter((commission) => {
           return (
             commission?.month === new Date().getMonth() + 1 &&
             commission?.year === new Date().getFullYear()
@@ -323,7 +351,7 @@ const AgentDashboard = () => {
         }
       });
       setFilteredTransactions((prevTransactions) => {
-        const updatedFiltered = prevTransactions.filter(
+        const updatedFiltered = prevTransactions?.filter(
           (tr) => tr._id !== data._id
         );
         if (activeFilter === "all" || data.status === activeFilter) {
@@ -362,6 +390,10 @@ const AgentDashboard = () => {
           agentId: decoded.id,
           userId: transactionToComplete?.userId?._id,
           commission: transactionToComplete?.commission / 2,
+        },{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       // console.log("Withdrawal transaction completed:", response.data);
@@ -377,13 +409,13 @@ const AgentDashboard = () => {
         balance: prevData.balance + data.amount + data.commission / 2,
       }));
       setTransactionsDone((prevTransactions) => {
-        const updatedTransactions = prevTransactions.filter(
+        const updatedTransactions = prevTransactions?.filter(
           (tr) => tr._id !== data._id
         );
         return [...updatedTransactions, data];
       });
       setAllCommissions((prevCommissions) => {
-        const thisMonthCommission = prevCommissions.filter((commission) => {
+        const thisMonthCommission = prevCommissions?.filter((commission) => {
           return (
             commission?.month === new Date().getMonth() + 1 &&
             commission?.year === new Date().getFullYear()
@@ -403,7 +435,7 @@ const AgentDashboard = () => {
         }
       });
       setFilteredTransactions((prevTransactions) => {
-        const updatedFiltered = prevTransactions.filter(
+        const updatedFiltered = prevTransactions?.filter(
           (tr) => tr._id !== data._id
         );
         if (activeFilter === "all" || data.status === activeFilter) {
@@ -441,7 +473,7 @@ const AgentDashboard = () => {
         setIsLengthZero(false);
       }
     } else {
-      const filteredTransactions = transactionsDone.filter(
+      const filteredTransactions = transactionsDone?.filter(
         (tr) => tr.status === filter
       );
       if (filteredTransactions.length === 0) {
@@ -477,6 +509,7 @@ const AgentDashboard = () => {
         currentSecurityDeposit={agentData.securityDeposit}
         decoded={decoded}
       />
+      
       <header className="bg-white text-black shadow-md mx-4 mx rounded-md mt-3">
         <div className="container mx-auto p-4">
           <div className="flex justify-between items-center mb-4">
@@ -589,7 +622,9 @@ const AgentDashboard = () => {
                         commission?.year === new Date().getFullYear()
                       );
                     })
-                    .map((commission) => commission.totalCommissionEarned) || 0}
+                    .map((commission) => {
+                      return commission?.totalCommissionEarned;
+                    }) || 0}
                 </p>
               </div>
               <div className="p-2 rounded-md bg-gray-200">
@@ -809,6 +844,7 @@ const AgentDashboard = () => {
           )}
         </div>
       </main>
+      <Footer/>
     </div>
   );
 };

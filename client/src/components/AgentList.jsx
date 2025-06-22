@@ -68,7 +68,11 @@ const AgentList = ({
 
   const getAgents = async () => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/api/agent/`);
+      const response = await axios.get(`${BACKEND_URL}/api/agent/`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
       // console.log("response of geting agents", response);
       setAllAgents(response?.data?.agents);
     } catch (err) {

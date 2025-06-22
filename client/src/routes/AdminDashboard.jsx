@@ -6,8 +6,10 @@ import UserManagement from "../components/UserManagement";
 import AgentCommissions from "../components/AgentCommissions";
 import PlatformSettings from "../components/PlatformSettings";
 import AdminOverview from "../components/AdminOverview";
+import useAuth from "../utils/useAuth";
 
 const AdminDashboard = () => {
+  useAuth();
   const [activeTab, setActiveTab] = useState("overview");
 
   const renderActiveComponent = () => {
