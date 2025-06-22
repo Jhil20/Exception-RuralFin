@@ -83,6 +83,12 @@ const UserDashboard = () => {
 
       setTransactionData((prev) => [...prev, data.transaction]);
       if (data?.transaction?.senderId._id === decoded?.id) {
+        setUserFinance((prev) => {
+          return {
+            ...prev,
+            balance: prev.balance - data.transaction.amount,
+          };
+        });
         toast.success(
           `₹${data?.transaction?.amount} sent to  ${capitalize(
             data?.transaction?.receiverId?.firstName
@@ -94,6 +100,12 @@ const UserDashboard = () => {
           )} ${capitalize(data?.transaction?.receiverId?.lastName)}`
         );
       } else {
+        setUserFinance((prev) => {
+          return {
+            ...prev,
+            balance: prev.balance + data.transaction.amount,
+          };
+        });
         toast.success(
           `₹${data?.transaction?.amount} received from  ${capitalize(
             data?.transaction?.senderId?.firstName
@@ -168,7 +180,8 @@ const UserDashboard = () => {
   const getTransactions = async () => {
     try {
       const result = await axios.get(
-        `${BACKEND_URL}/api/userToUserTransaction/getTransactions/${decoded?.id}`,{
+        `${BACKEND_URL}/api/userToUserTransaction/getTransactions/${decoded?.id}`,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -181,7 +194,8 @@ const UserDashboard = () => {
     }
     try {
       const result2 = await axios.get(
-        `${BACKEND_URL}/api/agentToUserTransaction/byUser/${decoded?.id}`,{
+        `${BACKEND_URL}/api/agentToUserTransaction/byUser/${decoded?.id}`,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -199,7 +213,8 @@ const UserDashboard = () => {
     try {
       // console.log("hiiii");
       const response = await axios.get(
-        `${BACKEND_URL}/api/user/${decoded?.id}`,{
+        `${BACKEND_URL}/api/user/${decoded?.id}`,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -209,7 +224,8 @@ const UserDashboard = () => {
       setUserData(response?.data?.data);
       // console.log("FIDDDD", response?.data?.data?.finance);
       const response2 = await axios.get(
-        `${BACKEND_URL}/api/finance/${response?.data?.data?.finance}`,{
+        `${BACKEND_URL}/api/finance/${response?.data?.data?.finance}`,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
