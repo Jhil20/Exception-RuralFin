@@ -92,7 +92,7 @@ const TermsOfService = () => {
         {/* Agreement Notice */}
         <section className="py-12 bg-gray-50">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white border-l-4 border-black p-6 rounded-r-lg border border-gray-200">
+            <div className="bg-white border-l-4  p-6 rounded-r-lg border border-gray-200">
               <div className="flex items-start space-x-3">
                 <CheckCircle className="w-6 h-6 text-gray-700 mt-1 flex-shrink-0" />
                 <div>

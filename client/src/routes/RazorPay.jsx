@@ -26,8 +26,8 @@ const RazorPay = () => {
   const hasInitiated = useRef(false);
 
   useEffect(() => {
-    if ((formData || amount || typeOfPayment) && !hasInitiated.current) {
-      hasInitiated.current = true;
+    if ((formData || amount || typeOfPayment) && !hasInitiated?.current) {
+      hasInitiated?.current = true;
       dispatch(showLoader());
       setTimeout(() => {
         initiatePayment();
@@ -123,7 +123,7 @@ const RazorPay = () => {
         }
       );
 
-      const { order_id } = orderRes.data;
+      const { order_id } = orderRes?.data;
 
       const options = {
         key: "rzp_test_rcMN4fKyf8uvKF",
@@ -143,7 +143,7 @@ const RazorPay = () => {
             response
           );
           // console.log("Payment Verification Response:", verifyRes.data);
-          if (verifyRes.data.success) {
+          if (verifyRes?.data?.success) {
             // console.log(
             //   "Payment verified successfully: calling toast and create agent"
             // );
@@ -191,7 +191,7 @@ const RazorPay = () => {
       const response2 = await axios.post(
         `${BACKEND_URL}/api/adminToAgentTransaction/`,
         {
-          agentId: response.data.agent._id,
+          agentId: response?.data?.agent?._id,
           amount: formData?.securityDeposit,
           conversionType: "cashToERupees",
         }
@@ -199,8 +199,8 @@ const RazorPay = () => {
       // console.log("Admin to Agent Transaction Response in create agent:", response2.data);
       const token = response?.data?.token;
       const decoded = jwtDecode(token);
-      createSocket(decoded.id);
-      const socket = getSocket(decoded.id);
+      createSocket(decoded?.id);
+      const socket = getSocket(decoded?.id);
       // console.log("new user socket send",response?.data?.agent)
       socket.emit("newAccountCreated", response?.data?.agent);
       socket.emit("newRecentActivity", {

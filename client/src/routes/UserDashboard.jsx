@@ -62,7 +62,7 @@ const UserDashboard = () => {
     },
   };
 
-  const categoryBudgets = Object.keys(budgetData.categoryBudgets);
+  const categoryBudgets = Object.keys(budgetData?.categoryBudgets);
 
   const token = Cookies.get("token");
   const decoded = useMemo(() => {
@@ -77,16 +77,16 @@ const UserDashboard = () => {
       setUserFinance((prev) => {
         return {
           ...prev,
-          balance: prev.balance + data.transaction.amount,
+          balance: prev.balance + data?.transaction?.amount,
         };
       });
 
-      setTransactionData((prev) => [...prev, data.transaction]);
-      if (data?.transaction?.senderId._id === decoded?.id) {
+      setTransactionData((prev) => [...prev, data?.transaction]);
+      if (data?.transaction?.senderId?._id === decoded?.id) {
         setUserFinance((prev) => {
           return {
             ...prev,
-            balance: prev.balance - data.transaction.amount,
+            balance: prev.balance - data?.transaction?.amount,
           };
         });
         toast.success(
@@ -103,7 +103,7 @@ const UserDashboard = () => {
         setUserFinance((prev) => {
           return {
             ...prev,
-            balance: prev.balance + data.transaction.amount,
+            balance: prev.balance + data?.transaction?.amount,
           };
         });
         toast.success(
@@ -129,7 +129,7 @@ const UserDashboard = () => {
       // console.log("user finance data", userFinance);
       setUserFinance((prev) => ({
         ...prev,
-        balance: prev.balance + (data.amount - data.commission),
+        balance: prev.balance + (data?.amount - data?.commission),
       }));
       setTransactionData((prev) => [...prev, data]);
       getTransactions();
@@ -142,7 +142,7 @@ const UserDashboard = () => {
       // console.log("user finance data", userFinance);
       setUserFinance((prev) => ({
         ...prev,
-        balance: prev.balance + (data.amount - data.commission),
+        balance: prev.balance + (data?.amount - data?.commission),
       }));
       setTransactionData((prev) => [...prev, data]);
       getTransactions();
@@ -305,7 +305,7 @@ const UserDashboard = () => {
           onClose={() => setIsReportOpen(false)}
           budgetData={budgetData}
           categoryBudgets={categoryBudgets}
-          totalSpent={budgetData.totalSpent}
+          totalSpent={budgetData?.totalSpent}
         />
       )}
 

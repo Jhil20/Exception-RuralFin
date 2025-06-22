@@ -85,11 +85,11 @@ const Login = () => {
 
     // console.log("btn clicked");
 
-    const fullPhone = `+91${values.phoneNumber}`;
+    const fullPhone = `+91${values?.phoneNumber}`;
     // console.log("Full Phone Number:", fullPhone);
     setPhoneState(fullPhone);
     try {
-      const whichRole = values.role;
+      const whichRole = values?.role;
       setWhatRole(whichRole);
       const response = await axios.post(
         `${BACKEND_URL}/api/${whichRole}/get${capitalize(whichRole)}ByPhone`,
@@ -139,12 +139,12 @@ const Login = () => {
         // console.log("SMS sent successfully:", confirmationResult);
         window.confirmationResult = confirmationResult;
         // })
-        toast.success("OTP sent successfully to " + "+91 "+values.phoneNumber);
+        toast.success("OTP sent successfully to " + "+91 "+values?.phoneNumber);
         setIsOtpSent(true);
       }
     } catch (error) {
       console.error("SMS not sent:", error);
-      setFirebaseError(error.message);
+      // setFirebaseError(error?.message);
       toast.error("Error sending OTP. Please refresh the page.");
       if (window.recaptchaVerifier) window.recaptchaVerifier.clear();
     }
@@ -229,12 +229,12 @@ const Login = () => {
 
       // Verify OTP
       const result = await confirmationResult.confirm(otpNumber);
-      const user = result.user;
+      const user = result?.user;
 
       // console.log("User verified successfully:", user);
       const token = Cookies.get("token");
       const decoded = jwtDecode(token);
-      const socket = createSocket(decoded.id);
+      const socket = createSocket(decoded?.id);
       dispatch(socketConnected());
       // console.log("Socket connected:", socket.id);
       toast.success("OTP verified successfully!");
@@ -332,7 +332,7 @@ const Login = () => {
                           name="otpNumber"
                           className="block w-full pl-10 pr-3 py-3 border-gray-300 bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
                           placeholder="Enter 6-digit OTP"
-                          value={values.otpNumber}
+                          value={values?.otpNumber}
                           onChange={handleChange}
                           onBlur={handleBlur}
                         />
@@ -428,7 +428,7 @@ const Login = () => {
                           name="phoneNumber"
                           className="block mt-2 w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
                           placeholder="Enter your 10-digit phone number"
-                          value={values.phoneNumber}
+                          value={values?.phoneNumber}
                           onChange={handleChange}
                           onBlur={handleBlur}
                           required
@@ -454,7 +454,7 @@ const Login = () => {
                           id="role"
                           name="role"
                           className={`block mt-2 w-full pl-10 pr-10 py-3 text-gray-600  border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white `}
-                          value={values.role}
+                          value={values?.role}
                           onChange={handleChange}
                           onBlur={handleBlur}
                           required
@@ -493,7 +493,7 @@ const Login = () => {
                           name="password"
                           className="block mt-2 w-full pl-10 pr-3 py-3 placeholder:text-gray-600 border-gray-300 border-[1px] bg-gray-50 focus:ring-black focus:border-black rounded-lg transition-all duration-200 outline-none focus:bg-white text-gray-900"
                           placeholder="Enter Your Password"
-                          value={values.password}
+                          value={values?.password}
                           onChange={handleChange}
                           onBlur={handleBlur}
                           required
