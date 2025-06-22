@@ -163,7 +163,7 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                     setIsAgentTransaction(false);
                   }
                 }}
-                className="flex items-center cursor-pointer hover:bg-gray-100 transition-all duration-200 justify-between py-3 border-b border-gray-100 last:border-0"
+                className="flex px-4 rounded-lg items-center cursor-pointer hover:bg-gray-100 transition-all duration-200 justify-between py-3 border-b border-gray-100 last:border-0"
               >
                 <div className="flex items-center space-x-3">
                   {agentTransaction ? (
@@ -280,7 +280,7 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                           : "text-red-600"
                       }`}
                     >
-                      {transaction?.type === "incoming" ? "+ " : "- "}
+                      {transaction?.senderId?._id === decoded.id ? "- " : "+ "}
                       {new Intl.NumberFormat("en-US", {
                         style: "currency",
                         currency: "INR",

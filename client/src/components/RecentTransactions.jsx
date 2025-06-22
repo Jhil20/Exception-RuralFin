@@ -156,7 +156,7 @@ const RecentTransactions = ({
                           : "text-red-600"
                       }`}
                     >
-                      {transaction?.type === "incoming" ? "+ " : "- "}
+                      {transaction?.senderId?._id === decoded.id ? "- " : "+ "}
                       {new Intl.NumberFormat("en-US", {
                         style: "currency",
                         currency: "INR",

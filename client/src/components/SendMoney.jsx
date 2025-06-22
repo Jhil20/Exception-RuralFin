@@ -262,6 +262,10 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
         );
         // console.log("response of transactiopn update", response);
       }
+      if(err?.response?.data?.message =="Receiver not found"){
+        toast.error("Receiver not found. Please check the RuralFin ID.");
+        return;
+      }
       console.log("Error in transaction", err);
       toast.error("Transaction failed. please refresh & try again.");
       return;

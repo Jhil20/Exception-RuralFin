@@ -117,7 +117,7 @@ const CityAutocomplete = () => {
       )}
       {/* ✅ Suggestions after fetch */}
       {!loading && suggestions.length > 0 && (
-        <ul className="relative z-10 w-full bg-white border rounded shadow-lg max-h-60 overflow-y-auto">
+        <ul className="absolute top-19 z-10 w-full bg-white border rounded shadow-lg max-h-60 overflow-y-auto">
           {suggestions.map((city) => (
             <li
               key={city.place_id}

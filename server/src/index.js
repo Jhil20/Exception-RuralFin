@@ -514,6 +514,7 @@ const serverStartTime = new Date();
 app.use("/api/checkOnline", async (req, res) => {
   try {
     const { accountId } = req.body;
+    // console.log("Checking online status for accountId:", accountId,onlineUsers);
     if (!accountId) {
       return res
         .status(400)

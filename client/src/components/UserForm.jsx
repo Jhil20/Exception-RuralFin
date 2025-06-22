@@ -320,14 +320,14 @@ const UserForm = ({ resetRole, setUserFormStep2 }) => {
 
                 {/* Address Fields below */}
                 <div className="grid md:grid-cols-3 gap-4 mt-4">
-                  <div className="relative w-full">
+                  <div className="relative flex flex-wrap content-start justify-start w-full">
                     <label
                       htmlFor="state"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
                       State
                     </label>
-                    <div className="absolute inset-y-0 left-0 top-6 pl-3 flex items-center pointer-events-none">
+                    <div className="relative  -left-8 top-9  pl-3 flex items-center pointer-events-none">
                       <Map className="h-5 w-5 text-gray-600" />
                     </div>
                     <Field
@@ -344,14 +344,14 @@ const UserForm = ({ resetRole, setUserFormStep2 }) => {
                     />
                   </div>
 
-                  <div className="relative w-full">
+                  <div className="relative  flex flex-wrap content-start justify-start w-full">
                     <label
                       htmlFor="country"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
                       Country
                     </label>
-                    <div className="absolute inset-y-0 left-0 top-6 pl-3 flex items-center pointer-events-none">
+                    <div className="relative -left-13 top-9 pl-3 flex items-center pointer-events-none">
                       <Globe className="h-5 w-5 text-gray-600" />
                     </div>
                     <Field
@@ -368,14 +368,14 @@ const UserForm = ({ resetRole, setUserFormStep2 }) => {
                     />
                   </div>
 
-                  <div className="relative w-full">
+                  <div className="relative  flex flex-wrap content-start justify-start w-full">
                     <label
                       htmlFor="zipCode"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
                       ZIP Code
                     </label>
-                    <div className="absolute inset-y-0 left-0 top-6 pl-3 flex items-center pointer-events-none">
+                    <div className="relative -left-14 top-9 pl-3 flex items-center pointer-events-none">
                       <MapPin className="h-5 w-5 text-gray-600" />
                     </div>
                     <Field

@@ -95,7 +95,7 @@ const AgentForm = ({ resetRole }) => {
       {step == 1 && (
         <Formik
           initialValues={initialValuesStep1}
-          // validationSchema={userValidationSchemaStep1}
+          validationSchema={userValidationSchemaStep1}
           onSubmit={handleSubmitStep1}
         >
           {({ isSubmitting, values }) => (

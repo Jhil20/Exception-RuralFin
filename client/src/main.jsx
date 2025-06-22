@@ -60,30 +60,11 @@ const appRouter = createBrowserRouter([
         path: "/agentDashboard",
         element: <AgentDashboard />,
       },
-      // {
-      //   path: "/aboutus",
-      //   element: <AboutUs />,
-      // },
-      // {
-      //   path: "/compliance",
-      //   element: <Compliance />,
-      // },
-      // {
-      //   path: "/licenses",
-      //   element: <Licenses />,
-      // },
-      // {
-      //   path: "/mission",
-      //   element: <Mission />,
-      // },
-      // {
-      //   path: "/privacypolicy",
-      //   element: <PrivacyPolicy />,
-      // },
-      // {
-      //   path: "/termsofservice",
-      //   element: <TermsOfService />,
-      // },
+      {
+        path: "/adminDashboard",
+        element: <AdminDashboard />,
+      },
+
     ],
   },
 ]);
