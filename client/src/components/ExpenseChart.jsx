@@ -63,7 +63,7 @@ const ExpenseChart = ({ budgetData, categoryBudgets }) => {
       labels: {
         color: '#333',
         font: {
-          size: 14,
+          size: 10,
         },
         padding: 10,            
         boxWidth: 12,
@@ -86,8 +86,8 @@ const ExpenseChart = ({ budgetData, categoryBudgets }) => {
 };
 
   return (
-    <div className="bg-white rounded-xl p-8 transition-all duration-300 shadow-gray-300 hover:shadow-gray-400 shadow-md hover:shadow-lg">
-      <div className="flex justify-between items-center mb-6">
+    <div className="bg-white rounded-xl p-2 py-6 lg:p-8 transition-all duration-300 shadow-gray-300 hover:shadow-gray-400 shadow-md hover:shadow-lg">
+      <div className="flex mx-4 justify-between items-center mb-6">
         <h3 className="text-lg font-semibold text-gray-900">Expense Distribution</h3>
         <div className="flex bg-gray-100 rounded-lg p-1">
           <button
@@ -119,10 +119,10 @@ const ExpenseChart = ({ budgetData, categoryBudgets }) => {
               const spentPercentage = (spent / totalSpent) * 100;
 
               return (
-                <div key={index} className="flex-1 h-full flex flex-col items-center group">
+                <div key={index} className="flex-1 h-full flex w-10 flex-col items-center group">
                   <div className="w-full h-full flex justify-center items-end mb-1 relative">
                     <div
-                      className="w-full max-w-[40px] rounded-t-sm transition-all opacity-100 duration-300 group-hover:opacity-90"
+                      className="w-full  max-w-[40px] rounded-t-sm transition-all opacity-100 duration-300 group-hover:opacity-90"
                       style={{
                         height: `${spentPercentage.toFixed(0)}%`,
                         backgroundColor: 'black',
@@ -134,7 +134,7 @@ const ExpenseChart = ({ budgetData, categoryBudgets }) => {
                       </div>
                     </div>
                   </div>
-                  <p className="text-xs text-gray-600 rotate-0 truncate w-16 text-center">{category}</p>
+                  <p className="lg:text-xs text-[9px] text-gray-600 rotate-0 truncate w-10 lg:w-16 text-center">{category}</p>
                   <p className="text-xs font-medium mt-1 text-gray-900">
                     {spentPercentage > 0 ? `${spentPercentage.toFixed(0)}%` : '0%'}
                   </p>
@@ -144,7 +144,7 @@ const ExpenseChart = ({ budgetData, categoryBudgets }) => {
           </div>
         ) : (
           <div className="relative w-full h-full flex items-center justify-center">
-            <div className="w-full h-full max-w-[400px] max-h-[280px]">
+            <div className="w-full h-full max-w-[270px]  lg:max-w-[400px] lg:max-h-[280px]">
               <Pie data={pieData} options={pieOptions} />
             </div>
           </div>
@@ -153,16 +153,16 @@ const ExpenseChart = ({ budgetData, categoryBudgets }) => {
 
       <div className="mt-0 grid grid-cols-3 justify-items-center gap-4 pt-6 border-t border-gray-100">
         <div>
-          <p className="text-sm text-gray-500 mb-1">Total Budget</p>
-          <p className="text-lg font-bold text-gray-900">{formatCurrency(totalBudget)}</p>
+          <p className="text-xs lg:text-sm text-gray-500 mb-1">Total Budget</p>
+          <p className="text-base lg:text-lg font-bold text-gray-900">{formatCurrency(totalBudget)}</p>
         </div>
         <div>
-          <p className="text-sm text-gray-500 mb-1">Total Spent</p>
-          <p className="text-lg font-bold text-gray-900">{formatCurrency(totalSpent)}</p>
+          <p className="text-xs lg:text-sm text-gray-500 mb-1">Total Spent</p>
+          <p className="text-base lg:text-lg font-bold text-gray-900">{formatCurrency(totalSpent)}</p>
         </div>
         <div>
-          <p className="text-sm text-gray-500 mb-1">Remaining</p>
-          <p className="text-lg font-bold text-gray-900">{formatCurrency(totalBudget - totalSpent)}</p>
+          <p className="text-xs lg:text-sm text-gray-500 mb-1">Remaining</p>
+          <p className="text-base lg:text-lg font-bold text-gray-900">{formatCurrency(totalBudget - totalSpent)}</p>
         </div>
       </div>
     </div>

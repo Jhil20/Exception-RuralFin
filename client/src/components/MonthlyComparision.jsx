@@ -79,7 +79,7 @@ const MonthlyComparison = ({ allYearBudgets, totalSpent, decoded,selectedMonth }
         {lastMonthStateData ? (
           <div className="bg-gray-50 shadow-gray-300 hover:shadow-gray-400 transition-all duration-300 shadow-md hover:shadow-lg rounded-xl p-5">
             <div className="flex justify-between items-center mb-1">
-              <h4 className="text-xl font-medium">Last Month</h4>
+              <h4 className="text-sm lg:text-xl font-medium">Last Month</h4>
             </div>
 
             <p className="text-2xl font-bold mb-4">
@@ -131,9 +131,9 @@ const MonthlyComparison = ({ allYearBudgets, totalSpent, decoded,selectedMonth }
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl flex flex-wrap p-8 pt-0 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100">
-            <div className="flex items-center justify-between ">
-              <h4 className="text-xl mr-50 font-semibold text-gray-900">
+          <div className="bg-white rounded-2xl content-start flex-col flex flex-wrap p-8 pt-0 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100">
+            <div className="flex w-full my-4 h-fit  items-center justify-between ">
+              <h4 className=" text-xl lg:mr-50 font-semibold text-gray-900">
                 Last Month
               </h4>
               <div className="bg-gray-100 p-2 rounded-lg">
@@ -141,7 +141,7 @@ const MonthlyComparison = ({ allYearBudgets, totalSpent, decoded,selectedMonth }
               </div>
             </div>
 
-            <div className="flex flex-col items-center justify-center py-8 px-4 bg-gray-50 ring ring-gray-200 rounded-xl">
+            <div className="flex flex-grow flex-col items-center w-full justify-center py-8 px-4 bg-gray-50 ring ring-gray-200 rounded-xl">
               <div className="bg-gray-100 p-4 rounded-full mb-4">
                 <BarChart2 className="h-8 w-8 text-gray-900" />
               </div>

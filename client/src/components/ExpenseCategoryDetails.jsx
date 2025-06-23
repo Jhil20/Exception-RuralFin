@@ -57,14 +57,14 @@ const ExpenseCategoryDetails = ({
                 {whichCategory=="Food"?"Food & Dining":whichCategory=="Others"?"Other Category":whichCategory} Transactions Details
               </h2>
               <X
-                size={38}
+                size={32}
                 onClick={() => setShowViewDetails(false)}
-                className="text-gray-700 cursor-pointer rounded-lg transition-all duration-300 hover:bg-gray-200 p-2 hover:text-gray-900"
+                className="text-gray-700 cursor-pointer rounded-lg transition-all duration-300 hover:bg-gray-200 p-1 hover:text-gray-900"
               >
                 Close
               </X>
             </div>
-            <div className="h-11/12 overflow-y-auto px-4 py-2 bg-white text-black rounded-xl">
+            <div className="h-11/12 overflow-y-auto px-0 py-2 bg-white text-black rounded-xl">
               {detailsTransactions.length === 0 ? (
                 <div className="text-center h-full flex justify-center items-center pb-10 text-gray-400 text-sm">
                   <h1 className="text-2xl text-gray-500 font-semibold">No transactions found.</h1>
@@ -78,14 +78,14 @@ const ExpenseCategoryDetails = ({
                     <div className="flex items-center space-x-3">
                       <TransactionIcon type={transaction?.remarks} />
 
-                      <div>
+                      <div className="pl-4 ">
                         {transaction?.senderId == decoded.id ? (
                           <>
-                            <p className="font-medium text-gray-900">
+                            <p className="font-medium text-sm  lg:text-base text-gray-900">
                               {capitalize(transaction?.receiverId?.firstName) +
                                 " " +
                                 capitalize(transaction?.receiverId?.lastName)}
-                              <span className="text-sm text-gray-500">
+                              <span className=" text-xs lg:text-sm text-gray-500">
                                 {" "}
                                 - {transaction?.receiverId?.ruralFinId}
                               </span>
@@ -93,18 +93,18 @@ const ExpenseCategoryDetails = ({
                           </>
                         ) : (
                           <>
-                            <p className="font-medium text-gray-900">
+                            <p className="font-medium  text-sm lg:text-base text-gray-900">
                               {capitalize(transaction?.senderId?.firstName) +
                                 " " +
                                 capitalize(transaction?.senderId?.lastName)}
-                              <span className="text-sm text-gray-500">
+                              <span className="text-xs lg:text-sm text-gray-500">
                                 {" "}
                                 - {transaction?.receiverId?.ruralFinId}
                               </span>
                             </p>
                           </>
                         )}
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs  text-gray-500">
                           {new Date(
                             transaction?.transactionDate
                           ).toLocaleString("en-US", {
@@ -119,9 +119,9 @@ const ExpenseCategoryDetails = ({
                       </div>
                     </div>
 
-                    <div className="flex items-center">
+                    <div className="flex w-28 lg:w-40 items-center justify-end">
                       <span
-                        className={`text-sm font-semibold ${
+                        className={` text-xs lg:text-sm font-semibold ${
                           transaction?.senderId != decoded.id
                             ? "text-green-600"
                             : "text-red-600"
@@ -134,7 +134,7 @@ const ExpenseCategoryDetails = ({
                         }).format(transaction?.amount)}
                       </span>
 
-                      <div className="ml-2">
+                      <div className="ml-1 lg:ml-2">
                         {transaction?.senderId != decoded.id ? (
                           <ArrowDownLeft size={16} className="text-green-600" />
                         ) : (

@@ -1,7 +1,7 @@
 import { Book, Car, CircleEllipsis, Clapperboard, HeartPulse, Home, Utensils, UtilityPole } from "lucide-react";
 
 const TransactionIcon = ({ type }) => {
-  const iconClasses = "w-8 h-8 rounded-full flex items-center justify-center";
+  const iconClasses = "sm:w-8 sm:h-8 w-10 h-8  mr-0 rounded-full flex items-center justify-center";
 
   switch (type) {
     case "Housing":

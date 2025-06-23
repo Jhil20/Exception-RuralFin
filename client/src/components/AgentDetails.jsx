@@ -431,7 +431,7 @@ const AgentDetails = ({
   }
 
   return (
-    <div className="bg-white h-11/12 w-11/12 md:w-2/3 rounded-2xl shadow-xl transition-all duration-300 transform animate-fade-in">
+    <div className="bg-white h-11/12 w-11/12 lg:w-2/3 rounded-2xl shadow-xl transition-all duration-300 transform animate-fade-in">
       {/* Header */}
       <div className="flex justify-between items-center h-22 mt-2 px-6 pb-2 border-b border-gray-100">
         <div>
@@ -448,7 +448,7 @@ const AgentDetails = ({
             setSelectedAgent(null);
             setShowAgentDetails(false);
           }}
-          className= "p-1 md:p-2 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors duration-200 group"
+          className= "p-1 md:p-1 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors duration-200 group"
           aria-label="Close"
         >
           <X
@@ -961,7 +961,7 @@ const AgentDetails = ({
                         handleFilterChange("all");
                         setTransactionFilter("all");
                       }}
-                      className={`px-3 py-1.5 text-sm cursor-pointer rounded-md transition-colors duration-200 flex items-center ${
+                      className={`px-3 py-1.5 text-xs lg:text-sm cursor-pointer rounded-md transition-colors duration-200 flex items-center ${
                         transactionFilter === "all"
                           ? "bg-gray-900 text-white"
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -975,7 +975,7 @@ const AgentDetails = ({
                         handleFilterChange("pending");
                         setTransactionFilter("pending");
                       }}
-                      className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
+                      className={`px-3 py-1.5 text-xs lg:text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
                         transactionFilter === "pending"
                           ? "bg-gray-900 text-white"
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -989,7 +989,7 @@ const AgentDetails = ({
                         handleFilterChange("accepted");
                         setTransactionFilter("accepted");
                       }}
-                      className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
+                      className={`px-3 py-1.5 text-xs lg:text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
                         transactionFilter === "accepted"
                           ? "bg-gray-900 text-white"
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -1003,7 +1003,7 @@ const AgentDetails = ({
                         handleFilterChange("rejected");
                         setTransactionFilter("rejected");
                       }}
-                      className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
+                      className={`px-3 py-1.5 text-xs lg:text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
                         transactionFilter === "rejected"
                           ? "bg-gray-900 text-white"
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -1017,7 +1017,7 @@ const AgentDetails = ({
                         handleFilterChange("completed");
                         setTransactionFilter("completed");
                       }}
-                      className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
+                      className={`px-3 py-1.5 text-xs lg:text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
                         transactionFilter === "completed"
                           ? "bg-gray-900 text-white"
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -1055,13 +1055,13 @@ const AgentDetails = ({
                             <div className="flex flex-col md:flex-row justify-between">
                               <div className="mb-2 md:mb-0">
                                 <div className="flex items-center mb-1">
-                                  <span className="font-medium text-gray-900">
+                                  <span className="font-medium text-gray-900 md:text-base text-sm">
                                     {transaction?.conversionType ===
                                     "cashToERupees"
                                       ? "Deposit"
                                       : "Withdrawal"}
                                   </span>
-                                  <span className="ml-2 text-sm text-gray-500">
+                                  <span className="ml-2 md:text-sm text-xs text-gray-500">
                                     #{transaction?._id}
                                   </span>
                                   <span
@@ -1090,7 +1090,7 @@ const AgentDetails = ({
                                 </div>
                               </div>
                               <div className="flex flex-col items-end">
-                                <span className="font-bold text-black">
+                                <span className="font-bold md:text-base text-sm text-black">
                                   ₹
                                   {transaction?.amount?.toLocaleString("en-IN")}
                                 </span>
@@ -1105,7 +1105,7 @@ const AgentDetails = ({
                           </div>
 
                           {transaction?.status === "completed" && (
-                            <div className="px-4 py-2 bg-gray-50 border-t border-gray-200 flex items-center text-sm text-gray-500">
+                            <div className="px-4 py-2 bg-gray-50 border-t border-gray-200 flex items-center text-xs md:text-sm text-gray-500">
                               <Check
                                 size={14}
                                 className="mr-1.5 text-green-500"
@@ -1122,14 +1122,14 @@ const AgentDetails = ({
               </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+            <div className="bg-white rounded-xl mt-6 border border-gray-200 overflow-hidden shadow-sm">
               <div className="p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
                   <Activity size={18} className="mr-2" />
                   Transaction Process
                 </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="bg-gray-50 border-gray-200 border p-4 rounded-lg">
                     <h4 className="font-medium text-gray-900 mb-3">
                       Withdrawal Flow (eRupees to Cash)

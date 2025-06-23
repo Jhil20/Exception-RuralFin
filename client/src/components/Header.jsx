@@ -307,7 +307,7 @@ const Header = () => {
           location.pathname === "/adminDashboard" ? (
             <div></div>
           ) : (
-            <nav className="hidden md:flex space-x-8">
+            <nav className="hidden md:flex md:space-x-5 lg:space-x-8">
               {isSignedIn ||
               location.pathname === "/home" ||
               location.pathname === "/login" ||

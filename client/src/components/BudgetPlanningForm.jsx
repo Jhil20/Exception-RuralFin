@@ -114,7 +114,7 @@ const BudgetPlanningForm = ({
   };
 
   return (
-    <div className="bg-white h-fit w-2/3 rounded-2xl p-6 shadow-sm">
+    <div className="bg-white h-fit w-10/12 lg:w-2/3 rounded-2xl p-6 shadow-sm">
       <div className="flex h-1/12 justify-start items-start mb-6">
         <h1 className="text-xl font-semibold">
           {step == 1
@@ -235,13 +235,13 @@ const BudgetPlanningForm = ({
                   <div className="flex justify-between items-center">
                     <button
                       onClick={() => setBudgetPlanningForm(false)}
-                      className="mt-4 w-52 px-4 py-3 bg-black  text-white font-semibold rounded-lg shadow-lg shadow-gray-400 hover:shadow-black/60 hover:bg-gray-800 transition-all duration-300 cursor-pointer disabled:bg-gray-400"
+                      className="mt-4 w-34 md:w-52 px-4 py-3 bg-black  text-white font-semibold rounded-lg shadow-lg shadow-gray-400 hover:shadow-black/60 hover:bg-gray-800 transition-all duration-300 cursor-pointer disabled:bg-gray-400"
                     >
                       Back
                     </button>
                     <button
                       type="submit"
-                      className="mt-4 w-52 px-4 py-3 bg-black  text-white font-semibold rounded-lg shadow-lg shadow-gray-400 hover:shadow-black/60 hover:bg-gray-800 transition-all duration-300 cursor-pointer disabled:bg-gray-400"
+                      className="mt-4 w-34 md:w-52 px-4 py-3 bg-black  text-white font-semibold rounded-lg shadow-lg shadow-gray-400 hover:shadow-black/60 hover:bg-gray-800 transition-all duration-300 cursor-pointer disabled:bg-gray-400"
                       disabled={isSubmitting}
                     >
                       Next
@@ -443,13 +443,13 @@ const BudgetPlanningForm = ({
                   <div className="flex justify-between items-center">
                     <button
                       onClick={() => setStep(1)}
-                      className="mt-4 w-52 px-4 py-3 bg-black  text-white font-semibold rounded-lg shadow-lg shadow-gray-400 hover:shadow-black/60 hover:bg-gray-800 transition-all duration-300 cursor-pointer disabled:bg-gray-400"
+                      className="mt-4 w-34 md:w-52 px-4 py-3 bg-black  text-white font-semibold rounded-lg shadow-lg shadow-gray-400 hover:shadow-black/60 hover:bg-gray-800 transition-all duration-300 cursor-pointer disabled:bg-gray-400"
                     >
                       Back
                     </button>
                     <button
                       type="submit"
-                      className="mt-4 w-52 px-4 py-3 bg-black  text-white font-semibold rounded-lg shadow-lg shadow-gray-400 hover:shadow-black/60 hover:bg-gray-800 transition-all duration-300 cursor-pointer disabled:bg-gray-400"
+                      className="mt-4 w-34 md:w-52 px-4 py-3 bg-black  text-white font-semibold rounded-lg shadow-lg shadow-gray-400 hover:shadow-black/60 hover:bg-gray-800 transition-all duration-300 cursor-pointer disabled:bg-gray-400"
                       disabled={isSubmitting}
                     >
                       Next

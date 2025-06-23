@@ -157,7 +157,7 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
       style={{ opacity: isOpen ? 1 : 0 }}
     >
       <div
-        className={`bg-white rounded-2xl w-full pb-8 max-w-4xl max-h-[90vh] overflow-hidden flex flex-col transition-all duration-300 transform ${
+        className={` bg-white rounded-2xl w-11/12 xl:w-full pb-8 max-w-4xl max-h-[90vh] overflow-hidden flex flex-col transition-all duration-300 transform ${
           isModalVisible ? "scale-100 opacity-100" : "scale-95 opacity-0"
         }`}
       >
@@ -173,9 +173,9 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="p-2 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors duration-200"
+              className="p-1 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors duration-200"
             >
-              <X size={20} className="text-gray-700" />
+              <X size={24} className="text-gray-700" />
             </button>
           </div>
         </div>
@@ -311,74 +311,6 @@ const DetailedExpenseReport = ({ isOpen, onClose }) => {
             />
           )}
 
-          {/* {activeTab === "trends" && (
-            <div className="space-y-6">
-              <h3 className="text-lg font-semibold">Spending Trends</h3>
-              <div className="bg-gray-50 rounded-xl p-6">
-                <h4 className="text-base font-medium mb-4">
-                  6-Month Spending Overview
-                </h4>
-                <div className="h-64 flex items-end space-x-4">
-                  {[...Array(6)].map((_, i) => {
-                    const height = 30 + Math.random() * 70;
-                    return (
-                      <div
-                        key={i}
-                        className="flex-1 flex flex-col items-center"
-                      >
-                        <div
-                          className="w-full bg-black rounded-t-sm"
-                          style={{ height: `${height}%` }}
-                        ></div>
-                        <p className="text-xs mt-2 text-gray-500">
-                          {months[(selectedMonth - 5 + i + 12) % 12].substring(
-                            0,
-                            3
-                          )}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="bg-gray-50 rounded-xl p-6">
-                <h4 className="text-base font-medium mb-4">Category Growth</h4>
-                <div className="space-y-4">
-                  {categoryBudgets.slice(0, 3).map((category, index) => {
-                    const growth = Math.floor(Math.random() * 40) - 20;
-                    return (
-                      <div key={index} className="flex items-center">
-                        <div className="w-32 text-sm font-medium">
-                          {category}
-                        </div>
-                        <div className="flex-1 flex items-center">
-                          <div
-                            className={`flex items-center ${
-                              growth >= 0 ? "text-green-600" : "text-red-600"
-                            }`}
-                          >
-                            <TrendingUp size={16} className="mr-1" />
-                            <span className="text-sm font-medium">
-                              {growth}%
-                            </span>
-                          </div>
-                          <div className="ml-4 flex-1 bg-gray-200 h-2 rounded-full">
-                            <div
-                              className={`h-2 rounded-full ${
-                                growth >= 0 ? "bg-green-500" : "bg-red-500"
-                              }`}
-                              style={{ width: `${Math.abs(growth) * 2}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          )} */}
         </div>
       </div>
     </div>

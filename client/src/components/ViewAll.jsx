@@ -10,10 +10,10 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
   const [isAgentTransaction, setIsAgentTransaction] = useState(false);
   // console.log("transactionData", transactionData);
   return (
-    <div className="w-2/3 h-10/12 bg-white rounded-lg shadow-lg p-6">
+    <div className="w-11/12 lg:w-2/3 h-10/12 bg-white rounded-lg shadow-lg p-6">
       {transactionInfo != null && showTransactionInfo == true && (
         <div className="fixed top-0 left-0 w-full h-full bg-black/40 flex justify-center items-center z-50">
-          <div className="bg-white w-1/3 h-fit  rounded-2xl shadow-xl p-8 relative">
+          <div className="bg-white w-10/12 lg:w-1/3 h-fit  rounded-2xl shadow-xl p-8 relative">
             <div className="flex justify-start items-start mb-4">
               <X
                 size={32}
@@ -24,7 +24,7 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                 }}
                 className="hover:bg-gray-200 p-1 pl-0 mr-3 mt-[1px] cursor-pointer rounded-md transition-all duration-300"
               />
-              <h2 className="text-2xl font-semibold text-gray-800  text-center">
+              <h2 className="text-xl  font-semibold text-gray-800  text-center">
                 Transaction Details
               </h2>
             </div>
@@ -187,11 +187,11 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                   <div>
                     {agentTransaction ? (
                       <>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium md:text-base text-sm text-gray-900">
                           {capitalize(transaction?.agentId?.firstName) +
                             " " +
                             capitalize(transaction?.agentId?.lastName)}
-                          <span className="text-sm text-gray-500">
+                          <span className="text-xs md:text-sm text-gray-500">
                             {" "}
                             -{" "}
                             {transaction?.conversionType === "cashToERupees"
@@ -202,11 +202,11 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                       </>
                     ) : transaction?.senderId == decoded.id ? (
                       <>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium  md:text-base text-sm text-gray-900">
                           {capitalize(transaction?.receiverId?.firstName) +
                             " " +
                             capitalize(transaction?.receiverId?.lastName)}
-                          <span className="text-sm text-gray-500">
+                          <span className="text-xs md:text-sm text-gray-500">
                             {" "}
                             - {transaction?.remarks}
                           </span>
@@ -214,11 +214,11 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                       </>
                     ) : (
                       <>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-sm md:text-base text-gray-900">
                           {capitalize(transaction?.senderId?.firstName) +
                             " " +
                             capitalize(transaction?.senderId?.lastName)}
-                          <span className="text-sm text-gray-500">
+                          <span className="text-xs md:text-sm text-gray-500">
                             {" "}
                             - {transaction?.remarks}
                           </span>
