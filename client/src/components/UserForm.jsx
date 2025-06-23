@@ -396,14 +396,14 @@ const UserForm = ({ resetRole, setUserFormStep2 }) => {
                 <div className="flex justify-between items-center">
                   <button
                     onClick={resetRole}
-                    className="mt-4 sm:mr-4 flex w-30 justify-center items-center md:w-52 px-4 py-3 shadow-lg hover:shadow-black/50 bg-gray-400 text-white font-semibold rounded-lg transition-all duration-300 cursor-pointer hover:bg-gray-600 disabled:bg-gray-600"
+                    className="mt-4 sm:mr-4 flex w-30 justify-center items-center md:w-52 px-4 py-3 shadow-lg hover:shadow-black/50 bg-black text-white font-semibold rounded-lg transition-all duration-300 cursor-pointer hover:bg-gray-800 disabled:bg-gray-600"
                   >
                     Back
                   </button>
 
                   <button
                     type="submit"
-                    className="mt-4 w-30  md:w-52 px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-black/50 hover:bg-blue-800 transition-all duration-300 cursor-pointer  disabled:bg-gray-400"
+                    className="mt-4 w-30  md:w-52 px-4 py-3 bg-black text-white font-semibold rounded-lg shadow-lg hover:shadow-black/50 hover:bg-gray-800 transition-all duration-300 cursor-pointer  disabled:bg-gray-400"
                     disabled={isSubmitting}
                   >
                     Next
@@ -543,7 +543,7 @@ const UserForm = ({ resetRole, setUserFormStep2 }) => {
 
                 <div className="flex justify-between items-center">
                   <button
-                    className="mt-4 w-30  flex justify-center items-center md:w-52 px-4 py-3 shadow-lg hover:shadow-black/50 bg-gray-400 text-white font-semibold rounded-lg transition-all duration-300 cursor-pointer hover:bg-gray-600 disabled:bg-gray-600"
+                    className="mt-4 w-30  flex justify-center items-center md:w-52 px-4 py-3 shadow-lg hover:shadow-black/50 bg-black text-white font-semibold rounded-lg transition-all duration-300 cursor-pointer hover:bg-gray-800 disabled:bg-gray-600"
                     onClick={() => {
                       setStep(1);
                       setUserFormStep2(false); //tochange the user form size
@@ -553,7 +553,7 @@ const UserForm = ({ resetRole, setUserFormStep2 }) => {
                   </button>
                   <button
                     type="submit"
-                    className="mt-4 w-45  md:w-52 px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-black/50 hover:bg-blue-800 transition-all duration-300 cursor-pointer  disabled:bg-gray-400"
+                    className="mt-4 w-45  md:w-52 px-4 py-3 bg-black text-white font-semibold rounded-lg shadow-lg hover:shadow-black/50 hover:bg-gray-800 transition-all duration-300 cursor-pointer  disabled:bg-gray-400"
                     disabled={isSubmitting}
                   >
                     Create User Account

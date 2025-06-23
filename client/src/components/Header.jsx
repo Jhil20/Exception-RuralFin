@@ -177,7 +177,7 @@ const Header = () => {
     <header className="bg-white border-b h-[9.1vh] border-gray-200 sticky w-full top-0 z-50 shadow-sm">
       {showNotifications && (
         <div className="fixed inset-0 bg-black/30  backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="h-10/12 w-6/12 p-6 bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="lg:h-10/12 w-9/12 lg:w-6/12 p-6 bg-white rounded-xl shadow-lg overflow-hidden">
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center">
                 <h2 className="text-2xl font-semibold text-gray-900">
@@ -237,7 +237,7 @@ const Header = () => {
                           {getIcon(notification.type)}
                         </div>
                         <div className="flex-1">
-                          <div className="flex justify-between items-start">
+                          <div className="flex text-xs sm:text-sm md:text-base justify-between items-start">
                             <div>
                               <p
                                 className={`${
@@ -248,7 +248,7 @@ const Header = () => {
                               >
                                 {notification.message}
                               </p>
-                              <p className="text-xs text-gray-500 mt-1">
+                              <p className="text-xs  text-gray-500 mt-1">
                                 {new Date(
                                   notification.createdAt
                                 ).toLocaleDateString() +
@@ -287,8 +287,8 @@ const Header = () => {
           </div>
         </div>
       )}
-      <div className="container mx-auto px-4 ">
-        <div className="flex justify-between items-center h-16">
+      <div className="mx-auto px-4 ">
+        <div className="flex justify-between items-center w-full h-16">
           {/* Logo */}
           <div
             onClick={() => {
@@ -343,12 +343,7 @@ const Header = () => {
                   >
                     Budget Tracking
                   </Link>
-                  {/* <Link
-                    to="/home#financial-literacy"
-                    className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
-                  >
-                    Financial Literacy
-                  </Link> */}
+                  
                 </>
               ) : (
                 <>
@@ -423,7 +418,7 @@ const Header = () => {
               to={"/login"}
               className="flex items-center space-x-4"
             >
-              <button className="flex cursor-pointer  hover:ring-2 hover:ring-gray-900 items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
+              <button className="flex cursor-pointer  hover:ring-2 hover:ring-gray-900 items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-full focus:outline-none ring-2 ring-gray-300 transition-all duration-300">
                 <User size={18} />
                 <span className="text-sm font-medium text-gray-800">
                   Account

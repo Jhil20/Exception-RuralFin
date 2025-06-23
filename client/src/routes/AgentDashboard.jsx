@@ -130,7 +130,8 @@ const AgentDashboard = () => {
   const getTransactionsDone = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/agentToUserTransaction/${decoded.id}`,{
+        `${BACKEND_URL}/api/agentToUserTransaction/${decoded.id}`,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -172,7 +173,8 @@ const AgentDashboard = () => {
         {
           status: "rejected",
           trId: transactionToReject?._id,
-        },{
+        },
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -233,7 +235,8 @@ const AgentDashboard = () => {
         {
           status: "accepted",
           trId: transactionToAccept?._id,
-        },{
+        },
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -303,7 +306,8 @@ const AgentDashboard = () => {
           agentId: decoded?.id,
           userId: transactionToComplete?.userId?._id,
           commission: transactionToComplete?.commission / 2,
-        },{
+        },
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -390,7 +394,8 @@ const AgentDashboard = () => {
           agentId: decoded?.id,
           userId: transactionToComplete?.userId?._id,
           commission: transactionToComplete?.commission / 2,
-        },{
+        },
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -509,33 +514,46 @@ const AgentDashboard = () => {
         currentSecurityDeposit={agentData?.securityDeposit}
         decoded={decoded}
       />
-      
+
       <header className="bg-white text-black shadow-md mx-4 mx rounded-md mt-3">
-        <div className="container mx-auto p-4">
+        <div className=" mx-auto p-4">
           <div className="flex justify-between items-center mb-4">
             <div className="">
-              <h1 className="ml-3 text-xl font-bold">Agent Dashboard</h1>
-              <h1 className="ml-2 pl-2 text-md font-semibold text-gray-500 bg-gray-100 p-1 mt-2 border border-gray-200 shadow-sm shadow-gray-300 pr-4 rounded-r-full">
+              <h1 className="ml-2 text-xl font-bold">Agent Dashboard</h1>
+              <h1 className=" pl-2 text-sm md:text-base font-medium text-gray-500 bg-gray-100 p-1 mt-2 border border-gray-200 shadow-sm shadow-gray-300 pr-4 rounded-r-full">
                 Note : 50% of the commission will be transfered to the admin
               </h1>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className=" hidden lg:flex self-end space-x-4">
               <button
                 onClick={() => {
                   setIsDepositOverlayOpen(true);
                 }}
-                className="hidden md:flex items-center space-x-4"
+                className="flex items-center space-x-4"
               >
-                <div className="flex cursor-pointer text-sm font-medium text-gray-600 hover:ring-2 hover:text-gray-700 hover:ring-gray-700 items-center space-x-2 bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
+                <div className="flex  cursor-pointer ring-2 ring-gray-200 text-base font-medium text-gray-600 hover:ring-2 shadow-md shadow-black/20 hover:text-gray-700 hover:ring-gray-700 items-center space-x-2 bg-gray-50 hover:bg-gray-100 px-3 py-1 rounded-l-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
                   <Wallet size={18} />
                   <span>Deposit more to increase balance</span>
                 </div>
               </button>
             </div>
           </div>
+          <div className=" flex lg:hidden items-center mb-4 space-x-4">
+              <button
+                onClick={() => {
+                  setIsDepositOverlayOpen(true);
+                }}
+                className="flex items-center space-x-4"
+              >
+                <div className="flex  cursor-pointer text-sm font-medium ring-2 ring-gray-200 shadow-md shadow-black/20 text-gray-600 hover:ring-2 hover:text-gray-700 hover:ring-gray-700 items-center space-x-2 bg-gray-50 hover:bg-gray-100 px-3 py-1 rounded-r-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
+                  <Wallet size={16} />
+                  <span>Deposit more to increase balance</span>
+                </div>
+              </button>
+            </div>
 
           {/* Quick stats bar */}
-          <div className="grid grid-cols-2 md:grid-cols-4 justify-items-center gap-58 py-6 px-10 bg-black rounded-lg">
+          <div className="grid grid-cols-2 md:grid-cols-4 justify-items-center gap-x-32 md:gap-38 lg:gap-58 py-6 px-10 bg-black rounded-lg">
             <div className="text-center">
               <p className="text-gray-300 text-md ">Today's Transactions</p>
               <p className="text-lg font-semibold text-white">
@@ -553,7 +571,7 @@ const AgentDashboard = () => {
                 })?.length || 0}
               </p>
             </div>
-            <div className="text-center">
+            <div className="hidden md:block text-center">
               <p className="text-gray-300 text-md ">
                 {monthsMapping[new Date().getMonth() + 1]}'s Transactions
               </p>
@@ -571,13 +589,13 @@ const AgentDashboard = () => {
                 })?.length || 0}
               </p>
             </div>
-            <div className="text-center">
+            <div className="text-center hidden md:block">
               <p className="text-gray-300 text-md ">Total Transaction</p>
               <p className="text-lg font-semibold text-white">
                 {transactionsDone?.length || 0}
               </p>
             </div>
-            <div className="text-center w-56 mr-10">
+            <div className="text-center w-36 2xl:w-56 mr-10">
               <p className="text-gray-300 text-md ">Total Commission Earned</p>
               <p className="text-lg font-semibold text-white">
                 ₹
@@ -590,7 +608,7 @@ const AgentDashboard = () => {
         </div>
       </header>
 
-      <main className="container mx-auto p-4 space-y-6">
+      <main className=" mx-auto p-4 space-y-6">
         {/* Main Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-lg shadow-md shadow-gray-300 hover:shadow-lg hover:shadow-black/40 transition-all duration-300">
@@ -658,7 +676,7 @@ const AgentDashboard = () => {
               {/* All Filter */}
               <button
                 onClick={() => handleFilterChange("all")}
-                className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
+                className={`px-3 py-1.5 text-xs md:text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
                   activeFilter === "all"
                     ? "bg-gray-900 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -671,7 +689,7 @@ const AgentDashboard = () => {
               {/* Pending Filter */}
               <button
                 onClick={() => handleFilterChange("pending")}
-                className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
+                className={`px-3 py-1.5 text-xs md:text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
                   activeFilter === "pending"
                     ? "bg-gray-900 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -684,7 +702,7 @@ const AgentDashboard = () => {
               {/* Accepted Filter */}
               <button
                 onClick={() => handleFilterChange("accepted")}
-                className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
+                className={`px-3 py-1.5 text-xs md:text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
                   activeFilter === "accepted"
                     ? "bg-gray-900 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -697,7 +715,7 @@ const AgentDashboard = () => {
               {/* Rejected Filter */}
               <button
                 onClick={() => handleFilterChange("rejected")}
-                className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
+                className={`px-3 py-1.5 text-xs md:text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
                   activeFilter === "rejected"
                     ? "bg-gray-900 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -710,7 +728,7 @@ const AgentDashboard = () => {
               {/* Completed Filter */}
               <button
                 onClick={() => handleFilterChange("completed")}
-                className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
+                className={`px-3 py-1.5 text-xs md:text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
                   activeFilter === "completed"
                     ? "bg-gray-900 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -739,7 +757,7 @@ const AgentDashboard = () => {
                     <div className="flex justify-between items-center">
                       <div className="space-y-1">
                         <div className="flex items-center">
-                          <p className="font-medium">
+                          <p className="text-xs md:text-base font-medium">
                             {transaction?.conversionType === "cashToERupees"
                               ? "Deposit"
                               : "Withdrawal"}{" "}
@@ -761,38 +779,41 @@ const AgentDashboard = () => {
                               transaction?.status.slice(1)}
                           </span>
                           {transaction?.status === "accepted" && (
-                            <span className="ml-4 text-sm bg-gray-100 border border-gray-200 font-medium flex text-gray-800 rounded-xl py-0.5 items-center px-4 ">
+                            <span className="ml-4 text-xs md:text-sm  bg-gray-100 border border-gray-200 font-medium flex text-gray-800 rounded-xl py-0.5 items-center px-4 ">
                               <Info size={16} className="mt-[0px] mr-1" /> Press
                               complete button only when cash transaction with
                               user is done.
                             </span>
                           )}
                         </div>
-                        <p className="text-gray-600">
+                        <p className="text-gray-600 text-xs md:text-base ">
                           Amount: ₹{transaction?.amount} | Commission: ₹
                           {transaction?.commission || 0}
                         </p>
-                        <p className="text-gray-600">
+                        <p className="text-gray-600 text-xs md:text-base ">
                           User:{" "}
                           {capitalize(transaction?.userId?.firstName) +
                             " " +
                             capitalize(transaction?.userId?.lastName)}{" "}
                           | Note: {transaction?.notes || "No note provided"}
                         </p>
-                        <p className="text-gray-500 text-sm">
+                        <p className="text-gray-500 text-xs md:text-sm ">
                           {formatDate(transaction?.transactionDate)}
                         </p>
                       </div>
                       {transaction?.status == "pending" && (
-                        <div className="flex space-x-2">
+                        <div className="flex flex-wrap space-y-2 justify-end md:flex-nowrap sm:space-x-2">
                           <button
                             disabled={isSubmitting}
                             onClick={() => {
                               handleTransactionRequestAccept(transaction);
                             }}
-                            className="flex items-center px-4 py-2 cursor-pointer hover:shadow-lg shadow-md shadow-gray-400 transition-all duration-300 hover:shadow-black/50 bg-black text-white rounded-md hover:bg-gray-900"
+                            className="flex w-22 md:w-fit h-8 md:h-fit text-xs md:text-base  items-center px-4 py-2 cursor-pointer hover:shadow-lg shadow-md shadow-gray-400 transition-all duration-300 hover:shadow-black/50 bg-black text-white rounded-md hover:bg-gray-900"
                           >
-                            <CheckCircle size={16} className="mr-2" />
+                            <CheckCircle
+                              size={16}
+                              className="mr-2 text-xs md:text-base"
+                            />
                             Accept
                           </button>
                           <button
@@ -800,9 +821,9 @@ const AgentDashboard = () => {
                             onClick={() => {
                               handleTransactionRequestReject(transaction);
                             }}
-                            className="flex items-center px-4 py-2 cursor-pointer hover:shadow-lg shadow-md shadow-gray-400 transition-all duration-300 hover:shadow-black/50 border border-gray-300 rounded-md hover:bg-gray-50"
+                            className="flex w-23 md:w-fit h-8 md:h-fit text-xs md:text-base items-center px-4 py-2 cursor-pointer hover:shadow-lg shadow-md shadow-gray-400 transition-all duration-300 hover:shadow-black/50 border border-gray-300 rounded-md hover:bg-gray-50"
                           >
-                            <XCircle size={16} className="mr-2" />
+                            <XCircle size={16} className="mr-2 md:text-base" />
                             Decline
                           </button>
                         </div>
@@ -844,7 +865,7 @@ const AgentDashboard = () => {
           )}
         </div>
       </main>
-      <Footer/>
+      <Footer />
     </div>
   );
 };
