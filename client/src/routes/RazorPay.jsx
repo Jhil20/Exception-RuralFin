@@ -27,7 +27,7 @@ const RazorPay = () => {
 
   useEffect(() => {
     if ((formData || amount || typeOfPayment) && !hasInitiated?.current) {
-      hasInitiated?.current = true;
+      hasInitiated.current = true;
       dispatch(showLoader());
       setTimeout(() => {
         initiatePayment();
