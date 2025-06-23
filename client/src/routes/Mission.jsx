@@ -106,7 +106,7 @@ const Mission = () => {
                   className="rounded-xl shadow-lg transition-all duration-500"
                 />
               </div>
-              <div className="absolute -top-6 -left-6 bg-white border-2 border-gray-300 p-6 rounded-xl shadow-lg hover:border-black transition-all duration-300">
+              <div className="absolute -top-6 -left-4 bg-white border-2 border-gray-300 p-6 rounded-xl shadow-lg hover:border-black transition-all duration-300">
                 <Globe className="w-8 h-8 text-gray-700 mb-2" />
                 <div className="text-sm font-medium text-black">Global Impact</div>
               </div>
@@ -184,19 +184,19 @@ const Mission = () => {
               Real numbers that reflect our commitment to rural development
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center bg-white/10 border border-white/20 p-8 rounded-2xl hover:bg-white/20 transition-all duration-300">
-              <div className="text-5xl font-bold mb-4">50,000+</div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="text-center mx-2 md:mx-0 bg-white/10 border border-white/20 p-8 rounded-2xl hover:bg-white/20 transition-all duration-300">
+              <div className="text-4xl md:text-5xl font-bold mb-4">50,000+</div>
               <div className="text-xl opacity-90">Families Empowered</div>
               <div className="text-sm opacity-75 mt-2">Across 15 states in India</div>
             </div>
-            <div className="text-center bg-white/10 border border-white/20 p-8 rounded-2xl hover:bg-white/20 transition-all duration-300">
-              <div className="text-5xl font-bold mb-4">₹500Cr+</div>
+            <div className="text-center mx-2 md:mx-0 bg-white/10 border border-white/20 p-8 rounded-2xl hover:bg-white/20 transition-all duration-300">
+              <div className="text-4xl md:text-5xl font-bold mb-4">₹500Cr+</div>
               <div className="text-xl opacity-90">Credit Disbursed</div>
               <div className="text-sm opacity-75 mt-2">Supporting rural enterprises</div>
             </div>
-            <div className="text-center bg-white/10 border border-white/20 p-8 rounded-2xl hover:bg-white/20 transition-all duration-300">
-              <div className="text-5xl font-bold mb-4">1,200+</div>
+            <div className="text-center mx-2 md:mx-0 bg-white/10 border border-white/20 p-8 rounded-2xl hover:bg-white/20 transition-all duration-300">
+              <div className="text-4xl md:text-5xl font-bold mb-4">1,200+</div>
               <div className="text-xl opacity-90">Villages Reached</div>
               <div className="text-sm opacity-75 mt-2">From remote to semi-urban</div>
             </div>

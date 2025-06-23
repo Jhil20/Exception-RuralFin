@@ -90,7 +90,7 @@ const AboutUs = () => {
         {/* Stats Section */}
         <section className="py-16 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 ">
-            <div className="grid grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
               {stats.map((stat, index) => (
                 <div key={index} className="text-center group">
                   <div className="bg-white border-2 border-gray-300 rounded-2xl p-8 hover:border-black hover:shadow-xl transition-all duration-300">
@@ -148,7 +148,7 @@ const AboutUs = () => {
                     className="rounded-xl shadow-lg transition-all duration-500"
                   />
                 </div>
-                <div className="absolute -bottom-6 -right-6 bg-black text-white p-6 rounded-xl shadow-lg border-2 border-white">
+                <div className="absolute -bottom-6 -right-4 bg-black text-white p-6 rounded-xl shadow-lg border-2 border-white">
                   <div className="text-2xl font-bold">7+</div>
                   <div className="text-sm opacity-90">Years of Impact</div>
                 </div>

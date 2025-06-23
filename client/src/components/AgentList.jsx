@@ -81,10 +81,10 @@ const AgentList = ({
   };
 
   return (
-    <div className="bg-gray-50  h-full rounded-2xl p-8 shadow-md shadow-gray-300">
+    <div className="bg-gray-50 h-full rounded-2xl p-8 shadow-md shadow-gray-300">
       <h3 className="text-xl font-semibold text-black mb-6">Select an Agent</h3>
 
-      <div className="grid w-full grid-cols-3 gap-6">
+      <div className={`grid w-full grid-cols-2 ${allAgents.length>2?"grid-rows-2":"grid-rows-1"}  lg:grid-rows-1   xl:grid-cols-3 gap-6`}>
         {allAgents.map((agent) => (
           <div
             key={agent?._id}
@@ -94,8 +94,8 @@ const AgentList = ({
             }}
             className="bg-gray-100 ring-1 ring-gray-300  mx-0.5 cursor-pointer p-5 rounded-lg shadow-md hover:shadow-lg shadow-black/30 transition-all duration-300 transform hover:scale-105"
           >
-            <div className="flex items-center">
-              <div className="bg-gray-900 p-2 rounded-full mr-4">
+            <div className="flex flex-wrap items-center">
+              <div className="bg-gray-900 p-2 mb-1 sm:mb-0 rounded-full mr-4">
                 <User className="w-6 h-6 text-white" />
               </div>
               <div className="flex flex-col">

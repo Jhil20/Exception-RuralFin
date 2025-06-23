@@ -13,19 +13,18 @@ const AgentsViewMore = ({
   const [searchInput, setSearchInput] = useState("");
   const [allAgents, setAllAgents] = useState([]);
   const [filteredAgents, setFilteredAgents] = useState([]);
-  const [searchBy, setSearchBy] = useState("name");
   useEffect(() => {
     getAgents();
   }, []);
-  const token=Cookies.get("token");
+  const token = Cookies.get("token");
 
   const getAgents = async () => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/api/agent/`,{
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+      const response = await axios.get(`${BACKEND_URL}/api/agent/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       //console.log("response of geting agents", response);
       setAllAgents(response?.data?.agents);
       setFilteredAgents(response?.data?.agents);
@@ -53,7 +52,7 @@ const AgentsViewMore = ({
         </button>
       </div>
       <div className="w-full flex justify-center items-center mt-4 h-1/12 p-2">
-        <div className="relative border border-gray-300 rounded-lg hover:border-black focus-within:border-black transition-all duration-300 w-6/12 h-10">
+        <div className="relative border-1 border-gray-300 rounded-lg hover:border-black focus-within:border-black transition-all duration-300 w-9/12 h-10">
           <Search
             size={20}
             className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -67,55 +66,23 @@ const AgentsViewMore = ({
             onChange={(e) => {
               const value = e.target.value.toLowerCase();
               setSearchInput(e.target.value);
-              if (searchBy === "name") {
-                setFilteredAgents(
-                  allAgents.filter((agent) =>
+              setFilteredAgents(
+                allAgents.filter(
+                  (agent) =>
+                    agent?.city.toLowerCase().includes(value) ||
+                    agent?.state.toLowerCase().includes(value) ||
+                    agent?.country.toLowerCase().includes(value) ||
+                    agent?.zipCode.toLowerCase().includes(value) ||
                     (agent?.firstName + " " + agent?.lastName)
                       .toLowerCase()
                       .includes(value)
-                  )
-                );
-              } else {
-                setFilteredAgents(
-                  allAgents.filter(
-                    (agent) =>
-                      agent?.city.toLowerCase().includes(value) ||
-                      agent?.state.toLowerCase().includes(value) ||
-                      agent?.country.toLowerCase().includes(value) ||
-                      agent?.zipCode.toLowerCase().includes(value)
-                  )
-                );
-              }
+                )
+              );
             }}
           />
         </div>
-
-        <div className="flex h-full items-center ml-4 space-x-3">
-          <button
-            onClick={() => setSearchBy("name")}
-            className={`py-2 px-5 rounded-lg cursor-pointer border transition-all duration-200 shadow-sm hover:shadow-md 
-      ${
-        searchBy === "name"
-          ? "bg-black text-white border-black ring-1 ring-black"
-          : "bg-white text-black border-gray-300 hover:bg-gray-100"
-      }`}
-          >
-            Search by Name
-          </button>
-          <button
-            className={`py-2 px-5 rounded-lg border cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md 
-      ${
-        searchBy === "address"
-          ? "bg-black text-white border-black ring-1 ring-black"
-          : "bg-white text-black border-gray-300 hover:bg-gray-100"
-      }`}
-            onClick={() => setSearchBy("address")}
-          >
-            Search by Address
-          </button>
-        </div>
       </div>
-      <div className="h-9/12 overflow-y-auto p-4 px-8 grid grid-cols-3 grid-rows-3 gap-6 justify-items-center">
+      <div className={`h-9/12  overflow-y-auto p-4 px-8 ${filteredAgents.length ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 lg:grid-rows-3 md:gap-6":""} justify-items-center`}>
         {filteredAgents?.map((agent) => (
           <div
             key={agent?._id}
@@ -154,6 +121,13 @@ const AgentsViewMore = ({
             </div>
           </div>
         ))}
+        {filteredAgents.length == 0 && (
+          <div className="w-40 md:w-fit  h-full flex items-center justify-center">
+            <h1 className="text-xl md:text-2xl text-center font-semibold text-gray-500">
+              No Matching Agents Found
+            </h1>
+          </div>
+        )}
       </div>
     </div>
   );

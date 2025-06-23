@@ -309,7 +309,7 @@ const UserDashboard = () => {
         />
       )}
 
-      <main className="container mx-auto px-4 sm:px-6 pt-10 pb-12">
+      <main className=" mx-auto px-4 sm:px-6 pt-10 pb-12">
         <section className="mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
             Hello, {capitalize(userData?.firstName)}{" "}
@@ -319,6 +319,7 @@ const UserDashboard = () => {
             Welcome back to your financial dashboard
           </p>
         </section>
+        
 
         <div className="grid grid-cols-1 h-fit lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-1 h-full">
@@ -358,7 +359,7 @@ const UserDashboard = () => {
                 setIsReportOpen={setIsReportOpen}
               />
             ) : (
-              <div className="bg-white  rounded-2xl flex flex-wrap justify-center content-center items-center h-full p-6 shadow-sm">
+              <div className="bg-white  rounded-2xl flex flex-wrap justify-center content-center items-center h-full p-6 shadow-md shadow-gray-300">
                 <div className="w-full">
                   <h1 className="text-xl px-16 text-center font-semibold text-gray-800">
                     Budget Planning is not enabled for your account. Enable it

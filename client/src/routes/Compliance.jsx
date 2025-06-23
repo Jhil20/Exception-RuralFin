@@ -151,7 +151,7 @@ const Compliance = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Shield className="w-16 h-16 mx-auto mb-6 opacity-90" />
-          <h1 className="text-5xl  font-bold mb-6 animate-fadeIn">
+          <h1 className="text-4xl md:text-5xl  font-bold mb-6 animate-fadeIn">
             Compliance & Governance
           </h1>
           <p className="text-xl max-w-4xl mx-auto leading-relaxed opacity-90">

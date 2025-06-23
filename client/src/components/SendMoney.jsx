@@ -23,10 +23,12 @@ import Cookies from "js-cookie";
 export const SendMoney = ({ showSend, user, finance, toastControl }) => {
   const [step, setStep] = useState("form");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectPlaceholder, setSelectPlaceholder] = useState("Please select a remark");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [amount, setAmount] = useState("");
   const [password, setPassword] = useState("");
+  const [placeholder, setPlaceholder] = useState("Search Favourites by name or RuralFin ID");
   const [otp, setOtp] = useState("");
   const [favourites, setFavourites] = useState([]);
   const [filteredFavourites, setFilteredFavourites] = useState([]);
@@ -144,6 +146,10 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       toast.error("Insufficient balance");
       return;
     }
+    if(values.ruralfinId === user?.ruralFinId) {
+      toast.error("You cannot send money to yourself");
+      return;
+    }
     setIsSubmitting(true);
     try {
       const response2 = await axios.get(
@@ -192,7 +198,8 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
           amount,
           remarks,
           password,
-        },{
+        },
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -254,15 +261,16 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       // console.log("checking delete", transactionCreated._id);
       if (transactionCreated?._id) {
         const response = await axios.delete(
-          `${BACKEND_URL}/api/userToUserTransaction/${transactionCreated?._id}`,{
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+          `${BACKEND_URL}/api/userToUserTransaction/${transactionCreated?._id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         // console.log("response of transactiopn update", response);
       }
-      if(err?.response?.data?.message =="Receiver not found"){
+      if (err?.response?.data?.message == "Receiver not found") {
         toast.error("Receiver not found. Please check the RuralFin ID.");
         return;
       }
@@ -367,7 +375,8 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
       toast.error("Error occured. Transaction failed");
 
       const response = await axios.delete(
-        `${BACKEND_URL}/api/userToUserTransaction/${transactionCreated?._id}`,{
+        `${BACKEND_URL}/api/userToUserTransaction/${transactionCreated?._id}`,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -464,10 +473,28 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
     }
   };
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 740) {
+        setPlaceholder("Search Favourites");
+        setSelectPlaceholder("Select Remark")
+      } else {
+        setPlaceholder("Search Favourites by name or RuralFin ID");
+        setSelectPlaceholder("Please select a remark");
+      }
+    };
+
+    handleResize(); // Initial check
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const handleBackForm = async () => {
     try {
       const response = await axios.delete(
-        `${BACKEND_URL}/api/userToUserTransaction/${transactionCreated?._id}`,{
+        `${BACKEND_URL}/api/userToUserTransaction/${transactionCreated?._id}`,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -570,19 +597,19 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
                 }
                 setShowSend(false);
               }}
-              className="text-gray-800 p-1 h-9 w-9 transition-all duration-500 hover:bg-gray-200 rounded-lg cursor-pointer"
+              className="text-gray-800 p-1 h-8 w-8 md:h-9 md:w-9 transition-all duration-500 hover:bg-gray-200 rounded-lg cursor-pointer"
             />
             <h2 className="text-xl font-semibold text-gray-900">Send Money</h2>
             <div className="relative">
               {addFavourites ? (
                 <X
                   onClick={() => setAddFavourites(false)}
-                  className="text-gray-800 p-2 h-10 bg-gray-200 w-10 transition-all duration-500 hover:bg-gray-200 rounded-lg cursor-pointer"
+                  className="text-gray-800 p-1 h-8 w-8 md:h-9 md:w-9 bg-gray-200  transition-all duration-500 hover:bg-gray-200 rounded-lg cursor-pointer"
                 />
               ) : (
                 <Users
                   onClick={() => setAddFavourites(true)}
-                  className="h-10 w-10 text-gray-800 cursor-pointer hover:bg-gray-200 transition-all duration-500 p-2 rounded-lg"
+                  className="md:h-10 h-9 w-9 md:w-10 text-gray-800 cursor-pointer hover:bg-gray-200 transition-all duration-500 p-2 rounded-lg"
                 />
               )}
               {addFavourites && (
@@ -665,7 +692,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
                   });
                   setFilteredFavourites(filtered);
                 }}
-                placeholder="Search Favourites by name or RuralFin ID"
+                placeholder={placeholder}
                 className={`w-full pl-10 pr-4 py-2 border hover:border-gray-700 transition-all duration-300 ${
                   favourites.length === 0 ? "cursor-not-allowed" : "cursor-text"
                 } border-gray-200 rounded-lg focus:ring-black focus:border-transparent`}
@@ -695,7 +722,6 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
                         "ruralfinId",
                         user?.ruralFinId
                       );
-                      // setFieldValue("ruralFinId", user?.ruralFinId);
                     }}
                     className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-colors ${
                       selectedUser?.id === user?.id
@@ -711,12 +737,12 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
                       </span>
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">
+                      <p className="font-medium md:text-base text-sm text-gray-900">
                         {capitalize(user?.firstName) +
                           " " +
                           capitalize(user?.lastName)}
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs md:text-sm text-gray-500">
                         {user?.ruralFinId}
                       </p>
                     </div>
@@ -741,7 +767,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
                       // value={ruralFinId}
                       // onChange={(e) => setRuralFinId(e.target.value.toUpperCase())}
                       name="ruralfinId"
-                      className="w-full px-4 py-2 border border-gray-200 rounded-lg  focus:ring-black focus:border-transparent"
+                      className="w-full px-4 py-2 border hover:border-black transition-all duration-300 border-gray-200 rounded-lg  focus:ring-black focus:border-transparent"
                       placeholder="Enter RuralFin ID"
                     />
                     <ErrorMessage
@@ -763,7 +789,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
                         <Field
                           type="number"
                           name="amount"
-                          className="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg  focus:ring-black focus:border-transparent"
+                          className="w-full pl-8 pr-4 py-2 border  hover:border-black transition-all duration-300 border-gray-200 rounded-lg  focus:ring-black focus:border-transparent"
                           placeholder="0.00"
                         />
                       </div>
@@ -781,12 +807,12 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
                         <Field
                           as="select"
                           name="remarks"
-                          className="w-full pl-3 cursor-pointer pr-4 py-2 border border-gray-200 rounded-lg  focus:ring-black focus:border-transparent"
+                          className="w-full pl-3 cursor-pointer hover:border-black transition-all duration-300 pr-4 py-2 border border-gray-200 rounded-lg  focus:ring-black focus:border-transparent"
                         >
                           <option
                             disabled
                             value=""
-                            label="Please select a remark"
+                            label={selectPlaceholder}
                           />
                           <option value="Housing" label="Housing" />
                           <option value="Food & Dining" label="Food & Dining" />
@@ -814,8 +840,9 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
                       type="password"
                       name="password"
                       maxLength={4}
-                      className="w-full px-4 py-2 border border-gray-200 rounded-lg  focus:ring-black focus:border-transparent"
+                      className="w-full px-4 py-2 border hover:border-black transition-all duration-300 border-gray-200 rounded-lg  focus:ring-black focus:border-transparent"
                       placeholder="Enter your Transaction PIN"
+                        
                     />
                     <ErrorMessage
                       name="password"

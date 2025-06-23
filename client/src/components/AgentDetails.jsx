@@ -431,14 +431,14 @@ const AgentDetails = ({
   }
 
   return (
-    <div className="bg-white h-11/12 w-2/3 rounded-2xl shadow-xl transition-all duration-300 transform animate-fade-in">
+    <div className="bg-white h-11/12 w-11/12 md:w-2/3 rounded-2xl shadow-xl transition-all duration-300 transform animate-fade-in">
       {/* Header */}
       <div className="flex justify-between items-center h-22 mt-2 px-6 pb-2 border-b border-gray-100">
         <div>
-          <h2 className="text-2xl font-semibold mb-2 mt-2  text-gray-900">
+          <h2 className=" text-xl mt-4 md:text-2xl font-semibold mb-1 md:mt-2  text-gray-900">
             Agent Details
           </h2>
-          <p className="text-gray-500 mt-1">
+          <p className="text-gray-500 mt-1 text-sm md:text-base">
             {capitalize(selectedAgent?.firstName)}{" "}
             {capitalize(selectedAgent?.lastName)} | ID: {selectedAgent?._id}
           </p>
@@ -448,7 +448,7 @@ const AgentDetails = ({
             setSelectedAgent(null);
             setShowAgentDetails(false);
           }}
-          className="p-2 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors duration-200 group"
+          className= "p-1 md:p-2 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors duration-200 group"
           aria-label="Close"
         >
           <X
@@ -459,10 +459,10 @@ const AgentDetails = ({
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b h-14 border-gray-100">
+      <div className="flex w-full justify-center border-b h-14 border-gray-100">
         <button
           onClick={() => setActiveTab("info")}
-          className={`px-8 py-4 cursor-pointer border-r border-r-gray-100 font-medium transition-colors duration-200 ${
+          className={`px-8 py-4 cursor-pointer md:text-base w-1/3 text-sm border-r border-r-gray-100 font-medium transition-colors duration-200 ${
             activeTab === "info"
               ? "text-black bg-gray-50 border-b-2 border-black"
               : "text-gray-500 hover:text-gray-900"
@@ -472,7 +472,7 @@ const AgentDetails = ({
         </button>
         <button
           onClick={() => setActiveTab("transactions")}
-          className={`px-8 py-4 cursor-pointer border-r border-r-gray-100 font-medium transition-colors duration-200 ${
+          className={`px-8 py-4 cursor-pointer md:text-base w-1/3 text-sm border-r border-r-gray-100 font-medium transition-colors duration-200 ${
             activeTab === "transactions"
               ? "text-black bg-gray-50 border-b-2 border-black"
               : "text-gray-500 hover:text-gray-900"
@@ -482,7 +482,7 @@ const AgentDetails = ({
         </button>
         <button
           onClick={() => setActiveTab("history")}
-          className={`px-8 py-4 cursor-pointer font-medium transition-colors duration-200 ${
+          className={`px-2 pl-2 py-4 cursor-pointer w-1/3 md:text-base text-sm font-medium transition-colors duration-200 ${
             activeTab === "history"
               ? "text-black bg-gray-50 border-b-2 border-black"
               : "text-gray-500 hover:text-gray-900"
@@ -529,7 +529,7 @@ const AgentDetails = ({
                         </p>
                       </div>
 
-                      <div className="mb-4">
+                      <div className="md:mb-4">
                         <label className="block text-sm font-medium text-gray-500 mb-1">
                           Aadhar Number
                         </label>
@@ -601,7 +601,7 @@ const AgentDetails = ({
                           </p>
                         </div>
 
-                        <div className="mb-4">
+                        <div className="md:mb-4">
                           <label className="block text-sm font-medium text-gray-500 mb-1">
                             IFSC Code
                           </label>
@@ -677,7 +677,7 @@ const AgentDetails = ({
                         <span className="text-sm font-medium text-gray-500">
                           Commission Earned
                         </span>
-                        <span className="text-black font-bold">
+                        <span className="text-black  font-bold">
                           ₹{thisMonthCommission?.toLocaleString("en-IN")}
                         </span>
                       </div>
@@ -732,7 +732,7 @@ const AgentDetails = ({
             </div>
           </div>
         ) : activeTab === "transactions" ? (
-          <div className="grid  grid-cols-3 gap-6 gap-y-12">
+          <div className="grid grid-cols-1 xl:grid-cols-3 xl:gap-6 gap-y-12">
             <div className="col-span-2  h-full">
               <div className="bg-white rounded-xl border h-full border-gray-200 overflow-hidden shadow-sm">
                 <div className="p-6">
@@ -885,7 +885,7 @@ const AgentDetails = ({
             </div>
 
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm h-full">
+              <div className="bg-white  rounded-xl border border-gray-200 overflow-hidden shadow-sm h-full">
                 <div className="p-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-2">
                     Transaction Guidelines
@@ -946,7 +946,7 @@ const AgentDetails = ({
           </div>
         ) : (
           // Transaction History Tab
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 ">
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
               <div className="p-6">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
