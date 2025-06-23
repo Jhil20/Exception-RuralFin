@@ -26,7 +26,6 @@ import { BACKEND_URL } from "../utils/constants";
 import { useMemo } from "react";
 
 const Header = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -288,7 +287,7 @@ const Header = () => {
           </div>
         </div>
       )}
-      <div className="container mx-auto px-4 sm:px-6">
+      <div className="container mx-auto px-4 ">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div
@@ -408,7 +407,7 @@ const Header = () => {
                   handleLogout();
                 }}
                 to={"/login"}
-                className="hidden md:flex items-center space-x-4"
+                className="flex items-center space-x-4"
               >
                 <div className="flex cursor-pointer text-sm font-medium text-gray-600 hover:ring-2 hover:text-gray-700 hover:ring-gray-700 items-center space-x-2 bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
                   <User size={18} />
@@ -422,7 +421,7 @@ const Header = () => {
                 // window.location.reload();
               }}
               to={"/login"}
-              className="hidden md:flex items-center space-x-4"
+              className="flex items-center space-x-4"
             >
               <button className="flex cursor-pointer  hover:ring-2 hover:ring-gray-900 items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
                 <User size={18} />
