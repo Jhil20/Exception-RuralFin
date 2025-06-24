@@ -41,28 +41,7 @@ const UserDashboard = () => {
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [showAgentsViewMore, setShowAgentsViewMore] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
-  const budgetData = {
-    totalBudget: 50000,
-    totalSpent: 35600,
-    categoryBudgets: {
-      Food: 15000,
-      Shopping: 10000,
-      Entertainment: 8000,
-      Transportation: 5000,
-      Utilities: 7000,
-      Healthcare: 5000,
-    },
-    categorySpending: {
-      Food: 12500,
-      Shopping: 9800,
-      Entertainment: 7300,
-      Transportation: 2800,
-      Utilities: 6500,
-      Healthcare: 3700,
-    },
-  };
 
-  const categoryBudgets = Object.keys(budgetData?.categoryBudgets);
 
   const token = Cookies.get("token");
   const decoded = useMemo(() => {
@@ -303,9 +282,7 @@ const UserDashboard = () => {
         <DetailedExpenseReport
           isOpen={isReportOpen}
           onClose={() => setIsReportOpen(false)}
-          budgetData={budgetData}
-          categoryBudgets={categoryBudgets}
-          totalSpent={budgetData?.totalSpent}
+
         />
       )}
 

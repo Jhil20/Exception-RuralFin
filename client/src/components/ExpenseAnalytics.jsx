@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import { useState } from "react";
+import { getSocket } from "../utils/socket";
 
 const ExpenseAnalytics = ({
   setIsReportOpen,
@@ -28,6 +29,35 @@ const ExpenseAnalytics = ({
     getBudget();
     getTotalSpent();
   }, []);
+
+  useEffect(()=>{
+    if(!decoded)return;
+    const socket=getSocket(decoded.id);
+    const handler=(data)=>{
+      const { amount, category } = data?.transaction;
+      if (amount && category) {
+        setTotalSpent((prev) => prev + amount);
+        setBudgetData((prev) => {
+          const updatedCategorySpending = {
+            ...prev.categorySpending,
+            [category]: (prev.categorySpending[category] || 0) + amount,
+          };
+          return {
+            ...prev,
+            categorySpending: updatedCategorySpending,
+          };
+        });
+      }
+      getBudget();
+      getTotalSpent();
+    }
+    socket.on("money-received-by-receiver",handler);
+    return () => {
+      if(socket){
+        socket.off("money-received-by-receiver",handler);
+      }
+    }
+  },[decoded]);
 
   const getTotalSpent = async () => {
     try {
