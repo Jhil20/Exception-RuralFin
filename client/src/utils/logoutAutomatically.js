@@ -7,7 +7,7 @@ import { NotSignedIn } from "../redux/slices/isSignInSlice";
 
 const logoutAutomatically = () => {
   const token = Cookies.get("token");
-//   const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const location = useLocation();
 
   if (token) {
