@@ -24,8 +24,10 @@ import { SignedIn } from "../redux/slices/isSignInSlice";
 import capitalize from "../utils/capitalize";
 import { createSocket } from "../utils/socket";
 import { socketConnected } from "../redux/slices/socketSlice";
+import logoutAutomatically from "../utils/logoutAutomatically";
 
 const Login = () => {
+  logoutAutomatically();
   const [firebaseError, setFirebaseError] = useState("");
   // const [isSignup, setIsSignup] = useState(false);
   const [isOtpSent, setIsOtpSent] = useState(false);
@@ -139,7 +141,7 @@ const Login = () => {
         // console.log("SMS sent successfully:", confirmationResult);
         window.confirmationResult = confirmationResult;
         // })
-        toast.success("OTP sent successfully to " + "+91 "+values?.phoneNumber);
+        toast.success("OTP sent successfully to " +values?.phoneNumber);
         setIsOtpSent(true);
       }
     } catch (error) {

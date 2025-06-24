@@ -242,7 +242,7 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                 </div>
 
                 {agentTransaction ? (
-                  <div className="flex w-28 md:w-fit items-center justify-end">
+                  <div className="flex w-32 md:w-fit items-center justify-end">
                     <span
                       className={`text-xs md:text-sm font-semibold ${
                         transaction?.conversionType === "cashToERupees"
@@ -263,7 +263,7 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                       )}
                     </span>
 
-                    <div className="ml-1">
+                    <div className="ml-0 md:ml-2">
                       {transaction?.conversionType === "cashToERupees" ? (
                         <ArrowDownLeft size={16} className="text-green-600" />
                       ) : (
@@ -272,7 +272,7 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                     </div>
                   </div>
                 ) : (
-                  <div className="flex w-28 md:w-fit items-center justify-end">
+                  <div className="flex w-32 md:w-fit items-center justify-end">
                     <span
                       className={`text-xs md:text-sm font-semibold ${
                         transaction?.senderId != decoded.id
@@ -287,7 +287,7 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                       }).format(transaction?.amount)}
                     </span>
 
-                    <div className="ml-1">
+                    <div className="ml-0 md:ml-2">
                       {transaction?.senderId != decoded.id ? (
                         <ArrowDownLeft size={16} className="text-green-600" />
                       ) : (

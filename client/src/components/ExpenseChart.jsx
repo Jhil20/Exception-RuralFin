@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BarChart, PieChart } from 'lucide-react';
 import { Pie } from 'react-chartjs-2';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
@@ -8,6 +8,22 @@ Chart.register(ArcElement, Tooltip, Legend);
 
 const ExpenseChart = ({ budgetData, categoryBudgets }) => {
   const [chartType, setChartType] = useState('pie');
+
+  useEffect(()=>{
+    // Set initial chart type based on screen size
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setChartType('pie');
+      } 
+    };
+
+    handleResize(); // Set initial type
+    window.addEventListener('resize', handleResize); // Update on resize
+
+    return () => {
+      window.removeEventListener('resize', handleResize); // Cleanup listener
+    };
+  },[])
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {

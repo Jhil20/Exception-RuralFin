@@ -124,7 +124,7 @@ const RecentTransactions = ({
                 </div>
 
                 {agentTransaction ? (
-                  <div className="flex w-28 md:w-fit items-center justify-end">
+                  <div className="flex w-32 md:w-fit items-center justify-end">
                     <span
                       className={`text-xs md:text-sm font-semibold ${
                         transaction?.conversionType === "cashToERupees"
@@ -139,7 +139,7 @@ const RecentTransactions = ({
                       }).format(transaction?.conversionType === "cashToERupees"?transaction?.amount-transaction?.commission:transaction?.amount+transaction?.commission)}
                     </span>
 
-                    <div className="ml-1 md:ml-2">
+                    <div className="ml-0 md:ml-2">
                       {transaction?.conversionType === "cashToERupees"? (
                         <ArrowDownLeft size={16} className="text-green-600" />
                       ) : (
@@ -148,7 +148,7 @@ const RecentTransactions = ({
                     </div>
                   </div>
                 ) : (
-                  <div className="flex  w-28 md:w-fit items-center justify-end">
+                  <div className="flex  w-32 md:w-fit items-center justify-end">
                     <span
                       className={`text-xs md:text-sm font-semibold ${
                         transaction?.senderId != decoded.id
@@ -163,7 +163,7 @@ const RecentTransactions = ({
                       }).format(transaction?.amount)}
                     </span>
 
-                    <div className="ml-2">
+                    <div className="ml-0 md:ml-2">
                       {transaction?.senderId != decoded.id ? (
                         <ArrowDownLeft size={16} className="text-green-600" />
                       ) : (

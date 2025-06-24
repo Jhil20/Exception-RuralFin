@@ -51,8 +51,8 @@ const ExpenseCategoryDetails = ({
     <div className="space-y-8">
       {showViewDetails && (
         <div className="fixed h-full inset-0 bg-black/60 flex items-center justify-center z-40">
-          <div className="w-11/12 h-9/12 bg-white shadow-lg rounded-lg p-5 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
-            <div className="flex justify-between h-1/12 items-center mb-4">
+          <div className="w-12/12 md:w-9/12 h-9/12 bg-white shadow-lg rounded-lg p-5 px-2 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+            <div className="flex mx-4 justify-between h-1/12 items-center mb-4">
               <h2 className="text-xl font-semibold">
                 {whichCategory=="Food"?"Food & Dining":whichCategory=="Others"?"Other Category":whichCategory} Transactions Details
               </h2>
@@ -78,14 +78,14 @@ const ExpenseCategoryDetails = ({
                     <div className="flex items-center space-x-0">
                       <TransactionIcon type={transaction?.remarks} />
 
-                      <div className="pl-4">
+                      <div className=" pl-2 md:pl-4">
                         {transaction?.senderId == decoded.id ? (
                           <>
                             <p className="font-medium text-sm  lg:text-base text-gray-900">
                               {capitalize(transaction?.receiverId?.firstName) +
                                 " " +
                                 capitalize(transaction?.receiverId?.lastName)}
-                              <span className=" text-xs lg:text-sm text-gray-500">
+                              <span className=" text-[10px] lg:text-sm text-gray-500">
                                 {" "}
                                 - {transaction?.receiverId?.ruralFinId}
                               </span>
@@ -97,7 +97,7 @@ const ExpenseCategoryDetails = ({
                               {capitalize(transaction?.senderId?.firstName) +
                                 " " +
                                 capitalize(transaction?.senderId?.lastName)}
-                              <span className="text-xs lg:text-sm text-gray-500">
+                              <span className="text-[10px] lg:text-sm text-gray-500">
                                 {" "}
                                 - {transaction?.receiverId?.ruralFinId}
                               </span>
@@ -127,14 +127,14 @@ const ExpenseCategoryDetails = ({
                             : "text-red-600"
                         }`}
                       >
-                        {transaction?.type === "incoming" ? "+ " : "- "}
+                        {/* {transaction?.type === "incoming" ? "+ " : "- "} */}
                         {new Intl.NumberFormat("en-US", {
                           style: "currency",
                           currency: "INR",
                         }).format(transaction?.amount)}
                       </span>
 
-                      <div className="ml-1 lg:ml-2">
+                      <div className="ml-0 md:ml-2">
                         {transaction?.senderId != decoded.id ? (
                           <ArrowDownLeft size={16} className="text-green-600" />
                         ) : (

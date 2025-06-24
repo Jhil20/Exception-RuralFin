@@ -462,7 +462,7 @@ const AgentDetails = ({
       <div className="flex w-full justify-center border-b h-14 border-gray-100">
         <button
           onClick={() => setActiveTab("info")}
-          className={`px-8 py-4 cursor-pointer text-center md:text-base w-1/3 text-sm border-r border-r-gray-100 font-medium transition-colors duration-200 ${
+          className={` cursor-pointer text-center md:text-base sm:text-sm w-1/3 text-xs border-r border-r-gray-100 font-medium transition-colors duration-200 ${
             activeTab === "info"
               ? "text-black bg-gray-50 border-b-2 border-black"
               : "text-gray-500 hover:text-gray-900"
@@ -472,7 +472,7 @@ const AgentDetails = ({
         </button>
         <button
           onClick={() => setActiveTab("transactions")}
-          className={`px-8 py-4 cursor-pointer text-center md:text-base w-1/3 text-sm border-r border-r-gray-100 font-medium transition-colors duration-200 ${
+          className={` cursor-pointer text-center md:text-base sm:text-sm w-1/3 text-xs border-r border-r-gray-100 font-medium transition-colors duration-200 ${
             activeTab === "transactions"
               ? "text-black bg-gray-50 border-b-2 border-black"
               : "text-gray-500 hover:text-gray-900"
@@ -482,7 +482,7 @@ const AgentDetails = ({
         </button>
         <button
           onClick={() => setActiveTab("history")}
-          className={`px-2 pl-2 py-4 cursor-pointer w-1/3 md:text-base text-sm font-medium transition-colors duration-200 ${
+          className={` cursor-pointer w-1/3 md:text-base sm:text-sm text-xs font-medium transition-colors duration-200 ${
             activeTab === "history"
               ? "text-black bg-gray-50 border-b-2 border-black"
               : "text-gray-500 hover:text-gray-900"
@@ -1061,11 +1061,11 @@ const AgentDetails = ({
                                       ? "Deposit"
                                       : "Withdrawal"}
                                   </span>
-                                  <span className="ml-2 md:text-sm text-xs text-gray-500">
+                                  <span className="sm:ml-2 mt-1 sm:mt-0 md:text-sm text-xs text-gray-500">
                                     #{transaction?._id}
                                   </span>
                                   <span
-                                    className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
+                                    className={`ml-2 hidden sm:block px-2 py-0.5 text-xs rounded-full ${
                                       transaction?.status === "completed"
                                         ? "bg-blue-100 text-blue-800"
                                         : transaction?.status === "pending"
@@ -1090,16 +1090,37 @@ const AgentDetails = ({
                                 </div>
                               </div>
                               <div className="flex flex-col items-end">
-                                <span className="font-bold md:text-base text-sm text-black">
+                                <h1 className="font-bold md:text-base text-sm text-black">
+                                    <span>
+
+                                    </span>
+                                  <span>
                                   ₹
                                   {transaction?.amount?.toLocaleString("en-IN")}
-                                </span>
+                                  </span>
+                                </h1>
                                 <span className="text-xs text-gray-500">
                                   Commission: ₹
                                   {transaction?.commission?.toLocaleString(
                                     "en-IN"
                                   )}
                                 </span>
+                                <span
+                                    className={`ml-2 sm:hidden mt-1 block px-2 py-0.5 text-xs rounded-full ${
+                                      transaction?.status === "completed"
+                                        ? "bg-blue-100 text-blue-800"
+                                        : transaction?.status === "pending"
+                                        ? "bg-yellow-100 text-yellow-800"
+                                        : transaction?.status === "accepted"
+                                        ? "bg-green-100 text-green-800"
+                                        : "bg-red-100 text-red-800"
+                                    }`}
+                                  >
+                                    {transaction?.status
+                                      .charAt(0)
+                                      .toUpperCase() +
+                                      transaction?.status.slice(1)}
+                                  </span>
                               </div>
                             </div>
                           </div>

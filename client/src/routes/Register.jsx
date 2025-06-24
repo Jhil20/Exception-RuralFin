@@ -4,7 +4,9 @@ import Header from "../components/Header";
 import RoleSelection from "../components/RoleSelection";
 import UserForm from "../components/UserForm";
 import AgentForm from "../components/AgentForm";
+import logoutAutomatically from "../utils/logoutAutomatically";
 const Register = () => {
+  logoutAutomatically();
   const [role, setRole] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submittedData, setSubmittedData] = useState(null);
