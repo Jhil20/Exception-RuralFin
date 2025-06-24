@@ -209,7 +209,7 @@ const BudgetPlanningForm = ({
                         htmlFor="savingsGoal"
                         className="block text-sm font-medium text-gray-700"
                       >
-                        Savings Goal Amount
+                        Savings Amount
                       </label>
                       <Field
                         type="number"
@@ -235,13 +235,13 @@ const BudgetPlanningForm = ({
                   <div className="flex justify-between items-center">
                     <button
                       onClick={() => setBudgetPlanningForm(false)}
-                      className="mt-4 w-34 md:w-52 px-4 py-3 bg-black  text-white font-semibold rounded-lg shadow-lg shadow-gray-400 hover:shadow-black/60 hover:bg-gray-800 transition-all duration-300 cursor-pointer disabled:bg-gray-400"
+                      className="mt-4 w-26 md:w-52 px-4 py-3 bg-black  text-white font-semibold rounded-lg shadow-lg shadow-gray-400 hover:shadow-black/60 hover:bg-gray-800 transition-all duration-300 cursor-pointer disabled:bg-gray-400"
                     >
                       Back
                     </button>
                     <button
                       type="submit"
-                      className="mt-4 w-34 md:w-52 px-4 py-3 bg-black  text-white font-semibold rounded-lg shadow-lg shadow-gray-400 hover:shadow-black/60 hover:bg-gray-800 transition-all duration-300 cursor-pointer disabled:bg-gray-400"
+                      className="mt-4 w-26 md:w-52 px-4 py-3 bg-black  text-white font-semibold rounded-lg shadow-lg shadow-gray-400 hover:shadow-black/60 hover:bg-gray-800 transition-all duration-300 cursor-pointer disabled:bg-gray-400"
                       disabled={isSubmitting}
                     >
                       Next
@@ -267,7 +267,7 @@ const BudgetPlanningForm = ({
                         htmlFor="CBHousing"
                         className="block text-sm font-medium text-gray-700"
                       >
-                        Housing Amount
+                        Housing 
                       </label>
                       <Field
                         type="number"
@@ -287,7 +287,7 @@ const BudgetPlanningForm = ({
                         htmlFor="CBFood"
                         className="block text-sm font-medium text-gray-700"
                       >
-                        Food & Dining Amount
+                        Food & Dining 
                       </label>
                       <Field
                         type="number"
@@ -310,7 +310,7 @@ const BudgetPlanningForm = ({
                         htmlFor="CBHealthcare"
                         className="block text-sm font-medium text-gray-700"
                       >
-                        Healthcare Amount
+                        Healthcare 
                       </label>
                       <Field
                         type="number"
@@ -331,7 +331,7 @@ const BudgetPlanningForm = ({
                         htmlFor="CBEducation"
                         className="block text-sm font-medium text-gray-700"
                       >
-                        Education Amount
+                        Education 
                       </label>
                       <Field
                         type="number"
@@ -354,7 +354,7 @@ const BudgetPlanningForm = ({
                         htmlFor="CBUtilities"
                         className="block text-sm font-medium text-gray-700"
                       >
-                        Utilities Amount
+                        Utilities 
                       </label>
                       <Field
                         type="number"
@@ -374,7 +374,7 @@ const BudgetPlanningForm = ({
                         htmlFor="CBEntertainment"
                         className="block text-sm font-medium text-gray-700"
                       >
-                        Entertainment Amount
+                        Entertainment 
                       </label>
                       <Field
                         type="number"
@@ -396,7 +396,7 @@ const BudgetPlanningForm = ({
                         htmlFor="CBTransport"
                         className="block text-sm font-medium text-gray-700"
                       >
-                        Transport Amount
+                        Transport 
                       </label>
                       <Field
                         type="number"
@@ -416,7 +416,7 @@ const BudgetPlanningForm = ({
                         htmlFor="CBOthers"
                         className="block text-sm font-medium text-gray-700"
                       >
-                        Others Amount
+                        Others 
                       </label>
                       <Field
                         type="number"
@@ -443,13 +443,13 @@ const BudgetPlanningForm = ({
                   <div className="flex justify-between items-center">
                     <button
                       onClick={() => setStep(1)}
-                      className="mt-4 w-34 md:w-52 px-4 py-3 bg-black  text-white font-semibold rounded-lg shadow-lg shadow-gray-400 hover:shadow-black/60 hover:bg-gray-800 transition-all duration-300 cursor-pointer disabled:bg-gray-400"
+                      className="mt-4 w-26 md:w-52 px-4 py-3 bg-black  text-white font-semibold rounded-lg shadow-lg shadow-gray-400 hover:shadow-black/60 hover:bg-gray-800 transition-all duration-300 cursor-pointer disabled:bg-gray-400"
                     >
                       Back
                     </button>
                     <button
                       type="submit"
-                      className="mt-4 w-34 md:w-52 px-4 py-3 bg-black  text-white font-semibold rounded-lg shadow-lg shadow-gray-400 hover:shadow-black/60 hover:bg-gray-800 transition-all duration-300 cursor-pointer disabled:bg-gray-400"
+                      className="mt-4 w-26 md:w-52 px-4 py-3 bg-black  text-white font-semibold rounded-lg shadow-lg shadow-gray-400 hover:shadow-black/60 hover:bg-gray-800 transition-all duration-300 cursor-pointer disabled:bg-gray-400"
                       disabled={isSubmitting}
                     >
                       Next

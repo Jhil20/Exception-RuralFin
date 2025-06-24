@@ -26,7 +26,7 @@ function App() {
   useEffect(() => {
     if (!decoded) return;
     const socket = getSocket(decoded.id);
-    const handler1 =async (data) => {
+    const handler1 = async (data) => {
       // console.log("User Agent Request Accepted :", data);
       if (data.userId._id == decoded.id) {
         toast.success(
@@ -50,7 +50,7 @@ function App() {
       }
     };
 
-    const handler2 =async (data) => {
+    const handler2 = async (data) => {
       // console.log("User Agent Request Rejected:", data);
       if (data.userId._id == decoded.id) {
         toast.error(
@@ -73,7 +73,7 @@ function App() {
         );
       }
     };
-    const handler3 =async  (data) => {
+    const handler3 = async (data) => {
       // console.log("request completed deposit");
       if (data?.userId?._id == decoded?.id) {
         toast.info(
@@ -94,12 +94,14 @@ function App() {
               ? "cash to eRupees"
               : "eRupees to cash"
           } request has been completed by ${capitalize(
-            data.agentId.firstName
-          )}  ${capitalize(data.agentId.lastName)} and ₹${data.amount - data.commission} has been deposited successfully`)
+          data.agentId.firstName
+        )}  ${capitalize(data.agentId.lastName)} and ₹${
+          data.amount - data.commission
+        } has been deposited successfully`);
       }
     };
 
-    const handler4 =async (data) => {
+    const handler4 = async (data) => {
       if (data.userId._id == decoded.id) {
         toast.info(
           `Your ${
@@ -119,8 +121,10 @@ function App() {
               ? "cash to eRupees"
               : "eRupees to cash"
           } request has been completed by ${capitalize(
-            data.agentId.firstName
-          )} ${capitalize(data.agentId.lastName)} and ₹${data.amount + data.commission} has been withdrawn successfully`)
+          data.agentId.firstName
+        )} ${capitalize(data.agentId.lastName)} and ₹${
+          data.amount + data.commission
+        } has been withdrawn successfully`);
       }
     };
     if (socket) {
@@ -146,6 +150,7 @@ function App() {
       {location.pathname != "/razorpay" && <Header />}
       <ToastContainer
         className={"z-50"}
+        toastClassName="!max-w-[220px] sm:!max-w-[250px] md:!max-w-md !rounded-xl !shadow-lg !text-sm sm:!text-sm md:!text-base"
         position="top-right"
         autoClose={5000}
         hideProgressBar={false}

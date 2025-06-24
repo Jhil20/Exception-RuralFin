@@ -75,10 +75,10 @@ const ExpenseCategoryDetails = ({
                     key={transaction?._id}
                     className="flex items-center justify-between py-3 border-b-[1px] border-gray-400 last:border-0"
                   >
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-0">
                       <TransactionIcon type={transaction?.remarks} />
 
-                      <div className="pl-4 ">
+                      <div className="pl-4">
                         {transaction?.senderId == decoded.id ? (
                           <>
                             <p className="font-medium text-sm  lg:text-base text-gray-900">

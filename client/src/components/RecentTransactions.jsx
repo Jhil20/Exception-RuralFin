@@ -10,7 +10,7 @@ const RecentTransactions = ({
   userFinance,
   budgetPlanningEnabled,
 }) => {
-  return (
+    return (
     <div className="bg-white min-h-full rounded-2xl p-6 shadow-md shadow-gray-300">
       <div className="flex justify-between items-center mb-3">
         <h3 className="text-xl font-semibold text-gray-900">
@@ -51,13 +51,13 @@ const RecentTransactions = ({
                   {agentTransaction ? (
                     transaction?.conversionType === "cashToERupees" ? (
                       <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center bg-gray-200`}
+                        className={`p-2 rounded-full flex items-center justify-center bg-gray-200`}
                       >
                         <ArrowDownLeft size={16} className="text-gray-800" />
                       </div>
                     ) : (
                       <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center bg-gray-200`}
+                        className={`p-2 rounded-full flex items-center justify-center bg-gray-200`}
                       >
                         <ArrowUpRight size={16} className="text-gray-800" />
                       </div>
@@ -69,11 +69,11 @@ const RecentTransactions = ({
                   <div>
                     {agentTransaction ? (
                       <>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium md:text-base text-sm text-gray-900">
                           {capitalize(transaction?.agentId?.firstName) +
                             " " +
                             capitalize(transaction?.agentId?.lastName)}
-                          <span className="text-sm text-gray-500">
+                          <span className="text-xs md:text-sm text-gray-500">
                             {" "}
                             -{" "}
                             {transaction?.conversionType === "cashToERupees"
@@ -84,11 +84,11 @@ const RecentTransactions = ({
                       </>
                     ) : transaction?.senderId == decoded.id ? (
                       <>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium md:text-base text-sm text-gray-900">
                           {capitalize(transaction?.receiverId?.firstName) +
                             " " +
                             capitalize(transaction?.receiverId?.lastName)}
-                          <span className="text-sm text-gray-500">
+                          <span className="text-xs md:text-sm text-gray-500">
                             {" "}
                             - {transaction?.remarks}
                           </span>
@@ -96,11 +96,11 @@ const RecentTransactions = ({
                       </>
                     ) : (
                       <>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium md:text-base text-sm text-gray-900">
                           {capitalize(transaction?.senderId?.firstName) +
                             " " +
                             capitalize(transaction?.senderId?.lastName)}
-                          <span className="text-sm text-gray-500">
+                          <span className="text-xs md:text-sm text-gray-500">
                             {" "}
                             - {transaction?.remarks}
                           </span>
@@ -124,9 +124,9 @@ const RecentTransactions = ({
                 </div>
 
                 {agentTransaction ? (
-                  <div className="flex items-center">
+                  <div className="flex w-28 md:w-fit items-center justify-end">
                     <span
-                      className={`text-sm font-semibold ${
+                      className={`text-xs md:text-sm font-semibold ${
                         transaction?.conversionType === "cashToERupees"
                           ? "text-green-600"
                           : "text-red-600"
@@ -139,7 +139,7 @@ const RecentTransactions = ({
                       }).format(transaction?.conversionType === "cashToERupees"?transaction?.amount-transaction?.commission:transaction?.amount+transaction?.commission)}
                     </span>
 
-                    <div className="ml-2">
+                    <div className="ml-1 md:ml-2">
                       {transaction?.conversionType === "cashToERupees"? (
                         <ArrowDownLeft size={16} className="text-green-600" />
                       ) : (
@@ -148,9 +148,9 @@ const RecentTransactions = ({
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-center">
+                  <div className="flex  w-28 md:w-fit items-center justify-end">
                     <span
-                      className={`text-sm font-semibold ${
+                      className={`text-xs md:text-sm font-semibold ${
                         transaction?.senderId != decoded.id
                           ? "text-green-600"
                           : "text-red-600"

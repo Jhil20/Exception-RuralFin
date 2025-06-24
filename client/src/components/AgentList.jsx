@@ -84,7 +84,7 @@ const AgentList = ({
     <div className="bg-gray-50 h-full rounded-2xl p-8 shadow-md shadow-gray-300">
       <h3 className="text-xl font-semibold text-black mb-6">Select an Agent</h3>
 
-      <div className={`grid w-full grid-cols-2 ${allAgents.length>2?"grid-rows-2":"grid-rows-1"}  lg:grid-rows-1   xl:grid-cols-3 gap-6`}>
+      <div className={`grid w-full grid-cols-1 sm:grid-cols-2 ${allAgents.length>2?"grid-rows-2":"grid-rows-1"}  lg:grid-rows-1   xl:grid-cols-3 gap-6`}>
         {allAgents.map((agent) => (
           <div
             key={agent?._id}

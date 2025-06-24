@@ -418,7 +418,7 @@ const Header = () => {
               to={"/login"}
               className="flex items-center space-x-4"
             >
-              <button className="flex cursor-pointer  hover:ring-2 hover:ring-gray-900 items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-full focus:outline-none ring-2 ring-gray-300 transition-all duration-300">
+              <button className="flex cursor-pointer  hover:ring-2 hover:ring-gray-900 items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-full focus:outline-none  transition-all duration-300">
                 <User size={18} />
                 <span className="text-sm font-medium text-gray-800">
                   Account

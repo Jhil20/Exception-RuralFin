@@ -513,14 +513,15 @@ const AgentDashboard = () => {
         currentBalance={agentData?.balance}
         currentSecurityDeposit={agentData?.securityDeposit}
         decoded={decoded}
+        agentData={agentData}
       />
 
       <header className="bg-white text-black shadow-md mx-4 mx rounded-md mt-3">
         <div className=" mx-auto p-4">
           <div className="flex justify-between items-center mb-4">
             <div className="">
-              <h1 className="ml-2 text-xl font-bold">Agent Dashboard</h1>
-              <h1 className=" pl-2 text-sm md:text-base font-medium text-gray-500 bg-gray-100 p-1 mt-2 border border-gray-200 shadow-sm shadow-gray-300 pr-4 rounded-r-full">
+              <h1 className="ml-2 text-lg md:text-xl font-bold">Agent Dashboard</h1>
+              <h1 className=" pl-2 text-xs sm:text-sm md:text-base font-medium text-gray-500 bg-gray-100 p-1 mt-2 border border-gray-200 shadow-sm shadow-gray-300 pr-4 rounded-r-full">
                 Note : 50% of the commission will be transfered to the admin
               </h1>
             </div>
@@ -531,7 +532,7 @@ const AgentDashboard = () => {
                 }}
                 className="flex items-center space-x-4"
               >
-                <div className="flex  cursor-pointer ring-2 ring-gray-200 text-base font-medium text-gray-600 hover:ring-2 shadow-md shadow-black/20 hover:text-gray-700 hover:ring-gray-700 items-center space-x-2 bg-gray-50 hover:bg-gray-100 px-3 py-1 rounded-l-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
+                <div className="flex  cursor-pointer ring-2 ring-gray-200 text-xs sm:text-sm md:text-base font-medium text-gray-600 hover:ring-2 shadow-md shadow-black/20 hover:text-gray-700 hover:ring-gray-700 items-center space-x-2 bg-gray-50 hover:bg-gray-100 px-3 py-1 rounded-l-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
                   <Wallet size={18} />
                   <span>Deposit more to increase balance</span>
                 </div>
@@ -545,7 +546,7 @@ const AgentDashboard = () => {
                 }}
                 className="flex items-center space-x-4"
               >
-                <div className="flex  cursor-pointer text-sm font-medium ring-2 ring-gray-200 shadow-md shadow-black/20 text-gray-600 hover:ring-2 hover:text-gray-700 hover:ring-gray-700 items-center space-x-2 bg-gray-50 hover:bg-gray-100 px-3 py-1 rounded-r-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
+                <div className="flex  cursor-pointer text-xs sm:text-sm md:text-base font-medium ring-2 ring-gray-200 shadow-md shadow-black/20 text-gray-600 hover:ring-2 hover:text-gray-700 hover:ring-gray-700 items-center space-x-2 bg-gray-50 hover:bg-gray-100 px-3 py-1 rounded-r-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
                   <Wallet size={16} />
                   <span>Deposit more to increase balance</span>
                 </div>
@@ -554,9 +555,9 @@ const AgentDashboard = () => {
 
           {/* Quick stats bar */}
           <div className="grid grid-cols-2 md:grid-cols-4 justify-items-center gap-x-32 md:gap-38 lg:gap-58 py-6 px-10 bg-black rounded-lg">
-            <div className="text-center">
-              <p className="text-gray-300 text-md ">Today's Transactions</p>
-              <p className="text-lg font-semibold text-white">
+            <div className="text-center ">
+              <p className="text-gray-300 text-xs md:text-base ">Today's Transactions</p>
+              <p className="text-base md:text-lg font-semibold text-white">
                 {transactionsDone?.filter((tr) => {
                   const today = new Date();
                   const transactionDate = new Date(tr?.transactionDate);
@@ -572,7 +573,7 @@ const AgentDashboard = () => {
               </p>
             </div>
             <div className="hidden md:block text-center">
-              <p className="text-gray-300 text-md ">
+              <p className="text-gray-300 text-base ">
                 {monthsMapping[new Date().getMonth() + 1]}'s Transactions
               </p>
               <p className="text-lg font-semibold text-white">
@@ -590,14 +591,14 @@ const AgentDashboard = () => {
               </p>
             </div>
             <div className="text-center hidden md:block">
-              <p className="text-gray-300 text-md ">Total Transaction</p>
+              <p className="text-gray-300 text-base ">Total Transaction</p>
               <p className="text-lg font-semibold text-white">
                 {transactionsDone?.length || 0}
               </p>
             </div>
-            <div className="text-center w-36 2xl:w-56 mr-10">
-              <p className="text-gray-300 text-md ">Total Commission Earned</p>
-              <p className="text-lg font-semibold text-white">
+            <div className="text-center w-24 2xl:w-56 mr-10">
+              <p className="text-gray-300 text-xs md:text-base ">Total Commission Earned</p>
+              <p className="text-base md:text-lg font-semibold text-white">
                 ₹
                 {allCommissions?.reduce((acc, commission) => {
                   return acc + (commission?.totalCommissionEarned || 0);
@@ -676,7 +677,7 @@ const AgentDashboard = () => {
               {/* All Filter */}
               <button
                 onClick={() => handleFilterChange("all")}
-                className={`px-3 py-1.5 text-xs md:text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
+                className={`px-2 md:px-3 py-1.5 text-xs md:text-sm rounded-md cursor-pointer transition-colors duration-200 flex items-center ${
                   activeFilter === "all"
                     ? "bg-gray-900 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -753,8 +754,8 @@ const AgentDashboard = () => {
                   );
                 })
                 ?.map((transaction) => (
-                  <div key={transaction?._id} className="px-8 py-4">
-                    <div className="flex justify-between items-center">
+                  <div key={transaction?._id} className="px-2 md:px-8 py-4">
+                    <div className="sm:flex sm:justify-between grid grid-cols-1 gap-y-4 justify-items-center sm:items-center">
                       <div className="space-y-1">
                         <div className="flex items-center">
                           <p className="text-xs md:text-base font-medium">
@@ -763,7 +764,7 @@ const AgentDashboard = () => {
                               : "Withdrawal"}{" "}
                             Request #{transaction?._id || ""}
                           </p>
-
+                              
                           <span
                             className={`ml-2 px-2 py-0.5 rounded-full text-xs font-normal ${
                               transaction?.status === "rejected"
@@ -779,7 +780,7 @@ const AgentDashboard = () => {
                               transaction?.status.slice(1)}
                           </span>
                           {transaction?.status === "accepted" && (
-                            <span className="ml-4 text-xs md:text-sm  bg-gray-100 border border-gray-200 font-medium flex text-gray-800 rounded-xl py-0.5 items-center px-4 ">
+                            <span className=" hidden ml-4 text-xs md:text-sm w-56 md:w-fit bg-gray-100 border border-gray-200 font-medium sm:flex text-gray-800 rounded-xl py-0.5 items-center px-4 ">
                               <Info size={16} className="mt-[0px] mr-1" /> Press
                               complete button only when cash transaction with
                               user is done.
@@ -800,9 +801,16 @@ const AgentDashboard = () => {
                         <p className="text-gray-500 text-xs md:text-sm ">
                           {formatDate(transaction?.transactionDate)}
                         </p>
+                        {transaction?.status === "accepted" && (
+                            <span className=" sm:hidden mt-2 text-xs md:text-sm w-full bg-gray-100 border border-gray-200  flex text-gray-800 rounded-xl py-0.5 items-center px-2 ">
+                              <Info size={16} className="mt-[0px] mr-1" /> Press
+                              complete button only when cash transaction with
+                              user is done.
+                            </span>
+                          )}
                       </div>
                       {transaction?.status == "pending" && (
-                        <div className="flex flex-wrap space-y-2 justify-end md:flex-nowrap sm:space-x-2">
+                        <div className="flex flex-wrap space-x-2 sm:space-y-2 justify-end md:flex-nowrap sm:space-x-2">
                           <button
                             disabled={isSubmitting}
                             onClick={() => {
@@ -846,7 +854,7 @@ const AgentDashboard = () => {
                                 );
                               }
                             }}
-                            className="flex items-center px-4 py-2 cursor-pointer hover:shadow-lg shadow-md shadow-gray-400 transition-all duration-300 hover:shadow-black/50 bg-black text-white rounded-md hover:bg-gray-900"
+                            className="flex w-23 md:w-fit h-8 md:h-fit text-xs md:text-base items-center px-4 py-2 cursor-pointer hover:shadow-lg shadow-md shadow-gray-400 transition-all duration-300 hover:shadow-black/50 bg-black text-white rounded-md hover:bg-gray-900"
                           >
                             <CheckCircle size={16} className="mr-2" />
                             Complete

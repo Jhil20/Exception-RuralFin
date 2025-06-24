@@ -7,7 +7,7 @@ import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 Chart.register(ArcElement, Tooltip, Legend);
 
 const ExpenseChart = ({ budgetData, categoryBudgets }) => {
-  const [chartType, setChartType] = useState('bar');
+  const [chartType, setChartType] = useState('pie');
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {
@@ -92,7 +92,7 @@ const ExpenseChart = ({ budgetData, categoryBudgets }) => {
         <div className="flex bg-gray-100 rounded-lg p-1">
           <button
             onClick={() => setChartType('bar')}
-            className={`p-2 rounded-md text-sm flex cursor-pointer items-center transition-all duration-200 ${
+            className={`p-2 hidden md:flex rounded-md text-sm cursor-pointer items-center transition-all duration-200 ${
               chartType === 'bar' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
             }`}
           >
@@ -144,7 +144,7 @@ const ExpenseChart = ({ budgetData, categoryBudgets }) => {
           </div>
         ) : (
           <div className="relative w-full h-full flex items-center justify-center">
-            <div className="w-full h-full max-w-[270px]  lg:max-w-[400px] lg:max-h-[280px]">
+            <div className="w-full h-full max-w-[240px]  lg:max-w-[400px] lg:max-h-[280px]">
               <Pie data={pieData} options={pieOptions} />
             </div>
           </div>

@@ -113,8 +113,10 @@ const UserForm = ({ resetRole, setUserFormStep2 }) => {
 
       setTimeout(() => {
         dispatch(SignedIn());
+        dispatch(hideLoader());
         navigate("/dashboard");
       }, 2000);
+      dispatch(showLoader())
       setUserFormStep2(false);
       setUserData(null);
       setStep(1);

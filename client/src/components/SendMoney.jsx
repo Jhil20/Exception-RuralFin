@@ -529,7 +529,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
         <div id="recaptcha-container"></div>
       </div>
       {step == "otp" ? (
-        <div className="bg-white w-1/3 rounded-xl shadow-lg p-6">
+        <div className="bg-white w-11/12 lg:w-1/3 rounded-xl shadow-lg p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-900">
               Verify Transfer
@@ -546,7 +546,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
               <p className="text-sm text-gray-600">
                 Sending to :
                 {receiverUser
-                  ? capitalize(receiverUser?.firstName) +
+                  ?" "+ capitalize(receiverUser?.firstName) +
                     " " +
                     capitalize(receiverUser?.lastName) +
                     " ( " +
@@ -586,7 +586,7 @@ export const SendMoney = ({ showSend, user, finance, toastControl }) => {
           </form>
         </div>
       ) : (
-        <div className="bg-white h-fit  w-2/3 rounded-xl shadow-lg p-6 relative">
+        <div className="bg-white h-fit w-11/12 lg:w-9/12 rounded-xl shadow-lg p-6 relative">
           <div className="flex items-center justify-between mb-6">
             <X
               onClick={() => {

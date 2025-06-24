@@ -10,7 +10,7 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
   const [isAgentTransaction, setIsAgentTransaction] = useState(false);
   // console.log("transactionData", transactionData);
   return (
-    <div className="w-11/12 lg:w-2/3 h-10/12 bg-white rounded-lg shadow-lg p-6">
+    <div className="w-11/12 lg:w-9/12 h-10/12 bg-white rounded-lg shadow-lg p-6">
       {transactionInfo != null && showTransactionInfo == true && (
         <div className="fixed top-0 left-0 w-full h-full bg-black/40 flex justify-center items-center z-50">
           <div className="bg-white w-10/12 lg:w-1/3 h-fit  rounded-2xl shadow-xl p-8 relative">
@@ -163,19 +163,19 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                     setIsAgentTransaction(false);
                   }
                 }}
-                className="flex px-4 rounded-lg items-center cursor-pointer hover:bg-gray-100 transition-all duration-200 justify-between py-3 border-b border-gray-100 last:border-0"
+                className="flex rounded-lg items-center cursor-pointer hover:bg-gray-100 transition-all duration-200 justify-between py-3 border-b border-gray-100 last:border-0"
               >
                 <div className="flex items-center space-x-3">
                   {agentTransaction ? (
                     transaction?.conversionType === "cashToERupees" ? (
                       <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center bg-gray-200`}
+                        className={` p-2 rounded-full flex items-center justify-center bg-gray-200`}
                       >
                         <ArrowDownCircle size={16} className="text-gray-800" />
                       </div>
                     ) : (
                       <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center bg-gray-200`}
+                        className={` p-2 rounded-full flex items-center justify-center bg-gray-200`}
                       >
                         <ArrowDownLeft size={16} className="text-gray-800" />
                       </div>
@@ -242,9 +242,9 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                 </div>
 
                 {agentTransaction ? (
-                  <div className="flex items-center">
+                  <div className="flex w-28 md:w-fit items-center justify-end">
                     <span
-                      className={`text-sm font-semibold ${
+                      className={`text-xs md:text-sm font-semibold ${
                         transaction?.conversionType === "cashToERupees"
                           ? "text-green-600"
                           : "text-red-600"
@@ -263,7 +263,7 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                       )}
                     </span>
 
-                    <div className="ml-2">
+                    <div className="ml-1">
                       {transaction?.conversionType === "cashToERupees" ? (
                         <ArrowDownLeft size={16} className="text-green-600" />
                       ) : (
@@ -272,9 +272,9 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-center">
+                  <div className="flex w-28 md:w-fit items-center justify-end">
                     <span
-                      className={`text-sm font-semibold ${
+                      className={`text-xs md:text-sm font-semibold ${
                         transaction?.senderId != decoded.id
                           ? "text-green-600"
                           : "text-red-600"
@@ -287,7 +287,7 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                       }).format(transaction?.amount)}
                     </span>
 
-                    <div className="ml-2">
+                    <div className="ml-1">
                       {transaction?.senderId != decoded.id ? (
                         <ArrowDownLeft size={16} className="text-green-600" />
                       ) : (

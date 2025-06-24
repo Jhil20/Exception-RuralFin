@@ -12,12 +12,12 @@ import { createSocket, getSocket } from "../utils/socket";
 import speak from "../utils/speak";
 import useAuth from "../utils/useAuth";
 
-
 const RazorPay = () => {
   useAuth();
   const location = useLocation();
   const formData = location?.state?.data || null;
   const amount = location?.state?.amount || null;
+  const agentData = location?.state?.agentData || null;
   const typeOfPayment = location?.state?.type || "FirstTimeDeposit";
   const agentId = location?.state?.agentId || null;
   const dispatch = useDispatch();
@@ -43,7 +43,8 @@ const RazorPay = () => {
         {
           agentId,
           amount,
-        },{
+        },
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -76,10 +77,8 @@ const RazorPay = () => {
       dispatch(hideLoader());
       toast.success("Security deposit increased successfully by ₹" + amount);
       await speak(`Security deposit increased successfully by ₹${amount}`);
-      setTimeout(() => {
-        navigate("/agentDashboard");
-        window.location.reload();
-      }, 500);
+      navigate("/agentDashboard");
+      window.location.reload();
     } catch (error) {
       console.error("Error increasing security deposit:", error);
       toast.error("Failed to increase security deposit");
@@ -158,9 +157,12 @@ const RazorPay = () => {
           }
         },
         prefill: {
-          name: formData?.name || "",
-          email: formData?.email || "",
-          contact: formData?.phone || "",
+          name:
+            formData?.firstName + formData?.lastName ||
+            agentData?.firstName + agentData?.lastName ||
+            "",
+          email: formData?.email || agentData?.email || "",
+          contact: formData?.phone || agentData?.phone || "",
         },
         modal: {
           escape: false,
@@ -221,10 +223,8 @@ const RazorPay = () => {
         razorPayInstance.close();
       }
       dispatch(hideLoader());
-      setTimeout(() => {
-        navigate("/agentDashboard");
-        window.location.reload();
-      }, 500);
+      navigate("/agentDashboard");
+      window.location.reload();
     } catch (error) {
       console.error("Error creating agent:", error);
     }

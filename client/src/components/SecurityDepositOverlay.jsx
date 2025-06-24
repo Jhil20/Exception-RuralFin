@@ -10,6 +10,7 @@ const SecurityDepositOverlay = ({
   currentBalance,
   currentSecurityDeposit,
   decoded,
+  agentData,
 }) => {
   const [depositAmount, setDepositAmount] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -26,6 +27,7 @@ const SecurityDepositOverlay = ({
     try {
       navigate("/razorpay", {
         state: {
+          agentData,
           agentId: decoded.id,
           amount: parseFloat(depositAmount),
           type: "increaseSecurityDeposit",
@@ -50,18 +52,18 @@ const SecurityDepositOverlay = ({
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-xs flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto box-content">
+      <div className="bg-white rounded-lg shadow-2xl max-w-md w-11/12 md:w-9/12 max-h-[90vh] overflow-y-auto box-content">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <Shield className="w-6 h-6 text-black" />
-            <h2 className="text-xl font-bold text-black">
+            <h2 className="text-base md:text-xl font-bold text-black">
               Increase Security Deposit
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors"
+            className="p-1 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors"
           >
             <X className="w-5 h-5 text-gray-900" />
           </button>
@@ -72,13 +74,13 @@ const SecurityDepositOverlay = ({
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-1">Current Balance</p>
-              <p className="text-2xl font-bold text-black">
+              <p className="text-xl md:text-2xl font-bold text-black">
                 ₹{currentBalance.toLocaleString()}
               </p>
             </div>
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-1">Security Deposit</p>
-              <p className="text-2xl font-bold text-black">
+              <p className="text-xl md:text-2xl font-bold text-black">
                 ₹{currentSecurityDeposit.toLocaleString()}
               </p>
             </div>

@@ -33,7 +33,7 @@ const AgentsViewMore = ({
     }
   };
   return (
-    <div className="bg-white h-11/12 w-2/3 rounded-2xl shadow-xl transition-all duration-300 transform animate-fade-in">
+    <div className="bg-white h-11/12 w-11/12 lg:w-9/12 rounded-2xl shadow-xl transition-all duration-300 transform animate-fade-in">
       <div className="flex justify-between items-center h-18 mt-2 px-6 pb-2 border-b border-gray-300">
         <h2 className="text-2xl ml-2 font-semibold text-gray-900">
           Agent List
