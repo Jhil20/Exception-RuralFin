@@ -122,8 +122,8 @@ const AgentsViewMore = ({
           </div>
         ))}
         {filteredAgents.length == 0 && (
-          <div className="w-40 md:w-fit  h-full flex items-center justify-center">
-            <h1 className="text-xl md:text-2xl text-center font-semibold text-gray-500">
+          <div className="w-full md:w-fit h-full flex items-center justify-center">
+            <h1 className="text-xl w-40 md:w-fit md:text-2xl text-center font-semibold text-gray-500">
               No Matching Agents Found
             </h1>
           </div>

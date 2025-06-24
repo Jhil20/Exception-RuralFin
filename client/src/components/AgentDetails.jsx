@@ -462,7 +462,7 @@ const AgentDetails = ({
       <div className="flex w-full justify-center border-b h-14 border-gray-100">
         <button
           onClick={() => setActiveTab("info")}
-          className={`px-8 py-4 cursor-pointer md:text-base w-1/3 text-sm border-r border-r-gray-100 font-medium transition-colors duration-200 ${
+          className={`px-8 py-4 cursor-pointer text-center md:text-base w-1/3 text-sm border-r border-r-gray-100 font-medium transition-colors duration-200 ${
             activeTab === "info"
               ? "text-black bg-gray-50 border-b-2 border-black"
               : "text-gray-500 hover:text-gray-900"
@@ -472,7 +472,7 @@ const AgentDetails = ({
         </button>
         <button
           onClick={() => setActiveTab("transactions")}
-          className={`px-8 py-4 cursor-pointer md:text-base w-1/3 text-sm border-r border-r-gray-100 font-medium transition-colors duration-200 ${
+          className={`px-8 py-4 cursor-pointer text-center md:text-base w-1/3 text-sm border-r border-r-gray-100 font-medium transition-colors duration-200 ${
             activeTab === "transactions"
               ? "text-black bg-gray-50 border-b-2 border-black"
               : "text-gray-500 hover:text-gray-900"
@@ -948,7 +948,7 @@ const AgentDetails = ({
           // Transaction History Tab
           <div className="grid grid-cols-1 ">
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-              <div className="p-6">
+              <div className="md:p-6 p-2">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-4 md:mb-0 flex items-center">
                     <History size={18} className="mr-2" />
@@ -1054,7 +1054,7 @@ const AgentDetails = ({
                           <div className="p-4 bg-white">
                             <div className="flex flex-col md:flex-row justify-between">
                               <div className="mb-2 md:mb-0">
-                                <div className="flex items-center mb-1">
+                                <div className="flex flex-wrap sm:flex-nowrap items-center mb-1">
                                   <span className="font-medium text-gray-900 md:text-base text-sm">
                                     {transaction?.conversionType ===
                                     "cashToERupees"
