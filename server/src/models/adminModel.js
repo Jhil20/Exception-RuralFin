@@ -8,7 +8,6 @@ const adminSchema = new Schema({
   phone: { type: String, required: true },
   password: { type: String, required: true },
   role: { type: String,  default: 'admin' },
-  profitPerMonth: { type: Number, default: 0 },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Admin', adminSchema);

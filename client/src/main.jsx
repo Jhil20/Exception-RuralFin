@@ -13,14 +13,6 @@ import store from "./redux/store/store";
 import RazorPay from "./routes/RazorPay";
 import AgentDashboard from "./routes/AgentDashboard";
 import AdminDashboard from "./routes/AdminDashboard";
-import LearningDashboard from "./components/LearningDashboard";
-import AboutUs from "./routes/AboutUs";
-import Compliance from "./routes/Compliance";
-import Licenses from "./routes/Licenses";
-import Mission from "./routes/Mission";
-import PrivacyPolicy from "./routes/PrivacyPolicy";
-import TermsOfService from "./routes/TermsOfService";
-
 //start by fixing transaction otp and  user to user debit and credit
 
 const appRouter = createBrowserRouter([

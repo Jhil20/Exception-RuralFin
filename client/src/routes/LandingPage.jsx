@@ -4,7 +4,6 @@ import Features from "../components/Features";
 import AgentModel from "../components/AgentModel";
 import SecuritySection from "../components/SecuritySection";
 import BudgetTracking from "../components/BudgetTracking";
-import FinancialLiteracy from "../components/FinancialLiteracy";
 import Stats from "../components/Stats";
 import { useGSAP } from "../hooks/useGSAP";
 import LandingFooter from "../components/LandingFooter";

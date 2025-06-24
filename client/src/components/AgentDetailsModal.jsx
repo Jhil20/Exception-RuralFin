@@ -14,7 +14,6 @@ import {
   KeyRound,
 } from "lucide-react";
 import Modal from "../components/Modal";
-import Button from "../components/Button";
 import Card from "../components/Card";
 import { toast } from "react-toastify";
 import capitalize from "../utils/capitalize";

@@ -10,7 +10,6 @@ import {
   TrendingDown,
 } from "lucide-react";
 import Card from "../components/Card";
-import Button from "../components/Button";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
