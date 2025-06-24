@@ -177,7 +177,7 @@ const Header = () => {
     <header className="bg-white border-b h-[9.1vh] border-gray-200 sticky w-full top-0 z-50 shadow-sm">
       {showNotifications && (
         <div className="fixed inset-0 bg-black/30  backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="lg:h-10/12 w-9/12 lg:w-6/12 p-6 bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="h-11/12 lg:h-10/12 w-11/12 lg:w-6/12 p-6 bg-white rounded-xl shadow-lg overflow-hidden">
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center">
                 <h2 className="text-2xl font-semibold text-gray-900">
@@ -212,7 +212,7 @@ const Header = () => {
                   {notifications.map((notification) => (
                     <div
                       key={notification._id}
-                      className={`p-4 rounded-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-md ${
+                      className={`p-2 lg:p-4 rounded-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-md ${
                         notification.read
                           ? "bg-gray-50"
                           : "bg-white border-l-4 border-gray-900 shadow-sm"
@@ -230,7 +230,7 @@ const Header = () => {
                     >
                       <div className="flex items-start">
                         <div
-                          className={`p-2 rounded-full mr-3 ${
+                          className={`p-2 rounded-full mr-2 lg:mr-3 ${
                             notification.read ? "bg-gray-100" : "bg-gray-200"
                           }`}
                         >
@@ -261,7 +261,7 @@ const Header = () => {
                             {!notification.read && (
                               <button
                                 onClick={() => markAsRead(notification._id)}
-                                className="ml-2 w-2/12 py-2 px-2 cursor-pointer text-xs text-gray-700 hover:text-gray-900 p-1 hover:bg-gray-100 rounded transition-colors duration-300"
+                                className="ml-2 w-20 lg:w-2/12 py-2 px-2 cursor-pointer text-xs text-gray-700 hover:text-gray-900 p-1 hover:bg-gray-100 rounded transition-colors duration-300"
                               >
                                 Mark as read
                               </button>

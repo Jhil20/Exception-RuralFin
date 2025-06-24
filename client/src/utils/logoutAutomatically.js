@@ -17,12 +17,12 @@ const logoutAutomatically = () => {
       location.pathname !== "/adminDashboard"
     ) {
       const decoded = jwtDecode(token);
+        dispatch(NotSignedIn());
       disconnectSocket();
-    //   dispatch(NotSignedIn());
     //   Cookies.remove("token");
     }
   }else{
-    console.log("No token found, user is not signed in.");
+    // console.log("No token found, user is not signed in.");
   }
 };
 
