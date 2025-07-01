@@ -36,7 +36,7 @@ const Header = () => {
   const decoded = useMemo(() => {
     if (token) return jwtDecode(token);
     return null;
-  }, []);
+  }, [token]);
 
   const handleLogout = () => {
     dispatch(showLoader());
@@ -91,7 +91,7 @@ const Header = () => {
 
   useEffect(() => {
     getNotifications();
-  }, []);
+  }, [decoded]);
 
   useEffect(() => {
     if (!decoded) return;
