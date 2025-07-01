@@ -202,22 +202,6 @@ const MonthlyComparison = ({ allYearBudgets, totalSpent, decoded,selectedMonth }
                           thisMonthStateData?.categoryBudgets?.[category]
                         )}
                       </span>
-                      {lastMonthStateData?.categorySpending?.[category] &&
-                        (spendingDifference < 0 ? (
-                          <div className="flex items-center text-xs text-red-600">
-                            <ArrowDownRight size={12} />
-                            <span>
-                              {Math.round(Math.abs(spendingDifference))}%
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center text-xs text-green-600">
-                            <ArrowUpRight size={12} />
-                            <span>
-                              {Math.round(Math.abs(spendingDifference))}%
-                            </span>
-                          </div>
-                        ))}
                     </div>
                   </div>
                   <div className="w-full bg-gray-300 rounded-full h-1.5">

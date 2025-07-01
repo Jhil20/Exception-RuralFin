@@ -280,7 +280,7 @@ const ViewAll = ({ setViewAll, transactionData, decoded }) => {
                           : "text-red-600"
                       }`}
                     >
-                      {transaction?.senderId?._id === decoded.id ? "- " : "+ "}
+                      {transaction?.senderId== decoded.id ? "- " : "+ "}
                       {new Intl.NumberFormat("en-US", {
                         style: "currency",
                         currency: "INR",

@@ -92,7 +92,14 @@ const ExpenseAnalytics = ({
       //   "response result of budget fetch in expense analytics",
       //   response
       // );
-      if (response?.data?.message == "Budget not found") {
+
+      setBudgetData(response?.data?.budget);
+      const keys = Object.keys(response?.data?.budget?.categoryBudgets);
+
+      setCategoryBudgets(keys);
+    } catch (err) {
+      console.log("error in fetching budget", err);
+      if (err?.response?.data?.message == "Budget not found") {
         const lastBudget = await axios.get(
           `${BACKEND_URL}/api/budget/lastMonthBudget/${decoded.id}`,
           {
@@ -102,29 +109,39 @@ const ExpenseAnalytics = ({
           }
         );
         const data = lastBudget?.data?.budget;
+        console.log("data ot send", { userId: decoded.id, ...data });
+        const values = {
+          userId: decoded.id,
+          income: data?.income,
+          budget: data?.budget,
+          savingsGoal: data?.savingsGoal,
+          alertsEnabled: data?.alertsEnabled,
+          CBHousing: data?.categoryBudgets?.Housing,
+          CBFood: data?.categoryBudgets?.Food,
+          CBTransport: data?.categoryBudgets?.Transport,
+          CBHealthcare: data?.categoryBudgets?.Healthcare,
+          CBEntertainment: data?.categoryBudgets?.Entertainment,
+          CBEducation: data?.categoryBudgets?.Education,
+          CBUtilities: data?.categoryBudgets?.Utilities,
+          CBOthers: data?.categoryBudgets?.Others,
+        };
         const response2 = await axios.post(
           `${BACKEND_URL}/api/budget/newMonthBudget`,
-          {
-            userId: decoded.id,
-            ...data,
-          },
+          values,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
+        console.log(
+          "response result of new month budget fetch in expense analytics",
+          response2
+        );
         setBudgetData(response2?.data?.newBudget);
         const keys = Object.keys(response2?.data?.newBudget?.categoryBudgets);
         setCategoryBudgets(keys);
-      } else {
-        setBudgetData(response?.data?.budget);
-        const keys = Object.keys(response?.data?.budget?.categoryBudgets);
-
-        setCategoryBudgets(keys);
       }
-    } catch (err) {
-      console.log("error in fetching budget", err);
     }
   };
 

@@ -51,7 +51,7 @@ const ExpenseCategoryDetails = ({
     <div className="space-y-8">
       {showViewDetails && (
         <div className="fixed h-full inset-0 bg-black/60 flex items-center justify-center z-40">
-          <div className="w-12/12 md:w-9/12 h-9/12 bg-white shadow-lg rounded-lg p-5 px-2 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+          <div className="w-12/12 md:w-10/12 h-9/12 bg-white shadow-lg rounded-lg p-5 px-2 lg:px-6 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
             <div className="flex mx-4 justify-between h-1/12 items-center mb-4">
               <h2 className="text-xl font-semibold">
                 {whichCategory=="Food"?"Food & Dining":whichCategory=="Others"?"Other Category":whichCategory} Transactions Details
@@ -73,7 +73,7 @@ const ExpenseCategoryDetails = ({
                 detailsTransactions.map((transaction) => (
                   <div
                     key={transaction?._id}
-                    className="flex items-center justify-between py-3 border-b-[1px] border-gray-400 last:border-0"
+                    className="flex items-center justify-between py-3 border-b border-gray-200 last:border-0"
                   >
                     <div className="flex items-center space-x-0">
                       <TransactionIcon type={transaction?.remarks} />
