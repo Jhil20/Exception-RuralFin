@@ -127,20 +127,20 @@ const RecentTransactions = ({
                   <div className="flex w-32 md:w-fit items-center justify-end">
                     <span
                       className={`text-xs md:text-sm font-semibold ${
-                        transaction?.conversionType === "cashToERupees"
+                        transaction?.conversionType == "cashToERupees"
                           ? "text-green-600"
                           : "text-red-600"
                       }`}
                     >
-                      {transaction?.conversionType === "cashToERupees" ? "+ " : "- "}
+                      {transaction?.conversionType == "cashToERupees" ? "+ " : "- "}
                       {new Intl.NumberFormat("en-US", {
                         style: "currency",
                         currency: "INR",
-                      }).format(transaction?.conversionType === "cashToERupees"?transaction?.amount-transaction?.commission:transaction?.amount+transaction?.commission)}
+                      }).format(transaction?.conversionType == "cashToERupees"?transaction?.amount-transaction?.commission:transaction?.amount+transaction?.commission)}
                     </span>
 
                     <div className="ml-0 md:ml-2">
-                      {transaction?.conversionType === "cashToERupees"? (
+                      {transaction?.conversionType == "cashToERupees"? (
                         <ArrowDownLeft size={16} className="text-green-600" />
                       ) : (
                         <ArrowUpRight size={16} className="text-red-600" />
@@ -151,12 +151,12 @@ const RecentTransactions = ({
                   <div className="flex  w-32 md:w-fit items-center justify-end">
                     <span
                       className={`text-xs md:text-sm font-semibold ${
-                        transaction?.senderId != decoded.id
+                        transaction?.senderId != decoded?.id
                           ? "text-green-600"
                           : "text-red-600"
                       }`}
                     >
-                      {transaction?.senderId?._id === decoded.id ? "- " : "+ "}
+                      {transaction?.senderId?._id == decoded?.id ? "- " : "+ "}
                       {new Intl.NumberFormat("en-US", {
                         style: "currency",
                         currency: "INR",

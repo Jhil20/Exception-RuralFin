@@ -163,7 +163,6 @@ const createBudget = async (req, res) => {
           type: "budget",
           read: false,
         });
-        
       }
     });
 
@@ -217,6 +216,192 @@ const getBudgetByUserId = async (req, res) => {
       .json({ budget, message: "Budget fetched successfully", success: true });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+const getLastMonthBudget = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Validate required fields
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ message: "userId is required", success: false });
+    }
+    const date = new Date();
+    const month = date.getMonth() === 0 ? 12 : date.getMonth();
+    const year = date.getFullYear();
+
+    const budget = await Budget.findOne({ userId, month, year });
+    if (!budget) {
+      return res
+        .status(404)
+        .json({ message: "Budget not found", success: false });
+    }
+
+    res
+      .status(200)
+      .json({ budget, message: "Budget fetched successfully", success: true });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const createBudgetForNewMonth = async (req, res) => {
+  try {
+    const {
+      userId,
+      income,
+      budget,
+      savingsGoal,
+      alertsEnabled,
+      CBHousing,
+      CBFood,
+      CBHealthcare,
+      CBEducation,
+      CBUtilities,
+      CBEntertainment,
+      CBTransport,
+      CBOthers,
+    } = req.body;
+
+    const financeCheck = await Finance.findOne({ userId });
+
+    if (financeCheck?.isBudgetPlanningEnabled == true) {
+      // Validate required fields
+      const requiredFields = [
+        "userId",
+        "income",
+        "budget",
+        "savingsGoal",
+        "alertsEnabled",
+        "CBHousing",
+        "CBFood",
+        "CBHealthcare",
+        "CBEducation",
+        "CBUtilities",
+        "CBEntertainment",
+        "CBTransport",
+        "CBOthers",
+      ];
+      for (const field of requiredFields) {
+        if (req.body[field] === undefined || req.body[field] === null) {
+          return res
+            .status(400)
+            .json({ message: `${field} is required`, success: false });
+        }
+      }
+
+      const date = new Date();
+      const currentMonth = date.getMonth() + 1;
+      const currentYear = date.getFullYear();
+
+      const AllDebitTransactions = await UserToUserTransaction.find({
+        senderId: userId,
+        status: "completed",
+        transactionDate: {
+          $gte: new Date(currentYear, currentMonth - 1, 1),
+          $lt: new Date(currentYear, currentMonth, 1),
+        },
+      });
+
+      const categorySpending = {
+        Housing: 0,
+        Food: 0,
+        Healthcare: 0,
+        Education: 0,
+        Utilities: 0,
+        Entertainment: 0,
+        Transport: 0,
+        Others: 0,
+      };
+
+      // console.log("AllDebitTransactions", AllDebitTransactions);
+      AllDebitTransactions.forEach(async (transaction) => {
+        const { amount, remarks } = transaction;
+        const category = remarks;
+        if (category == "Food & Dining") {
+          categorySpending.Food += amount;
+        } else {
+          categorySpending[category] += amount;
+        }
+      });
+
+      // console.log("categorySpending", categorySpending);
+
+      const newBudget = await Budget.create({
+        userId,
+        income,
+        budget,
+        month: currentMonth,
+        year: currentYear,
+        savingsGoal,
+        alertsEnabled,
+        categoryBudgets: {
+          Housing: CBHousing,
+          Food: CBFood,
+          Healthcare: CBHealthcare,
+          Education: CBEducation,
+          Utilities: CBUtilities,
+          Entertainment: CBEntertainment,
+          Transport: CBTransport,
+          Others: CBOthers,
+        },
+        categorySpending,
+      });
+      if (!newBudget) {
+        return res
+          .status(400)
+          .json({ message: "Failed to create budget", success: false });
+      }
+
+      const categories = Object.keys(categorySpending);
+      categories.forEach((category) => {
+        if (
+          newBudget.categorySpending[category] >=
+            newBudget.categoryBudgets[category] &&
+          newBudget.alertsEnabled
+        ) {
+          const notification = createNotification({
+            userType: "User",
+            userId,
+            message: `Budget Alert: You've exceeded your ₹${
+              newBudget.categoryBudgets[category]
+            } budget for ${
+              category == "Food" ? "Food & Dining" : category
+            } by ₹${
+              newBudget.categorySpending[category] -
+              newBudget.categoryBudgets[category]
+            } this month. Consider reviewing your spending to stay on track.`,
+            type: "budget",
+            read: false,
+          });
+        }
+      });
+
+      const finance = await Finance.updateOne(
+        { userId },
+        { $set: { budget: newBudget._id } },
+        { new: true }
+      );
+
+      if (!finance) {
+        await Budget.deleteOne({ _id: newBudget._id });
+        return res.status(400).json({
+          message: "Failed to update finance and Rollback Budget",
+          success: false,
+        });
+      }
+
+      res.status(201).json({
+        newBudget,
+        message: "Budget created successfully",
+        success: true,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -328,4 +513,6 @@ module.exports = {
   getBudgetByUserId,
   getAllBudgetsOfThisYearByUserId,
   updateBudgetSpending,
+  createBudgetForNewMonth,
+  getLastMonthBudget,
 };

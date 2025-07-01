@@ -30,10 +30,10 @@ const ExpenseAnalytics = ({
     getTotalSpent();
   }, []);
 
-  useEffect(()=>{
-    if(!decoded)return;
-    const socket=getSocket(decoded.id);
-    const handler=(data)=>{
+  useEffect(() => {
+    if (!decoded) return;
+    const socket = getSocket(decoded.id);
+    const handler = (data) => {
       const { amount, category } = data?.transaction;
       if (amount && category) {
         setTotalSpent((prev) => prev + amount);
@@ -50,21 +50,22 @@ const ExpenseAnalytics = ({
       }
       getBudget();
       getTotalSpent();
-    }
-    socket.on("money-received-by-receiver",handler);
+    };
+    socket.on("money-received-by-receiver", handler);
     return () => {
-      if(socket){
-        socket.off("money-received-by-receiver",handler);
+      if (socket) {
+        socket.off("money-received-by-receiver", handler);
       }
-    }
-  },[decoded]);
+    };
+  }, [decoded]);
 
   const getTotalSpent = async () => {
     try {
       const selectedMonth = new Date().getMonth() + 1;
       const response = await axios.post(
         `${BACKEND_URL}/api/userToUserTransaction/transactionsTotal/${decoded.id}`,
-        { selectedMonth: selectedMonth },{
+        { selectedMonth: selectedMonth },
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -80,7 +81,8 @@ const ExpenseAnalytics = ({
   const getBudget = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/budget/${decoded.id}`,{
+        `${BACKEND_URL}/api/budget/${decoded.id}`,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -90,10 +92,37 @@ const ExpenseAnalytics = ({
       //   "response result of budget fetch in expense analytics",
       //   response
       // );
-      setBudgetData(response?.data?.budget);
-      const keys = Object.keys(response?.data?.budget?.categoryBudgets);
+      if (response?.data?.message == "Budget not found") {
+        const lastBudget = await axios.get(
+          `${BACKEND_URL}/api/budget/lastMonthBudget/${decoded.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = lastBudget?.data?.budget;
+        const response2 = await axios.post(
+          `${BACKEND_URL}/api/budget/newMonthBudget`,
+          {
+            userId: decoded.id,
+            ...data,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setBudgetData(response2?.data?.newBudget);
+        const keys = Object.keys(response2?.data?.newBudget?.categoryBudgets);
+        setCategoryBudgets(keys);
+      } else {
+        setBudgetData(response?.data?.budget);
+        const keys = Object.keys(response?.data?.budget?.categoryBudgets);
 
-      setCategoryBudgets(keys);
+        setCategoryBudgets(keys);
+      }
     } catch (err) {
       console.log("error in fetching budget", err);
     }
