@@ -8,20 +8,29 @@ import Header from "./components/Header";
 import { toast, ToastContainer } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
-import { getSocket } from "./utils/socket";
+import { createSocket, getSocket } from "./utils/socket";
 import capitalize from "./utils/capitalize";
 import speak from "./utils/speak";
+import { socketConnected } from "./redux/slices/socketSlice";
 
 function App() {
   const isLoading = useSelector((state) => state.loading.isLoading);
   const location = useLocation();
   // const [decoded, setDecoded] = useState(null);
+  const isSocketConnected = useSelector((state => state.socket.isSocketConnected));
+  const dispatch = useDispatch();
 
   const token = Cookies.get("token");
   const decoded = useMemo(() => {
     if (token) return jwtDecode(token);
     return null;
   }, [token]);
+  useEffect(()=>{
+    if(token && !isSocketConnected){
+      createSocket(decoded?.id);
+      dispatch(socketConnected());
+    }
+  },[isSocketConnected,dispatch])
 
   useEffect(() => {
     if (!decoded) return;

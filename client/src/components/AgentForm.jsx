@@ -88,9 +88,7 @@ const AgentForm = ({ resetRole }) => {
     }
   };
 
-  return isLoading ? (
-    <Loader />
-  ) : (
+  return  (
     <div className="space-y-6">
       {step == 1 && (
         <Formik

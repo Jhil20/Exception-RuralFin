@@ -144,9 +144,7 @@ const UserForm = ({ resetRole, setUserFormStep2 }) => {
     }
   };
 
-  return isLoading ? (
-    <Loader />
-  ) : (
+  return  (
     <>
       {/* <ToastContainer
       position="top-right"

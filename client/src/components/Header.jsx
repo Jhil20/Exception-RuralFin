@@ -24,6 +24,7 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import { useMemo } from "react";
+import { socketDisconnected } from "../redux/slices/socketSlice";
 
 const Header = () => {
   const location = useLocation();
@@ -44,6 +45,7 @@ const Header = () => {
       Cookies.remove("token");
     }
     disconnectSocket();
+    dispatch(socketDisconnected());
     dispatch(NotSignedIn());
     navigate("/home");
     dispatch(hideLoader());

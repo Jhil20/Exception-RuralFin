@@ -224,9 +224,7 @@ const UserDashboard = () => {
     getTransactions();
   }, [decoded]);
 
-  return isLoading ? (
-    <Loader />
-  ) : (
+  return(
     <div className="bg-gray-50 min-h-screen">
       {showSend && (
         <div className="bg-black/40 flex justify-center items-center fixed top-0 z-50 w-full h-full">
