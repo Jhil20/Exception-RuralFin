@@ -8,12 +8,10 @@ import useAuth from "../utils/useAuth";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 import { useDispatch } from "react-redux";
-import { hideLoader, showLoader } from "../redux/slices/loadingSlice";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import capitalize from "../utils/capitalize";
 import AgentList from "../components/AgentList";
-import Loader from "../components/Loader";
 import SendMoney from "../components/SendMoney";
 import { toast } from "react-toastify";
 import ViewAll from "../components/ViewAll";
@@ -23,6 +21,7 @@ import AgentDetails from "../components/AgentDetails";
 import AgentsViewMore from "../components/AgentsViewMore";
 import { getSocket } from "../utils/socket";
 import speak from "../utils/speak";
+import speakPremium from "../utils/speakpremium";
 const UserDashboard = () => {
   useAuth();
   const isLoading = useSelector((state) => state.loading.isLoading);
@@ -73,7 +72,7 @@ const UserDashboard = () => {
             data?.transaction?.receiverId?.firstName
           )} ${capitalize(data?.transaction?.receiverId?.lastName)}`
         );
-        await speak(
+        await speakPremium(
           `₹${data?.transaction?.amount} sent to  ${capitalize(
             data?.transaction?.receiverId?.firstName
           )} ${capitalize(data?.transaction?.receiverId?.lastName)}`
@@ -90,7 +89,7 @@ const UserDashboard = () => {
             data?.transaction?.senderId?.firstName
           )} ${capitalize(data?.transaction?.senderId?.lastName)}`
         );
-        await speak(
+        await speakPremium(
           `₹${data?.transaction?.amount} received from  ${capitalize(
             data?.transaction?.senderId?.firstName
           )} ${capitalize(data?.transaction?.senderId?.lastName)}`

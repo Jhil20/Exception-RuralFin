@@ -29,6 +29,7 @@ import { BACKEND_URL } from "../utils/constants";
 import { toast } from "react-toastify";
 import speak from "../utils/speak";
 import { getSocket } from "../utils/socket";
+import speakPremium from "../utils/speakpremium";
 
 const AgentDetails = ({
   showAgentDetails,
@@ -325,7 +326,7 @@ const AgentDetails = ({
           transactionType === "deposit" ? "Deposit" : "Withdrawal"
         } request sent successful!`
       );
-      await speak(
+      await speakPremium(
         `${
           transactionType === "deposit" ? "Deposit" : "Withdrawal"
         } request sent successful!`

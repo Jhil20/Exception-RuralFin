@@ -1,4 +1,4 @@
-function speak(text, lang = "en-IN") {
+function speak(text, lang = "gu-IN") {
   return new Promise((resolve, reject) => {
     if (!window.speechSynthesis) {
       reject("Speech Synthesis not supported in this browser.");

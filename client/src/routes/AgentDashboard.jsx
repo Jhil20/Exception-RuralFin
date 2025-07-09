@@ -20,6 +20,7 @@ import speak from "../utils/speak";
 import { useDispatch } from "react-redux";
 import SecurityDepositOverlay from "../components/SecurityDepositOverlay";
 import Footer from "../components/Footer";
+import speakPremium from "../utils/speakpremium";
 
 const AgentDashboard = () => {
   useAuth();
@@ -84,7 +85,7 @@ const AgentDashboard = () => {
           data?.transaction?.userId?.firstName
         )} ${capitalize(data?.transaction?.userId?.lastName)}`
       );
-      await speak(
+      await speakPremium(
         `New ${
           data?.transaction?.conversionType === "cashToERupees"
             ? "Deposit"
@@ -275,7 +276,7 @@ const AgentDashboard = () => {
         )} ${capitalize(transactionToAccept?.userId?.lastName)}`
       );
 
-      await speak(
+      await speakPremium(
         `${
           transactionToAccept?.conversionType == "cashToERupees"
             ? "Deposit"
@@ -369,7 +370,7 @@ const AgentDashboard = () => {
           data?.userId?.firstName
         )} ${capitalize(data?.userId?.lastName)}`
       );
-      await speak(
+      await speakPremium(
         `Deposit request completed for ${capitalize(
           data?.userId?.firstName
         )} ${capitalize(data?.userId?.lastName)}`
@@ -454,7 +455,7 @@ const AgentDashboard = () => {
           data?.userId?.firstName
         )} ${capitalize(data?.userId?.lastName)}`
       );
-      await speak(
+      await speakPremium(
         `Withdrawal request completed for ${capitalize(
           data?.userId?.firstName
         )} ${capitalize(data?.userId?.lastName)}`

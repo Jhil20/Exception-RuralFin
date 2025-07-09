@@ -12,6 +12,7 @@ import { createSocket, getSocket } from "./utils/socket";
 import capitalize from "./utils/capitalize";
 import speak from "./utils/speak";
 import { socketConnected } from "./redux/slices/socketSlice";
+import speakPremium from "./utils/speakpremium";
 
 function App() {
   const isLoading = useSelector((state) => state.loading.isLoading);
@@ -47,7 +48,7 @@ function App() {
             data.agentId.firstName
           )} ${capitalize(data.agentId.lastName)}`
         );
-        await speak(
+        await speakPremium(
           `Your ${
             data.conversionType == "cashToERupees"
               ? "cash to eRupees"
@@ -71,7 +72,7 @@ function App() {
             data.agentId.firstName
           )} ${capitalize(data.agentId.lastName)}`
         );
-        await speak(
+        await speakPremium(
           `Your ${
             data.conversionType == "cashToERupees"
               ? "cash to eRupees"
@@ -97,7 +98,7 @@ function App() {
         toast.success(
           `₹${data.amount - data.commission} has been deposited successfully`
         );
-        await speak(`
+        await speakPremium(`
           Your ${
             data.conversionType == "cashToERupees"
               ? "cash to eRupees"
@@ -124,7 +125,7 @@ function App() {
         toast.success(
           `₹${data.amount + data.commission} has been withdrawn successfully`
         );
-        await speak(`
+        await speakPremium(`
           Your ${
             data.conversionType == "cashToERupees"
               ? "cash to eRupees"
