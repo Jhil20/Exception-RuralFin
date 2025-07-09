@@ -34,21 +34,18 @@ const app = express();
 connectMongo();
 const httpServer = createServer(app);
 
-app.use(
-  cors({
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: "https://ruralfin.netlify.app", 
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,                      
+};
+
+app.use(cors(corsOptions));
 
 const io = new Server(httpServer, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  },
+  cors: corsOptions, 
 });
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -495,6 +492,7 @@ app.get("/api/getActiveUsers", async (req, res) => {
   }
 });
 
+app.options("*", cors(corsOptions));
 app.use("/api/razorpay", razorpayRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/agent", agentRoutes);
