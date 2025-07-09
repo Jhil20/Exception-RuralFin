@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { disconnectSocket, getSocket } from "./socket";
 import { useDispatch } from "react-redux";
 import { NotSignedIn } from "../redux/slices/isSignInSlice";
+import { socketDisconnected } from "../redux/slices/socketSlice";
 
 const logoutAutomatically = () => {
   const token = Cookies.get("token");
@@ -17,11 +18,12 @@ const logoutAutomatically = () => {
       location.pathname !== "/adminDashboard"
     ) {
       const decoded = jwtDecode(token);
-        dispatch(NotSignedIn());
+      dispatch(NotSignedIn());
+      dispatch(socketDisconnected());
       disconnectSocket();
-    //   Cookies.remove("token");
+      //   Cookies.remove("token");
     }
-  }else{
+  } else {
     // console.log("No token found, user is not signed in.");
   }
 };

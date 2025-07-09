@@ -169,25 +169,25 @@ const LandingFooter = ({ setShowAboutUs,setShowCompliance,setShowLicenses,setSho
           </p>
           <div className="flex space-x-4">
             <a
-              href="#"
+              href="https://www.facebook.com/"
               className="text-gray-400 hover:text-white transition-colors"
             >
               <Facebook size={20} />
             </a>
             <a
-              href="#"
+              href="https://x.com/?lang=en"
               className="text-gray-400 hover:text-white transition-colors"
             >
               <Twitter size={20} />
             </a>
             <a
-              href="#"
+              href="https://www.instagram.com/"
               className="text-gray-400 hover:text-white transition-colors"
             >
               <Instagram size={20} />
             </a>
             <a
-              href="#"
+              href="https://www.linkedin.com/in/harsh-patadia-a677a4289/"
               className="text-gray-400 hover:text-white transition-colors"
             >
               <Linkedin size={20} />

@@ -76,25 +76,25 @@ const Footer = () => {
             </p>
             <div className="flex space-x-4">
               <a
-                href="#"
+                href="https://www.facebook.com/"
                 className="text-gray-400 hover:text-gray-200 transition-colors duration-200"
               >
                 <Facebook size={20} />
               </a>
               <a
-                href="#"
+                href="https://x.com/?lang=en"
                 className="text-gray-400 hover:text-gray-200 transition-colors duration-200"
               >
                 <Twitter size={20} />
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com/"
                 className="text-gray-400 hover:text-gray-200 transition-colors duration-200"
               >
                 <Instagram size={20} />
               </a>
               <a
-                href="#"
+                href="https://www.linkedin.com/in/harsh-patadia-a677a4289/"
                 className="text-gray-400 hover:text-gray-200 transition-colors duration-200"
               >
                 <Linkedin size={20} />
@@ -167,26 +167,7 @@ const Footer = () => {
           <p className="text-sm text-gray-500">
             © 2025 RuralFin. All rights reserved.
           </p>
-          <div className="flex space-x-6 mt-4 md:mt-0">
-            <a
-              href="#"
-              className="text-sm text-gray-400 cursor-pointer transition-all duration-300 hover:text-gray-200"
-            >
-              Privacy
-            </a>
-            <a
-              href="#"
-              className="text-sm text-gray-400 cursor-pointer transition-all duration-300 hover:text-gray-200"
-            >
-              Terms
-            </a>
-            <a
-              href="#"
-              className="text-sm text-gray-400 cursor-pointer transition-all duration-300 hover:text-gray-200"
-            >
-              Cookies
-            </a>
-          </div>
+          
         </div>
       </div>
     </footer>
