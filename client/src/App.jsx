@@ -12,13 +12,15 @@ import { createSocket, getSocket } from "./utils/socket";
 import capitalize from "./utils/capitalize";
 import speak from "./utils/speak";
 import { socketConnected } from "./redux/slices/socketSlice";
-import speakPremium from "./utils/speakpremium";
+import speakPremium from "./utils/speakPremium";
 
 function App() {
   const isLoading = useSelector((state) => state.loading.isLoading);
   const location = useLocation();
   // const [decoded, setDecoded] = useState(null);
-  const isSocketConnected = useSelector((state => state.socket.isSocketConnected));
+  const isSocketConnected = useSelector(
+    (state) => state.socket.isSocketConnected
+  );
   const dispatch = useDispatch();
 
   const token = Cookies.get("token");
@@ -26,12 +28,12 @@ function App() {
     if (token) return jwtDecode(token);
     return null;
   }, [token]);
-  useEffect(()=>{
-    if(token && !isSocketConnected){
+  useEffect(() => {
+    if (token && !isSocketConnected) {
       createSocket(decoded?.id);
       dispatch(socketConnected());
     }
-  },[isSocketConnected,dispatch])
+  }, [isSocketConnected, dispatch]);
 
   useEffect(() => {
     if (!decoded) return;

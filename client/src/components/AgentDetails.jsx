@@ -29,7 +29,7 @@ import { BACKEND_URL } from "../utils/constants";
 import { toast } from "react-toastify";
 import speak from "../utils/speak";
 import { getSocket } from "../utils/socket";
-import speakPremium from "../utils/speakpremium";
+import speakPremium from "../utils/speakPremium";
 
 const AgentDetails = ({
   showAgentDetails,
@@ -194,7 +194,8 @@ const AgentDetails = ({
     try {
       //console.log("Fetching user data for ID:", decoded.id);
       const response = await axios.get(
-        `${BACKEND_URL}/api/finance/getFinance/${decoded.id}`,{
+        `${BACKEND_URL}/api/finance/getFinance/${decoded.id}`,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -252,7 +253,8 @@ const AgentDetails = ({
 
     try {
       const result = await axios.get(
-        `${BACKEND_URL}/api/user/getTodayAgentTransactionAmount/${decoded.id}`,{
+        `${BACKEND_URL}/api/user/getTodayAgentTransactionAmount/${decoded.id}`,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -307,7 +309,8 @@ const AgentDetails = ({
       }
       const response = await axios.post(
         `${BACKEND_URL}/api/agentToUserTransaction/`,
-        data,{
+        data,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -367,7 +370,8 @@ const AgentDetails = ({
   const getAllTransactions = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/agentToUserTransaction/${selectedAgent._id}`,{
+        `${BACKEND_URL}/api/agentToUserTransaction/${selectedAgent._id}`,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -449,7 +453,7 @@ const AgentDetails = ({
             setSelectedAgent(null);
             setShowAgentDetails(false);
           }}
-          className= "p-1 md:p-1 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors duration-200 group"
+          className="p-1 md:p-1 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors duration-200 group"
           aria-label="Close"
         >
           <X
@@ -1092,12 +1096,12 @@ const AgentDetails = ({
                               </div>
                               <div className="flex flex-col items-end">
                                 <h1 className="font-bold md:text-base text-sm text-black">
-                                    <span>
-
-                                    </span>
+                                  <span></span>
                                   <span>
-                                  ₹
-                                  {transaction?.amount?.toLocaleString("en-IN")}
+                                    ₹
+                                    {transaction?.amount?.toLocaleString(
+                                      "en-IN"
+                                    )}
                                   </span>
                                 </h1>
                                 <span className="text-xs text-gray-500">
@@ -1107,21 +1111,19 @@ const AgentDetails = ({
                                   )}
                                 </span>
                                 <span
-                                    className={`ml-2 sm:hidden mt-1 block px-2 py-0.5 text-xs rounded-full ${
-                                      transaction?.status === "completed"
-                                        ? "bg-blue-100 text-blue-800"
-                                        : transaction?.status === "pending"
-                                        ? "bg-yellow-100 text-yellow-800"
-                                        : transaction?.status === "accepted"
-                                        ? "bg-green-100 text-green-800"
-                                        : "bg-red-100 text-red-800"
-                                    }`}
-                                  >
-                                    {transaction?.status
-                                      .charAt(0)
-                                      .toUpperCase() +
-                                      transaction?.status.slice(1)}
-                                  </span>
+                                  className={`ml-2 sm:hidden mt-1 block px-2 py-0.5 text-xs rounded-full ${
+                                    transaction?.status === "completed"
+                                      ? "bg-blue-100 text-blue-800"
+                                      : transaction?.status === "pending"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : transaction?.status === "accepted"
+                                      ? "bg-green-100 text-green-800"
+                                      : "bg-red-100 text-red-800"
+                                  }`}
+                                >
+                                  {transaction?.status.charAt(0).toUpperCase() +
+                                    transaction?.status.slice(1)}
+                                </span>
                               </div>
                             </div>
                           </div>

@@ -11,7 +11,7 @@ import { jwtDecode } from "jwt-decode";
 import { createSocket, getSocket } from "../utils/socket";
 import speak from "../utils/speak";
 import useAuth from "../utils/useAuth";
-import speakPremium from "../utils/speakpremium";
+import speakPremium from "../utils/speakPremium";
 
 const RazorPay = () => {
   useAuth();
@@ -77,7 +77,9 @@ const RazorPay = () => {
       }
       dispatch(hideLoader());
       toast.success("Security deposit increased successfully by ₹" + amount);
-      await speakPremium(`Security deposit increased successfully by ₹${amount}`);
+      await speakPremium(
+        `Security deposit increased successfully by ₹${amount}`
+      );
       navigate("/agentDashboard");
       window.location.reload();
     } catch (error) {

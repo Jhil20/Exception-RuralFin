@@ -1,10 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  Save,
-  DollarSign,
-  Percent,
-  Clock,
-} from "lucide-react";
+import { Save, DollarSign, Percent, Clock } from "lucide-react";
 import Card from "../components/Card";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -13,7 +8,7 @@ import { Formik } from "formik";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { getSocket } from "../utils/socket";
-import speakPremium from "../utils/speakpremium";
+import speakPremium from "../utils/speakPremium";
 
 const PlatformSettings = () => {
   const [uptime, setUptime] = useState("Calculating...");
@@ -71,10 +66,10 @@ const PlatformSettings = () => {
   // const createSystem=async()=>{
   //   try{
   //     const response=await axios.post(`${BACKEND_URL}/api/admin/createSystem`,{
-        //   headers: {
-        //     Authorization: `Bearer ${token}`,
-        //   },
-        // });
+  //   headers: {
+  //     Authorization: `Bearer ${token}`,
+  //   },
+  // });
   //     console.log("System created successfully:", response.data);
   //   }catch(error){
   //     console.error("Error creating system:", error);

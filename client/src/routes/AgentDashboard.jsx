@@ -20,7 +20,7 @@ import speak from "../utils/speak";
 import { useDispatch } from "react-redux";
 import SecurityDepositOverlay from "../components/SecurityDepositOverlay";
 import Footer from "../components/Footer";
-import speakPremium from "../utils/speakpremium";
+import speakPremium from "../utils/speakPremium";
 
 const AgentDashboard = () => {
   useAuth();
@@ -521,7 +521,9 @@ const AgentDashboard = () => {
         <div className=" mx-auto p-4">
           <div className="flex justify-between items-center mb-4">
             <div className="">
-              <h1 className="ml-2 text-lg md:text-xl font-bold">Agent Dashboard</h1>
+              <h1 className="ml-2 text-lg md:text-xl font-bold">
+                Agent Dashboard
+              </h1>
               <h1 className=" pl-2 text-xs sm:text-sm md:text-base font-medium text-gray-500 bg-gray-100 p-1 mt-2 border border-gray-200 shadow-sm shadow-gray-300 pr-4 rounded-r-full">
                 Note : 50% of the commission will be transfered to the admin
               </h1>
@@ -541,23 +543,25 @@ const AgentDashboard = () => {
             </div>
           </div>
           <div className=" flex lg:hidden items-center mb-4 space-x-4">
-              <button
-                onClick={() => {
-                  setIsDepositOverlayOpen(true);
-                }}
-                className="flex items-center space-x-4"
-              >
-                <div className="flex  cursor-pointer text-xs sm:text-sm md:text-base font-medium ring-2 ring-gray-200 shadow-md shadow-black/20 text-gray-600 hover:ring-2 hover:text-gray-700 hover:ring-gray-700 items-center space-x-2 bg-gray-50 hover:bg-gray-100 px-3 py-1 rounded-r-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
-                  <Wallet size={16} />
-                  <span>Deposit more to increase balance</span>
-                </div>
-              </button>
-            </div>
+            <button
+              onClick={() => {
+                setIsDepositOverlayOpen(true);
+              }}
+              className="flex items-center space-x-4"
+            >
+              <div className="flex  cursor-pointer text-xs sm:text-sm md:text-base font-medium ring-2 ring-gray-200 shadow-md shadow-black/20 text-gray-600 hover:ring-2 hover:text-gray-700 hover:ring-gray-700 items-center space-x-2 bg-gray-50 hover:bg-gray-100 px-3 py-1 rounded-r-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-300">
+                <Wallet size={16} />
+                <span>Deposit more to increase balance</span>
+              </div>
+            </button>
+          </div>
 
           {/* Quick stats bar */}
           <div className="grid grid-cols-2 md:grid-cols-4 justify-items-center gap-x-32 md:gap-38 lg:gap-58 py-6 px-10 bg-black rounded-lg">
             <div className="text-center ">
-              <p className="text-gray-300 text-xs md:text-base ">Today's Transactions</p>
+              <p className="text-gray-300 text-xs md:text-base ">
+                Today's Transactions
+              </p>
               <p className="text-base md:text-lg font-semibold text-white">
                 {transactionsDone?.filter((tr) => {
                   const today = new Date();
@@ -598,7 +602,9 @@ const AgentDashboard = () => {
               </p>
             </div>
             <div className="text-center w-24 2xl:w-56 mr-10">
-              <p className="text-gray-300 text-xs md:text-base ">Total Commission Earned</p>
+              <p className="text-gray-300 text-xs md:text-base ">
+                Total Commission Earned
+              </p>
               <p className="text-base md:text-lg font-semibold text-white">
                 ₹
                 {allCommissions?.reduce((acc, commission) => {
@@ -765,7 +771,7 @@ const AgentDashboard = () => {
                               : "Withdrawal"}{" "}
                             Request #{transaction?._id || ""}
                           </p>
-                              
+
                           <span
                             className={`ml-2 px-2 py-0.5 rounded-full text-xs font-normal ${
                               transaction?.status === "rejected"
@@ -803,12 +809,12 @@ const AgentDashboard = () => {
                           {formatDate(transaction?.transactionDate)}
                         </p>
                         {transaction?.status === "accepted" && (
-                            <span className=" sm:hidden mt-2 text-xs md:text-sm w-full bg-gray-100 border border-gray-200  flex text-gray-800 rounded-xl py-0.5 items-center px-2 ">
-                              <Info size={16} className="mt-[0px] mr-1" /> Press
-                              complete button only when cash transaction with
-                              user is done.
-                            </span>
-                          )}
+                          <span className=" sm:hidden mt-2 text-xs md:text-sm w-full bg-gray-100 border border-gray-200  flex text-gray-800 rounded-xl py-0.5 items-center px-2 ">
+                            <Info size={16} className="mt-[0px] mr-1" /> Press
+                            complete button only when cash transaction with user
+                            is done.
+                          </span>
+                        )}
                       </div>
                       {transaction?.status == "pending" && (
                         <div className="flex flex-wrap space-x-2 sm:space-y-2 justify-end md:flex-nowrap sm:space-x-2">

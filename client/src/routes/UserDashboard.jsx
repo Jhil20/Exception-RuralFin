@@ -21,7 +21,7 @@ import AgentDetails from "../components/AgentDetails";
 import AgentsViewMore from "../components/AgentsViewMore";
 import { getSocket } from "../utils/socket";
 import speak from "../utils/speak";
-import speakPremium from "../utils/speakpremium";
+import speakPremium from "../utils/speakPremium";
 const UserDashboard = () => {
   useAuth();
   const isLoading = useSelector((state) => state.loading.isLoading);
@@ -40,7 +40,6 @@ const UserDashboard = () => {
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [showAgentsViewMore, setShowAgentsViewMore] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
-
 
   const token = Cookies.get("token");
   const decoded = useMemo(() => {
@@ -223,7 +222,7 @@ const UserDashboard = () => {
     getTransactions();
   }, [decoded]);
 
-  return(
+  return (
     <div className="bg-gray-50 min-h-screen">
       {showSend && (
         <div className="bg-black/40 flex justify-center items-center fixed top-0 z-50 w-full h-full">
@@ -279,7 +278,6 @@ const UserDashboard = () => {
         <DetailedExpenseReport
           isOpen={isReportOpen}
           onClose={() => setIsReportOpen(false)}
-
         />
       )}
 
@@ -293,7 +291,6 @@ const UserDashboard = () => {
             Welcome back to your financial dashboard
           </p>
         </section>
-        
 
         <div className="grid grid-cols-1 h-fit lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-1 h-full">
