@@ -58,19 +58,19 @@ const AdminOverview = () => {
     const socket = getSocket(decoded.id);
     getActiveUsers();
     const handler = (data) => {
-      setActiveUsers(data.length);
+      setActiveUsers(data?.length);
     };
     const handler1 = (data) => {
       // console.log("New account created: sokceint in admin overview", data);
       if (data?.role == "agent") {
         setOverviewCardData((prevData) => ({
           ...prevData,
-          totalAgents: prevData.totalAgents + 1,
+          totalAgents: prevData?.totalAgents + 1,
         }));
       } else {
         setOverviewCardData((prevData) => ({
           ...prevData,
-          totalUsers: prevData.totalUsers + 1,
+          totalUsers: prevData?.totalUsers + 1,
         }));
       }
       getOverviewCardData();
@@ -78,7 +78,7 @@ const AdminOverview = () => {
     const handler2 = (data) => {
       setOverviewCardData((prevData) => ({
         ...prevData,
-        thisMonthTransactions: prevData.thisMonthTransactions + 1,
+        thisMonthTransactions: prevData?.thisMonthTransactions + 1,
       }));
       // console.log(
       //   "New transaction made: socket in admin overview",
@@ -87,11 +87,11 @@ const AdminOverview = () => {
       // );
       setTransactionVolumeData((prevData) => ({
         ...prevData,
-        todayTransactions: prevData.todayTransactions + data.transaction.amount,
+        todayTransactions: prevData?.todayTransactions + data?.transaction?.amount,
         thisWeekTransactions:
-          prevData.thisWeekTransactions + data.transaction.amount,
+          prevData?.thisWeekTransactions + data?.transaction?.amount,
         thisMonthTransactions:
-          prevData.thisMonthTransactions + data.transaction.amount,
+          prevData?.thisMonthTransactions + data?.transaction?.amount,
       }));
       getTransationVolume();
       getOverviewCardData();
@@ -102,7 +102,7 @@ const AdminOverview = () => {
       setRecentActivityData((prevData) => {
         const newActivity = {
           ...data,
-          createdAt: classifyDate(data.createdAt || data.transactionDate),
+          createdAt: classifyDate(data?.createdAt || data?.transactionDate),
         };
         return [newActivity, ...prevData];
       });
@@ -114,7 +114,7 @@ const AdminOverview = () => {
 
       setAllCommissions((prevData) => {
         const updatedCommissions = prevData?.filter((item) => {
-          return item._id != data?.adminCommission?.data?._id;
+          return item?._id != data?.adminCommission?.data?._id;
         });
         const newCommissions = [
           ...updatedCommissions,
@@ -148,7 +148,7 @@ const AdminOverview = () => {
           },
         }
       );
-      setAllCommissions(response.data.data);
+      setAllCommissions(response?.data?.data);
       //console.log("All Admin Commissions:", response.data.data);
     } catch (error) {
       console.error("Error fetching admin commissions:", error);
@@ -159,7 +159,7 @@ const AdminOverview = () => {
     try {
       const response = await axios.get(`${BACKEND_URL}/api/getActiveUsers`);
       //console.log("Active Users Data:", response.data);
-      const length = response.data.data.length + 1;
+      const length = response?.data?.data?.length + 1;
       setActiveUsers(length);
     } catch (error) {
       console.error("Error fetching active users:", error);
@@ -177,7 +177,7 @@ const AdminOverview = () => {
         }
       );
       //console.log("Overview Card Data:", response.data);
-      setOverviewCardData(response.data.data);
+      setOverviewCardData(response?.data?.data);
     } catch (error) {
       console.error("Error fetching overview card data:", error);
     }
@@ -212,7 +212,7 @@ const AdminOverview = () => {
         }
       );
       //console.log("Transaction Volume Data:", response.data);
-      setTransactionVolumeData(response.data.data);
+      setTransactionVolumeData(response?.data?.data);
     } catch (error) {
       console.error("Error fetching transaction volume data:", error);
     }
@@ -252,7 +252,7 @@ const AdminOverview = () => {
           title="Profit Earned"
           value={`₹${
             allCommissions?.reduce((acc, item) => {
-              return acc + item.totalCommissionEarned;
+              return acc + item?.totalCommissionEarned;
             }, 0) || "0"
           }`}
           icon={<IndianRupee size={20} />}
@@ -288,7 +288,7 @@ const AdminOverview = () => {
           title="Recent Activity"
         >
           <div className="space-y-4 h-11/12 overflow-y-auto">
-            {recentActivityData.map((activity) => (
+            {recentActivityData?.map((activity) => (
               <div
                 key={activity?._id}
                 className="flex items-start h-20 mb-1 pb-3 border-b border-gray-200 last:border-0 last:pb-0"
@@ -413,9 +413,9 @@ const AdminOverview = () => {
                       tooltip: {
                         callbacks: {
                           label: function (context) {
-                            const label = context.label || "";
-                            const value = context.parsed || 0;
-                            return `${label}: ₹${value.toLocaleString(
+                            const label = context?.label || "";
+                            const value = context?.parsed || 0;
+                            return `${label}: ₹${value?.toLocaleString(
                               "en-IN"
                             )}`;
                           },

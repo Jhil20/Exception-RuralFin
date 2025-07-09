@@ -26,7 +26,7 @@ const token=Cookies.get("token");
   const getAllTransactions = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/admin/allTransactionsForUser/${user._id}`,
+        `${BACKEND_URL}/api/admin/allTransactionsForUser/${user?._id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -52,8 +52,8 @@ const token=Cookies.get("token");
             <Card className="h-12/12 ">
               <div className="flex flex-col items-center">
                 <div className="h-20 w-20 rounded-full bg-gray-900 flex items-center justify-center text-white text-2xl font-bold mb-4">
-                  {user?.firstName?.charAt(0).toUpperCase() +
-                    user?.lastName?.charAt(0).toUpperCase()}
+                  {user?.firstName?.charAt(0)?.toUpperCase() +
+                    user?.lastName?.charAt(0)?.toUpperCase()}
                 </div>
 
                 <h3 className="text-xl font-semibold text-gray-800">
@@ -80,7 +80,7 @@ const token=Cookies.get("token");
                   <div className="flex items-center">
                     <Phone size={16} className="text-gray-500 mr-3" />
                     <span className="text-gray-700">
-                      {user?.phone.toLocaleString()}
+                      {user?.phone?.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex items-center">
@@ -90,7 +90,7 @@ const token=Cookies.get("token");
                   <div className="flex items-center">
                     <Calendar size={16} className="text-gray-500 mr-3" />
                     <span className="text-gray-700">
-                      Joined : {new Date(user?.createdAt).toLocaleDateString()}
+                      Joined : {new Date(user?.createdAt)?.toLocaleDateString()}
                     </span>
                   </div>
                   <div className="flex items-center">
@@ -99,10 +99,10 @@ const token=Cookies.get("token");
                       Last activity :{" "}
                       {new Date(
                         Math.max(
-                          new Date(user?.finance?.updatedAt).getTime(),
-                          new Date(user?.updatedAt).getTime()
+                          new Date(user?.finance?.updatedAt)?.getTime(),
+                          new Date(user?.updatedAt)?.getTime()
                         )
-                      ).toLocaleDateString()}
+                      )?.toLocaleDateString()}
                     </span>
                   </div>
                 </div>
@@ -117,7 +117,7 @@ const token=Cookies.get("token");
                   <div>
                     <p className="text-gray-500 text-sm">Wallet Balance</p>
                     <p className="text-2xl font-bold text-gray-800">
-                      ₹{user?.finance?.balance.toLocaleString()}
+                      ₹{user?.finance?.balance?.toLocaleString()}
                     </p>
                   </div>
                   <div className="p-3 bg-gray-200 rounded-lg text-gray-800">
@@ -157,12 +157,12 @@ const token=Cookies.get("token");
                       </thead>
 
                       <tbody className="divide-y divide-gray-200">
-                        {transactions.map((transaction) => (
+                        {transactions?.map((transaction) => (
                           <tr key={transaction?._id}>
                             <td className="px-4 text-center py-3 text-sm whitespace-nowrap">
                               {new Date(
                                 transaction?.transactionDate
-                              ).toLocaleDateString("en-IN", {
+                              )?.toLocaleDateString("en-IN", {
                                 year: "numeric",
                                 month: "2-digit",
                                 day: "2-digit",
@@ -177,7 +177,7 @@ const token=Cookies.get("token");
                             {transaction?.type == "User to User" ? (
                               <td className="px-4 text-center text-sm py-3 whitespace-nowrap">
                                 <span>
-                                  {transaction?.senderId._id == user._id
+                                  {transaction?.senderId?._id == user?._id
                                     ? "Debit"
                                     : "Credit"}
                                 </span>
@@ -193,14 +193,14 @@ const token=Cookies.get("token");
                               </td>
                             )}
                             <td className="px-4 text-center py-3 whitespace-nowrap font-medium">
-                              ₹{transaction.amount.toLocaleString()}
+                              ₹{transaction?.amount?.toLocaleString()}
                             </td>
 
                             {transaction?.type == "User to User" ? (
                               <td className="px-4 text-center py-3 text-sm whitespace-nowrap">
-                                {transaction?.senderId?._id == user._id
-                                  ? transaction?.receiverId._id
-                                  : transaction?.senderId._id}
+                                {transaction?.senderId?._id == user?._id
+                                  ? transaction?.receiverId?._id
+                                  : transaction?.senderId?._id}
                               </td>
                             ) : (
                               <td className="px-4 text-center text-sm py-3 whitespace-nowrap">

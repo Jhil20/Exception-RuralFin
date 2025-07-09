@@ -71,7 +71,7 @@ const UserManagement = () => {
         return (
           <span className="badge badge-warning flex justify-center items-center text-yellow-700 bg-yellow-100 px-2 py-1 rounded-full text-sm font-medium">
             <AlertTriangle size={12} className="mr-1" />
-            {status.charAt(0).toUpperCase() + status.slice(1)}
+            {status?.charAt(0)?.toUpperCase() + status?.slice(1)}
           </span>
         );
       default:
@@ -116,14 +116,14 @@ const UserManagement = () => {
               className="w-full h-full border-gray-300 rounded-xl hover:border-gray-400 focus:border-gray-400 transition-all duration-300 border-2 outline-0 py-2 pl-10"
               value={searchTerm}
               onChange={(e) => {
-                setSearchTerm(e.target.value);
+                setSearchTerm(e?.target?.value);
                 const filter = users.filter(
                   (user) =>
-                    (user.name
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase()) ||
-                      user.ruralFinID.includes(searchTerm)) &&
-                    (currentFilter === "all" || user.status === currentFilter)
+                    (user?.name
+                      ?.toLowerCase()
+                      ?.includes(searchTerm?.toLowerCase()) ||
+                      user?.ruralFinID?.includes(searchTerm)) &&
+                    (currentFilter === "all" || user?.status === currentFilter)
                 );
                 setFilteredUsers(filter);
               }}
@@ -154,7 +154,7 @@ const UserManagement = () => {
               <div>
                 <p className="text-gray-500 text-sm">Active Users</p>
                 <p className="text-2xl font-bold text-gray-800">
-                  {users?.filter((user) => user.isActive == true).length}
+                  {users?.filter((user) => user?.isActive == true)?.length}
                 </p>
               </div>
               <div className="p-3 bg-gray-200 rounded-lg text-gray-800">
@@ -171,7 +171,7 @@ const UserManagement = () => {
                   {
                     users?.filter(
                       (user) => user?.finance?.isBudgetPlanningEnabled == true
-                    ).length
+                    )?.length
                   }
                 </p>
               </div>
@@ -195,13 +195,13 @@ const UserManagement = () => {
             <span className="text-center">Last User Activity</span>
           </div>
           <div className="h-14/16 overflow-y-auto">
-            {filteredUsers.map((user) => (
+            {filteredUsers?.map((user) => (
               <div
                 key={user?._id}
                 onClick={() => handleViewDetails(user)}
                 className="grid w-full grid-cols-7  border-b border-b-gray-300 text-center px-4 py-3 items-center hover:bg-gray-100 cursor-pointer"
               >
-                <div className="pr-1">#{user._id}</div>
+                <div className="pr-1">#{user?._id}</div>
                 <div className="font-medium text-gray-800 ml-11">
                   {capitalize(user?.firstName) +
                     " " +
@@ -209,7 +209,7 @@ const UserManagement = () => {
                 </div>
                 <div className="pl-3 text-center ">{user?.ruralFinId}</div>
                 <div className="pl-13">
-                  ₹{user?.finance?.balance.toLocaleString()}
+                  ₹{user?.finance?.balance?.toLocaleString()}
                 </div>
                 <div className="pl-8 mx-3">
                   {getStatusBadge(
@@ -219,22 +219,22 @@ const UserManagement = () => {
                   )}
                 </div>
                 <div className="pl-7 mx-4">
-                  {getStatusBadge(user.isActive ? "active" : "inactive")}
+                  {getStatusBadge(user?.isActive ? "active" : "inactive")}
                 </div>
                 <div className="pl-4">
                   {new Date(
                     Math.max(
-                      new Date(user?.finance?.updatedAt).getTime(),
-                      new Date(user?.updatedAt).getTime()
+                      new Date(user?.finance?.updatedAt)?.getTime(),
+                      new Date(user?.updatedAt)?.getTime()
                     )
-                  ).toLocaleDateString()}
+                  )?.toLocaleDateString()}
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {filteredUsers.length === 0 && (
+        {filteredUsers?.length === 0 && (
           <div className="text-center py-8">
             <p className="text-gray-500">
               No users found matching your search criteria.

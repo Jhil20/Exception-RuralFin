@@ -18,9 +18,9 @@ const AgentCommissions = () => {
   const [selectedMonthCommissions, setSelectedMonthCommissions] = useState({});
   const [transactionData, setTransactionData] = useState([]);
   const date = new Date();
-  const formattedDate = `${date.getFullYear()}-${String(
-    date.getMonth() + 1
-  ).padStart(2, "0")}`;
+  const formattedDate = `${date?.getFullYear()}-${String(
+    date?.getMonth() + 1
+  )?.padStart(2, "0")}`;
   const [month, setMonth] = useState(formattedDate);
 
   const monthsMapping = {
@@ -135,7 +135,7 @@ const AgentCommissions = () => {
 
     const averageCommission =
       selectedMonthCommissions?.length > 0
-        ? totalCommission / selectedMonthCommissions.length
+        ? totalCommission / selectedMonthCommissions?.length
         : 0;
 
     setSelectedMonthCommissions({
@@ -188,13 +188,13 @@ const AgentCommissions = () => {
                 className="w-full h-12 border-gray-300 rounded-xl hover:border-gray-400 focus:border-gray-400 transition-all duration-300 border-2 outline-0 pl-10 pr-4"
                 value={searchTerm}
                 onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  const filtered = allAgents.filter((agent) => {
+                  setSearchTerm(e?.target?.value);
+                  const filtered = allAgents?.filter((agent) => {
                     const fullName =
-                      `${agent.firstName} ${agent.lastName}`.toLowerCase();
+                      `${agent?.firstName} ${agent?.lastName}`?.toLowerCase();
                     return (
-                      fullName.includes(e.target.value.toLowerCase()) ||
-                      agent._id.toString().includes(e.target.value)
+                      fullName?.includes(e?.target?.value?.toLowerCase()) ||
+                      agent?._id?.toString()?.includes(e?.target?.value)
                     );
                   });
                   setFilteredAgents(filtered);
@@ -211,10 +211,10 @@ const AgentCommissions = () => {
               type="month"
               className="h-12 px-3 py-2 border-2 hover:border-gray-400 text-gray-600 border-gray-300 rounded-xl outline-none ring-0 focus:border-gray-400 transition-all duration-300"
               value={month}
-              max={new Date().toISOString().slice(0, 7)}
+              max={new Date()?.toISOString()?.slice(0, 7)}
               onChange={(e) => {
-                setMonth(e.target.value);
-                handleMonthChange(e.target.value);
+                setMonth(e?.target?.value);
+                handleMonthChange(e?.target?.value);
               }}
             />
           </div>
@@ -241,7 +241,7 @@ const AgentCommissions = () => {
               <div>
                 <p className="text-sm text-gray-500">
                   Commission <br />
-                  <span>in {monthsMapping[month.split("-")[1]]}</span>
+                  <span>in {monthsMapping[month?.split("-")[1]]}</span>
                 </p>
 
                 <p className="text-2xl font-bold text-gray-900">
@@ -283,7 +283,7 @@ const AgentCommissions = () => {
           </div>
 
           <div className="flex-1 overflow-y-auto max-h-[calc(100vh-320px)]">
-            {filteredAgents.map((agent) => (
+            {filteredAgents?.map((agent) => (
               <div
                 key={agent?._id}
                 className="grid grid-cols-5 px-4 py-3 items-center text-center border-b border-gray-200 "
@@ -297,22 +297,22 @@ const AgentCommissions = () => {
                 <div className="text-gray-700 pl-3">
                   {transactionData?.filter((tr) => {
                     if (
-                      tr.agentId._id == agent._id &&
-                      new Date(tr.transactionDate).getMonth() + 1 ==
-                        month.split("-")[1]
+                      tr?.agentId?._id == agent?._id &&
+                      new Date(tr?.transactionDate)?.getMonth() + 1 ==
+                        month?.split("-")[1]
                     ) {
                       return tr;
                     }
-                  }).length || 0}
+                  })?.length || 0}
                 </div>
 
                 <div className="flex justify-center ">
                   ₹
                   {commissionData?.AllCommissions?.filter((data) => {
                     if (
-                      data.agentId == agent._id &&
-                      data.month == month.split("-")[1] &&
-                      data.year == month.split("-")[0]
+                      data.agentId == agent?._id &&
+                      data.month == month?.split("-")[1] &&
+                      data.year == month?.split("-")[0]
                     ) {
                       return true;
                     }
@@ -326,14 +326,14 @@ const AgentCommissions = () => {
                   ₹
                   {commissionData?.AllCommissions?.filter((data) => {
                     if (
-                      data.agentId == agent._id &&
-                      data.month == month.split("-")[1] &&
-                      data.year == month.split("-")[0]
+                      data.agentId == agent?._id &&
+                      data.month == month?.split("-")[1] &&
+                      data.year == month?.split("-")[0]
                     ) {
                       return true;
                     }
                     return false;
-                  }).reduce(
+                  })?.reduce(
                     (acc, item) => acc + item?.totalCommissionEarned,
                     0
                   ) || 0}
@@ -341,7 +341,7 @@ const AgentCommissions = () => {
               </div>
             ))}
 
-            {filteredAgents.length === 0 && (
+            {filteredAgents?.length === 0 && (
               <div className="h-full flex items-center w-full justify-center text-center py-8 text-gray-500">
                 No Agent commission data found matching your search criteria.
               </div>

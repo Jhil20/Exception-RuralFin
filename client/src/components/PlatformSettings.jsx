@@ -22,7 +22,7 @@ const PlatformSettings = () => {
     try {
       const response = await axios.get(`${BACKEND_URL}/api/uptime`);
       // console.log("Uptime response:", response.data);
-      const startTime = new Date(response.data.startTime);
+      const startTime = new Date(response?.data?.startTime);
       setDeployTime(startTime);
       const now = new Date();
       const diffMs = now - startTime;
@@ -87,7 +87,7 @@ const PlatformSettings = () => {
         }
       );
       // console.log("System settings fetched successfully:", response.data);
-      setSystemSettings(response.data.data);
+      setSystemSettings(response?.data?.data);
     } catch (error) {
       console.error("Error fetching system settings:", error);
     }
@@ -97,7 +97,7 @@ const PlatformSettings = () => {
     { label: "System Uptime", value: uptime },
     {
       label: "Last Deployment",
-      value: new Date(deployTime).toLocaleDateString("en-US", {
+      value: new Date(deployTime)?.toLocaleDateString("en-US", {
         year: "numeric",
         month: "short",
         day: "numeric",
@@ -110,35 +110,35 @@ const PlatformSettings = () => {
     try {
       const values = {
         maxSingleTransaction:
-          formikFormTransaction.current.values["max-single-transaction"],
-        maxDailyLimit: formikFormTransaction.current.values["max-daily-limit"],
+          formikFormTransaction?.current?.values["max-single-transaction"],
+        maxDailyLimit: formikFormTransaction?.current?.values["max-daily-limit"],
         maxWeeklyLimit:
-          formikFormTransaction.current.values["max-weekly-limit"],
+          formikFormTransaction?.current?.values["max-weekly-limit"],
         minTransactionAmount:
-          formikFormTransaction.current.values["min-transaction"],
+          formikFormTransaction?.current?.values["min-transaction"],
         transactionFee500to999:
-          formikFormFee.current.values["transaction-fee-500-999"],
+          formikFormFee?.current?.values["transaction-fee-500-999"],
         transactionFee1000to4999:
-          formikFormFee.current.values["transaction-fee-1000-4999"],
+          formikFormFee?.current?.values["transaction-fee-1000-4999"],
         transactionFee5000to9999:
-          formikFormFee.current.values["transaction-fee-5000-9999"],
+          formikFormFee?.current?.values["transaction-fee-5000-9999"],
         transactionFee10000:
-          formikFormFee.current.values["transaction-fee-10000"],
+          formikFormFee?.current?.values["transaction-fee-10000"],
         updatedBy: decoded.id,
       };
 
       if (
-        systemSettings?.maxSingleTransaction === values.maxSingleTransaction &&
-        systemSettings?.maxDailyLimit === values.maxDailyLimit &&
-        systemSettings?.maxWeeklyLimit === values.maxWeeklyLimit &&
-        systemSettings?.minTransactionAmount === values.minTransactionAmount &&
+        systemSettings?.maxSingleTransaction === values?.maxSingleTransaction &&
+        systemSettings?.maxDailyLimit === values?.maxDailyLimit &&
+        systemSettings?.maxWeeklyLimit === values?.maxWeeklyLimit &&
+        systemSettings?.minTransactionAmount === values?.minTransactionAmount &&
         systemSettings?.transactionFee500to999 ===
-          values.transactionFee500to999 &&
+          values?.transactionFee500to999 &&
         systemSettings?.transactionFee1000to4999 ===
-          values.transactionFee1000to4999 &&
+          values?.transactionFee1000to4999 &&
         systemSettings?.transactionFee5000to9999 ===
-          values.transactionFee5000to9999 &&
-        systemSettings?.transactionFee10000 === values.transactionFee10000
+          values?.transactionFee5000to9999 &&
+        systemSettings?.transactionFee10000 === values?.transactionFee10000
       ) {
         toast.info("Make some changes before saving!");
         return;
@@ -156,7 +156,7 @@ const PlatformSettings = () => {
       // console.log("Settings saved successfully:", response.data);
       socket.emit("updateSystemSettings", decoded.id);
 
-      if (response.data.success) {
+      if (response?.data?.success) {
         toast.success("Settings saved successfully!");
         await speakPremium("Settings saved successfully!");
         getSystemSettings();
@@ -175,12 +175,12 @@ const PlatformSettings = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {systemStats.map((stat, index) => (
+        {systemStats?.map((stat, index) => (
           <Card key={index}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm">{stat.label}</p>
-                <p className="text-xl font-bold text-gray-800">{stat.value}</p>
+                <p className="text-gray-500 text-sm">{stat?.label}</p>
+                <p className="text-xl font-bold text-gray-800">{stat?.value}</p>
               </div>
               <div className="p-3 bg-blue-100 rounded-lg text-blue-600">
                 <Clock size={20} />
@@ -240,22 +240,22 @@ const PlatformSettings = () => {
                       id: "min-transaction",
                       label: "Minimum Transaction Amount (₹)",
                     },
-                  ].map((field) => (
+                  ]?.map((field) => (
                     <div
-                      key={field.id}
+                      key={field?.id}
                       className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center"
                     >
                       <label
-                        htmlFor={field.id}
+                        htmlFor={field?.id}
                         className="font-medium text-gray-700"
                       >
-                        {field.label}
+                        {field?.label}
                       </label>
                       <input
-                        id={field.id}
+                        id={field?.id}
                         type="number"
                         className="input-field border-2 py-1 px-2 hover:border-gray-500 transition-all duration-400 border-gray-300 rounded-md"
-                        value={values[field.id]}
+                        value={values[field?.id]}
                         onChange={handleChange}
                       />
                     </div>
@@ -319,22 +319,22 @@ const PlatformSettings = () => {
                       id: "transaction-fee-10000",
                       label: "Transaction Fee for ₹10000+ (%)",
                     },
-                  ].map((field) => (
+                  ]?.map((field) => (
                     <div
-                      key={field.id}
+                      key={field?.id}
                       className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center"
                     >
                       <label
-                        htmlFor={field.id}
+                        htmlFor={field?.id}
                         className="font-medium text-gray-700"
                       >
-                        {field.label}
+                        {field?.label}
                       </label>
                       <input
-                        id={field.id}
+                        id={field?.id}
                         type="number"
                         className="input-field border-2 py-1 px-2 hover:border-gray-500 transition-all duration-400 border-gray-300 rounded-md"
-                        value={values[field.id]}
+                        value={values[field?.id]}
                         max={100}
                         onChange={handleChange}
                       />
@@ -347,7 +347,7 @@ const PlatformSettings = () => {
         </Formik>
         <div className="flex items-center gap-3">
           <button
-            className="bg-white flex border-2 disabled:cursor-not-allowed border-gray-300 items-center cursor-pointer px-4 py-2 text-black focus:ring-white hover:bg-gray-800 hover:text-white hover:ring-2 hover:ring-gray-600 font-semibold rounded-xl transition-all duration-300 focus:outline-none focus:ring-2  disabled:opacity-50 disabled:cursor-not-allowed "
+            className="bg-white flex border-2 border-gray-300 items-center cursor-pointer px-4 py-2 text-black focus:ring-white hover:bg-gray-800 hover:text-white hover:ring-2 hover:ring-gray-600 font-semibold rounded-xl transition-all duration-300 focus:outline-none focus:ring-2  disabled:opacity-50 disabled:cursor-not-allowed "
             onClick={handleSaveSettings}
             disabled={isSubmitting}
           >

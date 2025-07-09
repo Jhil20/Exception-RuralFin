@@ -20,16 +20,10 @@ const AdminDashboard = () => {
         return <AgentManagement />;
       case "users":
         return <UserManagement />;
-      case "withdrawals":
-        return <WithdrawalQueue />;
       case "commissions":
         return <AgentCommissions />;
-      case "analytics":
-        return <BudgetAnalytics />;
       case "settings":
         return <PlatformSettings />;
-      default:
-        return <Overview />;
     }
   };
 

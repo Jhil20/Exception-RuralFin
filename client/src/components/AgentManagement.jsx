@@ -53,8 +53,8 @@ const AgentManagement = () => {
           },
         });
       //console.log("Agent data fetched successfully:", response.data);
-      setAgents(response.data.agents);
-      setFilteredAgents(response.data.agents);
+      setAgents(response?.data?.agents);
+      setFilteredAgents(response?.data?.agents);
     } catch (error) {
       console.error("Error fetching agent data:", error);
     }
@@ -108,13 +108,13 @@ const AgentManagement = () => {
               className=" w-full h-full border-gray-300 rounded-xl   hover:border-gray-400 focus:border-gray-400 transition-all duration-300 border-2 outline-0 py-2 pl-10"
               value={searchTerm}
               onChange={(e) => {
-                setSearchTerm(e.target.value);
-                const filter = agents.filter(
+                setSearchTerm(e?.target?.value);
+                const filter = agents?.filter(
                   (agent) =>
                     (agent?.firstName + " " + agent?.lastName)
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase()) ||
-                    agent._id.toString().includes(searchTerm)
+                      ?.toLowerCase()
+                      ?.includes(searchTerm?.toLowerCase()) ||
+                    agent?._id?.toString()?.includes(searchTerm)
                 );
                 setFilteredAgents(filter);
               }}
@@ -166,14 +166,14 @@ const AgentManagement = () => {
             <span className="w-full text-center">Status</span>
           </div>
           <div className="h-14/16  overflow-y-auto">
-            {filteredAgents.map((agent) => (
+            {filteredAgents?.map((agent) => (
               <div
-                key={agent._id}
+                key={agent?._id}
                 onClick={() => handleViewDetails(agent)}
                 className="grid text-center h-13.4 border-b-1 w-full border-gray-300 px-4 grid-cols-5  hover:bg-gray-100 cursor-pointer rounded-md"
               >
                 <div className="px-1 flex items-center justify-center pr-2 py-3">
-                  #{agent._id.toLocaleString()}
+                  #{agent?._id?.toLocaleString()}
                 </div>
 
                 <div className="px-1 py-3 flex items-center pl-2 justify-center font-medium text-gray-800">
@@ -183,11 +183,11 @@ const AgentManagement = () => {
                 </div>
 
                 <div className="px-1 flex items-center pl-4 justify-center py-3">
-                  ₹{agent.securityDeposit.toLocaleString()}
+                  ₹{agent?.securityDeposit?.toLocaleString()}
                 </div>
 
                 <div className="px-1 flex items-center pl-7 justify-center py-3">
-                  ₹{agent.balance.toLocaleString()}
+                  ₹{agent?.balance?.toLocaleString()}
                 </div>
 
                 <div className=" pl-9 mx-10 py-3">
@@ -198,7 +198,7 @@ const AgentManagement = () => {
           </div>
         </div>
 
-        {filteredAgents.length === 0 && (
+        {filteredAgents?.length === 0 && (
           <div className="text-center py-8">
             <p className="text-gray-500">
               No agents found matching your search criteria.

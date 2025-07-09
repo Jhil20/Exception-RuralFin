@@ -29,7 +29,7 @@ const AgentDetailsModal = ({ isOpen, onClose, agent }) => {
   const getAlltransactions = async () => {
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/api/agentToUserTransaction/${agent._id}`,{
+        `${BACKEND_URL}/api/agentToUserTransaction/${agent?._id}`,{
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -53,8 +53,8 @@ const AgentDetailsModal = ({ isOpen, onClose, agent }) => {
             <Card className="h-full">
               <div className="flex flex-col items-center">
                 <div className="h-20 w-20 rounded-full bg-gray-900 flex items-center justify-center text-white text-2xl font-bold mb-4">
-                  {agent?.firstName[0].toUpperCase() +
-                    agent?.lastName[0].toUpperCase()}
+                  {agent?.firstName[0]?.toUpperCase() +
+                    agent?.lastName[0]?.toUpperCase()}
                 </div>
 
                 <h3 className="text-xl font-semibold text-gray-800">
@@ -63,7 +63,7 @@ const AgentDetailsModal = ({ isOpen, onClose, agent }) => {
                     capitalize(agent?.lastName)}
                 </h3>
                 <p className="text-gray-500 mb-4">
-                  Agent #{agent._id.toLocaleString()}
+                  Agent #{agent?._id?.toLocaleString()}
                 </p>
 
                 <div
@@ -104,7 +104,7 @@ const AgentDetailsModal = ({ isOpen, onClose, agent }) => {
                     <Calendar size={16} className="text-gray-500 mr-3" />
                     <span className="text-gray-700">
                       Joined :{" "}
-                      {new Date(agent?.createdAt).toLocaleDateString("en-US", {
+                      {new Date(agent?.createdAt)?.toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "short",
                         day: "numeric",
@@ -123,7 +123,7 @@ const AgentDetailsModal = ({ isOpen, onClose, agent }) => {
                   <div>
                     <p className="text-gray-500 text-sm">Balance</p>
                     <p className="text-2xl font-bold text-gray-800">
-                      ₹{agent?.balance.toLocaleString()}
+                      ₹{agent?.balance?.toLocaleString()}
                     </p>
                   </div>
                   <div className="p-3 bg-gray-900 rounded-lg text-white">
@@ -137,7 +137,7 @@ const AgentDetailsModal = ({ isOpen, onClose, agent }) => {
                   <div>
                     <p className="text-gray-500 text-sm">Security Deposit</p>
                     <p className="text-2xl font-bold text-gray-800">
-                      ₹{agent?.securityDeposit.toLocaleString()}
+                      ₹{agent?.securityDeposit?.toLocaleString()}
                     </p>
                   </div>
                   <div className="p-3 bg-gray-900 rounded-lg text-white">
@@ -151,7 +151,7 @@ const AgentDetailsModal = ({ isOpen, onClose, agent }) => {
                   <div>
                     <p className="text-gray-500 text-sm">Commission Earned</p>
                     <p className="text-2xl font-bold text-gray-800">
-                      ₹{agent?.commissionEarned.toLocaleString()}
+                      ₹{agent?.commissionEarned?.toLocaleString()}
                     </p>
                   </div>
                   <div className="p-3 bg-gray-900 rounded-lg text-white">
@@ -175,13 +175,13 @@ const AgentDetailsModal = ({ isOpen, onClose, agent }) => {
                   </thead>
                   <tbody className="divide-y h-10/12  overflow-y-auto divide-gray-200">
                     {transactions
-                      .filter((tr) => tr.status == "completed")
-                      .map((transaction) => (
+                      ?.filter((tr) => tr?.status == "completed")
+                      ?.map((transaction) => (
                         <tr key={transaction?._id}>
                           <td className="px-4 py-3 whitespace-nowrap">
                             {new Date(
                               transaction?.transactionDate
-                            ).toLocaleDateString()}
+                            )?.toLocaleDateString()}
                           </td>
                           <td className="px-4 py-3 whitespace-nowrap">
                             <span
@@ -195,13 +195,13 @@ const AgentDetailsModal = ({ isOpen, onClose, agent }) => {
                             </span>
                           </td>
                           <td className="px-4 text-center pr-7 py-3 whitespace-nowrap font-medium">
-                            ₹{transaction?.amount.toLocaleString()}
+                            ₹{transaction?.amount?.toLocaleString()}
                           </td>
                           <td className="px-4 py-3 text-center pr-7 whitespace-nowrap font-medium">
-                            ₹{transaction?.commission.toLocaleString()}
+                            ₹{transaction?.commission?.toLocaleString()}
                           </td>
                           <td className="px-4 py-3 whitespace-nowrap">
-                            #{transaction?.userId._id.toLocaleString()}
+                            #{transaction?.userId?._id?.toLocaleString()}
                           </td>
                         </tr>
                       ))}
