@@ -84,7 +84,7 @@ const AgentDetailsModal = ({ isOpen, onClose, agent }) => {
 
                   <div className="flex items-start">
                     <MapPin size={16} className="text-gray-500 mr-3 mt-1" />
-                    <span className="text-gray-700">{agent?.address}</span>
+                    <span className="text-gray-700">{agent?.city}, {agent?.state}, {agent?.country}-{agent?.zipCode}</span>
                   </div>
                   <div className="flex items-start">
                     <IdCard size={16} className="text-gray-500 mr-3 mt-1" />
@@ -151,7 +151,9 @@ const AgentDetailsModal = ({ isOpen, onClose, agent }) => {
                   <div>
                     <p className="text-gray-500 text-sm">Commission Earned</p>
                     <p className="text-2xl font-bold text-gray-800">
-                      ₹{agent?.commissionEarned?.toLocaleString()}
+                      ₹{transactions?.filter((tr)=>tr?.status == "completed")?.reduce((acc,tr)=>{
+                        return tr?.commission+acc;
+                      },0).toLocaleString()}
                     </p>
                   </div>
                   <div className="p-3 bg-gray-900 rounded-lg text-white">

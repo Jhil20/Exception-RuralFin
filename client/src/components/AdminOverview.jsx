@@ -87,7 +87,8 @@ const AdminOverview = () => {
       // );
       setTransactionVolumeData((prevData) => ({
         ...prevData,
-        todayTransactions: prevData?.todayTransactions + data?.transaction?.amount,
+        todayTransactions:
+          prevData?.todayTransactions + data?.transaction?.amount,
         thisWeekTransactions:
           prevData?.thisWeekTransactions + data?.transaction?.amount,
         thisMonthTransactions:
@@ -449,7 +450,14 @@ const AdminOverview = () => {
                           transactionVolumeData?.todayTransactions,
                           transactionVolumeData?.yesterdayTransactions
                         )
-                      )}
+                      )
+                        ? 0
+                        : Math.abs(
+                            findChange(
+                              transactionVolumeData?.todayTransactions,
+                              transactionVolumeData?.yesterdayTransactions
+                            )
+                          )}
                       %
                     </span>
                   </div>
@@ -487,7 +495,14 @@ const AdminOverview = () => {
                           transactionVolumeData?.thisWeekTransactions,
                           transactionVolumeData?.lastWeekTransactions
                         )
-                      )}
+                      ) == 0
+                        ? 100
+                        : Math.abs(
+                            findChange(
+                              transactionVolumeData?.thisWeekTransactions,
+                              transactionVolumeData?.lastWeekTransactions
+                            )
+                          )}
                       %
                     </span>
                   </div>
@@ -525,7 +540,14 @@ const AdminOverview = () => {
                           transactionVolumeData?.thisMonthTransactions,
                           transactionVolumeData?.lastMonthTransactions
                         )
-                      )}
+                      )
+                        ? 0
+                        : Math.abs(
+                            findChange(
+                              transactionVolumeData?.thisMonthTransactions,
+                              transactionVolumeData?.lastMonthTransactions
+                            )
+                          )}
                       %
                     </span>
                   </div>

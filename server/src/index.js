@@ -36,6 +36,7 @@ const httpServer = createServer(app);
 
 const corsOptions = {
   origin: "https://ruralfin.netlify.app", 
+  // origin:"*",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,                      
 };

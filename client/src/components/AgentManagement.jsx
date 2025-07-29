@@ -47,12 +47,12 @@ const AgentManagement = () => {
 
   const getAgentData = async () => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/api/agent/`,{
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      //console.log("Agent data fetched successfully:", response.data);
+      const response = await axios.get(`${BACKEND_URL}/api/agent/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      // console.log("Agent data fetched successfully:", response.data);
       setAgents(response?.data?.agents);
       setFilteredAgents(response?.data?.agents);
     } catch (error) {
@@ -109,6 +109,10 @@ const AgentManagement = () => {
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e?.target?.value);
+                if(searchTerm==""){
+                  setFilteredAgents(agents);
+                  return;
+                }
                 const filter = agents?.filter(
                   (agent) =>
                     (agent?.firstName + " " + agent?.lastName)
@@ -210,7 +214,10 @@ const AgentManagement = () => {
       {selectedAgent && (
         <AgentDetailsModal
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedAgent(null);
+          }}
           agent={selectedAgent}
         />
       )}

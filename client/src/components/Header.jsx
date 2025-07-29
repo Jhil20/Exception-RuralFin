@@ -35,7 +35,9 @@ const Header = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const token = Cookies.get("token");
   const decoded = useMemo(() => {
-    if (token) return jwtDecode(token);
+    if (token) {
+      return jwtDecode(token);
+    }
     return null;
   }, [token]);
 
@@ -62,7 +64,12 @@ const Header = () => {
     }
   };
 
+  useEffect(()=>{
+    getNotifications();
+  },[location.pathname]);
+
   const getNotifications = async () => {
+    // console.log("get Notifications called");
     try {
       if (decoded) {
         const type = location.pathname === "/dashboard" ? "User" : "Agent";
@@ -77,11 +84,12 @@ const Header = () => {
           {
             userId: decoded.id,
             userType: type,
-          },{
-          headers: {
-            Authorization: `Bearer ${token}`,
           },
-        }
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         // console.log("Notifications fetched:", response.data);
         setNotifications(response.data.data);
@@ -91,9 +99,9 @@ const Header = () => {
     }
   };
 
-  useEffect(() => {
-    getNotifications();
-  }, [decoded]);
+  // useEffect(() => {
+  //   getNotifications();
+  // }, [decoded]);
 
   useEffect(() => {
     if (!decoded) return;
@@ -141,7 +149,8 @@ const Header = () => {
         `${BACKEND_URL}/api/notification/updateNotificationRead`,
         {
           notificationId,
-        },{
+        },
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -162,7 +171,8 @@ const Header = () => {
         {
           userId: decoded.id,
           userType: location.pathname === "/dashboard" ? "User" : "Agent",
-        },{
+        },
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -345,7 +355,6 @@ const Header = () => {
                   >
                     Budget Tracking
                   </Link>
-                  
                 </>
               ) : (
                 <>

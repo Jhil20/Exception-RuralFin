@@ -246,7 +246,9 @@ const UserManagement = () => {
       {selectedUser && (
         <UserDetailsModal
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {setIsModalOpen(false)
+            setSelectedUser(null);
+          }}
           user={selectedUser}
         />
       )}

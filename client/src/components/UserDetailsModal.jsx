@@ -20,7 +20,8 @@ import { BACKEND_URL } from "../utils/constants";
 import Cookies from "js-cookie";
 
 const UserDetailsModal = ({ isOpen, onClose, user }) => {
-const token=Cookies.get("token");
+  const token = Cookies.get("token");
+  console.log("User details modal user:", user);
   const [transactions, setTransactions] = useState([]);
 
   const getAllTransactions = async () => {
@@ -85,7 +86,7 @@ const token=Cookies.get("token");
                   </div>
                   <div className="flex items-center">
                     <House size={16} className="text-gray-500 mr-3" />
-                    <span className="text-gray-700">{user?.address}</span>
+                    <span className="text-gray-700">{user?.city}, {user?.state}, {user?.country}-{user?.zipCode}</span>
                   </div>
                   <div className="flex items-center">
                     <Calendar size={16} className="text-gray-500 mr-3" />
@@ -131,7 +132,7 @@ const token=Cookies.get("token");
                   <div>
                     <p className="text-gray-500 text-sm">Total Transactions</p>
                     <p className="text-2xl font-bold text-gray-800">
-                      {user?.totalTransactions}
+                      {transactions?.filter((tr)=>tr?.status=="completed").length}
                     </p>
                   </div>
                   <div className="p-3 bg-gray-200 rounded-lg text-gray-800">
@@ -145,72 +146,79 @@ const token=Cookies.get("token");
               <div className="overflow-x-auto">
                 <Card className="h-[48.8vh] mb-5" title={"Transaction History"}>
                   <div className="overflow-x-auto h-10/12">
-                    <table className="min-w-full">
-                      <thead>
-                        <tr className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          <th className="pl-18 py-3">Date</th>
-                          <th className="pl-11 py-3">Type</th>
-                          <th className="px-4 pl-6 py-3">Conversion</th>
-                          <th className="px-4 pl-5 py-3">Amount</th>
-                          <th className="px-4 pl-17 py-3">User/Agent</th>
-                        </tr>
-                      </thead>
-
-                      <tbody className="divide-y divide-gray-200">
-                        {transactions?.map((transaction) => (
-                          <tr key={transaction?._id}>
-                            <td className="px-4 text-center py-3 text-sm whitespace-nowrap">
-                              {new Date(
-                                transaction?.transactionDate
-                              )?.toLocaleDateString("en-IN", {
-                                year: "numeric",
-                                month: "2-digit",
-                                day: "2-digit",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                hour12: true,
-                              })}
-                            </td>
-                            <td className="px-4 text-center text-sm py-3 whitespace-nowrap">
-                              <span>{transaction?.type}</span>
-                            </td>
-                            {transaction?.type == "User to User" ? (
-                              <td className="px-4 text-center text-sm py-3 whitespace-nowrap">
-                                <span>
-                                  {transaction?.senderId?._id == user?._id
-                                    ? "Debit"
-                                    : "Credit"}
-                                </span>
-                              </td>
-                            ) : (
-                              <td className="px-4 text-center text-sm py-3 whitespace-nowrap">
-                                <span>
-                                  {transaction?.conversionType ==
-                                  "cashToERupees"
-                                    ? "Deposit"
-                                    : "Withdraw"}
-                                </span>
-                              </td>
-                            )}
-                            <td className="px-4 text-center py-3 whitespace-nowrap font-medium">
-                              ₹{transaction?.amount?.toLocaleString()}
-                            </td>
-
-                            {transaction?.type == "User to User" ? (
-                              <td className="px-4 text-center py-3 text-sm whitespace-nowrap">
-                                {transaction?.senderId?._id == user?._id
-                                  ? transaction?.receiverId?._id
-                                  : transaction?.senderId?._id}
-                              </td>
-                            ) : (
-                              <td className="px-4 text-center text-sm py-3 whitespace-nowrap">
-                                {transaction?.agentId?._id}
-                              </td>
-                            )}
+                    {transactions.length!=0 && (
+                      <table className="min-w-full">
+                        <thead>
+                          <tr className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th className="pl-18 py-3">Date</th>
+                            <th className="pl-11 py-3">Type</th>
+                            <th className="px-4 pl-6 py-3">Conversion</th>
+                            <th className="px-4 pl-5 py-3">Amount</th>
+                            <th className="px-4 pl-17 py-3">User/Agent</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+
+                        <tbody className="divide-y divide-gray-200">
+                          {transactions?.map((transaction) => (
+                            <tr key={transaction?._id}>
+                              <td className="px-4 text-center py-3 text-sm whitespace-nowrap">
+                                {new Date(
+                                  transaction?.transactionDate
+                                )?.toLocaleDateString("en-IN", {
+                                  year: "numeric",
+                                  month: "2-digit",
+                                  day: "2-digit",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  hour12: true,
+                                })}
+                              </td>
+                              <td className="px-4 text-center text-sm py-3 whitespace-nowrap">
+                                <span>{transaction?.type}</span>
+                              </td>
+                              {transaction?.type == "User to User" ? (
+                                <td className="px-4 text-center text-sm py-3 whitespace-nowrap">
+                                  <span>
+                                    {transaction?.senderId?._id == user?._id
+                                      ? "Debit"
+                                      : "Credit"}
+                                  </span>
+                                </td>
+                              ) : (
+                                <td className="px-4 text-center text-sm py-3 whitespace-nowrap">
+                                  <span>
+                                    {transaction?.conversionType ==
+                                    "cashToERupees"
+                                      ? "Deposit"
+                                      : "Withdraw"}
+                                  </span>
+                                </td>
+                              )}
+                              <td className="px-4 text-center py-3 whitespace-nowrap font-medium">
+                                ₹{transaction?.amount?.toLocaleString()}
+                              </td>
+
+                              {transaction?.type == "User to User" ? (
+                                <td className="px-4 text-center py-3 text-sm whitespace-nowrap">
+                                  {transaction?.senderId?._id == user?._id
+                                    ? transaction?.receiverId?._id
+                                    : transaction?.senderId?._id}
+                                </td>
+                              ) : (
+                                <td className="px-4 text-center text-sm py-3 whitespace-nowrap">
+                                  {transaction?.agentId?._id}
+                                </td>
+                              )}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                    {!transactions.length && (
+                      <div className="text-center h-full w-full flex items-center justify-center py-8 pb-10">
+                        <p className="text-gray-500 text-xl">No transactions found.</p>
+                      </div>
+                    )}
                   </div>
                 </Card>
               </div>
